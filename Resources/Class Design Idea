@@ -1,0 +1,55 @@
+Here's my idea for the outlay of the classes --CJB
+
+Main Class
+    Runs all other classes and takes input/output and communicates with GUI and user.
+
+    Constructor()
+        Run GUI -> wait for response
+
+Brute Force Class
+    Runs Brute-Forcer, can interact using functions (methods)
+
+    Constructor()
+        Get all info we need through parameters
+
+    Set & Get functions...()
+        Set and get information ie: getChunks() -> returns chunks for nodes
+
+Dictionary Attack Class
+    Runs the dictionary attack, can interact using functions (methods)
+
+    Constructor()
+        Get all info we need through parameters (not file)
+
+    Set & Get functions...()
+        Set and get information ie: getFile() -> returns the wordlist file
+
+Rainbow Table Creator Class
+    Runs a Rainbow Table Creator, can interact using functions (methods)
+
+    Constructor()
+        Get all info we need through parameters (not file)
+
+    Set & Get functions...()
+        Set and get information ie: getFile() -> returns the file (table) to be created
+
+Rainbow Table User Class
+    Runs a Rainbow Table Attack using a given file (table), can interact using functions (methods)
+
+    Constructor()
+        Get all info we need through parameters (not file)
+
+    Set & Get functions...()
+        Set and get info ie: getFile() -> returns the file (table) to be used
+
+GUI Class
+    Runs the GUI app, can interact using functions (methods)
+
+    Constructor()
+        Does nothing?
+
+    Set & Get functions...()
+        Set and get info ie: setHashSpeed() -> sets current hash speed to be displayed
+
+    Screen functions....()
+        Show this or that screen ie: showMainScreen() -> Shows user main screen
