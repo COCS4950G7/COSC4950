@@ -3,6 +3,8 @@ __author__ = 'ChrisBugg'
 #   Chris Bugg
 #   10/1/14
 
+#   NOTE: Runs on Python 2.7.6
+
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
