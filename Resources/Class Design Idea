@@ -1,4 +1,4 @@
-Here's my idea for the outlay of the classes --CJB
+Here's my (current) ideas for the outlay of the classes --CJB
 
 Main Class
     Runs all other classes and takes input/output and communicates with GUI and user.
@@ -50,6 +50,3 @@ GUI Class
 
     Set & Get functions...()
         Set and get info ie: setHashSpeed() -> sets current hash speed to be displayed
-
-    Screen functions....()
-        Show this or that screen ie: showMainScreen() -> Shows user main screen
