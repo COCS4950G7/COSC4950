@@ -1,6 +1,3 @@
-# Chris Hamm was here...... yay
-__author__ = 'ChrisBugg'
-
 #   Chris Bugg
 #   10/1/14
 
@@ -16,16 +13,16 @@ from time import time
 from multiprocessing import Process, Pipe, Lock
 import os
 
-class DemoCrack():
+class DemoCrack1():
 
     algorithm = "sha256"
     origHash = ''
     #alphabet = list("0123456789")
-    alphabet = list("abcdefghijklmnopqrstuvwxyz")
+    alphabet = list("0123456789")
     chunk1 = 1
     chunk2 = 1
     key = ''
-    alphaChoice = "abcdefghijklmnopqrstuvwxyz"
+    alphaChoice = "0123456789"
     countey = 0
 
 
@@ -231,7 +228,7 @@ class DemoCrack():
 
     def getHash(self):
 
-        key = raw_input("What's the 6 LowerCase-Letter Key: ")
+        key = raw_input("What's the 6 DIGIT Key: ")
 
         self.key = key
 
@@ -314,4 +311,4 @@ class DemoCrack():
 
         return False
 
-DemoCrack()
+DemoCrack1()
