@@ -1,5 +1,3 @@
-__author__ = 'ChrisBugg'
-
 #   Brute_Force.py
 
 #   This class does all the Brute Forceing work,

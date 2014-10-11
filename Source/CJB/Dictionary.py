@@ -1,4 +1,9 @@
-__author__ = 'ChrisBugg'
+#   Dictonary.py
+
+#   DESCRIPTION HERE
+
+#   Chris Bugg
+#   10/7/14
 
 class Dictionary():
 

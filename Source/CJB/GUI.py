@@ -1,4 +1,3 @@
-__author__ = 'ChrisBugg'
 #   GUI.py
 
 #   This is the class that controls and displays
@@ -8,8 +7,11 @@ __author__ = 'ChrisBugg'
 #   Chris Bugg
 #   10/7/14
 
+#   Updated - 10/11/14 (CJB)
+#               -> Added Tkinter example and stand-alone ability (if uncommented)
 
 #Inputs
+import Tkinter
 
 #GUI class
 class GUI():
@@ -21,8 +23,24 @@ class GUI():
 
     #Contructor
     def __init__(self):
-
         done = True
+
+        """""
+        #Uncomment for Tkinter GUI example
+
+        myContainer1 = Tkinter.Frame()
+        myContainer1.pack()
+
+        button1 = Tkinter.Button(myContainer1)
+        button1["text"]="Hello, World!"
+        button1["background"] = "green"
+        button1.pack()
+
+        myContainer1.mainloop()
+        """""
+
+
+
 
     #Returns what the user picked as a string for controller class
     def getInput(self):
@@ -39,3 +57,5 @@ class GUI():
 
         self.state = futureState
 
+#Uncomment for Stand-alone running
+#GUI()
