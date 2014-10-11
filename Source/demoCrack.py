@@ -5,6 +5,11 @@ __author__ = 'ChrisBugg'
 
 #   NOTE: Runs on Python 2.7.6
 
+#   UPDATE:
+#   10/10/14
+#       -> Now runs with 8 sub-processes using
+#          the [a-z] alphabet
+
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
@@ -14,11 +19,12 @@ class DemoCrack():
 
     algorithm = "sha256"
     origHash = ''
-    alphabet = list("0123456789_")
+    #alphabet = list("0123456789")
+    alphabet = list("abcdefghijklmnopqrstuvwxyz")
     chunk1 = 1
     chunk2 = 1
     key = ''
-    alphaChoice = "0123456789_"
+    alphaChoice = "abcdefghijklmnopqrstuvwxyz"
     countey = 0
 
 
@@ -46,15 +52,57 @@ class DemoCrack():
 
         child2 = Process(target=self.subProcess, args=(childPipe, lock, ))
 
+        child3 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child5 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child6 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child7 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child8 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
         child1.start()
 
         child2.start()
+
+        child3.start()
+
+        child4.start()
+
+        child5.start()
+
+        child6.start()
+
+        child7.start()
+
+        child8.start()
 
         parentPipe.send("6")
         parentPipe.send(self.chunk1)
 
         parentPipe.send("6")
         parentPipe.send(self.chunk2)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk3)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk4)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk5)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk6)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk7)
+
+        parentPipe.send("6")
+        parentPipe.send(self.chunk8)
 
         count = 0
 
@@ -64,11 +112,23 @@ class DemoCrack():
 
         while not done:
 
-            if count > 1:
+            if count > 7:
 
                 child1.join()
 
                 child2.join()
+
+                child3.join()
+
+                child4.join()
+
+                child5.join()
+
+                child6.join()
+
+                child7.join()
+
+                child8.join()
 
                 print "No Dice!"
 
@@ -86,6 +146,18 @@ class DemoCrack():
 
                     child2.terminate()
 
+                    child3.terminate()
+
+                    child4.terminate()
+
+                    child5.terminate()
+
+                    child6.terminate()
+
+                    child7.terminate()
+
+                    child8.terminate()
+
                     done = True
 
                 count += 1
@@ -93,7 +165,7 @@ class DemoCrack():
         elapsed = (time() - start)
         print "That took: ", elapsed, " seconds."
 
-        speed = (2 * int(self.countey)) / elapsed
+        speed = (8 * int(self.countey)) / elapsed
 
         if rec == "found":
 
@@ -137,16 +209,28 @@ class DemoCrack():
 
     def chunkIt(self):
 
-        chunky = [self.alphabet[i::2] for i in range(2)]
+        chunky = [self.alphabet[i::8] for i in range(8)]
 
         self.chunk1 = chunky.pop()
 
         self.chunk2 = chunky.pop()
 
+        self.chunk3 = chunky.pop()
+
+        self.chunk4 = chunky.pop()
+
+        self.chunk5 = chunky.pop()
+
+        self.chunk6 = chunky.pop()
+
+        self.chunk7 = chunky.pop()
+
+        self.chunk8 = chunky.pop()
+
 
     def getHash(self):
 
-        key = raw_input("What's the 6 DIGIT Key: ")
+        key = raw_input("What's the 6 LowerCase-Letter Key: ")
 
         self.key = key
 
