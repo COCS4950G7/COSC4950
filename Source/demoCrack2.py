@@ -17,13 +17,11 @@ class DemoCrack():
 
     algorithm = "sha256"
     origHash = ''
-    #alphabet = list("0123456789")
-    #alphabet = list("abcdefghijklmnopqrstuvwxyz")
-    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") #added by chris h
+    alphabet = list("abcdefghijklmnopqrstuvwxyz")
     chunk1 = 1
     chunk2 = 1
     key = ''
-    alphaChoice = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" # changed by chris h
+    alphaChoice = "abcdefghijklmnopqrstuvwxyz"
     countey = 0
 
 

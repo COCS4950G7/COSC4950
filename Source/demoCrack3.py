@@ -5,22 +5,23 @@
 
 #   UPDATE:
 #   10/10/14
-#       -> Now runs with 8 sub-processes using [0-9]
+#       -> Now runs with 8 sub-processes using
+#          the [a-z,A-Z,0-9] alphabet
 
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
 import os
 
-class DemoCrack1():
+class DemoCrack():
 
     algorithm = "sha256"
     origHash = ''
-    alphabet = list("0123456789")
+    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") #added by chris h
     chunk1 = 1
     chunk2 = 1
     key = ''
-    alphaChoice = "0123456789"
+    alphaChoice = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" # changed by chris h
     countey = 0
 
 
@@ -226,7 +227,7 @@ class DemoCrack1():
 
     def getHash(self):
 
-        key = raw_input("What's the 6 DIGIT Key: ")
+        key = raw_input("What's the 6 LowerCase-Letter Key: ")
 
         self.key = key
 
@@ -309,4 +310,4 @@ class DemoCrack1():
 
         return False
 
-DemoCrack1()
+DemoCrack()
