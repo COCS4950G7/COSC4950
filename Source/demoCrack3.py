@@ -8,10 +8,11 @@
 #       -> Now runs with 8 sub-processes using
 #          the [a-z,A-Z,0-9] alphabet
 #
-#    10/12/2014 UPDATE: Ubuntu 14.04 and Windows 7 have commited to this project by Chris H
+#    10/12/2014 UPDATE: Ubuntu 14.04, OS X, and Windows 7 have commited to this project by Chris H
     #           Ubuntu GUI ran 1.71 million hashes per minute on Overclocked Tower 4.0GHz
     #           Ubuntu Terminal ran 1.81 million hashes per minute on Overclocked tower 4.0GHz
     #           Windows 7 ERROR!!! does not run code correctly. Didnt even try to crack the hash
+    #           OS X ran 371,000 hashes per second
 
 import hashlib
 from time import time
