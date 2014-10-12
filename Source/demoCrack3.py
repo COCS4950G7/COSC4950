@@ -7,6 +7,7 @@
 #   10/10/14
 #       -> Now runs with 8 sub-processes using
 #          the [a-z,A-Z,0-9] alphabet
+#   UPDATE: Ubuntu 14.04 and Windows 7 have commited to this project by Chris H
 
 import hashlib
 from time import time
