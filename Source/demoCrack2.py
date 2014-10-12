@@ -19,11 +19,11 @@ class DemoCrack():
     origHash = ''
     #alphabet = list("0123456789")
     #alphabet = list("abcdefghijklmnopqrstuvwxyz")
-    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") #added by chris h
     chunk1 = 1
     chunk2 = 1
     key = ''
-    alphaChoice = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    alphaChoice = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" # changed by chris h
     countey = 0
 
 
