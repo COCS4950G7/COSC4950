@@ -14,6 +14,11 @@
     #           Windows 7 ERROR!!! does not run code correctly. Didnt even try to crack the hash
     #           OS X ran 371,000 hashes per second
 
+#   10/13/14
+#       ->  Now runs on Windows systems
+#           Put another lock on subprocess progress display to solve overwriting on Windows
+#           (CJB)
+
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
@@ -32,6 +37,17 @@ class DemoCrack():
 
 
     def __init__(self):
+
+        #Code to fix the windows errors
+        """
+        Details:
+        This 'catches' the sub-processes on windows
+        so they don't execute the constructor, cause
+        Windows processes are stupid.
+        """
+        if not __name__ == '__main__':
+
+            return
 
         os.system('cls' if os.name == 'nt' else 'clear')
         self.whatWeGot()
@@ -187,7 +203,7 @@ class DemoCrack():
 
         lock.release()
 
-        if self.looper6(alphabet) == True:
+        if self.looper6(alphabet, lock) == True:
 
             lock.acquire()
 
@@ -290,11 +306,16 @@ class DemoCrack():
             return False
 
 
-    def looper6(self, alphabet):
+    def looper6(self, alphabet, lock):
 
         for x in alphabet:
 
+            #Processes were overwriting, so locking this print too --CJB
+            lock.acquire()
+
             print "Searching ...", x, "*****"
+
+            lock.release()
 
             for y in self.alphabet:
 

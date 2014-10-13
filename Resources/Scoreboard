@@ -19,7 +19,12 @@ At about:  1130677.21394  hashes per second.
 
 OS X ran 371,000 hashes per second
 
-5. Chris B (Ubuntu 14+ on 2x2.2GHz w/4GB RAM)
+5. Chris B (Ubuntu 14+ on 2x2.2 GHz w/4GB RAM)
 
 That took:  331.008501053  seconds.
 At about:  357122.84012  hashes per second.
+
+6. Chris B (Win7 on 2x2.2 GHz w/4GB RAM)
+
+That took:  443.42200017  seconds.
+At about:  266587.350097  hashes per second.
