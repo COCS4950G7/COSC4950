@@ -2,29 +2,59 @@ Post Top Scores!
 
 --- demoCrack3.py solving 'aa9999'
 
-1. Chris H:
+-> Chris H:
 
 Ubuntu Terminal ran 1.81 million hashes per minute on Overclocked tower 4.0GHz
 
-2. Chris H
+-> Chris H
 
 Ubuntu GUI ran 1.71 million hashes per minute on Overclocked Tower 4.0GHz
 
-3. hive1:
+-> hive1 (Linux on 8x2.1GHz w/12.3GB RAM)
 
 That took:  104.548578978  seconds.
 At about:  1130677.21394  hashes per second.
 
-4. Chris H
+-> fish16 (Linux on 4x1.6GHz w/8GB RAM)
+
+That took:  138.570836067  seconds.
+At about:  853070.525913  hashes per second.
+
+-> fish11 (Linux on 4x1.2GHz w/3.8GB RAM)
+
+That took:  247.813817024  seconds.
+At about:  477014.14481  hashes per second.
+
+-> Chris H
 
 OS X ran 371,000 hashes per second
 
-5. Chris B (Ubuntu 14+ on 2x2.2 GHz w/4GB RAM)
+-> Chris B (Ubuntu 14+ on 2x2.2 GHz w/4GB RAM)
 
 That took:  331.008501053  seconds.
 At about:  357122.84012  hashes per second.
 
-6. Chris B (Win7 on 2x2.2 GHz w/4GB RAM)
+-> fish17 (Linux on 2x2GHz w/3.9GB RAM)
+
+That took:  366.461498022  seconds.
+At about:  322573.303438  hashes per second.
+
+-> Chris B (Win7 on 2x2.2 GHz w/4GB RAM)
 
 That took:  443.42200017  seconds.
 At about:  266587.350097  hashes per second.
+
+
+
+Here's the stats for all the fish fyi (fish.cs.uwyo.edu ssh from hive):
+
+fish11 (Linux on 4x1.2GHz w/3.8GB RAM)
+fish12 (Linux on 4x1.2GHz w/3.8GB RAM)
+fish13 (Linux on 4x1.2GHz w/3.8GB RAM)
+fish14 (Linux on 4x1.2GHz w/3.8GB RAM)
+fish15 (Linux on 4x1.2GHz w/3.8GB RAM)
+fish16 (Linux on 4x1.6GHz w/8GB RAM)
+fish17 (Linux on 2x2GHz w/3.9GB RAM)
+fish18 (Linux on 2x2GHz w/3.9GB RAM)
+fish19 (Linux on 2x2GHz w/3.9GB RAM)
+fish20 (Linux on 2x2GHz w/3.9GB RAM)
