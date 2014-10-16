@@ -1,24 +1,11 @@
 __author__ = 'chris'
 #TESTING********ONLY*************
+import socket #import socket module
 
-import socket
-import sys
+s = socket.socket() #create a socket object
+host = '192.168.1.141' #Host i.p
+port = 12397 #Reserve a port for your service
 
-HOST, PORT = "localhost", 9999
-data = " ".join(sys.argv[1:])
-
-# Create a socket (SOCK_STREAM means a TCP socket)
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-try:
-    # Connect to server and send data
-    sock.connect((HOST, PORT))
-    sock.sendall(data + "\n")
-
-    # Receive data from the server and shut down
-    received = sock.recv(1024)
-finally:
-    sock.close()
-
-print "Sent:     {}".format(data)
-print "Received: {}".format(received)
+s.connect((host,port))
+print s.recv(1024)
+s.close
