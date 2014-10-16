@@ -34,6 +34,8 @@ class Dictionary():
     hash = ""
     status = ""
     found = False
+    file = 0
+    key = ""
 
     #Constructor
     def __init__(self):
@@ -43,34 +45,97 @@ class Dictionary():
     #Sets algorithm to be used
     def setAlgorithm(self, algorithm):
 
-        x=1
+        self.algorithm = algorithm
 
     #Sets the dictionary file's name
     def setFileName(self, fileName):
 
-        x=1
+        self.fileName = fileName
 
     #Sets the original hash we're looking for
     def setHash(self, hash):
 
-        x=1
+        self.hash = hash
 
     #Actually finds the hash in the file (hopefully)
     def find(self):
 
-        x=1
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Put all the lines of the file in a list
+        allLinesList = list(self.file)
+
+        self.file.close()
+
+        listSize = len(allLinesList)
+        countey = 0
+        #self.status = "Searching"
+
+        #for every item in the allLinesList list
+        for x in allLinesList:
+
+            self.status = (countey / listSize), " %"
+            countey += 1
+
+            #Split the string into a list
+            xLineToList = x.split()
+
+            #Check if it's empty (or eof)
+            if xLineToList:
+
+                #If it's not, extract the word (leaving an '/n')
+                newX = xLineToList.pop()
+
+            else:
+
+                #Otherwise give it an empty value that doesn't crash the program
+                newX = ""
+
+            #if the hashes match, YAY, return to get out of function
+            if self.hashThis(newX) == self.hash:
+
+                self.key = newX
+
+                self.done = True
+
+                self.found = True
+
+                return 0
+
+        #Otherwise...
+        self.found = False
+
+        self.done = True
 
     #Returns T/F if done searching or not
-    def done(self):
+    def isDone(self):
 
-        x=1
+        return self.done
 
     #Returns status summary of searching so far
-    def status(self):
+    def getStatus(self):
 
-        x=1
+        return self.status
 
-    #
-    def found(self):
+    #Returns T/F if found or not
+    def isFound(self):
 
-        x=1
+        return self.found
+
+    #Hashes a key
+    def hashThis(self, key):
+
+        thisHash = hashlib.md5(key).hexdigest()
+
+        return thisHash
+
+    #Returns key
+    def showKey(self):
+
+        return self.key
+
+    #Returns hash
+    def getHash(self):
+
+        return self.hash

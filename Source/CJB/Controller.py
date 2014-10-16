@@ -876,7 +876,7 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 ###userInput = GUI.getInput()
                 print "============="
-                print "singleRainMakerDoingScreen"
+                print "singleDictionaryScreen"
                 print "(crackIt)"
                 print "(back)"
                 print "(Exit)"
@@ -914,17 +914,21 @@ class Controller():
 
                 #display results and wait for user interaction
 
+                print "============="
+                print "singleDictionarySearchingScreen"
+
                 #Actually start the search
                 self.dictionary.find()
 
+                #This is broke!!!!!!!!!! doesn't actually display a status (cause it's on the same process as .find()
                 #While it's not done searching, wait and display progress
-                while not self.dictionary.done():
+                while not self.dictionary.isDone():
 
                     ###GUI.setStatus(self.dictionary.status())
-                    print self.dictionary.status()
-                    time.sleep(5)
+                    print self.dictionary.getStatus()
+                    time.sleep(.1)
 
-                if self.dictionary.found():
+                if self.dictionary.isFound():
 
                     self.state = "singleDictionaryFoundScreen"
 
@@ -936,7 +940,7 @@ class Controller():
                 ###userInput = GUI.getInput()
                 """
                 print "============="
-                print "singleRainMakerDoingScreen"
+                print "singleDictionaryNotFoundScreen"
                 print "(back)"
                 print "(Exit)"
                 userInput = raw_input("Choice: ")
@@ -960,8 +964,11 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 ###userInput = GUI.getInput()
                 print "============="
-                print "singleRainMakerDoingScreen"
-                print "(crackIt)"
+                print "singleDictionaryFoundScreen"
+
+                print "Key is: ", self.dictionary.showKey()
+                print "Wish a hash of: ", self.dictionary.getHash()
+
                 print "(back)"
                 print "(Exit)"
                 userInput = raw_input("Choice: ")
@@ -984,8 +991,7 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 ###userInput = GUI.getInput()
                 print "============="
-                print "singleRainMakerDoingScreen"
-                print "(crackIt)"
+                print "singleDictionaryNotFoundScreen"
                 print "(back)"
                 print "(Exit)"
                 userInput = raw_input("Choice: ")
