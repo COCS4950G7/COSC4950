@@ -24,6 +24,9 @@
 
 #Imports
 import hashlib
+import time
+from multiprocessing import Process, Pipe, Lock
+import os
 
 class Dictionary():
 
@@ -36,6 +39,7 @@ class Dictionary():
     found = False
     file = 0
     key = ""
+    allLinesList = []
 
     #Constructor
     def __init__(self):
@@ -58,27 +62,134 @@ class Dictionary():
         self.hash = hash
 
     #Actually finds the hash in the file (hopefully)
-    def find(self):
+    def find(self, chunkList):
 
         #Open the file for reading
-        self.file = open(self.fileName, 'r')
+        #self.file = open(self.fileName, 'r')
 
         #Put all the lines of the file in a list
-        allLinesList = list(self.file)
+        #allLinesList = list(self.file)
 
-        self.file.close()
+        #self.file.close()
 
-        listSize = len(allLinesList)
-        countey = 0
+        #Sub chunk chunkList and call processes
+        #chunky = self.chunkIt(chunkList, 4)
+        chunky = chunkList
+
+        chunk1 = chunky.pop()
+
+        chunk2 = chunky.pop()
+
+        chunk3 = chunky.pop()
+
+        chunk4 = chunky.pop()
+
+        lock = Lock()
+
+        parentPipe, childPipe = Pipe()
+
+        child1 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child2 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child3 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child1.start()
+
+        child2.start()
+
+        child3.start()
+
+        child4.start()
+
+        parentPipe.send(chunk1)
+
+        parentPipe.send(chunk2)
+
+        parentPipe.send(chunk3)
+
+        parentPipe.send(chunk4)
+
+        count = 0
+
+        done = False
+
+        rec = 0
+
+        while not done:
+
+            if count > 3:
+
+                child1.join()
+
+                child2.join()
+
+                child3.join()
+
+                child4.join()
+
+                self.found = False
+
+                self.done = True
+
+                done = True
+
+            else:
+
+                rec = parentPipe.recv()
+
+                if rec == "found":
+
+                    self.key = parentPipe.recv()
+
+                    child1.terminate()
+
+                    child2.terminate()
+
+                    child3.terminate()
+
+                    child4.terminate()
+
+                    done = True
+
+                    self.found = True
+
+                    self.done = True
+
+                count += 1
+
+        #listSize = len(chunkList)
+        #countey = 0
         #self.status = "Searching"
 
-        #for every item in the allLinesList list
-        for x in allLinesList:
+    #The sub-process function
+    def subProcess(self, pipe, lock):
 
-            self.status = (countey / listSize), " %"
-            countey += 1
+        lock.acquire()
+
+        chunkList = pipe.recv()
+
+        lock.release()
+
+        #if self.looper6(alphabet, lock ) == True:
+
+        #Do Work here
+
+        #listSize = len(chunkList)
+        #countey = 0
+        #self.status = "Searching"
+        #print "chunkList @ subprocess: ", chunkList
+        #for every item in the allLinesList list
+        for x in chunkList:
+
+            #self.status = (countey / listSize), " %"
+            #countey += 1
 
             #Split the string into a list
+            #print xLineToList
+            #print "x: ", x
             xLineToList = x.split()
 
             #Check if it's empty (or eof)
@@ -95,18 +206,36 @@ class Dictionary():
             #if the hashes match, YAY, return to get out of function
             if self.hashThis(newX) == self.hash:
 
-                self.key = newX
+                #self.key = newX
 
-                self.done = True
+                #self.done = True
 
-                self.found = True
+                #self.found = True
+
+                lock.acquire()
+
+                pipe.send("found")
+
+                pipe.send(newX)
+
+                pipe.close()
+
+                lock. release()
 
                 return 0
 
         #Otherwise...
-        self.found = False
+        #self.found = False
 
-        self.done = True
+        #self.done = True
+
+        lock.acquire()
+
+        pipe.send("not found")
+
+        pipe.close()
+
+        lock.release()
 
     #Returns T/F if done searching or not
     def isDone(self):
@@ -139,3 +268,29 @@ class Dictionary():
     def getHash(self):
 
         return self.hash
+
+    #Convers all lines of file into global list
+    def makeListOfFile(self):
+
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Put all the lines of the file in a list
+        self.allLinesList = list(self.file)
+
+        self.file.close()
+
+    #Returns list of lines in file
+    def getList(self):
+
+        return self.allLinesList
+
+    #Chunks up a list
+    def chunkIt(self, list, pieces):
+
+        chunky = [list[i::pieces] for i in range(pieces)]
+
+        #print "chunkIt gets ", list
+        #print "and gives ", chunky
+
+        return chunky

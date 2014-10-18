@@ -2,23 +2,37 @@ Post Top Scores!
 
 --- demoCrack3.py solving 'aa9999'
 
+***FOR AN EASY TO READ VERSION, ASK CHRIS HAMM FOR A COPY OF THE SPREADSHEET********
+
 -> Chris H:
 
-Ubuntu Terminal ran 1.81 million hashes per minute on Overclocked tower 4.0GHz
+Ubuntu Terminal ran 1.81 million hashes per minute on Overclocked full-tower 4.0GHz
+That took: 66.7 seconds
 
 -> Chris H
 
-Ubuntu GUI ran 1.71 million hashes per minute on Overclocked Tower 4.0GHz
+Ubuntu GUI ran 1.71 million hashes per minute on Overclocked full-Tower 4.0GHz
+That took: 69.7 seconds
 
 -> hive1 (Linux on 8x2.1GHz w/12.3GB RAM)
 
 That took:  104.548578978  seconds.
 At about:  1130677.21394  hashes per second.
 
+-> Chris H
+
+Ubuntu Terminal ran 892866 hashes per second on Native 2.44GHz mid-tower
+That took: 132.4 seconds
+
 -> fish16 (Linux on 4x1.6GHz w/8GB RAM)
 
 That took:  138.570836067  seconds.
 At about:  853070.525913  hashes per second.
+
+-> Chris H
+
+Ubuntu GUI ran 824438 hashes per second on Native 2.44GHz mid-tower
+That took: 143.4 seconds
 
 -> fish11 (Linux on 4x1.2GHz w/3.8GB RAM)
 

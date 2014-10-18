@@ -918,7 +918,13 @@ class Controller():
                 print "singleDictionarySearchingScreen"
 
                 #Actually start the search
-                self.dictionary.find()
+                self.dictionary.makeListOfFile()
+
+                bigList = self.dictionary.getList()
+
+                chunkList = self.dictionary.chunkIt(bigList, 4)
+
+                self.dictionary.find(chunkList)
 
                 #This is broke!!!!!!!!!! doesn't actually display a status (cause it's on the same process as .find()
                 #While it's not done searching, wait and display progress
