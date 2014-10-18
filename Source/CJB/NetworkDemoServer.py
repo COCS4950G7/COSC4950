@@ -11,5 +11,5 @@ while True:
     c,addr = s.accept() #Establish a connection with the client
     print "Got connection from", addr
     c.send("Thank you for connecting!")
-    c.send("crunch a 6 char password from aaaaaa to aa9999")
+    c.send("Cloud Strife was here")
     c.close()
