@@ -8,6 +8,9 @@
 #   a range of key lengths as set by max/minKeyLength. Also, added some simple
 #   if statements to support changing hashing algorithms through the algorithm variable.
 
+#   Update: 10/21/14
+#       Changed time estimate line and saw 1/3 slow-down on my machine (vs demo3)...-CJB
+
 #   Nick Baum
 #   Chris Bugg
 #   10/7/14
@@ -61,7 +64,8 @@ class Brute_Force():
         elapsed = (finish - start)
         print "That took: ", elapsed, " seconds."
 
-        speed = (8 * int(self.countey)) / elapsed
+        #This line needs to be changed to reflect the number of processes running
+        speed = (1 * int(self.countey)) / elapsed
 
         if self.rec == "found":
 
