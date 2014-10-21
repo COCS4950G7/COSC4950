@@ -3,14 +3,20 @@
 #   This class does all the Brute Forcing work,
 #   interacting with the Controller class.
 
-#   Reworked the original, using an iterable instead of manual loops has
-#   resulted in about an 8x speedup on my machine. Additionally, it will now check
-#   a range of key lengths as set by max/minKeyLength. Also, added some simple
-#   if statements to support changing hashing algorithms through the algorithm variable.
+#   Reworked the original, multiprocessing is disabled while I learn to use pools.
+#   Additionally, it will now check a range of
+#   key lengths as set by max/minKeyLength. Also, added some simple if statements
+#   to support changing hashing algorithms through the algorithm variable.
+
+#   Changed the speed calculation, still showing a modest increase in speed,
+#   around 25% in hashes per second for my machine.
+#   Overall time taken to find "aa9999" is still down from around 90 secs with
+#   8 processes on 4 cores to 38 seconds on a single process. I'm not sure about the origin
+#   of this change, presumably it searches keys in a different order and simply comes
+#   across the solution sooner.
 
 #   Nick Baum
-#   Chris Bugg
-#   10/7/14
+#   10/21/2014
 
 import hashlib
 import os
@@ -27,7 +33,7 @@ done = False
 
 class Brute_Force():
 
-    algorithm = "sha256"
+    algorithm = "sha1"
     origHash = ''
     key = ''
     rec = None
@@ -53,6 +59,8 @@ class Brute_Force():
 
         start = time()
 
+        #threadPool.imap(self.checkKeys(), keygen, 100000)
+
         self.checkKeys(keygen)
 
         finish = time()
@@ -61,7 +69,7 @@ class Brute_Force():
         elapsed = (finish - start)
         print "That took: ", elapsed, " seconds."
 
-        speed = (8 * int(self.countey)) / elapsed
+        speed = self.countey / elapsed
 
         if self.rec == "found":
 
