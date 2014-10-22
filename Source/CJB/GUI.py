@@ -11,7 +11,7 @@
 #               -> Added Tkinter example and stand-alone ability (if uncommented)
 
 #Inputs
-import Tkinter
+#import Tkinter
 
 #GUI class
 class GUI():
