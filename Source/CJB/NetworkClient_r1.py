@@ -1,6 +1,7 @@
 __author__ = 'chris'
 #chris hamm
 #NetworkClient_r1
+#CREATED: 10/22/2014
 #ER Diagram of this is available, talk to Chris Hamm if you want a copy.
 
 

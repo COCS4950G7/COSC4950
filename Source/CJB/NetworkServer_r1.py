@@ -1,6 +1,7 @@
 __author__ = 'chris'
 #chris hamm
 #networkServer_r1
+#CREATED: 10/22/2014
 #ER Diagram of this is available, talk to Chris Hamm if you want a copy.
 
 #IMPORTANT NOTE: NEED TO INSERT A CHECK TO SEE IF THERE IS NO MORE WORKLOAD TO DISTRIBUTE AND ALL NODES HAVE REPORTED
