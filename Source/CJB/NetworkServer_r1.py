@@ -3,6 +3,12 @@ __author__ = 'chris'
 #networkServer_r1
 #ER Diagram of this is available, talk to Chris Hamm if you want a copy.
 
+#IMPORTANT NOTE: NEED TO INSERT A CHECK TO SEE IF THERE IS NO MORE WORKLOAD TO DISTRIBUTE AND ALL NODES HAVE REPORTED
+#NO MATCH FOUND. NEED TO HAVE THE PROGRAM DISPLAY A MESSAGE SAYING THAT THE HASH WAS NOT FOUND
+
+
+
+
 #STARTUP SERVER#########################
 
 
