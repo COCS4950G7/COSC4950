@@ -19,6 +19,11 @@
 #           Put another lock on subprocess progress display to solve overwriting on Windows
 #           (CJB)
 
+#   10/24/2013
+#       Replaced the hashing code with an optimized version, showing around 17% speedup.
+#       Seeing 1690716 hashes per second on my laptop, up from around 1430000.
+#       Nick Baum
+
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
@@ -251,17 +256,7 @@ class DemoCrack():
 
         key = raw_input("What's the 6 LowerCase-Letter Key: ")
 
-        self.key = key
-
-        tempKey = hashlib.sha256()
-
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        self.origHash = tempKey.hexdigest()
+        self.origHash = hashlib.new(self.algorithm, key).hexdigest()
 
         print "The Key you entered was: ", key
         print "Which has a hash of: ", self.origHash
@@ -279,21 +274,13 @@ class DemoCrack():
 
     def isSolution(self, key):
 
-        tempKey = hashlib.sha256()
-
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        possible = tempKey.hexdigest()
+        possible = hashlib.new(self.algorithm, key).hexdigest()
 
         if possible == self.origHash:
 
             print
 
-            print"Solution found!"
+            print "Solution found!"
 
             print "Key is: ", key
 
