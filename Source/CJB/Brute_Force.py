@@ -5,39 +5,38 @@
 
 #   Reworked the original, multiprocessing is disabled while I learn to use pools.
 #   Additionally, it will now check a range of
-#   key lengths as set by max/minKeyLength. Also, added some simple if statements
-#   to support changing hashing algorithms through the algorithm variable.
+#   key lengths as set by max/minKeyLength.
 
-#   Changed the speed calculation, still showing a modest increase in speed,
-#   around 25% in hashes per second for my machine.
-#   Overall time taken to find "aa9999" is still down from around 90 secs with
-#   8 processes on 4 cores to 38 seconds on a single process. I'm not sure about the origin
-#   of this change, presumably it searches keys in a different order and simply comes
-#   across the solution sooner.
+#   Tried a new, more concise way of getting hashes which was only intended to allow
+#   for easy algorithm selection, but unexpectedly caused a significant speed increase.
+#   Applied it to demoCrack3 as well and got a more modest speed increase, but this code
+#   now runs at about the same single core speed as demoCrack3
 
-#   Nick Baum
-#   10/21/2014
+#   10/23 Nick Baum
+
 
 import hashlib
 import os
 import itertools
 import string
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 from time import time
 
 minKeyLength = 6
-maxKeyLength = 16
+maxKeyLength = 6
 alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
 done = False
 
 
 class Brute_Force():
 
-    algorithm = "sha1"
+    algorithm = "sha256"
     origHash = ''
     key = ''
     rec = None
     countey = 0
+    threadPool = Pool()
+
 
     def __init__(self):
 
@@ -45,6 +44,9 @@ class Brute_Force():
 
                 return
 
+        self.main()
+
+    def main(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         self.whatWeGot()
 
@@ -53,19 +55,22 @@ class Brute_Force():
         os.system('cls' if os.name == 'nt' else 'clear')
         self.whatWeGot()
 
-        keygen = itertools.chain.from_iterable(itertools.product(alphabet, repeat=i)
-                 for i in range(minKeyLength, maxKeyLength + 1))
-        #threadPool = Pool()
-
         start = time()
+        try:
+            self.crackit()
+            #for chunk in self.keygen():
+                #self.checkKeys(chunk)
+                #self.threadPool.apply_async(self.checkKeys, chunk)
 
-        #threadPool.imap(self.checkKeys(), keygen, 100000)
+        except Exception as e:
+            if e == 'done':
+                self.threadPool.terminate()
 
-        self.checkKeys(keygen)
 
         finish = time()
-        #threadPool.close()
-        #threadPool.join()
+        self.threadPool.close()
+        self.threadPool.terminate()
+        self.threadPool.join()
         elapsed = (finish - start)
         print "That took: ", elapsed, " seconds."
 
@@ -74,51 +79,39 @@ class Brute_Force():
         if self.rec == "found":
 
             print "At about: ", speed, " hashes per second."
+            return self.key
         else:
             print "No bounce no play."
 
         exit = raw_input("Hit (Enter/Return) to quit ")
 
-
-    def checkKeys(self, keygen):
-        for aKey in keygen:
-            self.countey += 1
-            #print ''.join(aKey)
-            if self.isSolution(''.join(aKey)):
-                self.rec = "found"
-
+    def checkKeys(self, keylist):
+        for key in keylist:
+            if self.isSolution(''.join(key)):
+                self.rec = 'found'
+                #raise Exception('done')
                 return True
+
+    def keygen(self):
+
+        it = itertools.chain.from_iterable(itertools.product(alphabet, repeat=i)
+                for i in range(minKeyLength, maxKeyLength + 1))
+
+        def take():
+            while True:
+                yield itertools.islice(it, 100000)
+
+        return take().next()
 
     def getHash(self):
 
         key = raw_input("Enter a key from 4 to 16 characters: ")
-
         self.key = key
+        self.origHash = hashlib.new(self.algorithm, key).hexdigest()
 
-        if self.algorithm == "sha1":
-            tempKey = hashlib.sha1()
-        elif self.algorithm == "sha224":
-            tempKey = hashlib.sha224()
-        elif self.algorithm == "sha256":
-            tempKey = hashlib.sha256()
-        elif self.algorithm == "sha384":
-            tempKey = hashlib.sha384()
-        elif self.algorithm == "sha512":
-            tempKey = hashlib.sha512()
-        elif self.algorithm == "md5":
-            tempKey = hashlib.md5()
-
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        self.origHash = tempKey.hexdigest()
 
         print "The Key you entered was: ", key
         print "Which has a hash of: ", self.origHash
-
 
     def whatWeGot(self):
 
@@ -130,39 +123,30 @@ class Brute_Force():
         print "Searching:    ", alphabet
         print "**********************************"
 
+    def crackit(self):
+        it = itertools.chain.from_iterable(itertools.product(alphabet, repeat=i)
+                        for i in range(minKeyLength, maxKeyLength + 1))
+        #for chunk in itertools.islice(it, 100000):
+        self.checkKeys(it)
+        #self.threadPool.map_async(self.isSolution, it, 100000)
+        self.threadPool.close()
+        self.threadPool.terminate()
+        self.threadPool.join()
+
+
     def isSolution(self, key):
 
-        if self.algorithm == "sha1":
-            tempKey = hashlib.sha1()
-        elif self.algorithm == "sha224":
-            tempKey = hashlib.sha224()
-        elif self.algorithm == "sha256":
-            tempKey = hashlib.sha256()
-        elif self.algorithm == "sha384":
-            tempKey = hashlib.sha384()
-        elif self.algorithm == "sha512":
-            tempKey = hashlib.sha512()
-        elif self.algorithm == "md5":
-            tempKey = hashlib.md5()
-
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        possible = tempKey.hexdigest()
-
-        if possible == self.origHash:
+        tempKey = hashlib.new(self.algorithm, key).hexdigest()
+        self.countey += 1
+        if tempKey == self.origHash:
 
             print
 
-            print"Solution found!"
-
+            print "Solution found!"
             print "Key is: ", key
-
-            print "Which has a hash of: ", possible
-
+            print "Which has a hash of: ", tempKey
+            #raise Exception('done')
+            self.rec = 'found'
             return True
 
         else:
