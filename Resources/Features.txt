@@ -1,0 +1,20 @@
+Here are a list of current, planned, and wish-list features. Feel free to expand the wish-list.
+
+Current Features:
+?
+
+Planned Features:
+-Distribute work-load over LAN (up to 90 Nodes?)
+-Multi-processing capable (at least 8 worker-processes)
+-GUI (Clean, simple, fast)
+-Tri-platform executables (Win 7+, OSX+, Ubuntu 14+)
+-Brute-Force Cracker capable of all ASCII (and subsets of)
+-Dictionary Cracker capable of any size word-list
+-Rainbow Table Creator capable of any size tables, all ASCII (and subsets of)
+-Rainbow Table User capable of any size tables, all ASCII (and subsets of)
+-Implements sha256, sha512, sha1, md5, sha3, LM, LMNT, AES, DES, ...
+-Capable of dealing with keys from 0-16 characters
+
+Wish-List:
+-Node-Performance detection (to optimize work-loads)
+-Able to use list (file) of hashes (instead of one-at-a-time)
