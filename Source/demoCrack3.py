@@ -24,6 +24,13 @@
 #       Seeing 1690716 hashes per second on my laptop, up from around 1430000.
 #       Nick Baum
 
+#   10/27/2014
+#       The code will work great on any Linux OS running python (can use something better than Ubuntu)
+#       Tested the code on my laptop and desktop for Chris's chart.
+#       Laptop running OSX 10.9 i5 @ 2.53GHz 8gb ram, took 388.63 seconds with 383,016 hashes per second
+#       Set up desktop tower with intel Dual Core @ 1.8GHz, 4GB ram, running centos, 431.9 secons with 273,697 hps
+
+
 import hashlib
 from time import time
 from multiprocessing import Process, Pipe, Lock
