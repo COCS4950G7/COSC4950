@@ -891,7 +891,8 @@ class Controller():
 
                     print "What's the algorithm: "
                     print "(md5)"
-                    algo = raw_input("Choice: ")
+                    #algo = raw_input("Choice: ")
+                    algo = "md5"
                     fileName = raw_input("File name: ")
                     hash = raw_input("Hash: ")
 
@@ -913,29 +914,30 @@ class Controller():
             elif state == "singleDictionarySearchingScreen":
 
                 #display results and wait for user interaction
-
                 print "============="
                 print "singleDictionarySearchingScreen"
 
-                #Actually start the search
-                self.dictionary.makeListOfFile()
+                #Have another dictionary (ie server-size) that chunks the data
+                #   So you don't have to send the whole file to every node
+                dictionary2 = Dictionary.Dictionary()
 
-                bigList = self.dictionary.getList()
+                #Give new dictionary (node) info it needs through a string (sent over network)
+                dictionary2.setVariables(self.dictionary.serverString())
 
-                chunkList = self.dictionary.chunkIt(bigList, 4)
+                #While we haven't gotten all through the file or found the key...
+                while not (self.dictionary.isEof() or dictionary2.isFound()):
 
-                self.dictionary.find(chunkList)
+                    #Serve up the next chunk from the server-side dictionary class
+                    chunkList = self.dictionary.getNextChunk()
 
-                #This is broke!!!!!!!!!! doesn't actually display a status (cause it's on the same process as .find()
-                #While it's not done searching, wait and display progress
-                while not self.dictionary.isDone():
+                    #and process it using the node-side client
+                    dictionary2.find(chunkList)
 
-                    ###GUI.setStatus(self.dictionary.status())
-                    print self.dictionary.getStatus()
-                    time.sleep(.1)
+                #if a(the) node finds a key
+                if dictionary2.isFound():
 
-                if self.dictionary.isFound():
-
+                    #Let the server know what the key is
+                    self.dictionary.key = dictionary2.showKey()
                     self.state = "singleDictionaryFoundScreen"
 
                 else:
@@ -946,7 +948,7 @@ class Controller():
                 ###userInput = GUI.getInput()
                 """
                 print "============="
-                print "singleDictionaryNotFoundScreen"
+                print "singleDictionarySearchingScreen"
                 print "(back)"
                 print "(Exit)"
                 userInput = raw_input("Choice: ")
@@ -977,6 +979,7 @@ class Controller():
 
                 print "(back)"
                 print "(Exit)"
+                self.dictionary.reset()
                 userInput = raw_input("Choice: ")
 
                 if userInput == "back":
@@ -1000,6 +1003,7 @@ class Controller():
                 print "singleDictionaryNotFoundScreen"
                 print "(back)"
                 print "(Exit)"
+                self.dictionary.reset()
                 userInput = raw_input("Choice: ")
 
                 if userInput == "back":

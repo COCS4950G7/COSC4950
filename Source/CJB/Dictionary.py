@@ -22,6 +22,9 @@
 #   Updated on 10/15/14:
 #   Chris Bugg is working on this class now
 
+#   Updated 10/18/14:
+#       Should be functioning? Tested on many lists of many sizes and it works just fine...--CJB
+
 #Imports
 import hashlib
 import time
@@ -40,6 +43,8 @@ class Dictionary():
     file = 0
     key = ""
     allLinesList = []
+    fileLocation = 0
+    eof = False
 
     #Constructor
     def __init__(self):
@@ -64,17 +69,8 @@ class Dictionary():
     #Actually finds the hash in the file (hopefully)
     def find(self, chunkList):
 
-        #Open the file for reading
-        #self.file = open(self.fileName, 'r')
-
-        #Put all the lines of the file in a list
-        #allLinesList = list(self.file)
-
-        #self.file.close()
-
         #Sub chunk chunkList and call processes
-        #chunky = self.chunkIt(chunkList, 4)
-        chunky = chunkList
+        chunky = self.chunkIt(chunkList, 8)
 
         chunk1 = chunky.pop()
 
@@ -83,6 +79,14 @@ class Dictionary():
         chunk3 = chunky.pop()
 
         chunk4 = chunky.pop()
+
+        chunk5 = chunky.pop()
+
+        chunk6 = chunky.pop()
+
+        chunk7 = chunky.pop()
+
+        chunk8 = chunky.pop()
 
         lock = Lock()
 
@@ -96,6 +100,14 @@ class Dictionary():
 
         child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
 
+        child5 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child6 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child7 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
+        child8 = Process(target=self.subProcess, args=(childPipe, lock, ))
+
         child1.start()
 
         child2.start()
@@ -103,6 +115,14 @@ class Dictionary():
         child3.start()
 
         child4.start()
+
+        child5.start()
+
+        child6.start()
+
+        child7.start()
+
+        child8.start()
 
         parentPipe.send(chunk1)
 
@@ -112,6 +132,14 @@ class Dictionary():
 
         parentPipe.send(chunk4)
 
+        parentPipe.send(chunk5)
+
+        parentPipe.send(chunk6)
+
+        parentPipe.send(chunk7)
+
+        parentPipe.send(chunk8)
+
         count = 0
 
         done = False
@@ -120,7 +148,7 @@ class Dictionary():
 
         while not done:
 
-            if count > 3:
+            if count > 7:
 
                 child1.join()
 
@@ -129,6 +157,14 @@ class Dictionary():
                 child3.join()
 
                 child4.join()
+
+                child5.join()
+
+                child6.join()
+
+                child7.join()
+
+                child8.join()
 
                 self.found = False
 
@@ -152,6 +188,14 @@ class Dictionary():
 
                     child4.terminate()
 
+                    child5.terminate()
+
+                    child6.terminate()
+
+                    child7.terminate()
+
+                    child8.terminate()
+
                     done = True
 
                     self.found = True
@@ -159,10 +203,6 @@ class Dictionary():
                     self.done = True
 
                 count += 1
-
-        #listSize = len(chunkList)
-        #countey = 0
-        #self.status = "Searching"
 
     #The sub-process function
     def subProcess(self, pipe, lock):
@@ -173,26 +213,13 @@ class Dictionary():
 
         lock.release()
 
-        #if self.looper6(alphabet, lock ) == True:
-
-        #Do Work here
-
-        #listSize = len(chunkList)
-        #countey = 0
-        #self.status = "Searching"
-        #print "chunkList @ subprocess: ", chunkList
         #for every item in the allLinesList list
         for x in chunkList:
 
-            #self.status = (countey / listSize), " %"
-            #countey += 1
-
-            #Split the string into a list
-            #print xLineToList
-            #print "x: ", x
+            #Split the string ['able\r\n'] into a list ['able','\r','\n']
             xLineToList = x.split()
 
-            #Check if it's empty (or eof)
+            #Check if it's NOT empty (or eof)
             if xLineToList:
 
                 #If it's not, extract the word (leaving an '/n')
@@ -206,12 +233,6 @@ class Dictionary():
             #if the hashes match, YAY, return to get out of function
             if self.hashThis(newX) == self.hash:
 
-                #self.key = newX
-
-                #self.done = True
-
-                #self.found = True
-
                 lock.acquire()
 
                 pipe.send("found")
@@ -223,11 +244,6 @@ class Dictionary():
                 lock. release()
 
                 return 0
-
-        #Otherwise...
-        #self.found = False
-
-        #self.done = True
 
         lock.acquire()
 
@@ -290,7 +306,87 @@ class Dictionary():
 
         chunky = [list[i::pieces] for i in range(pieces)]
 
-        #print "chunkIt gets ", list
-        #print "and gives ", chunky
-
         return chunky
+
+    #Gets next chunk of file as list
+    def getNextChunk(self):
+
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Seek to where we left off in the file
+        self.file.seek(self.fileLocation)
+
+        line = self.file.readline()
+
+        currentChunk = []
+
+        #keeps count of how many lines we've pu in currentChunk[]
+        lineCounter = 0
+
+        #to send to controller to say we're not done yet
+        eof = False
+
+        while not line == "":
+
+            currentChunk.append(line)
+
+            line = self.file.readline()
+
+            if line == "":
+
+                eof = True
+
+            lineCounter += 1
+
+            #If our chunk is at least 1000 lines, stop adding to it
+            if lineCounter >= 10000:
+
+                line = ""
+
+                eof = False
+
+        #update class on where we are in the file
+        self.fileLocation = self.file.tell()
+
+        self.file.close()
+
+        self.eof = eof
+
+        return currentChunk
+
+    #Returns if eof
+    def isEof(self):
+
+        return self.eof
+
+    #Resets class object to default values
+    def reset(self):
+
+        self.done = False
+        self.algorithm = ""
+        self.fileName = ""
+        self.hash = ""
+        self.status = ""
+        self.found = False
+        self.file = 0
+        self.key = ""
+        self.allLinesList = []
+        self.fileLocation = 0
+        self.eof = False
+
+    #Sets the variables for node based on server string
+    def setVariables(self, serverString):
+
+        serverStringList = serverString.split()
+
+        self.hash = serverStringList.pop()
+
+        self.algorithm = serverStringList.pop()
+
+    #Returns string with all useful info for nodes from server
+    def serverString(self):
+
+        oneStringToRule = self.algorithm + " " + self.hash
+
+        return oneStringToRule
