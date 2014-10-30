@@ -891,8 +891,11 @@ class Controller():
 
                     print "What's the algorithm: "
                     print "(md5)"
+                    print "(sha1)"
+                    print "(sha256)"
+                    print "(sha512)"
                     #algo = raw_input("Choice: ")
-                    algo = "md5"
+                    algo = raw_input("Choice: ")
                     fileName = raw_input("File name: ")
                     hash = raw_input("Hash: ")
 
@@ -975,7 +978,7 @@ class Controller():
                 print "singleDictionaryFoundScreen"
 
                 print "Key is: ", self.dictionary.showKey()
-                print "Wish a hash of: ", self.dictionary.getHash()
+                print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
 
                 print "(back)"
                 print "(Exit)"

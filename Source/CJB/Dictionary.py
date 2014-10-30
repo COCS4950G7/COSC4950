@@ -271,7 +271,7 @@ class Dictionary():
     #Hashes a key
     def hashThis(self, key):
 
-        thisHash = hashlib.md5(key).hexdigest()
+        thisHash = hashlib.new(self.algorithm, key).hexdigest()
 
         return thisHash
 
