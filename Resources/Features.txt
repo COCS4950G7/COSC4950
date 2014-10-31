@@ -1,7 +1,7 @@
 Here are a list of current, planned, and wish-list features. Feel free to expand the wish-list.
 
 Current Features:
-?
+-Single-User (Multi[8]-core) Console-based Dictionary Attack
 
 Planned Features:
 -Distribute work-load over LAN (up to 90 Nodes?)
@@ -18,3 +18,7 @@ Planned Features:
 Wish-List:
 -Node-Performance detection (to optimize work-loads)
 -Able to use list (file) of hashes (instead of one-at-a-time)
+-Can be run in console-only mode
+-Error Checking (and Node Crash Recovery)
+-Server Crash Recovery
+-"pause" ability on all classes (save to log-file?)

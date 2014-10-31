@@ -13,6 +13,11 @@
 
 #   NOTE: Diagrams of the layout (approximate names) are at bottom of file
 
+#   Update - 10/30/14 (CJB)
+#               -> Works in Console-only mode with Dictionary class (single-user only)
+#                   -> use "-c" argument to activate console-only mode
+#               -> More friendly UI, W/TIMER, AND STATUS BAR!!!!!
+
 #   ############################ W I P ###########################
 
 #Imports
@@ -22,7 +27,9 @@ import Dictionary
 import RainbowMaker
 import RainbowUser
 
-import time
+from time import time
+import sys
+import os
 
 #Controller class
 class Controller():
@@ -40,984 +47,1055 @@ class Controller():
     #Constructor
     def __init__(self):
 
-        #Startup GUI as new process
-        ###GUI.GUI()
+        args = sys.argv
 
-        #Loop till we're done
-        while not self.done:
+        clock = 0
 
-            #Do stuff with GUI, get state,
-            # process, and tell GUI when to
-            # move to new screen/state
+        #If we didn't get the argument "-c" in command-line
+        if not args.pop() == "-c":
 
-            #Get current screen from GUI
-            ###state = GUI.getState()
-            state = self.state
+            x=2 #Placeholder
+            #run in standard GUI mode
+            #GUI.GUI()
 
-            #Lots of if statements
+        #if we did get the argument "-c" in command-line
+        else:
 
-            #if we're at the start state
-            if state == "startScreen":
+            #Loop till we're done
+            while not self.done:
 
-                #What did the user pick? (Node, Server, Single, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "startScreen"
-                print "(Node)"
-                print "(Server)"
-                print "(Single)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                #Get current screen
+                state = self.state
 
-                #If user picks Node, tell GUI to go to Node start screen
-                if userInput == "Node":
+                #Clear the screen and re-draw
+                os.system('cls' if os.name == 'nt' else 'clear')
 
-                    ###GUI.setState("nodeStartScreen")
-                    self.state = "nodeStartScreen"
+                #run in console-only mode
+                print "...Console-Only Mode..."
 
-                elif userInput == "Server":
+                #Lots of if statements
 
-                    ###GUI.setState("serverStartScreen")
-                    self.state = "serverStartScreen"
+                #if we're at the start state
+                if state == "startScreen":
 
-                elif userInput == "Single":
+                    #What did the user pick? (Node, Server, Single, Exit)
+                    print "============="
+                    print "startScreen"
+                    print
+                    print "(Node)"
+                    print "(Server)"
+                    print "(Single)"
+                    print
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    ###GUI.setState("singleStartScreen")
-                    self.state = "singleStartScreen"
+                    #Sterolize inputs
+                    goodNames = {"Node", "Server", "Single", "Exit"}
+                    while not userInput in goodNames:
 
-                else:
+                        print "Input Error!"
 
-                    #We're done
-                    self.done = True
+                        userInput = raw_input("Try Again: ")
 
-            ################### NODE ################### vvv
+                    #If user picks Node, tell GUI to go to Node start screen
+                    if userInput == "Node":
 
-            #if we're at the node start state (Screen)
-            elif state == "nodeStartScreen":
+                        self.state = "nodeStartScreen"
 
-                #What did the user pick? (Be a node, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "nodeStartScreen"
-                print "(beNode)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    elif userInput == "Server":
 
-                if userInput == "beNode":
+                        self.state = "serverStartScreen"
 
-                    ###GUI.setState("nodeConnectingScreen")
-                    self.state = "nodeConnectingScreen"
+                    elif userInput == "Single":
 
-                elif userInput == "back":
+                        self.state = "singleStartScreen"
 
-                    ###GUI.setState("startScreen")
-                    self.state = "startScreen"
+                    else:
 
-                else:
+                        #We're done
+                        self.done = True
 
-                    #We're done
-                    self.done = True
+                ################### NODE ################### vvv
 
-            #if we're at the node connecting... state (Screen)
-            elif state == "nodeConnectingScreen":
+                #if we're at the node start state (Screen)
+                elif state == "nodeStartScreen":
 
-                #What did the user pick? (Be a Node, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "nodeConnectingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    #What did the user pick? (Be a node, Back, Exit)
+                    print "============="
+                    print "nodeStartScreen"
+                    print "(beNode)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                #wait for server connection
-                #then switch to nodeConnectedToScreen
+                    #Sterolize inputs
+                    goodNames = {"Node", "Server", "Single", "Exit"}
+                    while not userInput in goodNames:
 
-                if userInput == "back":
+                        print "Input Error!"
 
-                    ###GUI.setState("nodeStartScreen")
-                    self.state = "nodeStartScreen"
+                        userInput = raw_input("Try Again: ")
 
-                else:
+                    if userInput == "beNode":
 
-                    #We're done
-                    self.done = True
+                        ###GUI.setState("nodeConnectingScreen")
+                        self.state = "nodeConnectingScreen"
 
-            #if we're at the node connected state (Screen)
-            elif state == "nodeConnectedToScreen":
+                    elif userInput == "back":
 
-                #What did the user pick? (Be a Node, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "nodeConnectedToScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        ###GUI.setState("startScreen")
+                        self.state = "startScreen"
 
-                #wait for job or disconnect
-                #then switch to nodeDoingStuffScreen or nodeConnectingScreen depending
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("nodeStartScreen")
-                    self.state = "nodeStartScreen"
+                #if we're at the node connecting... state (Screen)
+                elif state == "nodeConnectingScreen":
 
-                else:
+                    #What did the user pick? (Be a Node, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "nodeConnectingScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #We're done
-                    self.done = True
+                    #wait for server connection
+                    #then switch to nodeConnectedToScreen
 
-            #if we're at the node doing stuff state (Screen)
-            elif state == "nodeDoingStuffScreen":
+                    if userInput == "back":
 
-                #What did the user pick? (Be a Node, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "nodeDoingStuffScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        ###GUI.setState("nodeStartScreen")
+                        self.state = "nodeStartScreen"
 
-                #wait to get done with our stuff
-                #then switch to nodeConnectedToScreen or nodeConnectingScreen depending
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("nodeStartScreen")
-                    self.state = "nodeStartScreen"
+                #if we're at the node connected state (Screen)
+                elif state == "nodeConnectedToScreen":
 
-                else:
+                    #What did the user pick? (Be a Node, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "nodeConnectedToScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #We're done
-                    self.done = True
+                    #wait for job or disconnect
+                    #then switch to nodeDoingStuffScreen or nodeConnectingScreen depending
 
-            ################### SERVER ################### vvv
+                    if userInput == "back":
 
-            #if we're at the Server start state (Screen)
-            elif state == "serverStartScreen":
+                        ###GUI.setState("nodeStartScreen")
+                        self.state = "nodeStartScreen"
 
-                #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverStartScreen"
-                print "(bruteForce)"
-                print "(rainbowMake)"
-                print "(rainbowUser)"
-                print "(dictionary)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "bruteForce":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("serverBruteForceScreen")
-                    self.state = "serverBruteForceScreen"
+                #if we're at the node doing stuff state (Screen)
+                elif state == "nodeDoingStuffScreen":
 
-                    #get info from GUI and pass to Brute_Force class
+                    #What did the user pick? (Be a Node, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "nodeDoingStuffScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                elif userInput == "rainbowMake":
+                    #wait to get done with our stuff
+                    #then switch to nodeConnectedToScreen or nodeConnectingScreen depending
 
-                    ###GUI.setState("serverRainMakerScreen")
-                    self.state = "serverRainMakerScreen"
+                    if userInput == "back":
 
-                    #get info from GUI and pass to Rainbow Maker class
+                        ###GUI.setState("nodeStartScreen")
+                        self.state = "nodeStartScreen"
 
-                elif userInput == "rainbowUser":
+                    else:
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                        #We're done
+                        self.done = True
 
-                    #get info from GUI and pass to Rainbow User class
+                ################### SERVER ################### vvv
 
-                elif userInput == "dictionary":
+                #if we're at the Server start state (Screen)
+                elif state == "serverStartScreen":
 
-                    ###GUI.setState("serverDictionaryScreen")
-                    self.state = "serverDictionaryScreen"
+                    #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverStartScreen"
+                    print "(bruteForce)"
+                    print "(rainbowMake)"
+                    print "(rainbowUser)"
+                    print "(dictionary)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #get info from GUI and pass to Dictionary class
+                    if userInput == "bruteForce":
 
-                elif userInput == "back":
+                        ###GUI.setState("serverBruteForceScreen")
+                        self.state = "serverBruteForceScreen"
 
-                    ###GUI.setState("startScreen")
-                    self.state = "startScreen"
+                        #get info from GUI and pass to Brute_Force class
 
-                else:
+                    elif userInput == "rainbowMake":
 
-                    #We're done
-                    self.done = True
+                        ###GUI.setState("serverRainMakerScreen")
+                        self.state = "serverRainMakerScreen"
 
-            #if we're at the serverBruteForceScreen state (Screen)
-            elif state == "serverBruteForceScreen":
+                        #get info from GUI and pass to Rainbow Maker class
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    elif userInput == "rainbowUser":
 
-                if userInput == "crackIt":
+                        ###GUI.setState("serverRainUserScreen")
+                        self.state = "serverRainUserScreen"
 
-                    GUI.setState("serverBruteSearchingScreen")
+                        #get info from GUI and pass to Rainbow User class
 
-                    #get info from GUI and pass to Brute_Force class
+                    elif userInput == "dictionary":
 
-                elif userInput == "back":
+                        ###GUI.setState("serverDictionaryScreen")
+                        self.state = "serverDictionaryScreen"
 
-                    GUI.setState("serverForceScreen")
+                        #get info from GUI and pass to Dictionary class
 
-                else:
+                    elif userInput == "back":
 
-                    #We're done
-                    self.done = True
+                        ###GUI.setState("startScreen")
+                        self.state = "startScreen"
 
-            #if we're at the serverBruteSearchingScreen state (Screen)
-            elif state == "serverBruteSearchingScreen":
+                    else:
 
-                #display results and wait for user interaction
+                        #We're done
+                        self.done = True
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                #if we're at the serverBruteForceScreen state (Screen)
+                elif state == "serverBruteForceScreen":
 
-                if userInput == "back":
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                    GUI.setState("serverBruteForceScreen")
+                    if userInput == "crackIt":
 
-                else:
+                        GUI.setState("serverBruteSearchingScreen")
 
-                    #We're done
-                    self.done = True
+                        #get info from GUI and pass to Brute_Force class
 
-            #if we're at the serverBruteFoundScreen state (Screen)
-            elif state == "serverBruteFoundScreen":
+                    elif userInput == "back":
 
-                #display results and wait for user interaction
+                        GUI.setState("serverForceScreen")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    GUI.setState("serverBruteForceScreen")
+                #if we're at the serverBruteSearchingScreen state (Screen)
+                elif state == "serverBruteSearchingScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-            #if we're at the serverBruteNotFoundScreen state (Screen)
-            elif state == "serverBruteNotFoundScreen":
+                    if userInput == "back":
 
-                #display results and wait for user interaction
+                        GUI.setState("serverBruteForceScreen")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    GUI.setState("serverBruteForceScreen")
+                #if we're at the serverBruteFoundScreen state (Screen)
+                elif state == "serverBruteFoundScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-            #if we're at the serverRainUserScreen state (Screen)
-            elif state == "serverRainUserScreen":
+                    if userInput == "back":
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainUserScreen"
-                print "(crackIt)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        GUI.setState("serverBruteForceScreen")
 
-                if userInput == "crackIt":
+                    else:
 
-                    ###GUI.setState("serverRainUserSearchingScreen")
-                    self.state = "serverRainUserSearchingScreen"
+                        #We're done
+                        self.done = True
 
-                    #get info from GUI and pass to Brute_Force class
+                #if we're at the serverBruteNotFoundScreen state (Screen)
+                elif state == "serverBruteNotFoundScreen":
 
-                elif userInput == "back":
+                    #display results and wait for user interaction
 
-                    ###GUI.setState("serverStartScreen")
-                    self.state = "serverStartScreen"
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                else:
+                    if userInput == "back":
 
-                    #We're done
-                    self.done = True
+                        GUI.setState("serverBruteForceScreen")
 
-            #if we're at the serverRainUserSearchingScreen state (Screen)
-            elif state == "serverRainUserSearchingScreen":
+                    else:
 
-                #display results and wait for user interaction
+                        #We're done
+                        self.done = True
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainUserSearchingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                #if we're at the serverRainUserScreen state (Screen)
+                elif state == "serverRainUserScreen":
 
-                if userInput == "back":
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainUserScreen"
+                    print "(crackIt)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                    if userInput == "crackIt":
 
-                else:
+                        ###GUI.setState("serverRainUserSearchingScreen")
+                        self.state = "serverRainUserSearchingScreen"
 
-                    #We're done
-                    self.done = True
+                        #get info from GUI and pass to Brute_Force class
 
-            #if we're at the serverRainUserFoundScreen state (Screen)
-            elif state == "serverRainUserFoundScreen":
+                    elif userInput == "back":
 
-                #display results and wait for user interaction
+                        ###GUI.setState("serverStartScreen")
+                        self.state = "serverStartScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainUserFoundScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                #if we're at the serverRainUserSearchingScreen state (Screen)
+                elif state == "serverRainUserSearchingScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainUserSearchingScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-            #if we're at the serverRainUserNotFoundScreen state (Screen)
-            elif state == "serverRainUserNotFoundScreen":
+                    if userInput == "back":
 
-                #display results and wait for user interaction
+                        ###GUI.setState("serverRainUserScreen")
+                        self.state = "serverRainUserScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainUserNotFoundScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                #if we're at the serverRainUserFoundScreen state (Screen)
+                elif state == "serverRainUserFoundScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainUserFoundScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-            #if we're at the serverRainMakerScreen state (Screen)
-            elif state == "serverRainMakerScreen":
+                    if userInput == "back":
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainMakerScreen"
-                print "(makeIt)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        ###GUI.setState("serverRainUserScreen")
+                        self.state = "serverRainUserScreen"
 
-                if userInput == "makeIt":
+                    else:
 
-                    ###GUI.setState("serverRainMakerSearchingScreen")
-                    self.state = "serverRainMakerSearchingScreen"
+                        #We're done
+                        self.done = True
 
-                    #get info from GUI and pass to Brute_Force class
+                #if we're at the serverRainUserNotFoundScreen state (Screen)
+                elif state == "serverRainUserNotFoundScreen":
 
-                elif userInput == "back":
+                    #display results and wait for user interaction
 
-                    ###GUI.setState("serverStartScreen")
-                    self.state = "serverStartScreen"
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainUserNotFoundScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                else:
+                    if userInput == "back":
 
-                    #We're done
-                    self.done = True
+                        ###GUI.setState("serverRainUserScreen")
+                        self.state = "serverRainUserScreen"
 
-            #if we're at the serverRainMakerSearchingScreen state (Screen)
-            elif state == "serverRainMakerSearchingScreen":
+                    else:
 
-                #display results and wait for user interaction
+                        #We're done
+                        self.done = True
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainMakerSearchingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                #if we're at the serverRainMakerScreen state (Screen)
+                elif state == "serverRainMakerScreen":
 
-                if userInput == "back":
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainMakerScreen"
+                    print "(makeIt)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    ###GUI.setState("serverRainMakerScreen")
-                    self.state = "serverRainMakerScreen"
+                    if userInput == "makeIt":
 
-                else:
+                        ###GUI.setState("serverRainMakerSearchingScreen")
+                        self.state = "serverRainMakerSearchingScreen"
 
-                    #We're done
-                    self.done = True
+                        #get info from GUI and pass to Brute_Force class
 
-            #if we're at the serverRainMakerDoneScreen state (Screen)
-            elif state == "serverRainMakerDoneScreen":
+                    elif userInput == "back":
 
-                #display results and wait for user interaction
+                        ###GUI.setState("serverStartScreen")
+                        self.state = "serverStartScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainMakerDoneScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("serverRainMakerScreen")
-                    self.state = "serverRainMakerScreen"
+                #if we're at the serverRainMakerSearchingScreen state (Screen)
+                elif state == "serverRainMakerSearchingScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainMakerSearchingScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-            #if we're at the serverDictionaryScreen state (Screen)
-            elif state == "serverDictionaryScreen":
+                    if userInput == "back":
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                        ###GUI.setState("serverRainMakerScreen")
+                        self.state = "serverRainMakerScreen"
 
-                if userInput == "crackIt":
+                    else:
 
-                    GUI.setState("serverDictionarySearchingScreen")
+                        #We're done
+                        self.done = True
 
-                    #get info from GUI and pass to Brute_Force class
+                #if we're at the serverRainMakerDoneScreen state (Screen)
+                elif state == "serverRainMakerDoneScreen":
 
-                elif userInput == "back":
+                    #display results and wait for user interaction
 
-                    GUI.setState("serverStartScreen")
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainMakerDoneScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                else:
+                    if userInput == "back":
 
-                    #We're done
-                    self.done = True
+                        ###GUI.setState("serverRainMakerScreen")
+                        self.state = "serverRainMakerScreen"
 
-            #if we're at the serverDictionarySearchingScreen state (Screen)
-            elif state == "serverDictionarySearchingScreen":
+                    else:
 
-                #display results and wait for user interaction
+                        #We're done
+                        self.done = True
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                #if we're at the serverDictionaryScreen state (Screen)
+                elif state == "serverDictionaryScreen":
 
-                if userInput == "back":
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                    GUI.setState("serverDictionaryScreen")
+                    if userInput == "crackIt":
 
-                else:
+                        GUI.setState("serverDictionarySearchingScreen")
 
-                    #We're done
-                    self.done = True
+                        #get info from GUI and pass to Brute_Force class
 
-            #if we're at the serverDictionaryFoundScreen state (Screen)
-            elif state == "serverDictionaryFoundScreen":
+                    elif userInput == "back":
 
-                #display results and wait for user interaction
+                        GUI.setState("serverStartScreen")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    GUI.setState("serverDictionaryScreen")
+                #if we're at the serverDictionarySearchingScreen state (Screen)
+                elif state == "serverDictionarySearchingScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-            #if we're at the serverDictionaryNotFoundScreen state (Screen)
-            elif state == "serverDictionaryNotFoundScreen":
+                    if userInput == "back":
 
-                #display results and wait for user interaction
+                        GUI.setState("serverDictionaryScreen")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    else:
 
-                if userInput == "back":
+                        #We're done
+                        self.done = True
 
-                    GUI.setState("serverDictionaryScreen")
+                #if we're at the serverDictionaryFoundScreen state (Screen)
+                elif state == "serverDictionaryFoundScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-            ################### SINGLE-USER ################### vvv
+                    if userInput == "back":
 
-            #if we're at the Single-User start state (Screen)
-            elif state == "singleStartScreen":
+                        GUI.setState("serverDictionaryScreen")
 
-                #What did the user pick? (Brute-Force, Rainbow, Dictionary, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleStartScreen"
-                print "(bruteForce)"
-                print "(rainbowMake)"
-                print "(rainbowUse)"
-                print "(dictionary)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "bruteForce":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("singleBruteForceScreen")
-                    self.state = "singleBruteForceScreen"
+                #if we're at the serverDictionaryNotFoundScreen state (Screen)
+                elif state == "serverDictionaryNotFoundScreen":
 
-                    #get info from GUI and pass to Brute_Force class
+                    #display results and wait for user interaction
 
-                elif userInput == "rainbowMake":
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                    ###GUI.setState("singleRainMakerScreen")
-                    self.state = "singleRainMakerScreen"
+                    if userInput == "back":
 
-                    #get info from GUI and pass to Rainbow Maker class
+                        GUI.setState("serverDictionaryScreen")
 
-                elif userInput == "rainbowUse":
+                    else:
 
-                    ###GUI.setState("singleRainUserScreen")
-                    self.state = "singleRainUserScreen"
+                        #We're done
+                        self.done = True
 
-                    #get info from GUI and pass to Rainbow User class
+                ################### SINGLE-USER ################### vvv
 
-                elif userInput == "dictionary":
+                #if we're at the Single-User start state (Screen)
+                elif state == "singleStartScreen":
 
-                    ###GUI.setState("singleDictionaryScreen")
-                    self.state = "singleDictionaryScreen"
+                    #What did the user pick? (Brute-Force, Rainbow, Dictionary, Back, Exit)
+                    print "============="
+                    print "Single-User Mode StartScreen"
+                    print
+                    print "(BruteForce)"
+                    print "(RainbowMake)"
+                    print "(RainbowUse)"
+                    print "(Dictionary)"
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #get info from GUI and pass to Dictionary class
+                    #Sterolize inputs
+                    goodNames = {"BruteForce", "RainbowMake", "RainbowUse", "Dictionary", "Back", "Exit"}
+                    while not userInput in goodNames:
 
-                elif userInput == "back":
+                        print "Input Error!"
 
-                    ###GUI.setState("startScreen")
-                    self.state = "startScreen"
+                        userInput = raw_input("Try Again: ")
 
-                else:
+                    if userInput == "BruteForce":
 
-                    #We're done
-                    self.done = True
+                        self.state = "singleBruteForceScreen"
 
-            #if we're at the  singleBruteForceScreen state (Screen)
-            elif state == "singleBruteForceScreen":
+                    elif userInput == "RainbowMake":
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                        self.state = "singleRainMakerScreen"
 
-                if userInput == "crackIt":
+                    elif userInput == "rainbowUse":
 
-                    GUI.setState("singleBruteSearchingScreen")
-                    self.state = "singlerRainMakerScreen"
+                        self.state = "singleRainUserScreen"
 
-                    #get info from GUI and pass to Brute_Force class
+                    elif userInput == "Dictionary":
 
-                elif userInput == "back":
+                        self.state = "singleDictionaryScreen"
 
-                    GUI.setState("singleStartScreen")
-                    self.state = "singleStartScreen"
+                    elif userInput == "Back":
 
-                else:
+                        self.state = "startScreen"
 
-                    #We're done
-                    self.done = True
+                    else:
 
-            #if we're at the singleBruteSearchingScreen state (Screen)
-            elif state == "singleBruteSearchingScreen":
+                        #We're done
+                        self.done = True
 
-                #display results and wait for user interaction
+                #if we're at the  singleBruteForceScreen state (Screen)
+                elif state == "singleBruteForceScreen":
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                if userInput == "back":
+                    if userInput == "crackIt":
 
-                    GUI.setState("singleBruteForceScreen")
-                    self.state = "singlerRainMakerScreen"
+                        GUI.setState("singleBruteSearchingScreen")
+                        self.state = "singlerRainMakerScreen"
 
-                else:
+                        #get info from GUI and pass to Brute_Force class
 
-                    #We're done
-                    self.done = True
+                    elif userInput == "back":
 
-            #if we're at the singleBruteFoundScreen state (Screen)
-            elif state == "singleBruteFoundScreen":
+                        GUI.setState("singleStartScreen")
+                        self.state = "singleStartScreen"
 
-                #display results and wait for user interaction
+                    else:
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                        #We're done
+                        self.done = True
 
-                if userInput == "back":
+                #if we're at the singleBruteSearchingScreen state (Screen)
+                elif state == "singleBruteSearchingScreen":
 
-                    GUI.setState("singleBruteForceScreen")
-                    self.state = "singlerRainMakerScreen"
+                    #display results and wait for user interaction
 
-                else:
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                    #We're done
-                    self.done = True
+                    if userInput == "back":
 
-            #if we're at the singleBruteNotFoundScreen state (Screen)
-            elif state == "singleBruteNotFoundScreen":
+                        GUI.setState("singleBruteForceScreen")
+                        self.state = "singlerRainMakerScreen"
 
-                #display results and wait for user interaction
+                    else:
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                userInput = GUI.getInput()
+                        #We're done
+                        self.done = True
 
-                if userInput == "back":
+                #if we're at the singleBruteFoundScreen state (Screen)
+                elif state == "singleBruteFoundScreen":
 
-                    GUI.setState("singleBruteForceScreen")
-                    self.state = "singlerRainMakerScreen"
+                    #display results and wait for user interaction
 
-                else:
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                    #We're done
-                    self.done = True
+                    if userInput == "back":
 
-            #if we're at the singleRainUserScreen state (Screen)
-            elif state == "singleRainUserScreen":
+                        GUI.setState("singleBruteForceScreen")
+                        self.state = "singlerRainMakerScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainUserScreen"
-                print "(crackIt)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "crackIt":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("singleRainUserSearchingScreen")
-                    self.state = "singleRainUserSearchingScreen"
+                #if we're at the singleBruteNotFoundScreen state (Screen)
+                elif state == "singleBruteNotFoundScreen":
 
-                    #get info from GUI and pass to Brute_Force class
+                    #display results and wait for user interaction
 
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    userInput = GUI.getInput()
 
-                elif userInput == "back":
+                    if userInput == "back":
 
-                    ###GUI.setState("singleStartScreen")
-                    self.state = "singleStartScreen"
+                        GUI.setState("singleBruteForceScreen")
+                        self.state = "singlerRainMakerScreen"
 
-                else:
+                    else:
 
-                    #We're done
-                    self.done = True
+                        #We're done
+                        self.done = True
 
-            #if we're at the singleRainUserSearchingScreen state (Screen)
-            elif state == "singleRainUserSearchingScreen":
+                #if we're at the singleRainUserScreen state (Screen)
+                elif state == "singleRainUserScreen":
 
-                #display results and wait for user interaction
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainUserScreen"
+                    print "(crackIt)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainUserSearchingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    if userInput == "crackIt":
 
-                if userInput == "back":
+                        ###GUI.setState("singleRainUserSearchingScreen")
+                        self.state = "singleRainUserSearchingScreen"
 
-                    ###GUI.setState("singleRainUserScreen")
-                    self.state = "singleRainUserScreen"
+                        #get info from GUI and pass to Brute_Force class
 
-                else:
 
-                    #We're done
-                    self.done = True
+                    elif userInput == "back":
 
-            #if we're at the singleRainUserFoundScreen state (Screen)
-            elif state == "singleRainUserFoundScreen":
+                        ###GUI.setState("singleStartScreen")
+                        self.state = "singleStartScreen"
 
-                #display results and wait for user interaction
+                    else:
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainUserFoundScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        #We're done
+                        self.done = True
 
-                if userInput == "back":
+                #if we're at the singleRainUserSearchingScreen state (Screen)
+                elif state == "singleRainUserSearchingScreen":
 
-                    ###GUI.setState("singleRainUserScreen")
-                    self.state = "singleRainUserScreen"
+                    #display results and wait for user interaction
 
-                else:
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainUserSearchingScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #We're done
-                    self.done = True
+                    if userInput == "back":
 
-            #if we're at the singleRainUserNotFoundScreen state (Screen)
-            elif state == "singleRainUserNotFoundScreen":
+                        ###GUI.setState("singleRainUserScreen")
+                        self.state = "singleRainUserScreen"
 
-                #display results and wait for user interaction
+                    else:
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainUserNotFoundScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        #We're done
+                        self.done = True
 
-                if userInput == "back":
+                #if we're at the singleRainUserFoundScreen state (Screen)
+                elif state == "singleRainUserFoundScreen":
 
-                    ###GUI.setState("singleRainUserScreen")
-                    self.state = "singleRainUserScreen"
+                    #display results and wait for user interaction
 
-                else:
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainUserFoundScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #We're done
-                    self.done = True
+                    if userInput == "back":
 
-            #if we're at the singleRainMakerScreen state (Screen)
-            elif state == "singleRainMakerScreen":
+                        ###GUI.setState("singleRainUserScreen")
+                        self.state = "singleRainUserScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "serverRainMakerScreen"
-                print "(makeIt)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "makeIt":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("singleRainMakerDoingScreen")
-                    self.state = "singleRainMakerDoingScreen"
+                #if we're at the singleRainUserNotFoundScreen state (Screen)
+                elif state == "singleRainUserNotFoundScreen":
 
-                    #get info from GUI and pass to Brute_Force class
+                    #display results and wait for user interaction
 
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainUserNotFoundScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                elif userInput == "back":
+                    if userInput == "back":
 
-                    ###GUI.setState("singleStartScreen")
-                    self.state = "singleStartScreen"
+                        self.state = "singleRainUserScreen"
 
-                else:
+                    else:
 
-                    #We're done
-                    self.done = True
+                        #We're done
+                        self.done = True
 
-            #if we're at the singleRainMakerSearchingScreen state (Screen)
-            elif state == "singleRainMakerDoingScreen":
+                #if we're at the singleRainMakerScreen state (Screen)
+                elif state == "singleRainMakerScreen":
 
-                #display results and wait for user interaction
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "serverRainMakerScreen"
+                    print "(makeIt)"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainMakerDoingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    if userInput == "makeIt":
 
-                if userInput == "back":
+                        ###GUI.setState("singleRainMakerDoingScreen")
+                        self.state = "singleRainMakerDoingScreen"
 
-                    ###GUI.setState("singleRainMakerScreen")
-                    self.state = "singleRainMakerScreen"
+                        #get info from GUI and pass to Brute_Force class
 
-                else:
 
-                    #We're done
-                    self.done = True
+                    elif userInput == "back":
 
-            #if we're at the singleRainMakerDoneScreen state (Screen)
-            elif state == "singleRainMakerDoneScreen":
+                        ###GUI.setState("singleStartScreen")
+                        self.state = "singleStartScreen"
 
-                #display results and wait for user interaction
+                    else:
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleRainMakerDoneScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                        #We're done
+                        self.done = True
 
-                if userInput == "back":
+                #if we're at the singleRainMakerSearchingScreen state (Screen)
+                elif state == "singleRainMakerDoingScreen":
 
-                    ###GUI.setState("singlerRainMakerScreen")
-                    self.state = "singlerRainMakerScreen"
+                    #display results and wait for user interaction
 
-                else:
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainMakerDoingScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                    #We're done
-                    self.done = True
+                    if userInput == "back":
 
-            #if we're at the singleDictionaryScreen state (Screen)
-            elif state == "singleDictionaryScreen":
+                        ###GUI.setState("singleRainMakerScreen")
+                        self.state = "singleRainMakerScreen"
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleDictionaryScreen"
-                print "(crackIt)"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "crackIt":
+                        #We're done
+                        self.done = True
 
-                    ###GUI.setState("singleDictionarySearchingScreen")
-                    self.state = "singleDictionarySearchingScreen"
+                #if we're at the singleRainMakerDoneScreen state (Screen)
+                elif state == "singleRainMakerDoneScreen":
 
-                    #get info from GUI and pass to Dictionary class
+                    #display results and wait for user interaction
+
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    ###userInput = GUI.getInput()
+                    print "============="
+                    print "singleRainMakerDoneScreen"
+                    print "(back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
+
+                    if userInput == "back":
+
+                        ###GUI.setState("singlerRainMakerScreen")
+                        self.state = "singlerRainMakerScreen"
+
+                    else:
+
+                        #We're done
+                        self.done = True
+
+                #if we're at the singleDictionaryScreen state (Screen)
+                elif state == "singleDictionaryScreen":
+
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    print "============="
+                    print "singleDictionaryScreen"
+                    print
+
+                    #Get the algorithm
 
                     print "What's the algorithm: "
                     print "(md5)"
                     print "(sha1)"
                     print "(sha256)"
                     print "(sha512)"
-                    #algo = raw_input("Choice: ")
+                    print
                     algo = raw_input("Choice: ")
-                    fileName = raw_input("File name: ")
-                    hash = raw_input("Hash: ")
 
+                    #Sterolize inputs
+                    goodNames = {"md5", "sha1", "sha256", "sha512"}
+                    while not algo in goodNames:
+
+                        print "Input Error!"
+
+                        algo = raw_input("Try Again: ")
+
+                    #Set algorithm of dictionary to user input of 'algo'
                     self.dictionary.setAlgorithm(algo)
-                    self.dictionary.setFileName(fileName)
+
+                    #Get the file name
+                    print
+                    fileName = raw_input("What's the file name: ")
+                    while not self.dictionary.setFileName(fileName) == "Good":
+
+                        print "File not found..."
+                        fileName = raw_input("What's the file name: ")
+
+                    #Get the hash
+                    print
+                    hash = raw_input("What's the hash we're searching for: ")
                     self.dictionary.setHash(hash)
 
-                elif userInput == "back":
+                    #Get the go-ahead
 
-                    ###GUI.setState("singleStartScreen")
-                    self.state = "singleStartScreen"
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Crack)"
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
 
-                else:
+                    #Sterolize inputs
+                    goodNames = {"Crack", "Back", "Exit"}
+                    while not userInput in goodNames:
 
-                    #We're done
-                    self.done = True
+                        print "Input Error!"
 
-            #if we're at the singleDictionarySearchingScreen state (Screen)
-            elif state == "singleDictionarySearchingScreen":
+                        userInput = raw_input("Try Again: ")
 
-                #display results and wait for user interaction
-                print "============="
-                print "singleDictionarySearchingScreen"
+                    if userInput == "Crack":
 
-                #Have another dictionary (ie server-size) that chunks the data
-                #   So you don't have to send the whole file to every node
-                dictionary2 = Dictionary.Dictionary()
+                        self.state = "singleDictionarySearchingScreen"
 
-                #Give new dictionary (node) info it needs through a string (sent over network)
-                dictionary2.setVariables(self.dictionary.serverString())
+                    elif userInput == "Back":
 
-                #While we haven't gotten all through the file or found the key...
-                while not (self.dictionary.isEof() or dictionary2.isFound()):
+                        self.state = "singleStartScreen"
 
-                    #Serve up the next chunk from the server-side dictionary class
-                    chunkList = self.dictionary.getNextChunk()
+                    else:
 
-                    #and process it using the node-side client
-                    dictionary2.find(chunkList)
+                        #We're done
+                        self.done = True
 
-                #if a(the) node finds a key
-                if dictionary2.isFound():
+                #if we're at the singleDictionarySearchingScreen state (Screen)
+                elif state == "singleDictionarySearchingScreen":
 
-                    #Let the server know what the key is
-                    self.dictionary.key = dictionary2.showKey()
-                    self.state = "singleDictionaryFoundScreen"
+                    #display results and wait for user interaction
+                    print "============="
+                    print "singleDictionarySearchingScreen"
 
-                else:
+                    self.clock = time()
 
-                    self.state = "singleDictionaryNotFoundScreen"
+                    #Have another dictionary (ie server-size) that chunks the data
+                    #   So you don't have to send the whole file to every node
+                    dictionary2 = Dictionary.Dictionary()
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                """
-                print "============="
-                print "singleDictionarySearchingScreen"
-                print "(back)"
-                print "(Exit)"
-                userInput = raw_input("Choice: ")
+                    #Give new dictionary (node) info it needs through a string (sent over network)
+                    dictionary2.setVariables(self.dictionary.serverString())
 
-                if userInput == "back":
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
 
-                    ###GUI.setState("singleDictionaryScreen")
-                    self.state = "singleDictionaryScreen"
+                    #While we haven't gotten all through the file or found the key...
+                    while not (self.dictionary.isEof() or dictionary2.isFound()):
 
-                else:
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
 
-                    #We're done
-                    self.done = True
-                """
+                        #Serve up the next chunk from the server-side dictionary class
+                        chunkList = self.dictionary.getNextChunk()
 
-            #if we're at the singleDictionaryFoundScreen state (Screen)
-            elif state == "singleDictionaryFoundScreen":
+                        #and process it using the node-side client
+                        dictionary2.find(chunkList)
 
-                #display results and wait for user interaction
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleDictionaryFoundScreen"
+                    #if a(the) node finds a key
+                    if dictionary2.isFound():
 
-                print "Key is: ", self.dictionary.showKey()
-                print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                        #Let the server know what the key is
+                        self.dictionary.key = dictionary2.showKey()
+                        self.state = "singleDictionaryFoundScreen"
 
-                print "(back)"
-                print "(Exit)"
-                self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                    else:
 
-                if userInput == "back":
+                        self.state = "singleDictionaryNotFoundScreen"
 
-                    ###GUI.setState("singleDictionaryScreen")
-                    self.state = "singleDictionaryScreen"
+                #if we're at the singleDictionaryFoundScreen state (Screen)
+                elif state == "singleDictionaryFoundScreen":
 
-                else:
+                    #display results and wait for user interaction
 
-                    #We're done
-                    self.done = True
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    print "============="
+                    print "singleDictionaryFoundScreen"
 
-            #if we're at the singleDictionaryNotFoundScreen state (Screen)
-            elif state == "singleDictionaryNotFoundScreen":
+                    print "Key is: ", self.dictionary.showKey()
+                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                    print "And it took", self.clock, "seconds."
 
-                #display results and wait for user interaction
+                    print "(Back)"
+                    print "(Exit)"
+                    self.dictionary.reset()
+                    userInput = raw_input("Choice: ")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
-                print "============="
-                print "singleDictionaryNotFoundScreen"
-                print "(back)"
-                print "(Exit)"
-                self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                    #Sterolize inputs
+                    goodNames = {"Back", "Exit"}
+                    while not userInput in goodNames:
 
-                if userInput == "back":
+                        print "Input Error!"
 
-                    ###GUI.setState("singleDictionaryScreen")
-                    self.state = "singleDictionaryScreen"
+                        userInput = raw_input("Try Again: ")
 
-                else:
+                    if userInput == "Back":
 
-                    #We're done
-                    self.done = True
+                        self.state = "singleDictionaryScreen"
+
+                    else:
+
+                        #We're done
+                        self.done = True
+
+                #if we're at the singleDictionaryNotFoundScreen state (Screen)
+                elif state == "singleDictionaryNotFoundScreen":
+
+                    #display results and wait for user interaction
+
+                    #What did the user pick? (Crack it!, Back, Exit)
+                    print "============="
+                    print "singleDictionaryNotFoundScreen"
+                    print
+                    print "Sorry, we didn't find it."
+                    print "Just FYI though, that took", self.clock, "seconds."
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    self.dictionary.reset()
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"Back", "Exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput == "Back":
+
+                        self.state = "singleDictionaryScreen"
+
+                    else:
+
+                        #We're done
+                        self.done = True
 
 Controller()
 

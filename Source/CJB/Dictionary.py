@@ -25,6 +25,9 @@
 #   Updated 10/18/14:
 #       Should be functioning? Tested on many lists of many sizes and it works just fine...--CJB
 
+#   Updated 10/30/14:
+#       Can now deal with filenotfound, multiple hash functions, and work with new console-UI --CJB
+
 #Imports
 import hashlib
 import time
@@ -60,6 +63,16 @@ class Dictionary():
     def setFileName(self, fileName):
 
         self.fileName = fileName
+
+        #Checks for filenotfound and returns code to caller class
+        try:
+            file = open(fileName, "r")
+            file.close()
+
+        except (OSError, IOError):
+            return "Fail"
+
+        return "Good"
 
     #Sets the original hash we're looking for
     def setHash(self, hash):
