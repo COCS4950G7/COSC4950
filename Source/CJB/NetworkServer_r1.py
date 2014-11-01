@@ -13,6 +13,7 @@ __author__ = 'chris'
         # Server now prompts user for how many nodes there will be
         # Server waits for all nodes to connect
         # Multiple new status lines have been added in for debugging purposes
+        # Server has exception handling while waiting for nodes to connect
 
 
 #STARTUP SERVER#########################
@@ -22,13 +23,13 @@ port= 12397 #reserving a port for the service
 socketObject.bind(('',port)) #bind to port
 
 #PROMPT USER FOR NUMBER OF NODES AND WHAT MODE (BF, DICTIONARY,ETC)##############################
-numOfNodes = raw_input('How many nodes will there be?') #store how many nodes there will be
+numOfNodes = int(raw_input('How many nodes will there be? ')) #store how many nodes there will be
 print ("Number of Nodes: " + str(numOfNodes)); #tell user how many nodes have been set to wait for
-print ("Now waiting for nodes to connect");
+print ("Now waiting for nodes to connect.");
 #(client-side task: startup the nodes
 #(client-side task: say "hi" to server)
 #WAIT FOR ALL NODES TO CONNECT#######################
-numOfConnectedNodes = 0 #a counter to count how many nodes have connected
+numOfConnectedNodes = int(0) #a counter to count how many nodes have connected
 listOfConnectedIPAddresses = []; #contains the ip addresses of all connected nodes
 socketObject.listen(5) #wait for client connection
 while True:
@@ -38,19 +39,27 @@ while True:
     c.send("Your IP address (" + str(addr) + ") has been added to the servers List!")
     print ("The node IP " + str(addr) + " has been added to the listOfConnectedIPAddresses");
     c.send("Thank you for connecting!")
-    ++numOfConnectedNodes #increment numOfConnectedNodes
+    numOfConnectedNodes += 1 #increment numOfConnectedNodes
 
     #ARE ALL NODES CONNECTED?#####################
+    try:
+        #IF NO, CONTINUE TO WAIT
+        if(numOfNodes - numOfConnectedNodes > 0):
+            c.send("Still waiting for " + str(numOfNodes - numOfConnectedNodes) + " nodes to connect." )
+            print("Still waiting for " + str(numOfNodes - numOfConnectedNodes) + " nodes to connect.");
+        #(client side task: wait for server to reply)
+        #IF YES,THEN SAY "return hi" TO ALL NODES
+        else:
+            print("Still waiting for " + str(numOfNodes - numOfConnectedNodes) + " nodes to connect.");
+            print("All nodes have connected to the server!");
+            c.close()
+    except Exception as inst:
+        print ("An Exception was thrown");
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        c.close()
 
-    #IF NO, CONTINUE TO WAIT
-    if((numOfNodes - numOfConnectedNodes) > 0):
-        c.send("Still waiting for " + str(numOfNodes - numOfConnectedNodes) + " nodes to connect." )
-        print("Still waiting for " + str(numOfNodes - numOfConnectedNodes) + " nodes to connect.");
-    #(client side task: wait for server to reply)
-    #IF YES,THEN SAY "return hi" TO ALL NODES
-    else:
-        c.send("All nodes have connected to the server!")
-    c.close()
 #SPLIT WORKLOAD INTO MANY EQUALLY SIZED PIECES###############################
 
 
