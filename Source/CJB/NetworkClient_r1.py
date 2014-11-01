@@ -4,13 +4,26 @@ __author__ = 'chris'
 #CREATED: 10/22/2014
 #ER Diagram of this is available, talk to Chris Hamm if you want a copy.
 
+    #Nov 1 2014 Chris Hamm
+        # Asks for the user to input what the host's ip address is
+        # Has basic error handing for trying to connect to an invalid host
 
 #STARTUP NODES####################
-
+import socket #import socket module
+socketObject= socket.socket() #create a socket object
+port = 12397 #Reserve a port for service
 
 #HAVE USER INPUT THE SERVER IP ADDRESS###############################3
-
-
+hostIPAddress = str(raw_input('What is the host IP Address?')) #ask user for the host IP address
+try:
+    socketObject.connect((hostIPAddress, port)) #try connecting to host
+    print socketObject.recv(1024)
+except Exception as inst:
+        print ("An Exception was thrown");
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        socketObject.close()
 #(server-side task: wait for all nodes to connect to server)
 #SAY "hi" TO THE SERVER####################################3
 
