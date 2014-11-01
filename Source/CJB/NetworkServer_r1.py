@@ -59,9 +59,9 @@ while True:
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
         c.close()
-    finally:
-        print("Closing socket");
-        c.close()
+    #finally:
+        #print("Closing socket");
+        #c.close()
 
 
 #SPLIT WORKLOAD INTO MANY EQUALLY SIZED PIECES###############################
