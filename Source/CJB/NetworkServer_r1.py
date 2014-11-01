@@ -63,17 +63,7 @@ while True:
         print("Closing socket");
         c.close()
 
-    #Receive data from nodes
-        while True:
-            data = socketObject.recv(16)
-            print("Received message: " + data)
-            if data:
-                print ("Replying to message");
-                reply_message= "Return Hi"
-                socketObject.sendall(reply_message)
-            else:
-                print ("No data has been received");
-                break;
+
 #SPLIT WORKLOAD INTO MANY EQUALLY SIZED PIECES###############################
 
 

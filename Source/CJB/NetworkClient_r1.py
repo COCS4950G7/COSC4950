@@ -30,19 +30,10 @@ try:
             socketObject.close()
     #(server-side task: wait for all nodes to connect to server)
     #SAY "hi" TO THE SERVER####################################3
-    message = 'Hi'
-    print("sending message: " + message);
-    socketObject.sendall(message)
 
     #(server-side task: say "return hi" to all nodes)
     #WAIT FOR SERVER TO REPLY##################################3
-    amount_received=0; #amount of data that has been received
-    expected_reply_message= 'Return Hi' #the expected return message
-    amount_expected= len(expected_reply_message) #length of the expected return message
-    while amount_received < amount_expected:
-        data = socketObject.recv(16)
-        amount_received += len(data)
-        print("Received message: " + data);
+   
         #HAS THE SERVER REPLIED?##########
 
             #IF NO, THEN CONTINUE WAITING
