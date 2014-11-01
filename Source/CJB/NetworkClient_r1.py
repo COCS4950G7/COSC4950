@@ -33,7 +33,7 @@ try:
 
     #(server-side task: say "return hi" to all nodes)
     #WAIT FOR SERVER TO REPLY##################################3
-   
+
         #HAS THE SERVER REPLIED?##########
 
             #IF NO, THEN CONTINUE WAITING
@@ -78,6 +78,6 @@ except Exception as inst:
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             socketObject.close()
-finally:
-        print ("Closing socket");
-        socketObject.close()
+#finally:
+        #print ("Closing socket");
+        #socketObject.close()
