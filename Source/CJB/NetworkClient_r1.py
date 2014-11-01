@@ -20,7 +20,9 @@ try:
     hostIPAddress = str(raw_input('What is the host IP Address?')) #ask user for the host IP address
     try:
         socketObject.connect((hostIPAddress, port)) #try connecting to host
-
+        print socketObject.recv(1024)
+        print socketObject.recv(1024)
+        print socketObject.recv(1024)
 
     except Exception as inst:
             print ("An Exception was thrown");
