@@ -77,7 +77,7 @@ try:
                                             #IF YES, THEN TELL THE SERVER "Found match"
                                             #THEN DISPLAY "FINISHED" PLUS THE RESULTS THE NODE FOUND
 except Exception as inst:
-            print ("An Exception was thrown");
+            print ("An Exception has occured.");
             print type(inst) #the exception instance
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
