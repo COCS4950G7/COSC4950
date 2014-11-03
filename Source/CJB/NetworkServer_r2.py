@@ -10,14 +10,16 @@ __author__ = 'Chris_Hamm'
             # Multiple new status lines have been added in for debugging purposes
             # Server has exception handling while waiting for nodes to connect
 
-    #Nove 2 2014 Chris Hamm (CURRENT REVISION)
+    #Nov 2 2014 Chris Hamm (CURRENT REVISION)
             #(UNTESTED) If server throws an exception, it sends a message to all nodes before closing the socket
-            #(UNTESTED) Server prompts user to select what type of cracking method you will be performing
+            # Server prompts user to select what type of cracking method you will be performing
             #(UNTESTED) Server informs the client nodes about what cracking mode the server is running
-            #(UNTESTED) Additonal try and except clause have been added to handle errors that are thrown in a section that is not covered by another try except clause
-
-    #UNSOLVED ERROR
-        #Somehow the socket was not closed properly and I was not able to run the server code on my computer again until I restarted my computer
+            #(UNTESTED) Additonal try and except clause have been added to handle errors that are thrown in a section
+                        # that is not covered by another try except clause
+    #Nov 3 2014 Chris Hamm
+            # Fixed some errors regarding the interface
+            #FUTURE NOTE: IMPLEMENT tcp reuse command on socket!!!!! to fix socket in use error, also change socket
+            #FUTURE Note: add error handling for the type of cracking input prompt
 
 #STARTUP SERVER#########################
 import socket #import the socket module
@@ -28,14 +30,15 @@ socketObject.bind(('',port)) #bind to port
 #PROMPT USER FOR NUMBER OF NODES##############################
 numOfNodes = int(raw_input('How many nodes will there be? ')) #store how many nodes there will be
 print ("Number of Nodes: " + str(numOfNodes)); #tell user how many nodes have been set to wait for
-print ("Now waiting for nodes to connect.");
+
 
 #PROMPT USER FOR WHAT MODE WILL THE SERVER BE RUNNING
-typeOfCracking = int(raw_input('What cracking method are you using? (Enter the appropriate Number) \n '
+typeOfCracking = int(raw_input('What cracking method are you using? (Enter the appropriate Number) \n'
                                '1) Brute-Force \n' #1 represents Brute-Force
                                '2) Dictionary \n' #2 represents Dictionary Attacks
-                               '3) Rainbow Tables')) #3 represents Rainbow Tables
+                               '3) Rainbow Tables \n')) #3 represents Rainbow Tables
 
+print ("Now waiting for nodes to connect.");
 #WAIT FOR ALL NODES TO CONNECT#######################
 numOfConnectedNodes = int(0) #a counter to count how many nodes have connected
 listOfConnectedIPAddresses = []; #contains the ip addresses of all connected nodes
