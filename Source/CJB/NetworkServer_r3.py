@@ -1,6 +1,6 @@
-__author__ = 'Chris_Hamm'
-#NetworkServer_r2
-#CREATED ON NOV 2 2014
+__author__ = 'chris'
+#NetworkServer_r3
+#CREATED ON NOV 3 2014
 
     #Nov 1 2014 Chris Hamm (FROM PREVIOUS REVISION)
             # Added the basic connection code
@@ -10,13 +10,13 @@ __author__ = 'Chris_Hamm'
             # Multiple new status lines have been added in for debugging purposes
             # Server has exception handling while waiting for nodes to connect
 
-    #Nov 2 2014 Chris Hamm (CURRENT REVISION)
+    #Nov 2 2014 Chris Hamm (FROM PREVIOUS REVISION)
             #(UNTESTED) If server throws an exception, it sends a message to all nodes before closing the socket
             # Server prompts user to select what type of cracking method you will be performing
             # Server informs the client nodes about what cracking mode the server is running
             # Additional try and except clause have been added to handle errors that are thrown in a section
                         # that is not covered by another try except clause
-    #Nov 3 2014 Chris Hamm
+    #Nov 3 2014 Chris Hamm (FROM PREVIOUS REVISION)
             # Fixed some errors regarding the interface
             # Added tolerance for incorrect input when selecting a type of cracking
             #BUG: IF A CLIENT DISCONNECTS WITHOUT TELLING THE SERVER, SERVER DOES NOT KNOW IT HAS DISCONNECTED
@@ -25,8 +25,12 @@ __author__ = 'Chris_Hamm'
                 #NEED TO USE TWISTED
             #FUTURE NOTE: IMPLEMENT tcp reuse command on socket!!!!! to fix socket in use error, also change socket
 
+    #Nov 3 2014 Chris Hamm (CURRENT REVISION)
+        #Implementing ability to use external classes (Twisted)
+
 
 #STARTUP SERVER#########################
+import Twisted #used for the multiple node connections
 import socket #import the socket module
 socketObject= socket.socket() #create a socket object
 port= 12397 #reserving a port for the service
