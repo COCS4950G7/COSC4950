@@ -30,10 +30,14 @@
 #       Laptop running OSX 10.9 i5 @ 2.53GHz 8gb ram, took 388.63 seconds with 383,016 hashes per second
 #       Set up desktop tower with intel Dual Core @ 1.8GHz, 4GB ram, running centos, 431.9 secons with 273,697 hps
 
+#   11/5/2014
+#       Replaced the numbered process and chunk variables with arrays of the same. Now automatically spawns the correct
+#       number of proceses and chunks as needed for that number.
+#       Nick Baum
 
 import hashlib
 from time import time
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe, Lock, cpu_count
 import os
 
 class DemoCrack():
@@ -41,11 +45,11 @@ class DemoCrack():
     algorithm = "sha256"
     origHash = ''
     alphabet = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789") #added by chris h
-    chunk1 = 1
-    chunk2 = 1
+    chunks = []
     key = ''
     alphaChoice = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" # changed by chris h
     countey = 0
+    number_of_processes = cpu_count()
 
 
     def __init__(self):
@@ -79,61 +83,15 @@ class DemoCrack():
 
         parentPipe, childPipe = Pipe()
 
-        child1 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        children = []
 
-        child2 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        for i in range(0, self.number_of_processes):
+            children.append(Process(target=self.subProcess, args=(childPipe, lock, )))
+            children[i].start()
 
-        child3 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child5 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child6 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child7 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child8 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child1.start()
-
-        child2.start()
-
-        child3.start()
-
-        child4.start()
-
-        child5.start()
-
-        child6.start()
-
-        child7.start()
-
-        child8.start()
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk1)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk2)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk3)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk4)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk5)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk6)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk7)
-
-        parentPipe.send("6")
-        parentPipe.send(self.chunk8)
+        for chunk in self.chunks:
+            parentPipe.send("6")
+            parentPipe.send(chunk)
 
         count = 0
 
@@ -145,21 +103,8 @@ class DemoCrack():
 
             if count > 7:
 
-                child1.join()
-
-                child2.join()
-
-                child3.join()
-
-                child4.join()
-
-                child5.join()
-
-                child6.join()
-
-                child7.join()
-
-                child8.join()
+                for i in range(0, self.number_of_processes):
+                    children[i].join()
 
                 print "No Dice!"
 
@@ -173,21 +118,8 @@ class DemoCrack():
 
                     self.countey = parentPipe.recv()
 
-                    child1.terminate()
-
-                    child2.terminate()
-
-                    child3.terminate()
-
-                    child4.terminate()
-
-                    child5.terminate()
-
-                    child6.terminate()
-
-                    child7.terminate()
-
-                    child8.terminate()
+                    for i in range(0, self.number_of_processes):
+                        children[i].terminate()
 
                     done = True
 
@@ -240,23 +172,9 @@ class DemoCrack():
 
     def chunkIt(self):
 
-        chunky = [self.alphabet[i::8] for i in range(8)]
-
-        self.chunk1 = chunky.pop()
-
-        self.chunk2 = chunky.pop()
-
-        self.chunk3 = chunky.pop()
-
-        self.chunk4 = chunky.pop()
-
-        self.chunk5 = chunky.pop()
-
-        self.chunk6 = chunky.pop()
-
-        self.chunk7 = chunky.pop()
-
-        self.chunk8 = chunky.pop()
+        chunky = [self.alphabet[i::self.number_of_processes] for i in range(self.number_of_processes)]
+        for chunk in chunky:
+            self.chunks.append(chunk)
 
 
     def getHash(self):
