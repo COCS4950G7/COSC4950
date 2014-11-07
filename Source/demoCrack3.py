@@ -101,7 +101,7 @@ class DemoCrack():
 
         while not done:
 
-            if count > 7:
+            if count > (self.number_of_processes - 1):
 
                 for i in range(0, self.number_of_processes):
                     children[i].join()
@@ -128,7 +128,7 @@ class DemoCrack():
         elapsed = (time() - start)
         print "That took: ", elapsed, " seconds."
 
-        speed = (8 * int(self.countey)) / elapsed
+        speed = (self.number_of_processes * int(self.countey)) / elapsed
 
         if rec == "found":
 
