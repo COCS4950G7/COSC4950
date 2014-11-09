@@ -11,6 +11,7 @@ __author__ = 'Chris_Hamm'
     #Nov 2 2014 -Chris Hamm (CURRENT REVISION)
         #Can now receive multiple lines from the server and display them
         #(UNTESTED) Will tell the server that there was an exception on the clients end and that the client must disconnect
+        #BUG: NEEDS TO BE ABLE HANDLE THE USER INPUTTING THE WRONG IP ADDRESS
         #FUTURE DESIGN CHANGE PLANNED - Have the client node always listen for messages from the server
 
 try:
