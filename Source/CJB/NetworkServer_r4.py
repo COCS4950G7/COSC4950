@@ -13,6 +13,7 @@ try:
     #NOTE: PRIVATE/DYNAMIC PORT NUMBERS ARE BETWEEN 49,152 AND 65,535
     initialPort= 49200 #use this port to initially connect to the server.
     initialConnectionSocket.bind(('',initialPort))  #Binding the socket to that port
+    initialConnectionSocket.listen(5)
 
     listOfPossiblePorts= [52000, 52001, 52002, 52003, 52004] #this list contains all of the possible ports the server can use to connunicate with clients (except the initial port)
     possiblePortsIndex= 0 #index used to iterate over the list of possible ports
@@ -27,6 +28,7 @@ try:
         firstClientPort= listOfPossiblePorts[possiblePortsIndex]
         possiblePortsIndex= 1 + possiblePortsIndex
         firstClientSocket.bind(('',firstClientPort))
+        firstClientSocket.listen(5)
     except Exception as inst:
         print("ERROR: problem with firstClientPort/possiblePortsIndex");
         print type(inst) #the exception instance
@@ -38,6 +40,7 @@ try:
         secondClientPort= listOfPossiblePorts[possiblePortsIndex]
         possiblePortsIndex= 1 + possiblePortsIndex
         secondClientSocket.bind(('',secondClientPort))
+        secondClientSocket.listen(5)
     except Exception as inst:
         print("ERROR: problem with secondClientPort/possiblePortsIndex");
         print type(inst) #the exception instance
@@ -49,6 +52,7 @@ try:
         thirdClientPort= listOfPossiblePorts[possiblePortsIndex]
         possiblePortsIndex= 1 + possiblePortsIndex
         thirdClientSocket.bind(('',thirdClientPort))
+        thirdClientSocket.listen(5)
     except Exception as inst:
         print("ERROR: problem with thirdClientPort/possiblePortsIndex");
         print type(inst) #the exception instance
@@ -56,10 +60,12 @@ try:
         print inst #_str_ allows args tto be printed directly
 
     fourthClientSocket= socket.socket()
+    # noinspection PyUnboundLocalVariable
     try:
         fourthClientPort= listOfPossiblePorts[possiblePortsIndex]
         possiblePortsIndex= 1 + possiblePortsIndex
         fourthClientSocket.bind(('',fourthClientPort))
+        fourthClientSocket.listen(5)
     except Exception as inst:
         print("ERROR: problem with fourthClientPort/possiblePortsIndex");
         print type(inst) #the exception instance
@@ -71,6 +77,7 @@ try:
         fifthClientPort= listOfPossiblePorts[possiblePortsIndex]
         possiblePortsIndex= 1 + possiblePortsIndex
         fifthClientSocket.bind(('',fifthClientPort))
+        fifthClientSocket.listen(5)
     except Exception as inst:
         print("ERROR: problem with fifthClientPort/possiblePortsIndex");
         print type(inst) #the exception instance
@@ -81,24 +88,46 @@ try:
 
     #CREATE CUSTOM CLASS OBJECTS TO HOLD THE NESSECARY PARAMETERS FOR EACH CRACKING METHOD TYPE
     class BruteForceParams:
+        #initializer
         def _init_(self, inputStartingPoint = None, inputEndingPoint = None):
             self.startingPoint = inputStartingPoint
             self.endingPoint = inputEndingPoint
+    #BruteForceParams constructor
+    def make_BruteForceParams(inputStartingPoint, inputEndingPoint):
+        newBruteForceParams = BruteForceParams(inputStartingPoint, inputEndingPoint)
+        return newBruteForceParams
 
     class DictionaryParams:
+        #initializer
         def _init_(self, inputDictionaryFile= None):
             self.dictionaryFile= inputDictionaryFile
+    #DictionaryParams constructor
+    def make_DictionaryParams(inputDictionaryFile):
+        newDictionaryParams= DictionaryParams(inputDictionaryFile)
+        return newDictionaryParams
 
     class RainbowTableParams:
+        #initializer
         def _init_(self, inputRainbowTableFile= None):
             self.rainbowTableFile= inputRainbowTableFile
+    #RainbowTableParams constructor
+    def make_RainbowTableParams(inputRainbowTableFile):
+        newRainbowTableParams= RainbowTableParams(inputRainbowTableFile)
+        return newRainbowTableParams
+
     #END OF CREATING CUSTOM PARAMETER CLASSES
     #CREATE CUSTOM CLIENT CLASS, THIS WILL BE USED TO KEEP TRACK OF WHAT EACH CLIENT IS DOING
     class Client:
-        def _init_(self, inputCrackingMethod= None, inputPossiblePortListIndex= None, inputCurrentTask= None):
+        #initializer
+        def _init_(self, inputCrackingMethod= None, inputPortNumber= None, inputCurrentTask= None):
             self.crackingMethod= inputCrackingMethod  #used to determine what cracking method this client is doing (intented to be used for the all cracking methods setting)
-            self.possiblePortListIndex= inputPossiblePortListIndex #used to indicate what the index value of the current port being used is. This is referring to the listOfPossiblePorts (above)
+            self.portNumber= inputPortNumber #used to indicate what port is being used
             self.currentTask= inputCurrentTask #this holds the custom parameter class that corresponds to the cracking method so that the server knows what each client is doing
+    #Client constructor
+    def make_Client(inputCrackingMethod, inputPortNumber):
+        newClient= Client(inputCrackingMethod, inputPortNumber, None) #None refers to a null object
+        return newClient
+
     #END OF CREATING CUSTOM CLIENT CLASS
 
     #PROMPT USER FOR CRACKING MODE
@@ -135,6 +164,41 @@ try:
 
     print("Now waiting for nodes to connect...");
 
+    finished= False #This variable is states whether or not the servers job is finished. (default: false)
+    listOfConnectedClients= [] #this list will contain client objects that tell what each client is doing
+    numOfCurrentlyConnectedClients= 0 #used to count how many clients are connected NOT FOR POSSIBLEPORTINDEX
+
+    while(finished == False):
+        #If a new client connects to the servers initial connection port and sends the server the connection message,
+        #tell the client where to redirect to
+        print("Debugging message begin");
+        if(initialConnectionSocket.recv(1024,"New Client Has Connected") == True):
+            print("Debugging message middle");
+            initialConnectionSocket.send("You have initially connected to the server. \n"
+                                         "Preparing to send new port information")
+            print("Debugging message end");
+            try:
+                theNewClient= make_Client(typeOfCracking, listOfPossiblePorts[possiblePortsIndex]) #makes a new client object
+                possiblePortsIndex= 1+possiblePortsIndex #increment iterator
+                listOfConnectedClients[numOfCurrentlyConnectedClients]= theNewClient
+                numOfCurrentlyConnectedClients= 1+numOfCurrentlyConnectedClients
+                print("New client object sucsessfully created.");
+                #tell client the information it needs (will send two messages)
+                initialConnectionSocket.send(theNewClient.crackingMethod)
+                initialConnectionSocket.send(theNewClient.portNumber)
+                print("sent client new port information.");
+                print("Number of clients currently connected: " + numOfCurrentlyConnectedClients);
+                #client needs to disconnect from the initialConnectionsocket
+            except Exception as inst:
+                print("ERROR: Problem with redirecting initial client to new port");
+                print("Closing all sockets");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+        #End of if statement
+
+
+#END OF THE MASTER TRY BLOCK
 except Exception as inst:
         print("ERROR: An exception was thrown!");
         print("Closing all sockets");
