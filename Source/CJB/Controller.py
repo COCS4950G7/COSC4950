@@ -824,26 +824,90 @@ class Controller():
                 #if we're at the singleRainMakerScreen state (Screen)
                 elif state == "singleRainMakerScreen":
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainMakerScreen"
-                    print "(makeIt)"
-                    print "(back)"
+                    print "singleRainMakerScreen"
+                    print
+
+                    #Get the algorithm
+                    print "What's the algorithm: "
+                    print "(md5)"
+                    print "(sha1)"
+                    print "(sha256)"
+                    print "(sha512)"
+                    print
+                    algo = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"md5", "sha1", "sha256", "sha512"}
+                    while not algo in goodNames:
+
+                        print "Input Error!"
+
+                        algo = raw_input("Try Again: ")
+
+                    #Set algorithm of RainbowMaker to user input of 'algo'
+                    self.rainbowMaker.setAlgorithm(algo)
+
+                    #Get the Number of chars of key
+                    print
+                    numChars = raw_input("How many characters will the key be? ")
+                    self.rainbowMaker.setNumChars(numChars)
+
+                    #Get the alphabet to be used
+                    print
+                    print "What's the alphabet: "
+                    print "0-9(d)"
+                    print "a-z(a)"
+                    print "A-Z(A)"
+                    print "a-z&A-Z(m)"
+                    print
+                    alphabet = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"d", "a", "A", "m"}
+                    while not alphabet in goodNames:
+
+                        print "Input Error!"
+
+                        alphabet = raw_input("Try Again: ")
+                    self.rainbowMaker.setAlphabet(alphabet)
+
+                    #Get dimensions
+                    print
+                    chainLength = raw_input("How long will the chains be? ")
+                    print
+                    numRows = raw_input("How many rows will there be? ")
+                    self.rainbowMaker.setDimensions(chainLength, numRows)
+
+                    #Get the file name
+                    print
+                    fileName = raw_input("What's the file name: ")
+                    self.rainbowMaker.setFileName(fileName)
+
+                    #Get the go-ahead
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Create)"
+                    print
+                    print "(Back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "makeIt":
+                    #Sterolize inputs
+                    goodNames = {"Create", "Back", "Exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("singleRainMakerDoingScreen")
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput == "Create":
+
                         self.state = "singleRainMakerDoingScreen"
 
-                        #get info from GUI and pass to Brute_Force class
+                    elif userInput == "Back":
 
-
-                    elif userInput == "back":
-
-                        ###GUI.setState("singleStartScreen")
                         self.state = "singleStartScreen"
 
                     else:
@@ -855,24 +919,60 @@ class Controller():
                 elif state == "singleRainMakerDoingScreen":
 
                     #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainMakerDoingScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    self.clock = time()
 
-                        ###GUI.setState("singleRainMakerScreen")
-                        self.state = "singleRainMakerScreen"
+                    #Have one ranbowMaker (ie server-size) that chunks the data
+                    #   So you don't have to send the whole file to every node
+                    rainbowMaker2 = RainbowMaker.RainbowMaker()
 
-                    else:
+                    #Give new rainbowMaker (node) info it needs through a string (sent over network)
+                    rainbowMaker2.setVariables(self.rainbowMaker.serverString())
 
-                        #We're done
-                        self.done = True
+                    #Get the file ready (put info in first line)
+                    self.rainbowMaker.setupFile()
+
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
+
+                    #While we haven't gotten all through the file or found the key...
+                    while not self.rainbowMaker.isDone():
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Creating--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+                        #Serve up the next chunk from the server-side dictionary class
+                        #chunkList = self.rainbowMaker.getNextChunk()
+
+                        #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
+                        #IE: number of total rows user picked divided into __ different chunks
+                        #chunkSize = self.rainbowMaker.numRows()/100
+
+                        #and process it using the node-side client
+                        chunkOfDone = rainbowMaker2.create()
+
+                        #Then give the result back to the server
+                        self.rainbowMaker.giveChunk(chunkOfDone)
+
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
+
+                    #Done, next screen
+                    self.state = "singleRainMakerDoneScreen"
 
                 #if we're at the singleRainMakerDoneScreen state (Screen)
                 elif state == "singleRainMakerDoneScreen":
@@ -883,14 +983,28 @@ class Controller():
                     ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainMakerDoneScreen"
-                    print "(back)"
+
+                    print "We just made ", self.rainbowMaker.getFileName()
+                    print "With chain length of ", self.rainbowMaker.getLength()
+                    print "And ", self.rainbowMaker.numRows(), "rows."
+                    print "And it took", self.clock, "seconds."
+
+                    print "(Back)"
                     print "(Exit)"
+                    self.rainbowMaker.reset()
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    #Sterolize inputs
+                    goodNames = {"Back", "Exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("singlerRainMakerScreen")
-                        self.state = "singlerRainMakerScreen"
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput == "Back":
+
+                        self.state = "singleRainMakerScreen"
 
                     else:
 
