@@ -172,7 +172,7 @@ try:
         #If a new client connects to the servers initial connection port and sends the server the connection message,
         #tell the client where to redirect to
         print("Debugging message begin");
-        if(initialConnectionSocket.recv(1024,"New Client Has Connected") == True):
+        if(initialConnectionSocket.recv(1024) == "New Client Has Connected"):
             print("Debugging message middle");
             initialConnectionSocket.send("You have initially connected to the server. \n"
                                          "Preparing to send new port information")
