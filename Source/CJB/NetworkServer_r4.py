@@ -174,7 +174,7 @@ try:
         #while socket is not connected
         while True:
             c, addr = initialConnectionSocket.accept()
-            print("Got connection from " + addr);
+            print("Got connection from " + str(raw_input(addr)));
 
         try:
             theNewClient= make_Client(typeOfCracking, listOfPossiblePorts[possiblePortsIndex]) #makes a new client object
