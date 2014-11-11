@@ -119,7 +119,7 @@ try:
     #CREATE CUSTOM CLIENT CLASS, THIS WILL BE USED TO KEEP TRACK OF WHAT EACH CLIENT IS DOING
     class Client:
         #initializer
-        def _init_(self, inputCrackingMethod= None, inputPortNumber= None, inputCurrentTask= None):
+        def _init_(self, inputCrackingMethod= None, inputPortNumber=None, inputCurrentTask= None):
             self.crackingMethod= inputCrackingMethod  #used to determine what cracking method this client is doing (intented to be used for the all cracking methods setting)
             self.portNumber= inputPortNumber #used to indicate what port is being used
             self.currentTask= inputCurrentTask #this holds the custom parameter class that corresponds to the cracking method so that the server knows what each client is doing
@@ -172,28 +172,37 @@ try:
         #If a new client connects to the servers initial connection port and sends the server the connection message,
         #tell the client where to redirect to
         #while socket is not connected
-        while True:
-            c, addr = initialConnectionSocket.accept()
-            print("Got connection from " + str(raw_input(addr)));
-
-        try:
-            theNewClient= make_Client(typeOfCracking, listOfPossiblePorts[possiblePortsIndex]) #makes a new client object
-            possiblePortsIndex= 1+possiblePortsIndex #increment iterator
-            listOfConnectedClients[numOfCurrentlyConnectedClients]= theNewClient
-            numOfCurrentlyConnectedClients= 1+numOfCurrentlyConnectedClients
-            print("New client object sucsessfully created.");
-            #tell client the information it needs (will send two messages)
-            initialConnectionSocket.send(theNewClient.crackingMethod)
-            initialConnectionSocket.send(theNewClient.portNumber)
-            print("sent client new port information.");
-            print("Number of clients currently connected: " + numOfCurrentlyConnectedClients);
-            #client needs to disconnect from the initialConnectionsocket
-        except Exception as inst:
-            print("ERROR: Problem with redirecting initial client to new port");
-            print("Closing all sockets");
-            print type(inst) #the exception instance
-            print inst.args #srguments stored in .args
-            print inst #_str_ allows args tto be printed directly
+        if True:
+            addr = initialConnectionSocket.accept()
+            print("Got connection from " )#+ str(raw_input(addr))); ##HANGING ON THIS SPECIFIC LINE
+            print("Still waiting...");
+#GETS STUCK IN WHILE LOOP HERE (changing to if did not fix the issue###################
+            try:
+                print("Creating new client object.");
+                theNewClient= make_Client(typeOfCracking, listOfPossiblePorts[possiblePortsIndex]) #makes a new client object
+                possiblePortsIndex= 1+possiblePortsIndex #increment iterator
+                listOfConnectedClients[numOfCurrentlyConnectedClients]= theNewClient
+                numOfCurrentlyConnectedClients= 1+numOfCurrentlyConnectedClients
+                print("New client object sucsessfully created.");
+                #tell client the information it needs (will send two messages)
+                initialConnectionSocket.send(theNewClient.crackingMethod)
+                initialConnectionSocket.send(theNewClient.portNumber)
+                print("sent client new port information.");
+                print("Number of clients currently connected: " + numOfCurrentlyConnectedClients);
+                #client needs to disconnect from the initialConnectionsocket
+            except Exception as inst:
+                print("ERROR: Problem with redirecting initial client to new port");
+                print("Closing all sockets");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+            finally:
+                initialConnectionSocket.close()
+                firstClientSocket.close()
+                secondClientSocket.close()
+                thirdClientSocket.close()
+                fourthClientSocket.close()
+                fifthClientSocket.close()
 
 
 
@@ -207,7 +216,7 @@ except Exception as inst:
 
 finally:
     initialConnectionSocket.close()
-    firstClientSocket.close()
+    #firstClientSocket.close() #CLAIMS THIIS IS NOT DEFINED
     secondClientSocket.close()
     thirdClientSocket.close()
     fourthClientSocket.close()
