@@ -3,7 +3,7 @@ __author__ = 'chris hamm'
 #NetworkServer_r5
 
 #This revision is not designed to use the special classes that r4 used.
-#Sucsessfully connects with a single client (Untested for multiple clients)
+#Sucsessfully connects with a single client and multiple clients!
 #Will give clients the NEXT instruction set, when the client requests it
 
 #Areas marked with @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ are areas that need to be changed to work more in an optimized fashion
