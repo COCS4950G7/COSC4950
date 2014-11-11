@@ -6,6 +6,7 @@ __author__ = 'chris hamm'
 #Sucsessfully connects with a single client (Untested for multiple clients)
 #Will give clients the NEXT instruction set, when the client requests it
 
+#Areas marked with @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ are areas that need to be changed to work more in an optimized fashion
 
 #MASTER TRY BLOCK
 try:
@@ -56,12 +57,14 @@ try:
                 print("Client requested the NEXT instruction set");
                 theClient.send("2nd test instruction set");
                 print("Sent client the NEXT instruction set");
-                #DEMO PURPOSES ONLY
+                #Need to make this a function that can be called@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                #Uses the keyword DONE
                 print("Sending the client the DONE command");
+                #Need to make sure this sends the message to all of the clients@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 theClient.sendall("DONE");
                 print("DONE command was sent to client");
                 print("The following clients have stopped:");
-                #insert for loop here in the future
+                #insert for loop here corresponding to numOfClients variable @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 print "Received message: " + theClient.recv(1024)
 
         except Exception as inst:

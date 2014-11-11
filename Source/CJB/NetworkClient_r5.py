@@ -5,6 +5,8 @@ __author__ = 'chris hamm'
 #This is designed to run with NetworkServer_r5 AND NetworkServer_r5_withThreading
 #This revision is designed to use a single socket, and just change the ports
 
+#Areas marked with @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ are areas that need to be changed to work in a more optimized fashion
+
 #MASTER TRY BLOCK
 try:
     import socket
@@ -33,10 +35,10 @@ try:
     print("Waiting for server instructions...");
     print "Received instructions: " + str(clientSocket.recv(1024))
 
-    serverSaysKeepSearching= True #set tto false when the node needs to be disconnected from network or is done
+    serverSaysKeepSearching= True #set to false when the node needs to be disconnected from network or is done
     while(serverSaysKeepSearching==True):
         #request for the next instruction set
-        try:
+        try: #Need to make into a function that can be called@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             clientSocket.send("NEXT"); #requesting the next instruction set
             print("Requesting the NEXT instruction set...");
             print "Received instructions: " + str(clientSocket.recv(1024))
