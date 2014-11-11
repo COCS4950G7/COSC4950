@@ -16,6 +16,18 @@ try:
     clientSocket.settimeout(20.0) #will time out after 20 seconds
     print("clientSocket was sucsessfully created");
 
+    #prompt user if they want debugging messages turned on
+    showDebuggingMessages= str(raw_input('Do you want to display the debugging messages? (Enter in corresponding numeral) \n'
+                                         '1) Yes \n'
+                                         '2) No (This option does not work, it throws an error and crashes) \n'))
+    if(showDebuggingMessages=="1"):
+        print("Debugging messages are turned ON");
+    elif(showDebuggingMessages=="2"):
+        print("Debugging messages are turned OFF");
+    else:
+        print("ERROR: Invalid input. Defaulting to debugging messages turned ON");
+        showDebuggingMessages="1"
+
     #prompt for the server's ip address
     serverIPAddress= str(raw_input('What is the host (server) IP Address?'))
     try:
@@ -30,10 +42,15 @@ try:
         print("Error code: " + str(msg[0]) + " Message: " + msg[1]);
 
     #print server connection verification message, then send client verification message
-    print clientSocket.recv(1024)
+    if(showDebuggingMessages=="1"):
+        print clientSocket.recv(1024)
+    else:
+        serverVerification= clientSocket.recv(1024)
+
     clientSocket.send("CLIENT VERIFICATION: I am connected");
     print("Waiting for server instructions...");
-    print "Received instructions: " + str(clientSocket.recv(1024))
+    if(showDebuggingMessages=="1"):
+        print "Received instructions: " + str(clientSocket.recv(1024))
 
     serverSaysKeepSearching= True #set to false when the node needs to be disconnected from network or is done
     while(serverSaysKeepSearching==True):
@@ -41,7 +58,10 @@ try:
         try: #Need to make into a function that can be called@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             clientSocket.send("NEXT"); #requesting the next instruction set
             print("Requesting the NEXT instruction set...");
-            print "Received instructions: " + str(clientSocket.recv(1024))
+            if(showDebuggingMessages=="1"):
+                print "Received instructions: " + str(clientSocket.recv(1024))
+            else:
+                myNewInstructions= clientSocket.recv(1024)
         except Exception as inst:
             print("ERROR: Exception thrown in request NEXT instruction set try block");
             print type(inst) #the exception instance
@@ -53,11 +73,15 @@ try:
         try:
             inputServerCommand= clientSocket.recv(1024)
             if(inputServerCommand=="DONE"):
-                print("Server has issued the DONE command.");
+                if(showDebuggingMessages=="1"):
+                    print("Server has issued the DONE command.");
                 serverSaysKeepSearching= False
-                print("Telling server that this client has received the DONE command");
+                if(showDebuggingMessages=="1"):
+                    print("Telling server that this client has received the DONE command");
                 clientSocket.send("Client has received DONE command, halting all searches");
-                print("Program has finished");
+                print("Program has finished by the DONE command");
+            else:
+                print("server command is not DONE");
         except Exception as inst:
             print("ERROR: An error has occurred in the check for servers DONE command try block");
             print type(inst) #the exception instance
