@@ -19,6 +19,19 @@ try:
     serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("Socket was created sucsessfully");
 
+    #ask if debugging messages should be shown
+    showDebuggingMessages= str(raw_input('Do you want to display debugging messages? (Enter in the corresponding numeral) \n'
+                                         '1) Yes \n'
+                                         '2) No \n'))
+    if(showDebuggingMessages == "1"):
+        print("Debugging messages are turned ON");
+    elif(showDebuggingMessages == "2"):
+        print("Debugging messages are turned OFF");
+    else:
+        print("ERROR: Invalid input. Defaulting to Debugging messages turned ON");
+        showDebuggingMessages= "1"
+
+
     #Bind socket to local host and port
     try:
         serverSocket.bind((host, port))
@@ -26,7 +39,8 @@ try:
         print("ERROR: failed to bind (host, port) to serverSocket");
         print("Error code: " + str(msg[0]) + " Message: " + msg[1]);
 
-    print("Socket bind complete");
+    if(showDebuggingMessages=="1"):
+        print("Socket bind complete");
 
     #Start listening to socket
     serverSocket.listen(5)
@@ -41,11 +55,16 @@ try:
         #addr[1] port number???
         print("Connected with " + addr[0] + ":" + str(addr[1]))
         #verify that the server and client are connected
-        print("Running Server/Client verification test...");
+        if(showDebuggingMessages=="1"):
+            print("Running Server/Client verification test...");
         theClient.sendto("SERVER VERIFICATION: You are connected", addr);
-        print theClient.recv(1024)
+        if(showDebuggingMessages=="1"):
+            print theClient.recv(1024)
+        else:
+            clientVerify= theClient.recv(1024)
         numOfClients= 1 + numOfClients
-        print("Server/Client verification test complete");
+        if(showDebuggingMessages=="1"):
+            print("Server/Client verification test complete");
         print("Sending client instructions");
         theClient.sendto("Test instruction set", addr);
         print(str(numOfClients) + " clients are connected");
@@ -54,18 +73,25 @@ try:
         try:
             clientRequest = theClient.recv(1024)
             if(clientRequest=="NEXT"):
-                print("Client requested the NEXT instruction set");
+                if(showDebuggingMessages=="1"):
+                    print("Client requested the NEXT instruction set");
                 theClient.send("2nd test instruction set");
-                print("Sent client the NEXT instruction set");
+                if(showDebuggingMessages=="1"):
+                    print("Sent client the NEXT instruction set");
                 #Need to make this a function that can be called@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 #Uses the keyword DONE
-                print("Sending the client the DONE command");
+                if(showDebuggingMessages=="1"):
+                    print("Sending the client the DONE command");
                 #Need to make sure this sends the message to all of the clients@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 theClient.sendall("DONE");
-                print("DONE command was sent to client");
-                print("The following clients have stopped:");
+                if(showDebuggingMessages=="1"):
+                    print("DONE command was sent to client");
+                print("The following clients have stopped from the DONE command:");
                 #insert for loop here corresponding to numOfClients variable @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                 print "Received message: " + theClient.recv(1024)
+
+            else:
+                print("clientRequest was not a NEXT");
 
         except Exception as inst:
             print("ERROR: Exception was thrown in client requests NEXT try block");
