@@ -81,6 +81,7 @@ try: #main client setup try block
     print("Listening for done command");
     print clientSocket.recv(1024)
     print("Server has issued the DONE command. Halting all searches");
+    print clientSocket.recv(1024) #listening the done additional message
 
   #  serverSaysKeepSearching= True
    # try: #client primary while loop try block
