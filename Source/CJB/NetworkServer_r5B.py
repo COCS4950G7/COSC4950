@@ -10,9 +10,9 @@ __author__ = 'chris hamm'
 #===========================================================================================
 try: #Server Commands try block
     #The DONE Command: This function sends all clients the DONE command along with a message from the server
-    def sendDoneCommand(additionalMessage):
-        serverSocket.sendall("DONE"); #issueing the DONE command
-        serverSocket.sendall(additionalMessage); #sending the additional message
+    def sendDoneCommand(additionalMessage, messageRecipient):
+        serverSocket.sendto("DONE", messageRecipient); #issueing the DONE command
+        serverSocket.sendto(additionalMessage, messageRecipient); #sending the additional message
 
     def sendConnectionVerification(messageRecipient):
         serverSocket.sendto("SEVER CONNECTION VERIFICATION MESSAGE", messageRecipient);
@@ -41,7 +41,7 @@ try: #server input checks try block
             return False
 
     def checkForFoundSolutionCommand(theInput):
-        print("Checking For the Found SOlution Command...");
+        print("Checking For the Found Solution Command...");
         if(theInput== "FOUNDSOLUTION"):
             return True
         else:
@@ -94,13 +94,16 @@ try: #Main server loop try block
     serverIsRunning= True #set to false to exit the while loop
     try: #Server primary while loop try block
         while(serverIsRunning==True):
+
             #wait for client to connect
             theNewClient, addr= serverSocket.accept()
             print("Connected with " + addr[0] + ":" + str(addr[1]));
 
             #send a server verification message
-            sendConnectionVerification(theNewClient);
-            print("Send server connection verification message");
+           # print("debugging message 1");
+           # sendConnectionVerification(theNewClient);
+           # print("debugging message 2");
+           # print("Send server connection verification message");
 
 
 
@@ -121,7 +124,7 @@ except Exception as inst:
     print inst #_str_ allows args tto be printed directly
     print("=============================================================================================");
 finally:
-    print("Sending DONE command to clients");
-    sendDoneCommand("The Server has thrown an exception");
+    #print("Sending DONE command to clients");
+    #sendDoneCommand("The Server has thrown an exception",addr);
     print("Closing the socket");
     serverSocket.close()

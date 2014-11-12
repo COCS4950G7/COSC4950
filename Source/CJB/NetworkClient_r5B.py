@@ -73,27 +73,27 @@ try: #main client setup try block
         print("========================================================================================");
 
     #listen for server connection verification message
-    print("Waiting for server connection verification message");
-    print clientSocket.recv(1024)
-    print("Received verification message from server");
+    #print("Waiting for server connection verification message");
+    #print clientSocket.recv(1024)
+    #print("Received verification message from server");
 
     #test purposes
-    print("Listening for done command");
-    print clientSocket.recv(1024)
-    print("Server has issued the DONE command. Halting all searches");
-    print clientSocket.recv(1024) #listening the done additional message
+    #print("Listening for done command");
+    #print clientSocket.recv(1024)
+    #print("Server has issued the DONE command. Halting all searches");
+    #print clientSocket.recv(1024) #listening the done additional message
 
-  #  serverSaysKeepSearching= True
-   # try: #client primary while loop try block
-    #    while(serverSaysKeepSearching==True):
-
-   # except Exception as inst:
-   #     print("=============================================================================================");
-   #     print("An exception was thrown in the Primary Client While Loop Try Block");
-   #     print type(inst) #the exception instance
-   #     print inst.args #srguments stored in .args
-   #     print inst #_str_ allows args tto be printed directly
-   #     print("=============================================================================================");
+    serverSaysKeepSearching= True
+    try: #client primary while loop try block
+        while(serverSaysKeepSearching==True):
+            tempVar=True
+    except Exception as inst:
+        print("=============================================================================================");
+        print("An exception was thrown in the Primary Client While Loop Try Block");
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        print("=============================================================================================");
 
 except Exception as inst:
     print("=============================================================================================");
