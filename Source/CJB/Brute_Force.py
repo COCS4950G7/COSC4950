@@ -6,7 +6,7 @@
 #   11/5/2014
 #   Rebuilt to check smaller chunks fed to a queue, added a WorkUnit class as a container for whatever information needs
 #   to be passed. Used a similar method of mutiprocessing to the one I added to demoCrack3, automatically creates the
-#   right number of processes for the available processes. Using synchronized, shared variables to update counts and
+#   right number of processes for the available processors. Using synchronized, shared variables to update counts and
 #   end computation when solution is found. Also, it is currently broken for key lengths shorter than 5; finds the
 #   solution but never terminates and the time and speed calculations fail.
 #   Also added simple methods to allow the class to be called from other sources (ie. a controller) and set class
@@ -19,25 +19,23 @@ import hashlib
 import os
 import itertools
 import string
-from multiprocessing import cpu_count, Pipe, Process, Lock, Queue, Value
+from multiprocessing import cpu_count, Process, Queue, Value
 
-from time import time
-
-# minKeyLength must be greater than 3
-minKeyLength = 6
-maxKeyLength = 16
-alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
-num_processes = cpu_count()
+from time import time, sleep
 
 
 class WorkUnit(object):
-    def __init__(self, prefix, length):
+    def __init__(self, prefix, length, alphabet):
         self.prefix = prefix
         self.length = length
+        self.alphabet = alphabet
 
 
 class Brute_Force():
-
+    minKeyLength = 6
+    maxKeyLength = 16
+    alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
+    num_processes = cpu_count()
     algorithm = "sha256"
     origHash = ''
     key = ''
@@ -49,6 +47,8 @@ class Brute_Force():
     chunk_size = 0
     countey = Value('I', 0)
     done = Value('b', False)
+    total_work_units = 0
+
 
     def __init__(self):
         if not __name__ == '__main__':
@@ -60,13 +60,14 @@ class Brute_Force():
     def command_line_demo(self):
         self.commandline()
 
-    def from_controller(self, alphabet, algorithm, origHash):
+    def from_controller(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
         self.alphabet = alphabet
         self.algorithm = algorithm
         self.origHash = origHash
+        self.minKeyLength = min_key_length
+        self.maxKeyLength = max_key_length
         self.set_chars_to_check()
-
-        return self
+        self.run()
 
     def from_controller_demo(self, alphabet, algorithm, key):
         self.alphabet = alphabet
@@ -87,46 +88,50 @@ class Brute_Force():
             return
 
     def set_chars_to_check(self):
-        iterations = alphabet.__len__()
+        iterations = self.alphabet.__len__()
         while True:
-            iterations *= alphabet.__len__()
+            iterations *= self.alphabet.__len__()
             self.charactersToCheck += 1
             if iterations > 2000000:
                 self.charactersToCheck -= 1
-                iterations /= alphabet.__len__()
+                iterations /= self.alphabet.__len__()
                 break
         print "Checking ", self.charactersToCheck, "characters per chunk."
         self.chunk_size = iterations
+        for i in range(self.minKeyLength, self.maxKeyLength):
+            self.total_work_units += ((self.alphabet.__len__() ^ i)/self.chunk_size)
 
     def crack_it(self):
         children = []
-        for j in range(0, num_processes):
+        for j in range(0, self.num_processes):
             children.append(Process(target=self.check_keys, args=(self.queue, self.countey, self.done)))
             children[j].start()
 
         #this may disappear, why even implement passwords that short?
-        if minKeyLength < self.charactersToCheck:
-            for i in range(minKeyLength, self.charactersToCheck):
+        if self.minKeyLength < self.charactersToCheck:
+            for i in range(self.minKeyLength, self.charactersToCheck):
                 self.queue.put(WorkUnit('', i))
 
-        for i in range(minKeyLength - self.charactersToCheck, maxKeyLength - self.charactersToCheck + 1):
-            prefixes = itertools.chain.from_iterable(itertools.product(alphabet, repeat=j)for j in range(i, i+1))
+        for i in range(max(self.minKeyLength - self.charactersToCheck, self.charactersToCheck), self.maxKeyLength - self.charactersToCheck + 1):
+            prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             print "starting process for key length ", i + self.charactersToCheck
             for prefix in prefixes:
                 if self.done.value:
                     self.queue.close()
+                    self.terminate_processes(children)
                     return
-                self.queue.put(WorkUnit(prefix, i))
+                self.queue.put(WorkUnit(prefix, i, self.alphabet))
             with self.done.get_lock():
                 if self.done.value:
                     self.queue.close()
-                return
+                    self.terminate_processes(children)
+                    return
 
         #wait while we burn through the remaining queue
         while self.queue:
-
             if self.done.value:
                 break
+
         self.queue.close()
         self.terminate_processes(children)
 
@@ -142,7 +147,7 @@ class Brute_Force():
             if done.value:
                 return
             workunit = queue.get()
-            print "checkKeys called for the prefix ", ''.join(workunit.prefix)
+            print "checkKeys called for length %d and the prefix %s" % (workunit.length, ''.join(workunit.prefix))
 
             #support for 1 or 2 char keys is broken for now, maybe forever, who allows passwords so short?
             if workunit.length < self.charactersToCheck:
@@ -151,7 +156,7 @@ class Brute_Force():
                 keysize = self.charactersToCheck
 
             prefix = ''.join(workunit.prefix)
-            keylist = itertools.product(alphabet, repeat=self.charactersToCheck)
+            keylist = itertools.product(self.alphabet, repeat=keysize)
             for key in keylist:
                 tempkey = prefix + ''.join(key)
                 mycount += 1
@@ -161,17 +166,17 @@ class Brute_Force():
                     while not queue.empty():
                         queue.get()
                     with self.countey.get_lock():
-                        countey.value += mycount
+                        countey.value += 1
                     print "We win!"
 
                     return True
             with self.countey.get_lock():
-                countey.value += self.chunk_size
+                countey.value += 1
         return None
 
     def get_hash(self):
 
-        key = raw_input("Enter a key from %d to %d characters: " % (minKeyLength, maxKeyLength))
+        key = raw_input("Enter a key from %d to %d characters: " % (self.minKeyLength, self.maxKeyLength))
         self.key = key
 
         self.origHash = hashlib.new(self.algorithm, key).hexdigest()
@@ -186,7 +191,7 @@ class Brute_Force():
         print
         print "Key is:       ", self.key
         print "Hash is:      ", self.origHash
-        print "Searching:    ", alphabet
+        print "Searching:    ", self.alphabet
         print "**********************************"
 
     def is_solution(self, key):
@@ -213,9 +218,9 @@ class Brute_Force():
 
         self.elapsed = (finish - start)
 
-        self.speed = self.countey.value / self.elapsed
+        self.speed = (self.countey.value * self.chunk_size)/self.elapsed
 
-        return
+        return self.key
 
     def commandline(self):
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -230,7 +235,7 @@ class Brute_Force():
         self.run()
 
         print "That took: ", self.elapsed, " seconds."
-        self.speed = self.countey.value/self.elapsed
+        self.speed = (self.countey.value * self.chunk_size)/self.elapsed
         print "At about: ", self.speed, " hashes per second."
 
         if self.done.value:
