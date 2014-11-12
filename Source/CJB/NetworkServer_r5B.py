@@ -65,7 +65,7 @@ try: #Main server loop try block
             sendConnectionVerification(theNewClient);
             print("Send server connection verification message");
 
-            raise Exception("force throw of done command")
+
 
     except Exception as inst:
         print("=============================================================================================");
