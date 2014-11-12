@@ -32,7 +32,7 @@ except Exception as inst:
 # so the server can respond accordingly. For example: receiving the NEXT command , server needs to give client more cracking material
 #============================================================================================
 try: #server input checks try block
-    #NOT BEEN TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!
+
     def checkForNextCommand(theInput):
         print("Checking For the Next Command...");
         if(theInput == "NEXT"):
@@ -47,13 +47,13 @@ try: #server input checks try block
         else:
             return False
 
-    def checkForNone(theInput): #check to see if theInput is equal to None
-        print("Checking to see if input is None");
-        if(theInput is None):
+    def checkForEmptyInput(theInput): #see if the input is empty
+        print("Checking to see if input is empty...");
+        if(theInput== ""):
             return True
         else:
             return False
-    #NOT BEEN TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 except Exception as inst:
     print("=============================================================================================");
     print("An exception was thrown in the Server Input Checks Try Block");
@@ -90,23 +90,31 @@ try: #Main server loop try block
     serverSocket.listen(5)
     print("Now waiting for clients to connect...");
 
+    #WAIT FOR FIRST CLIENT TO CONNECT
+    #wait for client to connect
+    theNewClient, addr= serverSocket.accept()
+    print("First client has connected");
+    print("Connected with " + addr[0] + ":" + str(addr[1]));
+
     #The servers primary while loop
     serverIsRunning= True #set to false to exit the while loop
     try: #Server primary while loop try block
         while(serverIsRunning==True):
             #CHECK FOR CLIENT COMMAND INPUTS
             #check to see if FOUNDSOLUTION was received
-            theInput= serverSocket.recv(1024)
+            theInput= theNewClient.recv(1024) #IS THIS OUT OF SCOPE?????????
             if(checkForFoundSolutionCommand(theInput) == True):
                 print("FOUNDSOLUTION command has been received!");
             #check to see if NEXT command was received
             elif(checkForNextCommand(theInput) == True):
                 print("NEXT command has been received!");
-            #check to see if nothing has been received
-            elif(checkForNone(theInput)):
-                print("None has been received");
+            #check to see if theInput is empty
+            elif(checkForEmptyInput(theInput) == True):
+                print("theInput is Empty!");
 
+            #CHECK TO SEE IF ANOTHER CLIENT IS TRYING TO CONNECT
             #wait for client to connect
+            print("Checking to see if more clients are trying to connect...");
             theNewClient, addr= serverSocket.accept()
             print("Connected with " + addr[0] + ":" + str(addr[1]));
 

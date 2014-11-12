@@ -27,8 +27,7 @@ except Exception as inst:
 #This section contains functions that will check the input from the server
 #=================================================================================================
 try: #Client input checks try block
-    #THIS SECTION IS NOT TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    #THIS SECTION IS NOT TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
     def checkForDoneCommand(theInput): #see if the input is the DONE command
         print("Checking for the DONE command...");
         if(theInput == "DONE"):
