@@ -50,7 +50,7 @@ try: #main client setup try block
     port= 49200
     clientSocket= socket.socket()
     #set the default timeout for trying to connect to a socket
-    clientSocket.settimeout(15.0) #will time out after 15 seconds
+    #clientSocket.settimeout(15.0) #will time out after 15 seconds
     print("clientSocket was sucsessfully created");
 
     #prompt for the server's ip address
