@@ -109,20 +109,29 @@ class Brute_Force():
 
         #this may disappear, why even implement passwords that short?
         if self.minKeyLength < self.charactersToCheck:
-            for i in range(self.minKeyLength, self.charactersToCheck):
-                self.queue.put(WorkUnit('', i,self.alphabet))
+            for i in range(self.minKeyLength, self.charactersToCheck+1):
+                self.queue.put(WorkUnit('', i, self.alphabet))
+        if self.minKeyLength - self.charactersToCheck < 0:
+            starting_length = self.charactersToCheck
+        else:
+            starting_length = self.minKeyLength - self.charactersToCheck
 
-        for i in range(max(self.minKeyLength - self.charactersToCheck, self.charactersToCheck), self.maxKeyLength - self.charactersToCheck + 1):
+        print "Starting length = %d" % starting_length
+        for i in range(starting_length, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             print "starting process for key length ", i + self.charactersToCheck
             for prefix in prefixes:
                 if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
                     self.queue.close()
                     self.terminate_processes(children)
                     return
                 self.queue.put(WorkUnit(prefix, i, self.alphabet))
             with self.done.get_lock():
                 if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
                     self.queue.close()
                     self.terminate_processes(children)
                     return
