@@ -94,17 +94,21 @@ try: #Main server loop try block
     serverIsRunning= True #set to false to exit the while loop
     try: #Server primary while loop try block
         while(serverIsRunning==True):
+            #CHECK FOR CLIENT COMMAND INPUTS
+            #check to see if FOUNDSOLUTION was received
+            theInput= serverSocket.recv(1024)
+            if(checkForFoundSolutionCommand(theInput) == True):
+                print("FOUNDSOLUTION command has been received!");
+            #check to see if NEXT command was received
+            elif(checkForNextCommand(theInput) == True):
+                print("NEXT command has been received!");
+            #check to see if nothing has been received
+            elif(checkForNone(theInput)):
+                print("None has been received");
 
             #wait for client to connect
             theNewClient, addr= serverSocket.accept()
             print("Connected with " + addr[0] + ":" + str(addr[1]));
-
-            #send a server verification message
-           # print("debugging message 1");
-           # sendConnectionVerification(theNewClient);
-           # print("debugging message 2");
-           # print("Send server connection verification message");
-
 
 
     except Exception as inst:

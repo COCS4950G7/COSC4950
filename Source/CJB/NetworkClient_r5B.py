@@ -72,21 +72,17 @@ try: #main client setup try block
         print("Error code: " + str(msg[0]) + " Message: " + msg[1]);
         print("========================================================================================");
 
-    #listen for server connection verification message
-    #print("Waiting for server connection verification message");
-    #print clientSocket.recv(1024)
-    #print("Received verification message from server");
-
-    #test purposes
-    #print("Listening for done command");
-    #print clientSocket.recv(1024)
-    #print("Server has issued the DONE command. Halting all searches");
-    #print clientSocket.recv(1024) #listening the done additional message
-
+    #CLIENT PRIMARY WHILE LOOP
     serverSaysKeepSearching= True
     try: #client primary while loop try block
         while(serverSaysKeepSearching==True):
-            tempVar=True
+            #check for server command inputs
+            theInput= clientSocket.recv(1024)
+            if(checkForDoneCommand(theInput) == True):
+                print("Server has issued the DONE command.");
+
+            #keep performing task
+
     except Exception as inst:
         print("=============================================================================================");
         print("An exception was thrown in the Primary Client While Loop Try Block");
