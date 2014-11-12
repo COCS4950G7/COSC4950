@@ -23,6 +23,26 @@ except Exception as inst:
     print("=============================================================================================");
 
 #================================================================================================
+#CLIENT INPUT CHECKS
+#This section contains functions that will check the input from the server
+#=================================================================================================
+try: #Client input checks try block
+    #THIS SECTION IS NOT TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #THIS SECTION IS NOT TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def checkForDoneCommand(theInput): #see if the input is the DONE command
+        print("Checking for the DONE command...");
+        if(theInput == "DONE"):
+            return True
+        else:
+            return False
+except Exception as inst:
+    print("=============================================================================================");
+    print("An exception was thrown in the Client Inputs Check Try Block");
+    print type(inst) #the exception instance
+    print inst.args #srguments stored in .args
+    print inst #_str_ allows args tto be printed directly
+    print("=============================================================================================");
+#================================================================================================
 #MAIN CLIENT Setup
 #This is the main loop the client goes through
 #================================================================================================

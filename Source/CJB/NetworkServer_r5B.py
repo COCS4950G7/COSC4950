@@ -25,6 +25,43 @@ except Exception as inst:
     print inst #_str_ allows args tto be printed directly
     print("=============================================================================================");
 
+
+#============================================================================================
+#SERVER INPUT CHECKS
+#This section has functions that the server will use to check what the input from the client was,
+# so the server can respond accordingly. For example: receiving the NEXT command , server needs to give client more cracking material
+#============================================================================================
+try: #server input checks try block
+    #NOT BEEN TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!
+    def checkForNextCommand(theInput):
+        print("Checking For the Next Command...");
+        if(theInput == "NEXT"):
+            return True
+        else:
+            return False
+
+    def checkForFoundSolutionCommand(theInput):
+        print("Checking For the Found SOlution Command...");
+        if(theInput== "FOUNDSOLUTION"):
+            return True
+        else:
+            return False
+
+    def checkForNone(theInput): #check to see if theInput is equal to None
+        print("Checking to see if input is None");
+        if(theInput is None):
+            return True
+        else:
+            return False
+    #NOT BEEN TESTED YET!!!!!!!!!!!!!!!!!!!!!!!!!!!
+except Exception as inst:
+    print("=============================================================================================");
+    print("An exception was thrown in the Server Input Checks Try Block");
+    print type(inst) #the exception instance
+    print inst.args #srguments stored in .args
+    print inst #_str_ allows args tto be printed directly
+    print("=============================================================================================");
+
 #============================================================================================
 #MAIN SERVER LOOP
 # This is the main loop that the server goes through, listening for client requests, accepting new clients and more
