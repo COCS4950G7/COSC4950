@@ -110,7 +110,7 @@ class Brute_Force():
         #this may disappear, why even implement passwords that short?
         if self.minKeyLength < self.charactersToCheck:
             for i in range(self.minKeyLength, self.charactersToCheck):
-                self.queue.put(WorkUnit('', i))
+                self.queue.put(WorkUnit('', i,self.alphabet))
 
         for i in range(max(self.minKeyLength - self.charactersToCheck, self.charactersToCheck), self.maxKeyLength - self.charactersToCheck + 1):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
@@ -142,16 +142,17 @@ class Brute_Force():
             process.terminate()
 
     def check_keys(self, queue, countey, done):
-        mycount = 0
+
         while queue:
             if done.value:
                 return
             workunit = queue.get()
-            print "checkKeys called for length %d and the prefix %s" % (workunit.length, ''.join(workunit.prefix))
+            length = workunit.length+workunit.prefix.__len__()
+            print "checkKeys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
 
             #support for 1 or 2 char keys is broken for now, maybe forever, who allows passwords so short?
-            if workunit.length < self.charactersToCheck:
-                keysize = workunit.length
+            if length < self.charactersToCheck:
+                keysize = length
             else:
                 keysize = self.charactersToCheck
 
@@ -159,7 +160,6 @@ class Brute_Force():
             keylist = itertools.product(self.alphabet, repeat=keysize)
             for key in keylist:
                 tempkey = prefix + ''.join(key)
-                mycount += 1
                 if self.is_solution(tempkey):
                     done.value = True
                     self.key = tempkey
