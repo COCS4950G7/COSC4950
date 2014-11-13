@@ -29,7 +29,7 @@ except Exception as inst:
 try: #Client input checks try block
     
     def checkForDoneCommand(theInput): #see if the input is the DONE command
-        print("Checking for the DONE command...");
+        #print("Checking for the DONE command...");
         if(theInput == "DONE"):
             return True
         else:
