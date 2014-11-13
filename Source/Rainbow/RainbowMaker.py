@@ -435,7 +435,7 @@ class RainbowMaker():
 
         #sub-process's chunk size (num rows to calculate)
         #subChunkSize = chunkSize / 8
-        subChunkSize = 10
+        subChunkSize = 1
 
         #Create lock
         lock = Lock()

@@ -7,13 +7,13 @@
 #   Chris Bugg
 #   10/7/14
 
-#   Update - 10/11/14 (CJB)
+#   Update - 10/11/14 (Latest Stable Versions)
 #               -> Main layout is complete, just needs more actual methods
 #               ->  from supporting classes.
 
 #   NOTE: Diagrams of the layout (approximate names) are at bottom of file
 
-#   Update - 10/30/14 (CJB)
+#   Update - 10/30/14 (Latest Stable Versions)
 #               -> Works in Console-only mode with Dictionary class (single-user only)
 #                   -> use "-c" argument to activate console-only mode
 #               -> More friendly UI, W/TIMER, AND STATUS BAR!!!!!
@@ -21,23 +21,29 @@
 #   ############################ W I P ###########################
 
 #Imports
-import GUI
-import Brute_Force
-import Dictionary
-import RainbowMaker
-import RainbowUser
-
 from time import time
 import sys
 import os
 
+#import GUI
+import RainbowMaker
+import Dictionary
+import Brute_Force
+
+
+
+
 #Controller class
+#from Source.Dictionary import Dictionary
+#from Source.Rainbow import RainbowUser
+
+
 class Controller():
 
     #Class variables
     done = False
     rainbowMaker = RainbowMaker.RainbowMaker()
-    rainbowUser = RainbowUser.RainbowUser()
+    #rainbowUser = RainbowUser.RainbowUser()
     dictionary = Dictionary.Dictionary()
 
     #tempGUI Variables
@@ -90,7 +96,7 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "Server", "Single", "Exit"}
+                    goodNames = {"Node", "node", "Server", "server", "Single", "single", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -98,15 +104,15 @@ class Controller():
                         userInput = raw_input("Try Again: ")
 
                     #If user picks Node, tell GUI to go to Node start screen
-                    if userInput == "Node":
+                    if userInput in ("Node", "node"):
 
                         self.state = "nodeStartScreen"
 
-                    elif userInput == "Server":
+                    elif userInput in ("Server", "server"):
 
                         self.state = "serverStartScreen"
 
-                    elif userInput == "Single":
+                    elif userInput in ("single", "Single"):
 
                         self.state = "singleStartScreen"
 
@@ -282,17 +288,17 @@ class Controller():
                 elif state == "serverBruteForceScreen":
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "crackIt":
 
-                        GUI.setState("serverBruteSearchingScreen")
-
+                        #GUI.setState("serverBruteSearchingScreen")
+                        x=1
                         #get info from GUI and pass to Brute_Force class
 
                     elif userInput == "back":
-
-                        GUI.setState("serverForceScreen")
+                        x=1
+                        #GUI.setState("serverForceScreen")
 
                     else:
 
@@ -305,11 +311,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverBruteForceScreen")
+                        x=1
+                        #GUI.setState("serverBruteForceScreen")
 
                     else:
 
@@ -322,11 +328,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverBruteForceScreen")
+                        x=1
+                        #GUI.setState("serverBruteForceScreen")
 
                     else:
 
@@ -339,11 +345,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverBruteForceScreen")
+                        x=1
+                        #GUI.setState("serverBruteForceScreen")
 
                     else:
 
@@ -527,17 +533,17 @@ class Controller():
                 elif state == "serverDictionaryScreen":
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "crackIt":
-
-                        GUI.setState("serverDictionarySearchingScreen")
+                        x=1
+                        #GUI.setState("serverDictionarySearchingScreen")
 
                         #get info from GUI and pass to Brute_Force class
 
                     elif userInput == "back":
-
-                        GUI.setState("serverStartScreen")
+                        x=1
+                        #GUI.setState("serverStartScreen")
 
                     else:
 
@@ -550,11 +556,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverDictionaryScreen")
+                        x=1
+                        #GUI.setState("serverDictionaryScreen")
 
                     else:
 
@@ -567,11 +573,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverDictionaryScreen")
+                        x=1
+                        #GUI.setState("serverDictionaryScreen")
 
                     else:
 
@@ -584,11 +590,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
-
-                        GUI.setState("serverDictionaryScreen")
+                        x=1
+                        #GUI.setState("serverDictionaryScreen")
 
                     else:
 
@@ -614,30 +620,30 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"BruteForce", "RainbowMake", "RainbowUse", "Dictionary", "Back", "Exit"}
+                    goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "BruteForce":
+                    if userInput in ("BruteForce", "bruteforce", "Brute", "brute"):
 
                         self.state = "singleBruteForceScreen"
 
-                    elif userInput == "RainbowMake":
+                    elif userInput in ("RainbowMake", "rainbowmake", "rainmake", "make"):
 
                         self.state = "singleRainMakerScreen"
 
-                    elif userInput == "rainbowUse":
+                    elif userInput in ("RainbowUse", "rainbowuse", "rainuse", "use"):
 
                         self.state = "singleRainUserScreen"
 
-                    elif userInput == "Dictionary":
+                    elif userInput in ("Dictionary", "dictionary", "dic"):
 
                         self.state = "singleDictionaryScreen"
 
-                    elif userInput == "Back":
+                    elif userInput in ("Back", "back"):
 
                         self.state = "startScreen"
 
@@ -650,18 +656,16 @@ class Controller():
                 elif state == "singleBruteForceScreen":
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "crackIt":
 
-                        GUI.setState("singleBruteSearchingScreen")
                         self.state = "singlerRainMakerScreen"
 
                         #get info from GUI and pass to Brute_Force class
 
                     elif userInput == "back":
 
-                        GUI.setState("singleStartScreen")
                         self.state = "singleStartScreen"
 
                     else:
@@ -675,11 +679,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
 
-                        GUI.setState("singleBruteForceScreen")
+                        #GUI.setState("singleBruteForceScreen")
                         self.state = "singlerRainMakerScreen"
 
                     else:
@@ -693,11 +697,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
 
-                        GUI.setState("singleBruteForceScreen")
+                        #GUI.setState("singleBruteForceScreen")
                         self.state = "singlerRainMakerScreen"
 
                     else:
@@ -711,11 +715,11 @@ class Controller():
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    userInput = GUI.getInput()
+                    #userInput = GUI.getInput()
 
                     if userInput == "back":
 
-                        GUI.setState("singleBruteForceScreen")
+                        #GUI.setState("singleBruteForceScreen")
                         self.state = "singlerRainMakerScreen"
 
                     else:
@@ -851,6 +855,12 @@ class Controller():
                     #Get the Number of chars of key
                     print
                     numChars = raw_input("How many characters will the key be? ")
+                    while not self.isInt(numChars):
+
+                        print "Input Error, Not an Integer!"
+
+                        numChars = raw_input("Try Again: ")
+
                     self.rainbowMaker.setNumChars(numChars)
 
                     #Get the alphabet to be used
@@ -875,8 +885,20 @@ class Controller():
                     #Get dimensions
                     print
                     chainLength = raw_input("How long will the chains be? ")
+                    while not self.isInt(chainLength):
+
+                        print "Input Error, Not an Integer!"
+
+                        chainLength = raw_input("Try Again: ")
+
                     print
                     numRows = raw_input("How many rows will there be? ")
+                    while not self.isInt(numRows):
+
+                        print "Input Error, Not an Integer!"
+
+                        numRows = raw_input("Try Again: ")
+
                     self.rainbowMaker.setDimensions(chainLength, numRows)
 
                     #Get the file name
@@ -895,18 +917,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Create", "Back", "Exit"}
+                    goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "Create":
+                    if userInput in ("Create", "create"):
 
                         self.state = "singleRainMakerDoingScreen"
 
-                    elif userInput == "Back":
+                    elif userInput in ("Back", "back"):
 
                         self.state = "singleStartScreen"
 
@@ -995,14 +1017,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "Exit"}
+                    goodNames = {"Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "Back":
+                    if userInput in ("Back", "back"):
 
                         self.state = "singleRainMakerScreen"
 
@@ -1065,18 +1087,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Crack", "Back", "Exit"}
+                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "Crack":
+                    if userInput in ("Crack", "crack"):
 
                         self.state = "singleDictionarySearchingScreen"
 
-                    elif userInput == "Back":
+                    elif userInput in ("Back", "back"):
 
                         self.state = "singleStartScreen"
 
@@ -1161,14 +1183,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "Exit"}
+                    goodNames = {"Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "Back":
+                    if userInput in ("Back", "back"):
 
                         self.state = "singleDictionaryScreen"
 
@@ -1195,14 +1217,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "Exit"}
+                    goodNames = {"Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "Back":
+                    if userInput in ("Back", "back"):
 
                         self.state = "singleDictionaryScreen"
 
@@ -1211,11 +1233,23 @@ class Controller():
                         #We're done
                         self.done = True
 
+    #returns true/false if value is int
+    def isInt(self, value):
+
+        try:
+
+            int(value)
+            return True
+
+        except ValueError:
+
+            return False
+
 Controller()
 
 
 ''''
-Two versions of a diagram grouped differently--CJB
+Two versions of a diagram grouped differently--Latest Stable Versions
 
 startScreen
 

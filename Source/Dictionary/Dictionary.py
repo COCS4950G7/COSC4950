@@ -23,10 +23,10 @@
 #   Chris Bugg is working on this class now
 
 #   Updated 10/18/14:
-#       Should be functioning? Tested on many lists of many sizes and it works just fine...--CJB
+#       Should be functioning? Tested on many lists of many sizes and it works just fine...--Latest Stable Versions
 
 #   Updated 10/30/14:
-#       Can now deal with filenotfound, multiple hash functions, and work with new console-UI --CJB
+#       Can now deal with filenotfound, multiple hash functions, and work with new console-UI --Latest Stable Versions
 
 #Imports
 import hashlib
