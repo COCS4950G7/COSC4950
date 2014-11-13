@@ -68,23 +68,29 @@ except Exception as inst:
 #============================================================================================
 try: #Main server loop try block
     import socket
+    import select
     host= '' #Symbolic name, meaning all available interfaces
     port= 49200
     numOfClients= 0
     #socket.AF_INET is a socket address family represented as a pair. (hostname, port). This is the default parameter
     #socket.SOCK_STREAM is the default parameter. This defines the socket type
     serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #serverSocket.setblocking(0)
+
     print("Socket was created sucsessfully");
 
     #Bind the socket to local host and port
     try: #Bind socket try block
         serverSocket.bind((host,port))
-    except socket.error as msg:
+        print("Socket bind complete.");
+    except socket.error as inst:
         print("========================================================================================");
         print("ERROR: failed to bind (host, port) to serverSocket");
-        print("Error code: " + str(msg[0]) + " Message: " + msg[1]);
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
         print("========================================================================================");
-    print("Socket bind complete.");
+        raise Exception("Could not bind to socket")
 
     #Start listening to socket
     serverSocket.listen(5)
@@ -92,9 +98,11 @@ try: #Main server loop try block
 
     #WAIT FOR FIRST CLIENT TO CONNECT
     #wait for client to connect
+
     theNewClient, addr= serverSocket.accept()
     print("First client has connected");
     print("Connected with " + addr[0] + ":" + str(addr[1]));
+
 
     #The servers primary while loop
     serverIsRunning= True #set to false to exit the while loop
@@ -102,21 +110,42 @@ try: #Main server loop try block
         while(serverIsRunning==True):
             #CHECK FOR CLIENT COMMAND INPUTS
             #check to see if FOUNDSOLUTION was received
-            theInput= theNewClient.recv(1024) #IS THIS OUT OF SCOPE?????????
-            if(checkForFoundSolutionCommand(theInput) == True):
-                print("FOUNDSOLUTION command has been received!");
-            #check to see if NEXT command was received
-            elif(checkForNextCommand(theInput) == True):
-                print("NEXT command has been received!");
-            #check to see if theInput is empty
-            elif(checkForEmptyInput(theInput) == True):
-                print("theInput is Empty!");
+            try: #check for command  inputs try block
+
+                print("Checking for input from client");
+                theInput= theNewClient.recv(1024)
+
+                print("Debugging message 1");
+                if(checkForFoundSolutionCommand(theInput) == True):
+                    print("FOUNDSOLUTION command has been received!");
+                #check to see if NEXT command was received
+                elif(checkForNextCommand(theInput) == True):
+                    print("NEXT command has been received!");
+                #check to see if theInput is empty
+                elif(checkForEmptyInput(theInput) == True):
+                    print("theInput is Empty!");
+
+            except Exception as inst:
+                print("========================================================================================");
+                print("ERROR: problem inside the check for command inputs try block");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("========================================================================================");
 
             #CHECK TO SEE IF ANOTHER CLIENT IS TRYING TO CONNECT
             #wait for client to connect
-            print("Checking to see if more clients are trying to connect...");
-            theNewClient, addr= serverSocket.accept()
-            print("Connected with " + addr[0] + ":" + str(addr[1]));
+            try: #check to see if another client is trying to connect
+                print("Checking to see if more clients are trying to connect...");
+                theNewClient, addr= serverSocket.accept()
+                print("Connected with " + addr[0] + ":" + str(addr[1]));
+            except Exception as inst:
+                print("========================================================================================");
+                print("ERROR: problem finding additional client to connect");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("========================================================================================");
 
 
     except Exception as inst:
