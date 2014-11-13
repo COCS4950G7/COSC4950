@@ -30,6 +30,7 @@ __author__ = 'chris'
 
 
 #STARTUP SERVER#########################
+import Twisted #used for the multiple node connections
 import socket #import the socket module
 socketObject= socket.socket() #create a socket object
 port= 12397 #reserving a port for the service

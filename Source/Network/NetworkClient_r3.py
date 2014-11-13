@@ -19,6 +19,7 @@ __author__ = 'chris'
 try:
 
     #STARTUP NODES####################
+    import Twisted #used for the multiple node connections
     import socket #import socket module
     socketObject= socket.socket() #create a socket object
     port = 12397 #Reserve a port for service
