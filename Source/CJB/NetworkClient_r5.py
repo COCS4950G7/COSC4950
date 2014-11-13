@@ -92,6 +92,11 @@ try:
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
 
+        #Demo code
+        counter=0;
+        while True:
+            if(counter==0):
+                print("Inside eternal loop");
 
 
 #MASTER EXCEPTION BLOCK
