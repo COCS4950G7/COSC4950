@@ -2,6 +2,8 @@ __author__ = 'chris hamm'
 #NetworkClient_r5B
 #Designed to work with NetworkServer_r5B
 
+#DONT USE THIS VERSION ANYMORE , USE R5 INSTEAD
+
 #This is a varient of NetworkClient_r5 that has been structured in a more modular fashion
 
 #==============================================================================================

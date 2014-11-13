@@ -2,6 +2,8 @@ __author__ = 'chris hamm'
 #Created on 11/11/2014
 #NetwrokClient_r5A
 
+#DONT USE THIS VERSION ANYMORE , USE R5 INSTEAD
+
 #This is designed to run with NetworkServer_r5A
 #This revision is designed to use a single socket, and just change the ports
 

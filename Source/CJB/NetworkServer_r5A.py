@@ -3,6 +3,8 @@ __author__ = 'chris hamm'
 #modified version of r5 that makes the next and done commands functions
 #corresponds with network client_r5A
 
+#DONT USE THIS VERSION ANYMORE , USE R5 INSTEAD
+
 #This revision is not designed to use the special classes that r4 used.
 #Sucsessfully connects with a single client and multiple clients!
 #Will give clients the NEXT instruction set, when the client requests it

@@ -97,7 +97,7 @@ try:
         while True:
             if(counter==0):
                 print("Inside eternal loop");
-
+                counter = 1
 
 #MASTER EXCEPTION BLOCK
 except Exception as inst:
