@@ -22,4 +22,4 @@ Wish-List:
 -Error Checking (and Node Crash Recovery)
 -Server Crash Recovery
 -"pause" ability on all classes (save to log-file?)
-
+-GPU integration
