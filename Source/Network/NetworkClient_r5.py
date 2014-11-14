@@ -5,6 +5,8 @@ __author__ = 'chris hamm'
 #This is designed to run with NetworkServer_r5 AND NetworkServer_r5_withThreading
 #This revision is designed to use a single socket, and just change the ports
 
+#THIS HAS BEEN SUPERCEEDED BY NetworkClient_r5B
+
 #Areas marked with @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ are areas that need to be changed to work in a more optimized fashion
 
 #MASTER TRY BLOCK

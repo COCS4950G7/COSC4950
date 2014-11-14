@@ -6,6 +6,8 @@ __author__ = 'chris hamm'
 #Sucsessfully connects with a single client and multiple clients!
 #Will give clients the NEXT instruction set, when the client requests it
 
+#THIS HAS BEEN SUPERCEEDED BY NetworkServer_r5B
+
 #Areas marked with @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ are areas that need to be changed to work more in an optimized fashion
 
 #MASTER TRY BLOCK
