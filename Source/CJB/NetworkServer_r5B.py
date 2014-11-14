@@ -68,7 +68,7 @@ except Exception as inst:
 #============================================================================================
 try: #Main server loop try block
     import socket
-    import select
+    import random
     host= '' #Symbolic name, meaning all available interfaces
     port= 49200
     numOfClients= 0
@@ -94,7 +94,7 @@ try: #Main server loop try block
 
     #Start listening to socket
     serverSocket.listen(5)
-    print("Now waiting for clients to connect...");
+    print("Now waiting for the initial client to connect...");
 
     #WAIT FOR FIRST CLIENT TO CONNECT
     #wait for client to connect
@@ -112,18 +112,26 @@ try: #Main server loop try block
             #check to see if FOUNDSOLUTION was received
             try: #check for command  inputs try block
 
-                print("Checking for input from client");
-                theInput= theNewClient.recv(1024)
-
-                print("Debugging message 1");
-                if(checkForFoundSolutionCommand(theInput) == True):
-                    print("FOUNDSOLUTION command has been received!");
-                #check to see if NEXT command was received
-                elif(checkForNextCommand(theInput) == True):
-                    print("NEXT command has been received!");
-                #check to see if theInput is empty
-                elif(checkForEmptyInput(theInput) == True):
-                    print("theInput is Empty!");
+                print("Checking for input from client(s)...");
+                theNewClient.settimeout(5.0)
+                try:
+                    theInput= theNewClient.recv(1024) #GETS STUCK HERE
+                                                #2ndary error, need a new name for each new client
+                    if(checkForFoundSolutionCommand(theInput) == True):
+                        print("FOUNDSOLUTION command has been received!");
+                    #check to see if NEXT command was received
+                    elif(checkForNextCommand(theInput) == True):
+                        print("NEXT command has been received!");
+                    #check to see if theInput is empty
+                    elif(checkForEmptyInput(theInput) == True):
+                        print("theInput is Empty!");
+                except socket.timeout as inst:
+                    print("========================================================================================");
+                    print("ERROR: Socket timed out. No input was detected.");
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print("========================================================================================");
 
             except Exception as inst:
                 print("========================================================================================");
@@ -132,13 +140,43 @@ try: #Main server loop try block
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
                 print("========================================================================================");
+            #DISTRIBUTE COMMAND TO CLIENTS IF NEEDED
+            try: #distribute command to clients try block
+                magicNumber= random.randrange(0,5) #including zero but smaller than five
+                if(magicNumber==0):
+                    print "Server did not issue any commands"
+                elif(magicNumber==1):
+                    print "Server has issued the DONE command"
+                    theNewClient.sendall("DONE")
+                    print "DONE command successfully sent"
+                    serverIsRunning=False
+                    print "Server is no longer running. Job finished."
+                    break
+                else:
+                    print "Server did not issue any commands"
+
+            except Exception as inst:
+                print("========================================================================================");
+                print("ERROR: problem inside the distribute command to clients try block");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("========================================================================================");
 
             #CHECK TO SEE IF ANOTHER CLIENT IS TRYING TO CONNECT
             #wait for client to connect
             try: #check to see if another client is trying to connect
+                serverSocket.settimeout(2.0)
                 print("Checking to see if more clients are trying to connect...");
                 theNewClient, addr= serverSocket.accept()
                 print("Connected with " + addr[0] + ":" + str(addr[1]));
+            except socket.timeout as inst:
+                print("========================================================================================");
+                print("ERROR: socket timed out. No clients are trying to connect");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("========================================================================================");
             except Exception as inst:
                 print("========================================================================================");
                 print("ERROR: problem finding additional client to connect");

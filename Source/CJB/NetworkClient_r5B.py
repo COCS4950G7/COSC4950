@@ -71,6 +71,7 @@ try: #main client setup try block
         print("========================================================================================");
         print("ERROR: Failed to connect to server");
         print("Error code: " + str(msg[0]) + " Message: " + msg[1]);
+        raise Exception("Failed to connect to server")
         print("========================================================================================");
 
     #CLIENT PRIMARY WHILE LOOP
@@ -78,11 +79,38 @@ try: #main client setup try block
     try: #client primary while loop try block
         while(serverSaysKeepSearching==True):
             #check for server command inputs
-            theInput= clientSocket.recv(1024)
-            if(checkForDoneCommand(theInput) == True):
-                print("Server has issued the DONE command.");
+            clientSocket.settimeout(5.0)
+            try:
+                theInput= clientSocket.recv(1024)
+                if(checkForDoneCommand(theInput) == True):
+                    print("Server has issued the DONE command.");
+                    serverSaysKeepSearching= False
+                    break
+            except socket.timeout as inst:
+                print("=============================================================================================");
+                print("ERROR: Socket has timed out. No server command has been received.");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("=============================================================================================");
+            except Exception as inst:
+                print("=============================================================================================");
+                print("An exception was thrown in the check for server commands input Try Block");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("=============================================================================================");
 
             #keep performing task
+            try: #performing task try block
+                print "Crunching numbers..."
+            except Exception as inst:
+                print("=============================================================================================");
+                print("An exception was thrown in the Performing task Try Block");
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print("=============================================================================================");
 
     except Exception as inst:
         print("=============================================================================================");
@@ -100,4 +128,5 @@ except Exception as inst:
     print inst #_str_ allows args tto be printed directly
     print("=============================================================================================");
 finally:
+    print "Closing the socket"
     clientSocket.close()
