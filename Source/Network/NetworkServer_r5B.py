@@ -77,7 +77,7 @@ try: #Main server loop try block
     serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #serverSocket.setblocking(0)
 
-    print("Socket was created sucsessfully");
+    print("Socket was created successfully");
 
     #Bind the socket to local host and port
     try: #Bind socket try block
