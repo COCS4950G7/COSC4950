@@ -4,6 +4,7 @@ __author__ = 'chris hamm'
 #Created on: 11/14/2014
 
 #This is designed to work with NetworkClient_r6
+#
 
 #===========================================================================================
 #SERVER COMMANDS
