@@ -167,6 +167,6 @@ finally:
     for x in range(0, len(listOfClients)):
         (sock, addr) = listOfClients[x]
         print " " + str(x) + ") socket:" + str(sock) + " address:" + str(addr)
-        serverSocket.sendto("DONE", sock)
+        sock.sendall("DONE")
         print "Send DONE command to client"
 
