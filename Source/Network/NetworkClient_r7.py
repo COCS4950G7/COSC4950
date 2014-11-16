@@ -40,6 +40,10 @@ try: #Master try block
                 try: #checking for server commands try block
                     print "Checking for server commands..."
                     theInput= clientSocket.recv(2048)
+                    if(theInput=="DONE"):
+                        print "Server has issued the DONE command."
+                        serverSaysKeepSearching= False
+                        break
 
                 except socket.timeout as inst:
                     print "============================================================================================="

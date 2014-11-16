@@ -42,7 +42,7 @@ try: #Master try block
     #Display the cracking method type HERE
     #-----------------------------
     try: #getIP tryblock
-        print "The server's IP address is: "
+        print "The server's IP address is (THIS MAY NOT BE CROSS PLATFORM!!): "
         print socket.gethostbyname(socket.gethostname())
     except Exception as inst:
         print "========================================================================================"
@@ -65,7 +65,7 @@ try: #Master try block
     print "Connected with " + addr[0] + ":" + str(addr[1])
     listOfClients.append((sock, addr)) #add the tuple to the list of clients
     print "Client successfully added to the list of clients"
-    print len(listOfClients) + " Client(s) are currently Connected."
+    print str(len(listOfClients)) + " Client(s) are currently Connected."
 
     #Server PRIMARY WHILE LOOP
     serverIsRunning = True
@@ -127,7 +127,7 @@ try: #Master try block
                 print "Connected with " + addr[0] + ":" + str(addr[1])
                 listOfClients.append((sock, addr))
                 print "Client successfully added to the list of clients"
-                print len(listOfClients) + " Client(s) are currently Connected."
+                print str(len(listOfClients)) + " Client(s) are currently Connected."
 
             except socket.timeout as inst:
                 print "========================================================================================"
@@ -166,4 +166,7 @@ finally:
     print "listOfClients currently contains: "
     for x in range(0, len(listOfClients)):
         (sock, addr) = listOfClients[x]
-        print x + ") socket:" + sock + " address:" + addr
+        print " " + str(x) + ") socket:" + str(sock) + " address:" + str(addr)
+        serverSocket.sendto("DONE", sock)
+        print "Send DONE command to client"
+
