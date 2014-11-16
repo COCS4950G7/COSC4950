@@ -1,10 +1,8 @@
 __author__ = 'chris hamm'
-#NetworkServer_r6
-#This is based off of NetworkServer_r5B
-#Created on: 11/14/2014
+#NetworkServer_r5B
+#Designed to work with NetworkClient_r5B
 
-#This is designed to work with NetworkClient_r6
-#THIS VERSION IS OBSOLETE, NEW STRUCTURE INTRODUCED
+#This is a varient of NetworkServer_r5 that has been structured in a more modular fashion
 
 #===========================================================================================
 #SERVER COMMANDS
@@ -20,12 +18,12 @@ try: #Server Commands try block
         serverSocket.sendto("SEVER CONNECTION VERIFICATION MESSAGE", messageRecipient);
 
 except Exception as inst:
-    print "============================================================================================="
-    print "An exception was thrown in the Server Commands Try Block"
+    print("=============================================================================================");
+    print("An exception was thrown in the Server Commands Try Block");
     print type(inst) #the exception instance
     print inst.args #srguments stored in .args
     print inst #_str_ allows args tto be printed directly
-    print "============================================================================================="
+    print("=============================================================================================");
 
 
 #============================================================================================
@@ -36,33 +34,33 @@ except Exception as inst:
 try: #server input checks try block
 
     def checkForNextCommand(theInput):
-        print "Checking For the Next Command..."
+        print("Checking For the Next Command...");
         if(theInput == "NEXT"):
             return True
         else:
             return False
 
     def checkForFoundSolutionCommand(theInput):
-        print "Checking For the Found Solution Command..."
+        print("Checking For the Found Solution Command...");
         if(theInput== "FOUNDSOLUTION"):
             return True
         else:
             return False
 
     def checkForEmptyInput(theInput): #see if the input is empty
-        print "Checking to see if input is empty..."
+        print("Checking to see if input is empty...");
         if(theInput== ""):
             return True
         else:
             return False
 
 except Exception as inst:
-    print "============================================================================================="
-    print "An exception was thrown in the Server Input Checks Try Block"
+    print("=============================================================================================");
+    print("An exception was thrown in the Server Input Checks Try Block");
     print type(inst) #the exception instance
     print inst.args #srguments stored in .args
     print inst #_str_ allows args tto be printed directly
-    print "============================================================================================="
+    print("=============================================================================================");
 
 #============================================================================================
 #MAIN SERVER LOOP
@@ -79,68 +77,31 @@ try: #Main server loop try block
     serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #serverSocket.setblocking(0)
 
-    print "Socket was created successfully"
+    print("Socket was created successfully");
 
     #Bind the socket to local host and port
     try: #Bind socket try block
         serverSocket.bind((host,port))
-        print "Socket bind complete."
+        print("Socket bind complete.");
     except socket.error as inst:
-        print "========================================================================================"
-        print "ERROR: failed to bind (host, port) to serverSocket"
+        print("========================================================================================");
+        print("ERROR: failed to bind (host, port) to serverSocket");
         print type(inst) #the exception instance
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
-        print "========================================================================================"
+        print("========================================================================================");
         raise Exception("Could not bind to socket")
-
-    #prompt user for cracking method
-    try: #prompt user for cracking method try block
-        validCrackingMethod= False
-        while(validCrackingMethod==False):
-            typeOfCracking= int(raw_input('Select the type of Cracking Method you will be using (Select corresponding number): \n'
-                                          '1) Brute-Force \n'
-                                          '2) Dictionary \n'
-                                          '3) Rainbow Tables \n'
-                                          '4) All methods (WARNING: This requires a lot of computers) \n'))
-            if(typeOfCracking < 1):
-                print "-------------------------------------------------"
-                print "Invalid input. Selection must be greater than 0"
-                print "-------------------------------------------------"
-            elif(typeOfCracking > 4):
-                print "-------------------------------------------------"
-                print "Invalid input. Selection must be less than 5"
-                print "-------------------------------------------------"
-            else:
-                validCrackingMethod=True
-    except Exception as inst:
-        print "========================================================================================"
-        print "ERROR: Problem in the Prompt User for Cracking Method try block"
-        print type(inst) #the exception instance
-        print inst.args #srguments stored in .args
-        print inst #_str_ allows args tto be printed directly
-        print "========================================================================================"
-
-    #Display what cracking method was selected
-    if(typeOfCracking==1):
-        print "Brute-Force cracking method has been selected \n"
-    elif(typeOfCracking==2):
-        print "Dictionary cracking method selected \n"
-    elif(typeOfCracking==3):
-        print "Rainbow Table cracking method has been selected \n"
-    elif(typeOfCracking==4):
-        print "All cracking methods have been selected \n"
 
     #Start listening to socket
     serverSocket.listen(5)
-    print "Now waiting for the initial client to connect..."
+    print("Now waiting for the initial client to connect...");
 
     #WAIT FOR FIRST CLIENT TO CONNECT
     #wait for client to connect
 
     theNewClient, addr= serverSocket.accept()
-    print "First client has connected"
-    print "Connected with " + addr[0] + ":" + str(addr[1])
+    print("First client has connected");
+    print("Connected with " + addr[0] + ":" + str(addr[1]));
 
 
     #The servers primary while loop
@@ -148,37 +109,37 @@ try: #Main server loop try block
     try: #Server primary while loop try block
         while(serverIsRunning==True):
             #CHECK FOR CLIENT COMMAND INPUTS
+            #check to see if FOUNDSOLUTION was received
             try: #check for command  inputs try block
-                print "Checking for input from client(s)..."
+
+                print("Checking for input from client(s)...");
                 theNewClient.settimeout(5.0)
                 try:
-                    theInput= theNewClient.recv(1024)
-                    #check to see if FOUNDSOLUTION was received
+                    theInput= theNewClient.recv(1024) #GETS STUCK HERE
+                                                #2ndary error, need a new name for each new client
                     if(checkForFoundSolutionCommand(theInput) == True):
-                        print "FOUNDSOLUTION command has been received!"
-                        print "Issuing the DONE command"
-                        sendDoneCommand("The solution has been found!", theNewClient) #Currently only talks to one client
+                        print("FOUNDSOLUTION command has been received!");
                     #check to see if NEXT command was received
                     elif(checkForNextCommand(theInput) == True):
-                        print "NEXT command has been received!"
+                        print("NEXT command has been received!");
                     #check to see if theInput is empty
                     elif(checkForEmptyInput(theInput) == True):
-                        print "theInput is Empty!"
+                        print("theInput is Empty!");
                 except socket.timeout as inst:
-                    print "========================================================================================"
-                    print "ERROR: Socket timed out. No input was detected."
+                    print("========================================================================================");
+                    print("ERROR: Socket timed out. No input was detected.");
                     print type(inst) #the exception instance
                     print inst.args #srguments stored in .args
                     print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
+                    print("========================================================================================");
 
             except Exception as inst:
-                print "========================================================================================"
-                print "ERROR: problem inside the check for command inputs try block"
+                print("========================================================================================");
+                print("ERROR: problem inside the check for command inputs try block");
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
+                print("========================================================================================");
             #DISTRIBUTE COMMAND TO CLIENTS IF NEEDED
             try: #distribute command to clients try block
                 magicNumber= random.randrange(0,5) #including zero but smaller than five
@@ -186,8 +147,7 @@ try: #Main server loop try block
                     print "Server did not issue any commands"
                 elif(magicNumber==1):
                     print "Server has issued the DONE command"
-                   # theNewClient.sendall("DONE") #THIS NEEDS TO USE THE SERVER COMMAND FUNCTION THAT IS DEFINED ABOVE...
-                    sendDoneCommand("The solution has been found!", theNewClient) #only sends to one client!!!!
+                    theNewClient.sendall("DONE")
                     print "DONE command successfully sent"
                     serverIsRunning=False
                     print "Server is no longer running. Job finished."
@@ -196,51 +156,54 @@ try: #Main server loop try block
                     print "Server did not issue any commands"
 
             except Exception as inst:
-                print "========================================================================================"
-                print "ERROR: problem inside the distribute command to clients try block"
+                print("========================================================================================");
+                print("ERROR: problem inside the distribute command to clients try block");
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
+                print("========================================================================================");
 
             #CHECK TO SEE IF ANOTHER CLIENT IS TRYING TO CONNECT
             #wait for client to connect
             try: #check to see if another client is trying to connect
                 serverSocket.settimeout(2.0)
-                print "Checking to see if more clients are trying to connect..."
+                print("Checking to see if more clients are trying to connect...");
                 theNewClient, addr= serverSocket.accept()
-                print "Connected with " + addr[0] + ":" + str(addr[1])
+                print("Connected with " + addr[0] + ":" + str(addr[1]));
             except socket.timeout as inst:
-                print "========================================================================================"
-                print "ERROR: socket timed out. No clients are trying to connect"
+                print("========================================================================================");
+                print("ERROR: socket timed out. No clients are trying to connect");
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
+                print("========================================================================================");
             except Exception as inst:
-                print "========================================================================================"
-                print "ERROR: problem finding additional client to connect"
+                print("========================================================================================");
+                print("ERROR: problem finding additional client to connect");
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
+                print("========================================================================================");
+
 
     except Exception as inst:
-        print "============================================================================================="
-        print "An exception was thrown in Servers Primary While Loop Try Block"
+        print("=============================================================================================");
+        print("An exception was thrown in Servers Primary While Loop Try Block");
         print type(inst) #the exception instance
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
         serverIsRunning=False
-        print "============================================================================================="
+        print("=============================================================================================");
 
 except Exception as inst:
-    print "============================================================================================="
-    print "An exception was thrown in the Main Server Loop Try Block"
+    print("=============================================================================================");
+    print("An exception was thrown in the Main Server Loop Try Block");
     print type(inst) #the exception instance
     print inst.args #srguments stored in .args
     print inst #_str_ allows args tto be printed directly
-    print "============================================================================================="
+    print("=============================================================================================");
 finally:
-    print "Closing the socket"
+    #print("Sending DONE command to clients");
+    #sendDoneCommand("The Server has thrown an exception",addr);
+    print("Closing the socket");
     serverSocket.close()
