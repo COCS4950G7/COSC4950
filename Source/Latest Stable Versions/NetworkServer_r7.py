@@ -2,7 +2,23 @@ __author__ = 'chris hamm'
 #Created: 11/15/2014
 #This is designed to run with NetworkClient_r7
 
+#Updated on 11/16/2014 , still works with client_r7
+
 try: #Master try block
+#=================================================================================================
+#SERVER-CONTROLLER COMMUNICATION FUNCTIONS
+#This section contains methods that the server will use to communicate with the controller class
+#=================================================================================================
+    try: #server-controller communication functions try block
+        def add_controller_message_to_list(inputString): #call this function called from the controller class to send the server a message
+            listOfControllerMessages.append(inputString) #store the string in the list
+    except Exception as inst:
+        print "============================================================================================="
+        print "An exception was thrown in the Server-Controller Communication Functions Try Block"
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        print "============================================================================================="
 #=================================================================================================
 #Main Server Loop
 #=================================================================================================
@@ -18,7 +34,7 @@ try: #Master try block
         print "socket created successfully"
     except Exception as inst:
         print "============================================================================================="
-        print "An exception was thrown in the Main Server Try Block"
+        print "ERROR: An exception was thrown in the Main Server Try Block"
         print type(inst) #the exception instance
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
@@ -43,6 +59,7 @@ try: #Master try block
     #-----------------------------
     try: #getIP tryblock
         print "The server's IP address is (THIS MAY NOT BE CROSS PLATFORM!!): "
+        print "(This function works on Windows 7)"
         print socket.gethostbyname(socket.gethostname())
     except Exception as inst:
         print "========================================================================================"
@@ -58,6 +75,7 @@ try: #Master try block
 
     #list to store the socket and address of every client
     listOfClients = [] #This list is a list of tuples (socket, address)
+    listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
 
     #Waiting for initial Client to connect
     sock, addr= serverSocket.accept()
@@ -81,7 +99,7 @@ try: #Master try block
 
             except socket.timeout as inst:
                 print "========================================================================================"
-                print "ERROR: Socket has timed out. No input from client detected."
+                print "Socket has timed out. No input from client detected."
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
@@ -97,9 +115,15 @@ try: #Master try block
             #Check for input from controller class
             try: #check for input from controller try block
                 print "Checking for input from the Controller class..."
-                #-------------------------------------
-                #INSERT FUNCTION TO CHECK FOR INPUT FROM CONTROLLER CLASS HERE
-                #-------------------------------------
+                if(len(listOfControllerMessages) > 0): #if the list has something in it
+                    print "Received the following input from the Controller class:"
+                    for x in range (0, len(listOfControllerMessages)):
+                        print str(listOfControllerMessages[x]) #print out the string
+                    del listOfControllerMessages[:] #deletes all elements in the listOfControllerMessages
+                    print "list of controller messages has been emptied"
+                else:
+                    print "No input was received from the Controller class"
+
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
@@ -131,7 +155,7 @@ try: #Master try block
 
             except socket.timeout as inst:
                 print "========================================================================================"
-                print "ERROR: Socket timed out. No client is trying to connect."
+                print "Socket timed out. No client is trying to connect."
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
