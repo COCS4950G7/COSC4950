@@ -252,6 +252,9 @@ class Controller():
                     #Start up the networkServer class (as sub-process in the background)
                     self.networkClient.join()
 
+                    #Go back to the nodeStart screen since we're done here
+                    self.state = "nodeStartScreen"
+
                     '''
                     print "(back)"
                     print "(Exit)"
@@ -731,6 +734,9 @@ class Controller():
                             #Get the chunk again
                             chunkList = self.dictionary.getThisChunk(params)
 
+                            #Send the chunk again
+                            self.controllerPipe.send(chunkList)
+
                         #if the server is waiting for nodes to finish
                         elif rec == "waiting":
 
@@ -758,6 +764,9 @@ class Controller():
                         self.state = "serverDictionaryFoundScreen"
 
                     else:
+
+                        #Let the network  class know we're done but didn't find anything (stop all the nodes anyways)
+                        self.controllerPipe.send("notFound")
 
                         self.state = "serverDictionaryNotFoundScreen"
 
