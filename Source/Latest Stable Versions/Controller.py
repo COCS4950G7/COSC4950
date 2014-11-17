@@ -24,11 +24,14 @@
 from time import time
 import sys
 import os
+from multiprocessing import Process, Pipe, Lock
 
 #import GUI
 import RainbowMaker
 import Dictionary
 import Brute_Force
+import NetworkClient_r7
+import NetworkServer_r7
 
 
 
@@ -45,6 +48,17 @@ class Controller():
     rainbowMaker = RainbowMaker.RainbowMaker()
     #rainbowUser = RainbowUser.RainbowUser()
     dictionary = Dictionary.Dictionary()
+    #brute_force = Brute_Force.Brute_Force()
+
+    #lock = Lock()
+    controllerPipe, networkPipe = Pipe()
+
+    #Defining network sub-processes as class variables that are instances of the network objects
+    networkServer = Process(target=NetworkServer_r7.NetworkServer_r7(), args=(networkPipe, ))
+    networkClient = Process(target=NetworkClient_r7.NetworkClient_r7(), args=(networkPipe, ))
+
+    #Initializing variable to a default value
+    serverIP = "127.1.1.1"
 
     #tempGUI Variables
     state = "startScreen"
@@ -129,27 +143,31 @@ class Controller():
                     #What did the user pick? (Be a node, Back, Exit)
                     print "============="
                     print "nodeStartScreen"
-                    print "(beNode)"
-                    print "(back)"
+                    print
+
+                    #Get the server's IP:
+                    self.serverIP = raw_input("What's the server's IP: ")
+
+                    print "Ready?"
+                    print "(Node)"
+                    print "(Back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "Server", "Single", "Exit"}
+                    goodNames = {"Node", "node", "back", "Back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput == "beNode":
+                    if userInput in ("Node", "node"):
 
-                        ###GUI.setState("nodeConnectingScreen")
                         self.state = "nodeConnectingScreen"
 
-                    elif userInput == "back":
+                    elif userInput in ("Back", "back"):
 
-                        ###GUI.setState("startScreen")
                         self.state = "startScreen"
 
                     else:
@@ -160,34 +178,81 @@ class Controller():
                 #if we're at the node connecting... state (Screen)
                 elif state == "nodeConnectingScreen":
 
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkClient.start()
+
                     #What did the user pick? (Be a Node, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
                     print "nodeConnectingScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                    print
+
+                    #userInput = raw_input("Choice: ")
 
                     #wait for server connection
                     #then switch to nodeConnectedToScreen
 
-                    if userInput == "back":
+                    #Send the server IP over the pipe to network class
+                    self.controllerPipe.send(self.serverIP)
 
-                        ###GUI.setState("nodeStartScreen")
-                        self.state = "nodeStartScreen"
+                    #Get response from network class, (looking for "connected")
+                    rec = self.controllerPipe.recv()
 
-                    else:
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
 
-                        #We're done
-                        self.done = True
+                    #While not connected, print a "connecting" bar
+                    while not rec == "connected":
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Connecting--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+                    #Got connected, so switch screens
+                    self.state = "nodeConnectedToScreen"
 
                 #if we're at the node connected state (Screen)
                 elif state == "nodeConnectedToScreen":
 
-                    #What did the user pick? (Be a Node, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "nodeConnectedToScreen"
+                    done = False
+
+                    while not done:
+
+                        rec = self.controllerPipe.recv()
+
+                        if rec == "done":
+
+                            done = True
+
+                        elif rec == "connected":
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print "============="
+                            print "nodeConnectedToScreen"
+
+                        elif rec == "doingStuff":
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print "============="
+                            print "nodeDoingStuffScreen"
+
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkClient.join()
+
+                    '''
                     print "(back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
@@ -204,7 +269,8 @@ class Controller():
 
                         #We're done
                         self.done = True
-
+                    '''
+                #Ignore for now, implemented in nodeConnectedScreen
                 #if we're at the node doing stuff state (Screen)
                 elif state == "nodeDoingStuffScreen":
 
@@ -529,72 +595,241 @@ class Controller():
                         #We're done
                         self.done = True
 
-                #if we're at the serverDictionaryScreen state (Screen)
+                 #if we're at the serverDictionaryScreen state (Screen)
                 elif state == "serverDictionaryScreen":
 
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkServer.start()
+
                     #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "serverDictionaryScreen"
+                    print
 
-                    if userInput == "crackIt":
-                        x=1
-                        #GUI.setState("serverDictionarySearchingScreen")
+                    #Get the algorithm
 
-                        #get info from GUI and pass to Brute_Force class
+                    print "What's the algorithm: "
+                    print "(md5)"
+                    print "(sha1)"
+                    print "(sha256)"
+                    print "(sha512)"
+                    print
+                    algo = raw_input("Choice: ")
 
-                    elif userInput == "back":
-                        x=1
-                        #GUI.setState("serverStartScreen")
+                    #Sterolize inputs
+                    goodNames = {"md5", "sha1", "sha256", "sha512"}
+                    while not algo in goodNames:
+
+                        print "Input Error!"
+
+                        algo = raw_input("Try Again: ")
+
+                    #Set algorithm of dictionary to user input of 'algo'
+                    self.dictionary.setAlgorithm(algo)
+
+                    #Get the file name
+                    print
+                    fileName = raw_input("What's the file name: ")
+                    while not self.dictionary.setFileName(fileName) == "Good":
+
+                        print "File not found..."
+                        fileName = raw_input("What's the file name: ")
+
+                    #Get the hash
+                    print
+                    hash = raw_input("What's the hash we're searching for: ")
+                    self.dictionary.setHash(hash)
+
+                    #Get the go-ahead
+
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Crack)"
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Crack", "crack"):
+
+                        self.state = "serverDictionarySearchingScreen"
+
+                    elif userInput in ("Back", "back"):
+
+                        self.state = "serverStartScreen"
 
                     else:
 
                         #We're done
                         self.done = True
 
-                #if we're at the serverDictionarySearchingScreen state (Screen)
+                #if we're at the singleDictionarySearchingScreen state (Screen)
                 elif state == "serverDictionarySearchingScreen":
 
                     #display results and wait for user interaction
+                    print "============="
+                    print "serverDictionarySearchingScreen"
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    self.clock = time()
 
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverDictionaryScreen")
+                    #Have another dictionary (ie server-size) that chunks the data
+                    #   So you don't have to send the whole file to every node
+                    #dictionary2 = Dictionary.Dictionary()
+
+                    #Give new dictionary (node) info it needs through a string (sent over network)
+                    #dictionary2.setVariables(self.dictionary.serverString())
+
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
+
+                    isFound = False
+
+                    #While we haven't gotten all through the file or found the key...
+                    while not (self.dictionary.isEof() or isFound):
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+                        #What's the server saying:
+                        rec = self.controllerPipe.recv()
+
+                        #If the server needs a chunk, give one.
+                        if rec == "nextChunk":
+
+                            #Note, this will eventually be sending more information (ie: parameters) not just the list of words
+                            chunk = self.dictionary.getNextChunk()
+
+                            self.controllerPipe.send(chunk)
+
+                        #If the server needs a chunk again
+                        elif rec == "chunkAgain":
+
+                            #Get the parameters of the chunk
+                            params = self.controllerPipe.recv()
+
+                            #Get the chunk again
+                            chunkList = self.dictionary.getThisChunk(params)
+
+                        #if the server is waiting for nodes to finish
+                        elif rec == "waiting":
+
+                            #Placeholder
+                            chrisHamm = True
+
+                        #If the server has a 'done' chunk
+                        elif rec == "done":
+
+                            #Get the done chunk
+                            whatDidYouFind = self.controllerPipe.recv()
+
+                            #See if it's the key or just a "not found"
+                            isFound = self.dictionary.isKey()
+
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
+
+                    #if a(the) node finds a key
+                    if isFound():
+
+                        #Let the network class know we've found the key, and stop all nodes
+                        self.controllerPipe.send("found")
+
+                        self.state = "serverDictionaryFoundScreen"
 
                     else:
 
-                        #We're done
-                        self.done = True
+                        self.state = "serverDictionaryNotFoundScreen"
 
-                #if we're at the serverDictionaryFoundScreen state (Screen)
+                #if we're at the singleDictionaryFoundScreen state (Screen)
                 elif state == "serverDictionaryFoundScreen":
 
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkServer.join()
+
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "serverDictionaryFoundScreen"
 
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverDictionaryScreen")
+                    print "Key is: ", self.dictionary.showKey()
+                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                    print "And it took", self.clock, "seconds."
+
+                    print "(Back)"
+                    print "(Exit)"
+                    self.dictionary.reset()
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "serverDictionaryScreen"
 
                     else:
 
                         #We're done
                         self.done = True
 
-                #if we're at the serverDictionaryNotFoundScreen state (Screen)
+                #if we're at the singleDictionaryNotFoundScreen state (Screen)
                 elif state == "serverDictionaryNotFoundScreen":
+
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkServer.join()
 
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "serverDictionaryNotFoundScreen"
+                    print
+                    print "Sorry, we didn't find it."
+                    print "Just FYI though, that took", self.clock, "seconds."
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    self.dictionary.reset()
+                    userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverDictionaryScreen")
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "serverDictionaryScreen"
 
                     else:
 

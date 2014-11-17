@@ -132,6 +132,7 @@ class RainbowMaker():
 
         return self.done
 
+    '''
     #Make the table
     def makeTable(self):
 
@@ -174,37 +175,12 @@ class RainbowMaker():
 
         #Close the file
         self.file.close()
-
+        '''
 
     #Hashes key
     def hashThis(self, key):
 
-        if self.algorithm == "sha256":
-
-            tempKey = hashlib.sha256()
-
-        elif self.algorithm == "sha512":
-
-            tempKey = hashlib.sha512()
-
-        elif self.algorithm == "md5":
-
-            tempKey = hashlib.md5()
-
-        elif self.algorithm == "sha1":
-
-            tempKey = hashlib.sha1()
-
-        #Convert to bytes to give update()
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        thisHash = tempKey.hexdigest()
-
-        return thisHash
+        return hashlib.new(self.algorithm, key).hexdigest()
 
 
     #Produces seeded key
@@ -237,7 +213,7 @@ class RainbowMaker():
 
         return randKey
 
-
+    '''
     #Finds and fixes collisions in the final hash list
     def collisionFixer(self):
 
@@ -335,8 +311,8 @@ class RainbowMaker():
             self.file.close()
 
             return 0
-
-
+    '''
+    '''
     #Import table
     def importTable(self):
 
@@ -367,7 +343,7 @@ class RainbowMaker():
 
         #Close the file
         self.file.close()
-
+    '''
 
     #Sets up the file initially (put info in first line)
     def setupFile(self):
