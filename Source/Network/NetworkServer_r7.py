@@ -3,6 +3,9 @@ __author__ = 'chris hamm'
 #This is designed to run with NetworkClient_r7
 
 #Updated on 11/16/2014 , still works with client_r7
+#Updated on 11/17/2014, still works with client_r7
+    #Added in crash handling/notification system  (STILL BEING CONSTRUCTED)
+    
 
 try: #Master try block
 #=================================================================================================
@@ -15,6 +18,19 @@ try: #Master try block
     except Exception as inst:
         print "============================================================================================="
         print "An exception was thrown in the Server-Controller Communication Functions Try Block"
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        print "============================================================================================="
+#=================================================================================================
+#SERVER-CLIENT COMMUNICATION FUNCTIONS
+#This section contains methods used by the server to communicate with the clients
+#=================================================================================================
+    try: #server-client communication functions try block
+        print "Insert Function here"
+    except Exception as inst:
+        print "============================================================================================="
+        print "An exception was thrown in the Server-Client Communication Functions Try Block"
         print type(inst) #the exception instance
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
@@ -184,6 +200,7 @@ except Exception as inst:
     print inst.args #srguments stored in .args
     print inst #_str_ allows args tto be printed directly
     print "========================================================================================"
+    #insert send crash message to clients here
 finally:
     print "Closing socket"
     serverSocket.close()
@@ -193,4 +210,5 @@ finally:
         print " " + str(x) + ") socket:" + str(sock) + " address:" + str(addr)
         sock.sendall("DONE")
         print "Send DONE command to client"
+
 

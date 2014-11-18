@@ -2,7 +2,8 @@ __author__ = 'chris hamm'
 #Created: 11/15/2014
 
 #This is designed to work with NetworkServer_r7
-
+#Updated on 11/17/2014, still works with server_r7
+    #Added in crash handling/notification system
 try: #Master try block
 #======================================================================================
 #Main Client Loop
