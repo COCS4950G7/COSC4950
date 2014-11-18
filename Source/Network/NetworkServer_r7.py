@@ -5,7 +5,7 @@ __author__ = 'chris hamm'
 #Updated on 11/16/2014 , still works with client_r7
 #Updated on 11/17/2014, still works with client_r7
     #Added in crash handling/notification system  (STILL BEING CONSTRUCTED)
-    
+
 
 try: #Master try block
 #=================================================================================================
@@ -76,6 +76,7 @@ try: #Master try block
     try: #getIP tryblock
         print "The server's IP address is (THIS MAY NOT BE CROSS PLATFORM!!): "
         print "(This function works on Windows 7)"
+        print "(This function works on OS X)"
         print socket.gethostbyname(socket.gethostname())
     except Exception as inst:
         print "========================================================================================"
