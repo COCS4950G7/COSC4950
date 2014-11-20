@@ -1,6 +1,9 @@
 __author__ = 'chris hamm'
 #NetworkClient_r8
 #Created on:11/17/2014
+###############################################
+#THIS REVISION/CONCEPT WAS ABANDONED
+###############################################
 
 #This restructured client operates by communicating with the controller class as a primary method of communication
 print "Network Client revision 8 is starting up..."

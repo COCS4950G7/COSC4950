@@ -1,7 +1,9 @@
 __author__ = 'Chris Hamm'
 #NetworkServer_r8
 #Created on: 11/17/2014
-
+###############################################
+#THIS REVISION/CONCEPT WAS ABANDONED
+#################################################
 #Redesigned server. Structure has changed so that the server must talk to the controller class
 
 print "Network Server revision 8 is starting up..."
