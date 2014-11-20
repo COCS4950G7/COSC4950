@@ -39,6 +39,16 @@ __author__ = 'chris hamm'
 #       -if the client receives an invalid command, it returns this string to the server
 #-------------------------------------------------------------------------------------
 
+#------------------------------------------------------------------------------------------
+#COMMANDS/THINGS THE CLIENT WILL ACCEPT
+#   "DONE"
+#       -server issues the done command to all clients and all clients stop what they are doing
+#   the next part of the cracking problem
+#       -server gives the client the next part of the cracking problem
+#   "INVALIDCOMMAND"
+#       -if the server receives an invalid command from the client, then the server returns this string
+#-------------------------------------------------------------------------------------------
+
 try: #Master try block
 #======================================================================================
 #CLIENT-CONTROLLER COMMUNICATION FUNCTIONS
@@ -59,7 +69,46 @@ try: #Master try block
 #This section contains methods the client will use to communicate with the server.
 #======================================================================================
     try: #client-server communication functions try block
-        print "Insert functions here"
+        #Outbound communication functions
+            #NEXT
+        def sendNextCommandToServer():
+            clientSocket.send("NEXT") #sends the NEXT command to the serve
+            print "The NEXT command was sent to the server"
+
+            #FOUNDSOLUTION
+        def sendFoundSolutionToServer():
+            clientSocket.send("FOUNDSOLUTION") #sends the FOUNDSOLUTION command to the server
+            print "The FOUNDSOLUTION command was sent to the server"
+
+            #CRASHED
+        def sendCrashedCommandToServer():
+            clientSocket.send("CRASHED") #sends the CRASHED command to the server
+            print "The CRASHED command was sent to the server"
+
+            #INVALIDCOMMAND
+        def sendInvalidCommandToServer():
+            clientSocket.send("INVALIDCOMMAND") #sends INVALIDCOMMAND command to server
+            print "The INVALIDCOMMAND command was sent to the server"
+
+        #Inbound communication functions
+            #DONE
+        def checkForDoneCommand(inboundString):
+            if(inboundString=="DONE"):
+                return True
+            else:
+                return False
+
+            #next part of problem
+        #def checkForNextPartOfProblem(inboundString): #checks for the next part of the problem
+            #not sure what to check for here
+
+            #INVALIDCOMMAND
+        def checkForInvalidCommand(inboundString):
+            if(inboundString=="INVALIDCOMMAND"):
+                return True
+            else:
+                return False
+
     except Exception as inst:
         print "============================================================================================="
         print "An exception was thrown in the Client-Server Communication FUnctions Try Block"
