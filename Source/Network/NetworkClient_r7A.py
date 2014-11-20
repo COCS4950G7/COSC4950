@@ -55,7 +55,22 @@ try: #Master try block
 #This section contains methods the client will use to communicate with the controller class
 #======================================================================================
     try: #client-controller communication functions try block
-        print "Insert functions here"
+        #Outbound communication functions with controller
+            #done
+        def sendDoneCommandToController():
+            #not sure how to send through pipes
+            print "The DONE command was sent to the Controller"
+
+            #connected
+        def sendConnectedCommandToCOntroller():
+            #not sure how to sendover a pipe
+            print "The CONNECTED command was sent to the Controller"
+
+            #doingStuff
+        def sendDoingStuffCommandToController():
+            # ditto as above
+            print "The DOINGSTUFF command was sent to the Controller"
+
     except Exception as inst:
         print "============================================================================================="
         print "An exception was thrown in the Client-Controller Communication Functions Try Block"

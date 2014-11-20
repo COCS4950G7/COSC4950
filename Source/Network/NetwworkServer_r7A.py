@@ -58,9 +58,47 @@ try: #Master try block
 #This section contains methods that the server will use to communicate with the controller class
 #=================================================================================================
     try: #server-controller communication functions try block
-        print "SERVER-CONTROLLER COMMUNICATION FUNCTIONS ARE DEFINED YET"
-        print "Need to use pipes"
-        #Use the NOTES from above to determine what functions need to go here
+        #Outbound communication with Controller
+            #nextChunk
+        def sendNextChunkCommandToController():
+            #not sure how to send strings over the pipes
+            print "The NEXTCHUNK command was sent to the Controller"
+
+            #chunkAgain
+        def sendChunkAgainCommandToController():
+            #ditto as above
+            print "The CHUNKAGAIN command was sent to the Controller"
+
+            #waiting
+        def sendWaitingCommandToController():
+            #ditto as above
+            print "The WAITING command was sent to the Controller"
+
+            #done
+        def sendDoneCommandToController():
+            #ditto as above
+            print "The DONE command was sent to the Controller"
+
+        #Inbound communication with controller
+            #REPLY OT NEXTCHUNK
+        def checkForNextChunk(inboundString): #check to see if the string contains the next chunk of the problem
+            #not sure how to do this
+            print "Checking to see if inboundString is the next part of problem..."
+            print "The function for this is not finished yet"
+
+            #REPLY TO CHUNKAGAIN
+        def checkForChunkAgain(inboundString): #check to see if the string contains that chunk that was requested
+            #ditto as above
+            print "Checking to see if inboundString is the requested chunk (chunkAgain)..."
+            print "The function for this is not finished"
+
+            #REPLY TO DONE
+        def checkForFound(inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
+            #dittoe as above
+            print "Checking to see if the key was found..."
+            print "The function for this is not finished"
+
+
     except Exception as inst:
         print "============================================================================================="
         print "An exception was thrown in the Server-Controller Communication Functions Try Block"
