@@ -202,13 +202,7 @@ try: #Master try block
                         break
 
                 except socket.timeout as inst:
-                    #I commented the extra print lines out to make this look more clean
-                   # print "============================================================================================="
                     print "Socket timed out. No new server command"
-                   # print type(inst) #the exception instance
-                   # print inst.args #srguments stored in .args
-                   # print inst #_str_ allows args tto be printed directly
-                   # print "============================================================================================="
                 except Exception as inst:
                     print "============================================================================================="
                     print "An exception was thrown in the checking for server commands Try Block"

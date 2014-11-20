@@ -8,6 +8,10 @@ __author__ = 'chris hamm'
 #   design layout that uses the controller class.
 #   This is designed to work with NetworkClient_r7A
 #   NetworkServer_r8 has been abandoned.
+#
+#   IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#   Server Does not issue the DONE command when the server stops!!!
+#   So the clients get stuck in a forever loop!!
 #=======================================================================================
 
 #---------------------------------------------------------------------------------------
@@ -277,15 +281,8 @@ try: #Master try block
                 sock.settimeout(2.0)
                 theInput = sock.recv(2048) #listening for input
                 print "Received a message from a client."
-
             except socket.timeout as inst:
-                # To make this look cleaner, I have commented out the other print line for a socket timeout
-               # print "========================================================================================"
                 print "Socket has timed out. No input from client detected."
-               # print type(inst) #the exception instance
-               # print inst.args #srguments stored in .args
-               # print inst #_str_ allows args tto be printed directly
-               # print "========================================================================================"
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception has been thrown in the Check for client input Try Block"
@@ -297,8 +294,7 @@ try: #Master try block
             #Check for input from controller class
             try: #check for input from controller try block
                 print "Checking for input from the Controller class..."
-                print "Insert Server-Controller communication function calls here"
-
+                print "The function is not finished"
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
@@ -327,15 +323,8 @@ try: #Master try block
                 listOfClients.append((sock, addr))
                 print "Client successfully added to the list of clients"
                 print str(len(listOfClients)) + " Client(s) are currently Connected."
-
             except socket.timeout as inst:
-                # To make this look cleaner, I have commented out all of the other print lines
-               # print "========================================================================================"
                 print "Socket timed out. No client is trying to connect."
-               # print type(inst) #the exception instance
-               # print inst.args #srguments stored in .args
-               # print inst #_str_ allows args tto be printed directly
-               # print "========================================================================================"
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
@@ -344,7 +333,6 @@ try: #Master try block
                 print inst #_str_ allows args tto be printed directly
                 print "========================================================================================"
         #END OF MAIN SERVER LOOP
-
     except Exception as inst: #Exception for Server Primary While Loop Try Block
         print "========================================================================================"
         print "ERROR: An exception has been thrown in the Server Primary While Loop Try Block"
@@ -352,7 +340,6 @@ try: #Master try block
         print inst.args #srguments stored in .args
         print inst #_str_ allows args tto be printed directly
         print "========================================================================================"
-
 except Exception as inst: #Exception for Master Try Block
     print "========================================================================================"
     print "ERROR: An exception has been thrown in the Master Try Block"
@@ -364,10 +351,12 @@ except Exception as inst: #Exception for Master Try Block
 finally:
     print "Closing socket"
     serverSocket.close()
-    #print "listOfClients currently contains: "
     for x in range(0, len(listOfClients)):
         (sock, addr) = listOfClients[x]
+        sock.sendall("DONE")
+        #sendDoneCommandToClient(sock,addr)
+        print "Sent DONE command to: " + str(addr)
         #This is only needed for debugging
       #  print " " + str(x) + ") socket:" + str(sock) + " address:" + str(addr)
-        sock.sendall("DONE")
-        print "Send DONE command to client"
+       # sock.sendall("DONE")
+       # print "Send DONE command to client"
