@@ -94,7 +94,17 @@ try: #Master try block
 
             #REPLY TO DONE
         def checkForFound(inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
-            #dittoe as above
+            if(inboundString=="Found"):
+                print "The Controller says that the key has been Found"
+                return True
+            elif(inboundString=="notFound"):
+                return False
+            else:
+                print "==================================================="
+                print "ERROR: Invalid input from the Controller class"
+                print "==================================================="
+                return False
+
             print "Checking to see if the key was found..."
             print "The function for this is not finished"
 
@@ -200,6 +210,32 @@ try: #Master try block
         print inst #_str_ allows args tto be printed directly
         print "========================================================================================"
         raise Exception("Could not bind to socket! Server Must Shut Down.")
+
+    try: #getOS try block
+        import platform
+        print "*************************************"
+        print "OS DETECTION:"
+        if(platform.system()=="Windows"): #Detecting Windows
+            print platform.system()
+            print platform.win32_ver()
+        elif(platform.system()=="Linux"): #Detecting Linux
+            print platform.system()
+            print platform.dist()
+        elif(platform.system()=="Darwin"): #Detecting OSX
+            print platform.system()
+            print platform.mac_ver()
+        else:                           #Detecting an OS that is not listed
+            print platform.system()
+            print platform.version()
+            print platform.release()
+        print "*************************************"
+    except Exception as inst:
+        print "========================================================================================"
+        print "ERROR: An exception was thrown in getOS try block"
+        print type(inst) #the exception instance
+        print inst.args #srguments stored in .args
+        print inst #_str_ allows args tto be printed directly
+        print "========================================================================================"
 
     try: #getIP tryblock
         print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "

@@ -141,6 +141,32 @@ try: #Master try block
         clientSocket= socket.socket()
         print "clientSocket successfully created"
 
+        try: #getOS try block
+            import platform
+            print "*************************************"
+            print "OS DETECTION:"
+            if(platform.system()=="Windows"): #Detecting Windows
+                print platform.system()
+                print platform.win32_ver()
+            elif(platform.system()=="Linux"): #Detecting Linux
+                print platform.system()
+                print platform.dist()
+            elif(platform.system()=="Darwin"): #Detecting OSX
+                print platform.system()
+                print platform.mac_ver()
+            else:                           #Detecting an OS that is not listed
+                print platform.system()
+                print platform.version()
+                print platform.release()
+            print "*************************************"
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in getOS try block"
+            print type(inst) #the exception instance
+            print inst.args #srguments stored in .args
+            print inst #_str_ allows args tto be printed directly
+            print "========================================================================================"
+            
         #prompt user for the servers IP address
         serverIPAddress= str(raw_input('What is the host (server) IP Address?'))
         try:
