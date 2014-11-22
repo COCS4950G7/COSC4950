@@ -193,7 +193,7 @@ try: #Master Try Block
                 print "============================================================================================="
 
             #constructor
-            def _init_(self, pipeendconnectedtocontroller):
+            def __init__(self, pipeendconnectedtocontroller):
                 self.pipe= pipeendconnectedtocontroller
 
                 #Bind the socket to local host and port
