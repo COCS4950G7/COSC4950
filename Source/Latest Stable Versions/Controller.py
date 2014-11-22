@@ -30,8 +30,8 @@ from multiprocessing import Process, Pipe, Lock
 import RainbowMaker
 import Dictionary
 import Brute_Force
-import NetworkClient_r7
-import NetworkServer_r7
+import NetworkClient
+import NetworkServer
 
 
 
@@ -54,8 +54,8 @@ class Controller():
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer_r7.NetworkServer_r7(), args=(networkPipe, ))
-    networkClient = Process(target=NetworkClient_r7.NetworkClient_r7(), args=(networkPipe, ))
+    networkServer = Process(target=NetworkServer.NetworkServer(), args=(networkPipe, ))
+    networkClient = Process(target=NetworkClient.NetworkClient(), args=(networkPipe, ))
 
     #Initializing variable to a default value
     serverIP = "127.1.1.1"
@@ -722,6 +722,10 @@ class Controller():
 
                             #Note, this will eventually be sending more information (ie: parameters) not just the list of words
                             chunk = self.dictionary.getNextChunk()
+
+                            #need parameters/data object
+                            #has standard parameter variables for network to keep (and associate with nodes)
+                            #and data which the network passes to the client
 
                             self.controllerPipe.send(chunk)
 
