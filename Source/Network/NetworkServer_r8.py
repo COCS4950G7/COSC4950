@@ -6,6 +6,9 @@ __author__ = 'Chris Hamm'
 #################################################
 #Redesigned server. Structure has changed so that the server must talk to the controller class
 
+#New concept:
+#   -Current State: states what the clients are currently doing
+
 print "Network Server revision 8 is starting up..."
 print "WARNING: IP detection does not work on all OS's"
 print "         Confirmed to work on Windows 7"
@@ -28,3 +31,18 @@ print "The Server is using Port: (Function Under Construction)"
 #       -controller will determine if it is the key or not
 #           -if key is found, controller sends "found" over the pipe to the server, so the server can stop the nodes
 #           -if it isnt the key (but we are done), controller sends "notFound" over the pipe to the server, so the server can stop the nodes
+
+
+#Master Try Block
+try:
+    print "Server has started..."
+
+#Master except block
+except Exception as inst:
+    print "========================================================================================"
+    print "ERROR: An exception has been thrown in the Master Try Block"
+    print type(inst) #the exception instance
+    print inst.args #srguments stored in .args
+    print inst #_str_ allows args tto be printed directly
+    print "========================================================================================"
+finally:
