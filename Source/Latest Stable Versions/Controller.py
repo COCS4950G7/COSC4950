@@ -54,8 +54,10 @@ class Controller():
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer.NetworkServer(), args=(networkPipe, ))
-    networkClient = Process(target=NetworkClient.NetworkClient(), args=(networkPipe, ))
+    #networkServer = Process(target=NetworkServer.NetworkServer(), args=(0, networkPipe, ))
+    networkServer = Process(target=NetworkServer.NetworkServer(networkPipe))
+    #networkClient = Process(target=NetworkClient.NetworkClient(), args=(0, networkPipe, ))
+    networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
 
     #Initializing variable to a default value
     serverIP = "127.1.1.1"
@@ -307,13 +309,21 @@ class Controller():
                     ###userInput = GUI.getInput()
                     print "============="
                     print "serverStartScreen"
+                    print
                     print "(bruteForce)"
                     print "(rainbowMake)"
                     print "(rainbowUser)"
                     print "(dictionary)"
+                    print
                     print "(back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"bruteForce", "rainbowMake", "rainbowUser", "dictionary", "back", "Back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
 
                     if userInput == "bruteForce":
 
