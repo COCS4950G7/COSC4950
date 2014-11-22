@@ -62,7 +62,7 @@ try: #Master Try Block
             #socket.AF_INET is a socket address family represented as a pair. (hostname, port). This is the default parameter
             #socket.SOCK_STREAM is the default parameter. This defines the socket type
             serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            print "socket created successfully"
+            print "server socket created successfully"
             #list to store the socket and address of every client
             listOfClients = [] #This list is a list of tuples (socket, address)
             listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
