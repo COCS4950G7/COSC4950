@@ -211,6 +211,8 @@ try: #Master Try Block
 
             try: #getOS try block
                 print "*************************************"
+                print "    Network Server"
+                print "*************************************"
                 print "OS DETECTION:"
                 if(platform.system()=="Windows"): #Detecting Windows
                     print platform.system()

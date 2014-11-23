@@ -112,6 +112,8 @@ try: #Master Try Block
                 print "Entering Main Client Loop"
                 try: #getOS try block
                     print "*************************************"
+                    print "    Network Client"
+                    print "*************************************"
                     print "OS DETECTION:"
                     if(platform.system()=="Windows"): #Detecting Windows
                         print platform.system()
