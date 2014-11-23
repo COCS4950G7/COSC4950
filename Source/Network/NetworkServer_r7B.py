@@ -196,139 +196,139 @@ try: #Master Try Block
             def __init__(self, pipeendconnectedtocontroller):
                 self.pipe= pipeendconnectedtocontroller
 
-                #Bind the socket to local host and port
-                try: #Bind socket try block
-                    self.serverSocket.bind((self.host,self.port))
-                    print "Socket bind complete."
-                except self.socket.error as inst:
-                    print "========================================================================================"
-                    print "ERROR: failed to bind (host, port) to serverSocket"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
-                    raise Exception("Could not bind to socket! Server Must Shut Down.")
+            #Bind the socket to local host and port
+            try: #Bind socket try block
+                serverSocket.bind((host,port))
+                print "Socket bind complete."
+            except socket.error as inst:
+                print "========================================================================================"
+                print "ERROR: failed to bind (host, port) to serverSocket"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
+                raise Exception("Could not bind to socket! Server Must Shut Down.")
 
-                try: #getOS try block
-                    print "*************************************"
-                    print "OS DETECTION:"
-                    if(self.platform.system()=="Windows"): #Detecting Windows
-                        print self.platform.system()
-                        print self.platform.win32_ver()
-                    elif(self.platform.system()=="Linux"): #Detecting Linux
-                        print self.platform.system()
-                        print self.platform.dist()
-                    elif(self.platform.system()=="Darwin"): #Detecting OSX
-                        print self.platform.system()
-                        print self.platform.mac_ver()
-                    else:                           #Detecting an OS that is not listed
-                        print self.platform.system()
-                        print self.platform.version()
-                        print self.platform.release()
-                    print "*************************************"
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception was thrown in getOS try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
+            try: #getOS try block
+                print "*************************************"
+                print "OS DETECTION:"
+                if(platform.system()=="Windows"): #Detecting Windows
+                    print platform.system()
+                    print platform.win32_ver()
+                elif(platform.system()=="Linux"): #Detecting Linux
+                    print platform.system()
+                    print platform.dist()
+                elif(platform.system()=="Darwin"): #Detecting OSX
+                    print platform.system()
+                    print platform.mac_ver()
+                else:                           #Detecting an OS that is not listed
+                    print platform.system()
+                    print platform.version()
+                    print platform.release()
+                print "*************************************"
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in getOS try block"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
 
-                try: #getIP tryblock
-                    print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "
-                    print "(NOTE: This function works on Windows 7)"
-                    print "(NOTE: This function works on OS X)"
-                    print self.socket.gethostbyname(self.socket.gethostname())
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception was thrown in getIP try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
+            try: #getIP tryblock
+                print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "
+                print "(NOTE: This function works on Windows 7)"
+                print "(NOTE: This function works on OS X)"
+                print socket.gethostbyname(socket.gethostname())
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in getIP try block"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
 
-                #Start listening to socket
-                self.serverSocket.listen(5)
-                print "Waiting for initial client to connect..."
+            #Start listening to socket
+            serverSocket.listen(5)
+            print "Waiting for initial client to connect..."
 
-                #Waiting for initial Client to connect
-                sock, addr= self.serverSocket.accept()
-                print "First client has connected"
-                print "Connected with " + addr[0] + ":" + str(addr[1])
-                self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
-                print "Client successfully added to the list of clients"
-                print str(len(self.listOfClients)) + " Client(s) are currently Connected."
+            #Waiting for initial Client to connect
+            sock, addr= serverSocket.accept()
+            print "First client has connected"
+            print "Connected with " + addr[0] + ":" + str(addr[1])
+            listOfClients.append((sock, addr)) #add the tuple to the list of clients
+            print "Client successfully added to the list of clients"
+            print str(len(listOfClients)) + " Client(s) are currently Connected."
 
-                #Server PRIMARY WHILE LOOP
-                serverIsRunning = True
-                try: #server primary while loop try block
-                    while(serverIsRunning==True): #server primary while loop
+            #Server PRIMARY WHILE LOOP
+            serverIsRunning = True
+            try: #server primary while loop try block
+                while(serverIsRunning==True): #server primary while loop
 
-                        #Check for input from clients
-                        print "Checking for input from client(s)..."
-                        try: #check for client input try block
-                            sock.settimeout(2.0)
-                            theInput = sock.recv(2048) #listening for input
-                            print "Received a message from a client."
-                        except self.socket.timeout as inst:
-                            print "Socket has timed out. No input from client detected."
-                        except Exception as inst:
-                            print "========================================================================================"
-                            print "ERROR: An exception has been thrown in the Check for client input Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "========================================================================================"
+                    #Check for input from clients
+                    print "Checking for input from client(s)..."
+                    try: #check for client input try block
+                        sock.settimeout(2.0)
+                        theInput = sock.recv(2048) #listening for input
+                        print "Received a message from a client."
+                    except socket.timeout as inst:
+                        print "Socket has timed out. No input from client detected."
+                    except Exception as inst:
+                        print "========================================================================================"
+                        print "ERROR: An exception has been thrown in the Check for client input Try Block"
+                        print type(inst) #the exception instance
+                        print inst.args #srguments stored in .args
+                        print inst #_str_ allows args tto be printed directly
+                        print "========================================================================================"
 
-                        #Check for input from controller class
-                        try: #check for input from controller try block
-                            print "Checking for input from the Controller class..."
-                            print "The function is not finished"
-                        except Exception as inst:
-                            print "========================================================================================"
-                            print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "========================================================================================"
+                    #Check for input from controller class
+                    try: #check for input from controller try block
+                        print "Checking for input from the Controller class..."
+                        print "The function is not finished"
+                    except Exception as inst:
+                        print "========================================================================================"
+                        print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
+                        print type(inst) #the exception instance
+                        print inst.args #srguments stored in .args
+                        print inst #_str_ allows args tto be printed directly
+                        print "========================================================================================"
 
-                        #Distribute command to clients if needed
-                        try: #distribute command try block
-                            print "Checking to see if a command needs to be send to the clients..."
-                        except Exception as inst:
-                            print "========================================================================================"
-                            print "ERROR: An exception has been thrown in the Distribute command to clients Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "========================================================================================"
+                    #Distribute command to clients if needed
+                    try: #distribute command try block
+                        print "Checking to see if a command needs to be send to the clients..."
+                    except Exception as inst:
+                        print "========================================================================================"
+                        print "ERROR: An exception has been thrown in the Distribute command to clients Try Block"
+                        print type(inst) #the exception instance
+                        print inst.args #srguments stored in .args
+                        print inst #_str_ allows args tto be printed directly
+                        print "========================================================================================"
 
-                        #Check to see if another client is trying to connect
-                        try: #check to see if another client is trying to connect try block
-                            print "Checking to see if another client is trying to connect..."
-                            self.serverSocket.settimeout(2.0)
-                            sock, addr =self.serverSocket.accept()
-                            print "Connected with " + addr[0] + ":" + str(addr[1])
-                            self.listOfClients.append((sock, addr))
-                            print "Client successfully added to the list of clients"
-                            print str(len(self.listOfClients)) + " Client(s) are currently Connected."
-                        except self.socket.timeout as inst:
-                            print "Socket timed out. No client is trying to connect."
-                        except Exception as inst:
-                            print "========================================================================================"
-                            print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "========================================================================================"
-                    #END OF MAIN SERVER LOOP
-                except Exception as inst: #Exception for Server Primary While Loop Try Block
-                    print "========================================================================================"
-                    print "ERROR: An exception has been thrown in the Server Primary While Loop Try Block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
+                    #Check to see if another client is trying to connect
+                    try: #check to see if another client is trying to connect try block
+                        print "Checking to see if another client is trying to connect..."
+                        serverSocket.settimeout(2.0)
+                        sock, addr =serverSocket.accept()
+                        print "Connected with " + addr[0] + ":" + str(addr[1])
+                        listOfClients.append((sock, addr))
+                        print "Client successfully added to the list of clients"
+                        print str(len(listOfClients)) + " Client(s) are currently Connected."
+                    except socket.timeout as inst:
+                        print "Socket timed out. No client is trying to connect."
+                    except Exception as inst:
+                        print "========================================================================================"
+                        print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
+                        print type(inst) #the exception instance
+                        print inst.args #srguments stored in .args
+                        print inst #_str_ allows args tto be printed directly
+                        print "========================================================================================"
+                #END OF MAIN SERVER LOOP
+            except Exception as inst: #Exception for Server Primary While Loop Try Block
+                print "========================================================================================"
+                print "ERROR: An exception has been thrown in the Server Primary While Loop Try Block"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
             #End of Constructor Block
         except Exception as inst: #Except for NetworkServer class try block
             print "============================================================================================="
