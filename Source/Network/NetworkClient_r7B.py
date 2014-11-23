@@ -216,4 +216,4 @@ except Exception as inst:
     print inst #_str_ allows args tto be printed directly
     print "============================================================================================="
 finally:
-    print "REMINDER: clientSocket is not defined outside of the networkClient class"
+    print "Program has ended"
