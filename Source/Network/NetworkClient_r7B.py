@@ -158,16 +158,16 @@ try: #Master Try Block
 
                 #Client primary while loop
                 try: #client primary while loop
-                    while(self.serverSaysKeepSearching==True):
-                        self.clientSocket.settimeout(2.0)
+                    while(serverSaysKeepSearching==True):
+                        clientSocket.settimeout(2.0)
                         try: #checking for server commands try block
                             print "Checking for server commands..."
-                            theInput= self.clientSocket.recv(2048)
+                            theInput= clientSocket.recv(2048)
                             if(theInput=="DONE"):
                                 print " "  #Make this line seperate from the other print statements
                                 print "Server has issued the DONE command."
                                 print " "
-                                self.serverSaysKeepSearching= False
+                                serverSaysKeepSearching= False
                                 break
 
                         except socket.timeout as inst:
