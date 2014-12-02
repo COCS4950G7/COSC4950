@@ -272,6 +272,7 @@ try: #Master Try Block
                         sock.settimeout(2.0)
                         theInput = sock.recv(2048) #listening for input
                         print "Received a message from a client."
+                        print "RECEIVED MSG: " + str(theInput)
                     except socket.timeout as inst:
                         print "Socket has timed out. No input from client detected."
                     except Exception as inst:
