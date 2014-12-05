@@ -5,7 +5,7 @@ from Tkinter import *
 import Tkinter as Tk
 
 ########################################################################
-
+## adding a hashinng button, used to test basic functionality of enter text.
 
 class MyApp(object):
     """"""
@@ -19,11 +19,6 @@ class MyApp(object):
 
         title1 = Label(root, text="Single User Mode")
         title1.grid(row=1, column=0)
-        #title1.pack()
-
-        #btn_sum = Tk.Button(self.frame, text="Single User Mode", command=self.open_sum)
-        #btn_sum.grid(row=2, column=0)
-        #btn_sum.pack()
 
         btn_dictionary = Tk.Button(self.frame, text="Dictionary", command=self.open_dictionary)
         btn_dictionary.grid(row=2, column=0)
@@ -36,19 +31,12 @@ class MyApp(object):
 
         btn_node = Tk.Button(self.frame, text="Node", command=self.open_node)
         btn_node.grid(row=4, column=0)
-        #btn_node.pack()
 
         btn_server = Tk.Button(self.frame, text="Server", command=self.open_server)
         btn_server.grid(row=4, column=2)
 
         btn_hash = Tk.Button(self.frame, text="Hash", command=self.open_hash)
         btn_hash.grid(row=5, column=2)
-        #btn_server.pack()
-
-
-        #btn_exit = Tk.Button(self, text="Exit", command=self.quit)
-        #btn_exit.pack()
-
 
     #----------------------------------------------------------------------
     def hide(self):
@@ -96,12 +84,6 @@ class MyApp(object):
         sum_frame.geometry("400x300")
         sum_frame.title("Single User Mode")
         handler = lambda: self.onCloseOtherFrame(sum_frame)
-        #btn_brute_force = Tk.Button(self.frame, text="Node", command=self.open_brute_force)
-        #btn_brute_force.pack()
-        #btn_dictionary = Tk.Button(self.frame, text="Node", command=self.open_dictionary)
-        #btn_dictionary.pack()
-        #btn_rainbow = Tk.Button(self.frame, text="Node", command=self.open_rainbow)
-        #btn_rainbow.pack()
         btn = Tk.Button(sum_frame, text="Back", command=handler)
         btn.pack()
 
