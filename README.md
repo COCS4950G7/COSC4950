@@ -1,12 +1,11 @@
 *************'s Project for UWyo COSC 4950/5
 ============================================
 
-Authors: Chris Hamm, John Wilks Booth, Nick Boo-something, Chris Bugg
+Authors: Chris Hamm, John Wright, Nick Baum, Chris Bugg
 
-#NAME OF OUR PROJECT
+Mighty Cracker
 
 This is a Python2 Distributed, Multi-Process, Multi-Platform, GUI hash cracker.
-#TO BE EXPANDED UPON
 
 
 For Grader:
