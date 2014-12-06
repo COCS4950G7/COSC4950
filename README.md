@@ -27,9 +27,10 @@ password faster.
 For Grader:
 
 Our designs and concepts (along with an ER-ish Diagram) are in the Resources folder,
-which may be helpful to browse before delving into the source.
+which may be helpful to browse before delving into the source. At the moment we have several versions of each file,
+please assume that the most current version is the correct one to look at.
 
-The source contains Seven files:
+The source contains Several files:
 
 Controller.py -> This is the main, 'controlling' class which acts as an interface
                     between the GUI, the Networking, and the other classes.
@@ -37,9 +38,17 @@ Controller.py -> This is the main, 'controlling' class which acts as an interfac
 GUI.py ->        This is the GUI class which is responsible to all User-Interaction
                     and Display of information to the user. That's all it does.
                     
-Networking.py -> This is the class that provides for all communication between the 
-                    server and the nodes (for the distributed aspect).
+NetworkClient.py -> These are the class's that provides for all communication between the 
+NetworkServer.py      server and the nodes (for the distributed aspect).
                     
-Brute_Force.py ->This is the class that does all the work in regards to our Brute-Force
-                    capabilities. It talks only with the Controller.py class to get and
-                    give information.
+Brute_Force.py -> This is the class that does all the work in regards to our Brute-Force capabilities. 
+                     It talks only with the Controller.py class to get and give information.
+                    
+Dictionary.py -> This is the class that does all the work in regards to our Dictionary capabilities.
+                     It talks only with the Controller.py class to get and give information.
+
+dic.txt       -> this is the word file for use with the Dictionary.py, in future we hope to have some more,
+                     some could be simple dictionary words, others could be list of most common passwords.
+                     
+Rainbow.py ->    This is the class that does all the work in regards to our Rainbow Table capabilities.
+                     It talks only with the Controller.yp class to get and give information.
