@@ -36,7 +36,7 @@
 
 ###EXTENSIONS
 
-*put here there extensions, one at a time, each refering to the step of the main scenario*
+*put here there extensions, one at a time, each referring to the step of the main scenario*
 
 * *step altered number* *condition*:
 
