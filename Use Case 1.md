@@ -1,16 +1,16 @@
 #Use Cases
 
-##Use Case: 1 Single Node Cracking
+##Use Case: 1 Hash Cracking
 
 ###CHARACTERISTIC INFORMATION
 
-**Goal in Context:** The user will run the program on a single computer.
+**Goal in Context:** The user will run the program.
 
 **Scope:** End User/Program
 
 **Level:** Primary Function
 
-**Preconditions:** The program is running on a single computer, the user has a hash in one of the supported formats ready to be cracked. The user has files for specific methods of cracking (a dictionary file and/or rainbow table)
+**Preconditions:** The program is running on at least one computer, the user has a hash in one of the supported formats ready to be cracked. The user has files for specific methods of cracking (a dictionary file and/or rainbow table).
 
 **Success End Condition:** The hash will have been found and the user will have the original text used to create it.
 
@@ -18,7 +18,7 @@
 
 **Primary Actor:** User, the person operating the software.
 
-**Trigger:** The program is started and single computer mode is selected.
+**Trigger:** The program is started.
 
 ###MAIN SUCCESS SCENARIO
 
@@ -51,10 +51,11 @@
   + 1c1. Program moves directly to input and mode selection screen.
 
 * 4a. User has selected Brute Force cracking
-  + 4a1. No further action is required.
+  + 4a1. Program requests hash type.
 * 4b. User has selected dictionary cracking
   + 4b1. Program requests dictionary file.
-  + 4b2. If no file is available, program cannot continue.
+  + 4b2. program request hash type.
+  + 4b3. If no file is available, program cannot continue.
 * 4c. User has selected Rainbow Table cracking
   + 4c1. Program requests rainbow table file.
   + 4c2. If no file is available, user may generate a rainbow table.
@@ -68,17 +69,16 @@
 
 *put here the sub-variations that will cause eventual bifurcation in the scenario*
 
-* *step or variation number* *list of sub-variations*
 
 * 1a. User may select program mode
-Single Computer,
-Node,
+Single Computer, 
+Node, 
 Server
 
 
 * 2a. User may choose cracking method
-brute force,
-dictionary,
+brute force, 
+dictionary, 
 rainbow table
 
  
@@ -86,28 +86,22 @@ rainbow table
 
 ###RELATED INFORMATION (optional)
 
-**Priority:** *how critical to your system / organization*
+**Priority:** Necessary for hash cracking.
 
-**Performance Target:** *the amount of time this use case should take*
+**Performance Target:** Time scales range from miliseconds to years, depending on available computing power.
 
-**Frequency:** *how often it is expected to happen*
+**Frequency:** Each time the user has a hash they wish to crack.
 
-**Superordinate Use Case:** *optional, name of use case that includes this one*
+**Channel to primary actor:** Interactive GUI or CLI.
 
-**Subordinate Use Cases:** *optional, depending on tools, links to sub.use cases*
-
-**Channel to primary actor:** *e.g. interactive, static files, database*
-
-**Secondary Actors:** *list of other systems needed to accomplish use case*
-
-**Channel to Secondary Actors:** *e.g. interactive, static, file, database, timeout*
+**Secondary Actors:** A system in server mode requires one or more computers in Node mode. Computers in Node mode require a computer in Server mode.
 
 ###OPEN ISSUES (optional)
-
-*list of issues about this use cases awaiting decisions*
-
+* Rainbow table generator may run independently.
+* Additional modes may be implemented including running multiple modes simultaneously on separate clients.
+* 
 ###SCHEDULE
 
-**Due Date:** *date or release of deployment*
+**Due Date:** March 2015
 
 ...any other schedule / staffing information you need…
