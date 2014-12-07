@@ -19,6 +19,8 @@ try: #Master Try Block
             print "client socket created successfully"
            # done= False #useed for the while loop
             serverSaysKeepSearching= True
+            exitFromDoneCommand= False #set to true, if the done command was given
+            serverIP= 0
 
             #======================================================================================
             #CLIENT-CONTROLLER COMMUNICATION FUNCTIONS
@@ -69,7 +71,7 @@ try: #Master Try Block
 
                     #CRASHED
                 def sendCrashedCommandToServer(self):
-                    self.clientSocket.send("CRASHED") #sends the CRASHED command to the server
+                    self.clientSocket.sendto("CRASHED", self.serverIP) #sends the CRASHED command to the server
                     print "The CRASHED command was sent to the server"
 
                     #INVALIDCOMMAND
@@ -143,6 +145,7 @@ try: #Master Try Block
                     print "Attempting to connect to server"
                     clientSocket.connect((serverIPAddress, port))
                     print "Successfully connected to server"
+                    serverIP= serverIPAddress #set ip to class variable
                 except socket.timeout as msg:
                     print "========================================================================================"
                     print "ERROR: the connection has timed out. Check to see if you entered the correct IP Address."
@@ -168,6 +171,7 @@ try: #Master Try Block
                                 print "Server has issued the DONE command."
                                 print " "
                                 serverSaysKeepSearching= False
+                                exitFromDoneCommand= True
                                 break
 
                         except socket.timeout as inst:
@@ -207,6 +211,12 @@ try: #Master Try Block
             print inst #_str_ allows args tto be printed directly
             print "============================================================================================="
         finally:
+            if(exitFromDoneCommand == False):
+                print "ERROR: This Client did not exit from the DONE command!"
+                print "NOTICE: Sending Crash Message to Server"
+                #The LINE BELOW HAS AN ERROR!!! CANT PASS SELF FROM OUTSIDE THE CLASS!!!!
+                self.sendCrashedCommandToServer() #THIS LINE HAS THE ERROR, CANT PASS SELF FROM OUTSIDE THE CLASS!!!!!
+                print "NOTICE: Crash message was successfully sent to server"
             print "Closing the socket"
             clientSocket.close()
 
@@ -219,3 +229,4 @@ except Exception as inst:
     print "============================================================================================="
 finally:
     print "Program has ended"
+
