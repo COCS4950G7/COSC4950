@@ -1,28 +1,25 @@
 __author__ = 'Chris Hamm'
-#NetworkClient_r7B
+#NetworkClient_rBugg
 #Created: 11/21/2014
 
 #This is a restructured version of r7A
 
+#NOTES: SOCKET IS NOT CLOSED WHEN FINISHED!!!
 
 import socket
 import platform
 import Chunk
 
-#try: #Master Try Block
 #===================================================================
 #Client constructor/class definition
 #===================================================================
 #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 class NetworkClient():
-    #try: #NetworkClient class try block
     #class variables
     pipe = 0
     #This does not stay a number
-    #pipeendconnectedtocontroller = 0
     port = 49200
     clientSocket = 0
-   # done= False #useed for the while loop
     serverSaysKeepSearching = True
     serverIP = "127.0.1.1"
     chunk = Chunk.Chunk()
@@ -79,8 +76,8 @@ class NetworkClient():
                 print inst
                 print "========================================================================================"
 
-            #prompt user for the servers IP address
-            #serverIPAddress = raw_input('What is the host (server) IP Address?')
+            #Retreive the server's IP from the controller class
+
 
             try:
                 print "Attempting to get serverIP from controller"
@@ -216,8 +213,7 @@ class NetworkClient():
     #CLIENT-SERVER COMMUNICATION FUNCTIONS
     #This section contains methods the client will use to communicate with the server.
     #======================================================================================
-    #try: #client-server communication functions try block
-    #print "Inside the client server comm block"
+
     #Outbound communication functions
 
         #NEXT
@@ -259,6 +255,7 @@ class NetworkClient():
         #CRASHED
     def sendCrashedCommandToServer(self):
         #sends the CRASHED command to the server
+        #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!
         try:
             self.clientSocket.send("CRASHED")
             print "The CRASHED command was sent to the server"
@@ -310,7 +307,7 @@ class NetworkClient():
             print "============================================================================================="
 
         #next part of problem
-    #def checkForNextPartOfProblem(inboundString): #checks for the next part of the problem
+
         #not sure what to check for here
 
         #INVALIDCOMMAND
@@ -335,8 +332,7 @@ class NetworkClient():
     #CLIENT-CONTROLLER COMMUNICATION FUNCTIONS
     #This section contains methods the client will use to communicate with the controller class
     #======================================================================================
-    #try: #client-controller communication functions try block
-    #print "Inside the client controller comm block"
+
     #Outbound communication functions with controller
         #done
 

@@ -31,7 +31,7 @@ from multiprocessing import Process, Pipe, Lock
 import Dictionary
 #import Brute_Force
 import NetworkClient_rBugg
-import NetworkServer
+import NetworkServer_r7A
 import Chunk
 
 
