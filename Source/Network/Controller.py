@@ -20,6 +20,13 @@
 
 #   ############################ W I P ###########################
 
+# HEY!!!! CLIENT NEEDS TO START VIA THE CONTROLLER!
+#BUT CONTROLLER STARTS SERVER AUTOMATICALLY
+#CLIENT FAILS TO EVEN LAUNCH!!!!!!!!!!!!!!!!!
+
+
+
+
 #Imports
 from time import time
 import sys
