@@ -7,6 +7,7 @@ __author__ = 'Chris Hamm'
 
 import socket
 import platform
+import Chunk
 
 #try: #Master Try Block
 #===================================================================
@@ -24,6 +25,8 @@ class NetworkClient():
    # done= False #useed for the while loop
     serverSaysKeepSearching = True
     serverIP = "127.0.1.1"
+    chunk = Chunk.Chunk()
+    key = 0
 
     #constructor
     def __init__(self, pipeendconnectedtocontroller):
@@ -122,20 +125,45 @@ class NetworkClient():
                 while self.serverSaysKeepSearching:
                     self.clientSocket.settimeout(2.0)
 
+                    ######################## SERVER-CLIENT Communication #############################################
+
                     #checking for server commands try block
                     try:
                         print "Checking for server commands..."
                         theInput = self.clientSocket.recv(2048)
-                        #if theInput == "DONE":
-                        if self.checkForDoneCommand(theInput):
+                        if theInput == "DONE":
+
+                            self.sendDoneCommandToController()
+
                             #Make this line seperate from the other print statements
                             print " "
                             print "Server has issued the DONE command."
                             print " "
                             serverSaysKeepSearching = False
                             break
-                        #There should be more elifs with client-controller stuff
-                        #  ie: if server says here's that chunk you asked for, or other stuff
+                        #If the server wants to give us the next chunk, take it
+                        #Server should be sending "NEXT" -> params -> data in seperate strings all to us
+                        elif theInput == "NEXT":
+                            try:
+                                #and store it locally till controller is ready for it
+                                self.chunk.params = self.clientSocket.recv(2048)
+                                self.chunk.data = self.clientSocket.recv(2048)
+                                #let controller know we're ready to give it a chunk
+                                self.sendDoingStuffCommandToController()
+
+                                #send chunk object to controller
+                                self.pipe.send(self.chunk)
+
+                            except Exception as inst:
+                                print "============================================================================================="
+                                print "An exception was thrown in the checking for server commands Try Block"
+                                #the exception instance
+                                print type(inst)
+                                #srguments stored in .args
+                                print inst.args
+                                #_str_ allows args tto be printed directly
+                                print inst
+                                print "============================================================================================="
 
                     except socket.timeout as inst:
                         print "Socket timed out. No new server command"
@@ -151,10 +179,21 @@ class NetworkClient():
                         print inst
                         print "============================================================================================="
 
-                    #keep performing task
-                    #-------------------------
-                        #INSERT TASK HERE
-                    #-------------------------
+                    ########################## Client - Controller Communication #########################################
+                    #check for controller commands
+                    recv = self.pipe.recv()
+
+                    #If controller says 'next', say 'next' to server
+                    if recv == "next":
+
+                        self.sendNextCommandToServer()
+
+                    #if controller says 'found' then send 'found' and key to server
+                    elif recv == "found":
+
+                        self.key = self.pipe.recv()
+
+                        self.sendFoundSolutionToServer()
 
             except Exception as inst:
                 print "============================================================================================="
@@ -201,9 +240,10 @@ class NetworkClient():
 
         #FOUNDSOLUTION
     def sendFoundSolutionToServer(self):
-        #sends the FOUNDSOLUTION command to the server
+        #sends the FOUNDSOLUTION command to the server, and key
         try:
             self.clientSocket.send("FOUNDSOLUTION")
+            self.clientSocket.send(self.key)
             print "The FOUNDSOLUTION command was sent to the server"
         except Exception as inst:
             print "============================================================================================="
