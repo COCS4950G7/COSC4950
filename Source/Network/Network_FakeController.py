@@ -5,6 +5,8 @@ __author__ = 'Chris Hamm'
 #and I need to test the Network classes
 #This also allows for me to manually select which network class I want to start up
 
+#FLAW: if you launch client, you can't pass the server's ip to it!!!
+
 
 from time import time
 import sys
@@ -56,12 +58,6 @@ class Network_FakeController():
         #end of while loop
 
     #end of constructor
+
 Network_FakeController()
 
-#except Exception as inst:
- #   print "========================================================================================"
-  #  print "ERROR: An Exception was thrown in the Master Try Block of Controller class in FakeController"
-   # print type(inst) #the exception instance
-    #print inst.args #srguments stored in .args
-    #print inst #_str_ allows args tto be printed directly
-    #print "========================================================================================"

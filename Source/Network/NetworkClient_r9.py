@@ -6,9 +6,7 @@ __author__ = 'Chris Hamm'
 #This is a restructured version of r7A
 #This was copied form rBugg
 
-#PROBLEM!!!!!!!!!!!!!!!
-#Must be launched from controller or it doesnt work AT ALL!!!
-#Going to have to implement a fakeController for personal use
+
 
 import socket
 import platform
@@ -395,7 +393,7 @@ class NetworkClient():
     def receiveServerIPFromController(self):
         try:
             #self.pipe.send("doingStuff")
-            print "Attempting to get serverIP from Controller (function block)"
+            print "Waiting to receive the serverIP from Controller (function block)"
             self.serverIP = self.pipe.recv()
             print "The ServerIP was received from the Controller (function block)"
         except Exception as inst:
