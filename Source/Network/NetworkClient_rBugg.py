@@ -6,6 +6,8 @@ __author__ = 'Chris Hamm'
 
 #NOTES: SOCKET IS NOT CLOSED WHEN FINISHED!!!
 
+#SUPERCEDED BY r9!!!!
+
 import socket
 import platform
 import Chunk

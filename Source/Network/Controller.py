@@ -37,8 +37,9 @@ from multiprocessing import Process, Pipe, Lock
 #import RainbowMaker
 import Dictionary
 #import Brute_Force
-import NetworkClient_rBugg
-import NetworkServer_r7A
+#import NetworkClient_rBugg
+import NetworkClient_r9
+import NetworkServer_r9
 import Chunk
 
 
@@ -63,10 +64,10 @@ class Controller():
 
     #Defining network sub-processes as class variables that are instances of the network objects
     networkServer = 0
-    #networkServer = Process(target=NetworkServer.NetworkServer(networkPipe))
+    #networkServer = Process(target=NetworkServer_r9.NetworkServer(networkPipe))
     #networkClient = 0
     #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
-    networkClient = Process(target=NetworkClient_rBugg.NetworkClient, args=(networkPipe,))
+    networkClient = Process(target=NetworkClient_r9.NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
     serverIP = "127.1.1.1"
@@ -667,7 +668,7 @@ class Controller():
                 elif state == "serverDictionaryScreen":
 
                     #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer = Process(target=NetworkServer.NetworkServer(self.networkPipe))
+                    self.networkServer = Process(target=NetworkServer_r9.NetworkServer(self.networkPipe))
                     self.networkServer.start()
 
                     #What did the user pick? (Crack it!, Back, Exit)
