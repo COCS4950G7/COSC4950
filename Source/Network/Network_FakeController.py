@@ -3,7 +3,7 @@ __author__ = 'Chris Hamm'
 
 #This is used to simulate the controller class since i cant modify the existing one
 #and I need to test the Network classes
-
+#This also allows for me to manually select which network class I want to start up
 
 
 from time import time
