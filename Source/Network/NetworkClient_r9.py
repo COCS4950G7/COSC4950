@@ -178,8 +178,9 @@ class NetworkClient():
 
                     ########################## Client - Controller Communication #########################################
                     #check for controller commands
-                    recv = self.pipe.recv()
-
+                    print "Checking for controller commands..."
+                    recv = self.pipe.recv()  #Gets stuck on this line ##########
+                    print "Received a controller command"
                     #If controller says 'next', say 'next' to server
                     if recv == "next":
 
@@ -191,7 +192,7 @@ class NetworkClient():
                         self.key = self.pipe.recv()
 
                         self.sendFoundSolutionToServer()
-
+                #end of while loop
             except Exception as inst:
                 print "============================================================================================="
                 print "An exception was thrown in the Client Primary Loop Try Block"
@@ -210,6 +211,7 @@ class NetworkClient():
         finally:
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
+            print "Socket has been closed"
 
         #End of constructor block
 

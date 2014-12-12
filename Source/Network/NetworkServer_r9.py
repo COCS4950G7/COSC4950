@@ -107,6 +107,17 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         sock.settimeout(2.0)
                         theInput = sock.recv(2048) #listening for input
                         print "Received a message from a client."
+                        if(self.checkForNextCommand(theInput)):
+                            print "NEXT command was received"
+                        elif(self.checkForFoundSolutionCommand(theInput)):
+                            print "FOUNDSOLUTION command was received"
+                        elif(self.checkForCrashedCommand(theInput)):
+                            print "CRASHED command was received"
+                        elif(self.checkForInvalidCommand(theInput)):
+                            print "INVALIDINPUT command received"
+                        else:
+                            print "ERROR: unknown command received"
+                            print "The unknown command: " + theInput
                     except socket.timeout as inst:
                         print "Socket has timed out. No input from client detected."
                     except Exception as inst:
@@ -173,6 +184,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 for x in range(0, len(self.listOfClients)):
                     (sock, addr) = self.listOfClients[x]
                     #sock.sendall("DONE")
+                    print "Before sending the DONE command"
                     self.sendDoneCommandToClient(sock,addr)
                     print "Sent DONE command to: " + str(addr)
             #End of Constructor Block
