@@ -33,6 +33,8 @@ import hashlib
 import time
 from multiprocessing import Process, Pipe, Lock
 import os
+import Chunk
+import random
 
 class Dictionary():
 
@@ -403,3 +405,43 @@ class Dictionary():
         oneStringToRule = self.algorithm + " " + self.hash
 
         return oneStringToRule
+
+    #################### BELOW '2' methods are fake versions to provide functionality for controller-network communication temporarily ####################
+
+    def getThisChunk2(self, params):
+
+        chunk = Chunk.Chunk()
+
+        chunk.params = params
+
+        chunk.data = "asdasdf"
+
+        return chunk
+
+    def getNextChunk2(self):
+
+        chunk = Chunk.Chunk()
+
+        chunk.params = "dictionary"
+
+        chunk.data = "asdasdf"
+
+        return chunk
+
+    def isKey2(self, key):
+
+        self.key = key
+
+        return True
+
+    #modify to set how often a solution will be found (if needed)
+    def find2(self, chunk):
+
+        x = random.randint(1, 100)
+
+        if x > 98:
+
+            self.found = True
+
+
+

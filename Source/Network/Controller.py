@@ -20,13 +20,6 @@
 
 #   ############################ W I P ###########################
 
-# HEY!!!! CLIENT NEEDS TO START VIA THE CONTROLLER!
-#BUT CONTROLLER STARTS SERVER AUTOMATICALLY
-#CLIENT FAILS TO EVEN LAUNCH!!!!!!!!!!!!!!!!!
-
-
-
-
 #Imports
 from time import time
 import sys
@@ -37,18 +30,9 @@ from multiprocessing import Process, Pipe, Lock
 #import RainbowMaker
 import Dictionary
 #import Brute_Force
-#import NetworkClient_rBugg
 import NetworkClient_r9
 import NetworkServer_r9
 import Chunk
-
-
-
-
-#Controller class
-#from Source.Dictionary import Dictionary
-#from Source.Rainbow import RainbowUser
-
 
 class Controller():
 
@@ -59,18 +43,15 @@ class Controller():
     dictionary = Dictionary.Dictionary()
     #brute_force = Brute_Force.Brute_Force()
 
-    #lock = Lock()
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = 0
-    #networkServer = Process(target=NetworkServer_r9.NetworkServer(networkPipe))
-    #networkClient = 0
+    networkServer = Process(target=NetworkServer_r9.NetworkServer, args=(networkPipe,))
     #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
     networkClient = Process(target=NetworkClient_r9.NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
-    serverIP = "127.1.1.1"
+    serverIP = "127.0.1.1"
 
     #tempGUI Variables
     state = "startScreen"
@@ -262,6 +243,9 @@ class Controller():
                         os.system('cls' if os.name == 'nt' else 'clear')
                         print "============="
                         print "nodeConnectedToScreen"
+
+                        #First command that requests
+                        self.controllerPipe.send("next")
 
                     #If the server says we're doing stuff
                     elif rec == "doingStuff":
@@ -668,8 +652,7 @@ class Controller():
             elif state == "serverDictionaryScreen":
 
                 #Start up the networkServer class (as sub-process in the background)
-                self.networkServer = Process(target=NetworkServer_r9.NetworkServer(self.networkPipe))
-                self.networkServer.start()
+                #self.networkServer.start()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -749,6 +732,9 @@ class Controller():
                 #display results and wait for user interaction
                 print "============="
                 print "serverDictionarySearchingScreen"
+
+                #Start up the networkServer class (as sub-process in the background)
+                self.networkServer.start()
 
                 self.clock = time()
 

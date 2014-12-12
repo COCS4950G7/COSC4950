@@ -31,15 +31,8 @@ from multiprocessing import Process, Pipe, Lock
 import Dictionary
 #import Brute_Force
 import NetworkClient
-#import NetworkServer
-
-
-
-
-#Controller class
-#from Source.Dictionary import Dictionary
-#from Source.Rainbow import RainbowUser
-
+import NetworkServer
+import Chunk
 
 class Controller():
 
@@ -50,18 +43,15 @@ class Controller():
     dictionary = Dictionary.Dictionary()
     #brute_force = Brute_Force.Brute_Force()
 
-    #lock = Lock()
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = 0
-    #networkServer = Process(target=NetworkServer.NetworkServer(networkPipe))
-    #networkClient = 0
+    networkServer = Process(target=NetworkServer.NetworkServer, args=(networkPipe,))
     #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
     networkClient = Process(target=NetworkClient.NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
-    serverIP = "127.1.1.1"
+    serverIP = "127.0.1.1"
 
     #tempGUI Variables
     state = "startScreen"
@@ -229,11 +219,15 @@ class Controller():
                 #if we're at the node connected state (Screen)
                 elif state == "nodeConnectedToScreen":
 
+                    #First command that requests
+                    self.controllerPipe.send("next")
+
                     done = False
-                    ####PROBLEMS FOUND HERE, FUNCTIONALITY IS BROKE
+
                     #While the current job is not done
                     while not done:
 
+                        #Receive the next (or first) command
                         rec = self.controllerPipe.recv()
 
                         #If the server says we're done
@@ -258,15 +252,41 @@ class Controller():
                             print "============="
                             print "nodeDoingStuffScreen"
 
-                            ###### THERE SHOULD BE SOME DOING STUFF CODE HERE #######
+                            #'chunk' is an object that has attributes 'params' and 'data' (both are strings for network passing)
 
-                            #Get a chunk from networkClient
+                            #Receive our chunk object
+                            chunk = self.controllerPipe.recv()
 
-                            #Parse the chunk
+                            #Get the params as a list from chunk object
+                            paramsList = chunk.params.split()
 
-                            #Work on stuff
+                            ##### add other types later
+                            if paramsList[0] == "dictionary":
 
-                            #send results back to networkClient
+                                #This is the client's dictionary class,
+                                #   and this is where it searches (will be unresponsive during search)
+                                self.dictionary.find2(chunk)
+
+                                #If it's found something
+                                if self.dictionary.isFound():
+
+                                    #get the key from local dictionary class
+                                    key = self.dictionary.showKey()
+
+                                    #send "found" over pipe to networkClient
+                                    self.controllerPipe.send("found")
+
+                                    #send the key we found to networkClient
+                                    self.controllerPipe.send(key)
+
+                                    #stop searching and get done
+                                    done = True
+
+                                else:
+
+                                    #if it didn't find anything (but is done)
+                                    #get next command (which might be chunk or done or something else)
+                                    self.controllerPipe.send("next")
 
                     self.networkClient.join()
                     #self.networkClient.terminate()
@@ -629,7 +649,6 @@ class Controller():
                 elif state == "serverDictionaryScreen":
 
                     #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer = Process(target=NetworkServer.NetworkServer(self.networkPipe))
                     self.networkServer.start()
 
                     #What did the user pick? (Crack it!, Back, Exit)
@@ -746,15 +765,11 @@ class Controller():
                         #What's the server saying:
                         rec = self.controllerPipe.recv()
 
-                        #If the server needs a chunk, give one.
+                        #If the server needs a chunk, give one. (this should be the first thing server says)
                         if rec == "nextChunk":
 
-                            #Note, this will eventually be sending more information (ie: parameters) not just the list of words
-                            chunk = self.dictionary.getNextChunk()
-
-                            #need parameters/data object
-                            #has standard parameter variables for network to keep (and associate with nodes)
-                            #and data which the network passes to the client
+                            #chunk is a Chunk object
+                            chunk = self.dictionary.getNextChunk2()
 
                             self.controllerPipe.send(chunk)
 
@@ -764,11 +779,11 @@ class Controller():
                             #Get the parameters of the chunk
                             params = self.controllerPipe.recv()
 
-                            #Get the chunk again
-                            chunkList = self.dictionary.getThisChunk(params)
+                            #Get the chunk again (again a Chunk object)
+                            chunk = self.dictionary.getThisChunk2(params)
 
                             #Send the chunk again
-                            self.controllerPipe.send(chunkList)
+                            self.controllerPipe.send(chunk)
 
                         #if the server is waiting for nodes to finish
                         elif rec == "waiting":
@@ -776,37 +791,33 @@ class Controller():
                             #Placeholder
                             chrisHamm = True
 
-                        #If the server has a 'done' chunk
-                        elif rec == "done":
+                        #If the server has a key
+                        elif rec == "found":
 
-                            #Get the done chunk
-                            whatDidYouFind = self.controllerPipe.recv()
+                            #Get the key
+                            key = self.controllerPipe.recv()
 
-                            #See if it's the key or just a "not found"
-                            isFound = self.dictionary.isKey()
+                            #This will help for error checking later, though for now not so much
+                            isFound = self.dictionary.isKey2(key)
 
                     elapsed = (time() - self.clock)
                     self.clock = elapsed
 
-                    #if a(the) node finds a key
-                    if isFound():
+                    #Let the network  class know to be done
+                    self.controllerPipe.send("done")
 
-                        #Let the network class know we've found the key, and stop all nodes
-                        self.controllerPipe.send("found")
+                    #if the key has been found
+                    if isFound:
 
                         self.state = "serverDictionaryFoundScreen"
 
                     else:
-
-                        #Let the network  class know we're done but didn't find anything (stop all the nodes anyways)
-                        self.controllerPipe.send("notFound")
 
                         self.state = "serverDictionaryNotFoundScreen"
 
                 #if we're at the singleDictionaryFoundScreen state (Screen)
                 elif state == "serverDictionaryFoundScreen":
 
-                    #Start up the networkServer class (as sub-process in the background)
                     self.networkServer.join()
                     #self.networkServer.terminate()
 
