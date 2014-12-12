@@ -118,7 +118,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         else:
                             print "ERROR: unknown command received"
                             print "The unknown command: " + theInput
-                            
+
                     except socket.timeout as inst:
                         print "Socket has timed out. No input from client detected."
                     except Exception as inst:
@@ -130,9 +130,18 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print "========================================================================================"
 
                     #Check for input from controller class
+                    print "Checking for input from the Controller class..."
                     try: #check for input from controller try block
-                        print "Checking for input from the Controller class..."
-                        print "NOTICE: The check for input from controller class function is not finished"
+                        recv = self.pipe.recv()
+                        print "Received a message from the controller"
+                        if(self.checkForNextChunk(recv)==True):
+                            print "Received the reply to the NextChunk command"
+                        elif(self.checkForChunkAgain(recv)==True):
+                            print "Received the reply to the ChunkAgain command"
+                        elif(self.checkForFound(recv)==True):
+                            print "Received reply stating whether the key has been found or not"
+                        else:
+                            print "ERROR: Received an unknown command from the controller"
                     except Exception as inst:
                         print "========================================================================================"
                         print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
@@ -261,7 +270,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
         #Inbound communication with controller
             #REPLY OT NEXTCHUNK
-        def checkForNextChunk(inboundString): #check to see if the string contains the next chunk of the problem
+        def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
             try:
                 print "Checking to see if inboundString is the next part of problem..."
                 print "The function for this is not finished yet"
@@ -277,7 +286,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
             #REPLY TO CHUNKAGAIN
-        def checkForChunkAgain(inboundString): #check to see if the string contains that chunk that was requested
+        def checkForChunkAgain(self,inboundString): #check to see if the string contains that chunk that was requested
             try:
                 print "Checking to see if inboundString is the requested chunk (chunkAgain)..."
                 print "The function for this is not finished"
@@ -293,7 +302,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
             #REPLY TO DONE
-        def checkForFound(inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
+        def checkForFound(self,inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
             try:
                 print "Checking to see if the key was found..."
                 print "The function for this is not finished"
