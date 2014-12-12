@@ -107,17 +107,18 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         sock.settimeout(2.0)
                         theInput = sock.recv(2048) #listening for input
                         print "Received a message from a client."
-                        if(self.checkForNextCommand(theInput)):
+                        if(self.checkForNextCommand(theInput)==True):
                             print "NEXT command was received"
-                        elif(self.checkForFoundSolutionCommand(theInput)):
+                        elif(self.checkForFoundSolutionCommand(theInput)==True):
                             print "FOUNDSOLUTION command was received"
-                        elif(self.checkForCrashedCommand(theInput)):
+                        elif(self.checkForCrashedCommand(theInput)==True):
                             print "CRASHED command was received"
-                        elif(self.checkForInvalidCommand(theInput)):
+                        elif(self.checkForInvalidCommand(theInput)==True):
                             print "INVALIDINPUT command received"
                         else:
                             print "ERROR: unknown command received"
                             print "The unknown command: " + theInput
+                            
                     except socket.timeout as inst:
                         print "Socket has timed out. No input from client detected."
                     except Exception as inst:
@@ -131,7 +132,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     #Check for input from controller class
                     try: #check for input from controller try block
                         print "Checking for input from the Controller class..."
-                        print "The function is not finished"
+                        print "NOTICE: The check for input from controller class function is not finished"
                     except Exception as inst:
                         print "========================================================================================"
                         print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
@@ -375,7 +376,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
         #Inbound communication functions
             #NEXT
-        def checkForNextCommand(inboundString): #checks for the NEXT command
+        def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
                 if(inboundString=="NEXT"):
                     print "A Client has issued the NEXT command"
@@ -394,7 +395,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
             #FOUNDSOLUTION
-        def checkForFoundSolutionCommand(inboundString): #checks for the "FOUNDSOLUTION" string
+        def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
             try:
                 if(inboundString=="FOUNDSOLUTION"):
                     print "A Client has issued the FOUNDSOLUTION command"
@@ -413,7 +414,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
             #CRASHED
-        def checkForCrashedCommand(inboundString): #checks for the "CRASHED" Command
+        def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
                 if(inboundString=="CRASHED"):
                     print "NOTICE: A Client has issued the CRASHED command"
@@ -432,7 +433,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
             #INVALIDCOMMAND
-        def checkForInvalidCommand(inboundString): #checks for the "INVALIDCOMMAND" string
+        def checkForInvalidCommand(self,inboundString): #checks for the "INVALIDCOMMAND" string
             try:
                 if(inboundString=="INVALIDCOMMAND"):
                     print "ERROR: A Client has issued the INVALIDCOMMAND command"
