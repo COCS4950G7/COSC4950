@@ -212,7 +212,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The NEXTCHUNK command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -228,7 +228,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The CHUNKAGAIN command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -244,7 +244,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The WAITING command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -260,7 +260,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The DONE command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -277,7 +277,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The function for this is not finished yet"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -293,7 +293,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The function for this is not finished"
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Inbound checkForChunkAgain Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Inbound checkForChunkAgain Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -319,7 +319,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Controller Inbound checkForFound Try Block"
+                print "ERROR: An exception was thrown in the Server-Controller Inbound checkForFound Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -343,7 +343,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The DONE command was issued to: " + str(recipientIPAddress)
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -359,7 +359,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The next part of the problem was sent to: " + str(recipientIPAddress)
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Outbound sendNext Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -375,7 +375,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "The INVALIDINPUT command was issued to: " + str(recipientIPAddress)
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the SServer-Client Outbound sendInvalidCommand Try Block"
+                print "ERROR: An exception was thrown in the SServer-Client Outbound sendInvalidCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -395,7 +395,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Inbound checkForNextCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Inbound checkForNextCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -414,7 +414,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Inbound checkForFoundSolutionCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Inbound checkForFoundSolutionCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -433,7 +433,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
@@ -452,7 +452,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Server-Client Inbound checkForInvalidCommand Try Block"
+                print "ERROR: An exception was thrown in the Server-Client Inbound checkForInvalidCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args

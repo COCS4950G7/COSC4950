@@ -152,7 +152,7 @@ class NetworkClient():
 
                             except Exception as inst:
                                 print "============================================================================================="
-                                print "An exception was thrown in the checking for server commands Try Block"
+                                print "ERROR: An exception was thrown in the checking for server commands Try Block"
                                 #the exception instance
                                 print type(inst)
                                 #srguments stored in .args
@@ -166,7 +166,7 @@ class NetworkClient():
 
                     except Exception as inst:
                         print "============================================================================================="
-                        print "An exception was thrown in the checking for server commands Try Block"
+                        print "ERROR: An exception was thrown in the checking for server commands Try Block"
                         #the exception instance
                         print type(inst)
                         #srguments stored in .args
@@ -202,7 +202,7 @@ class NetworkClient():
                 #end of server says keep searching while loop
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Client Primary Loop Try Block"
+                print "ERROR: An exception was thrown in the Client Primary Loop Try Block"
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
@@ -210,7 +210,7 @@ class NetworkClient():
 
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Main Client Loop Try Block"
+            print "ERROR: An exception was thrown in the Main Client Loop Try Block"
             print type(inst) #the exception instance
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
@@ -238,7 +238,7 @@ class NetworkClient():
 
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendNextCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -256,7 +256,7 @@ class NetworkClient():
             print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -275,7 +275,7 @@ class NetworkClient():
             print "INFO: The CRASHED command was sent to the server"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -292,7 +292,7 @@ class NetworkClient():
             print "INFO: The INVALIDCOMMAND command was sent to the server"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -312,7 +312,7 @@ class NetworkClient():
                 return False
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -335,7 +335,7 @@ class NetworkClient():
                 return False
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server checkForInvalidCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server checkForInvalidCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -358,7 +358,7 @@ class NetworkClient():
             print "INFO: The DONE command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -374,7 +374,7 @@ class NetworkClient():
             print "INFO: The CONNECTED command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -390,7 +390,7 @@ class NetworkClient():
             print "INFO: The DOINGSTUFF command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -409,7 +409,7 @@ class NetworkClient():
             print "INFO: The ServerIP was received from the Controller (function block)"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
