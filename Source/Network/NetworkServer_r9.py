@@ -132,16 +132,17 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     #Check for input from controller class
                     print "Checking for input from the Controller class..."
                     try: #check for input from controller try block
-                        recv = self.pipe.recv()
-                        print "Received a message from the controller"
-                        if(self.checkForNextChunk(recv)==True):
-                            print "Received the reply to the NextChunk command"
-                        elif(self.checkForChunkAgain(recv)==True):
-                            print "Received the reply to the ChunkAgain command"
-                        elif(self.checkForFound(recv)==True):
-                            print "Received reply stating whether the key has been found or not"
-                        else:
-                            print "ERROR: Received an unknown command from the controller"
+                        if(self.pipe.poll()):
+                            recv = self.pipe.recv()
+                            print "Received a message from the controller"
+                            if(self.checkForNextChunk(recv)==True):
+                                print "Received the reply to the NextChunk command"
+                            elif(self.checkForChunkAgain(recv)==True):
+                                print "Received the reply to the ChunkAgain command"
+                            elif(self.checkForFound(recv)==True):
+                                print "Received reply stating whether the key has been found or not"
+                            else:
+                                print "ERROR: Received an unknown command from the controller"
                     except Exception as inst:
                         print "========================================================================================"
                         print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"

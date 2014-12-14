@@ -31,6 +31,8 @@ class Network_FakeController():
     networkServer = Process(target=NetworkServer_r9.NetworkServer, args=(networkPipe,))
     networkClient = Process(target=NetworkClient_r9.NetworkClient, args=(networkPipe,))
 
+
+
     #constructor
     def __init__(self):
 

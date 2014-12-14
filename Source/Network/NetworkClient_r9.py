@@ -48,7 +48,7 @@ class NetworkClient():
                     print platform.system()
                     print platform.win32_ver()
 
-                #Detecting Linux
+                #Detecting GNU/Linux
                 elif platform.system() == "Linux":
                     print platform.system()
                     print platform.dist()
@@ -178,9 +178,27 @@ class NetworkClient():
 
                     ########################## Client - Controller Communication #########################################
                     #check for controller commands
-                    print "Checking for controller commands..."
-                    recv = self.pipe.recv()  #Gets stuck on this line ##########
-                    print "Received a controller command"
+                    print "Checking for controller commands... "
+                    if(self.pipe.poll()):
+                        recv = self.pipe.recv()  #Gets stuck on this line ##########
+                        print "Received a controller command"
+                        #if controller says next, say "next" to server
+                        if(recv == "next"):
+                            print "Received next command from controller"
+                            self.sendNextCommandToServer()
+                        #if controller says "found" then send "found" and the key to the server
+                        elif(recv == "found"):
+                            print "Received found command from controller"
+                            print "Retrieving key"
+                            if(self.pipe.poll()):
+                                self.key = self.pipe.recv()
+                                print "the key has been received"
+                                self.sendFoundSolutionToServer()
+                        else:
+                            print "ERROR: unknown command was received"
+                    else:
+                        print "No command was received"
+                        '''
                     #If controller says 'next', say 'next' to server
                     if recv == "next":
 
@@ -192,7 +210,8 @@ class NetworkClient():
                         self.key = self.pipe.recv()
 
                         self.sendFoundSolutionToServer()
-                #end of while loop
+                        '''
+                #end of server says keep searching while loop
             except Exception as inst:
                 print "============================================================================================="
                 print "An exception was thrown in the Client Primary Loop Try Block"
