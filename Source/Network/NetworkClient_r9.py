@@ -22,6 +22,7 @@ class NetworkClient():
     port = 49200
     clientSocket = 0
     serverSaysKeepSearching = True
+    serverIssuedDoneCommand = False
     serverIP = "127.0.1.1"
     chunk = Chunk.Chunk()
     key = 0
@@ -136,6 +137,7 @@ class NetworkClient():
                             print "INFO: Server has issued the DONE command."
                             print " "
                             self.serverSaysKeepSearching = False
+                            self.serverIssuedDoneCommand = True
                             break
                         #If the server wants to give us the next chunk, take it
                         #Server should be sending "NEXT" -> params -> data in seperate strings all to us
@@ -216,6 +218,10 @@ class NetworkClient():
             print inst #_str_ allows args tto be printed directly
             print "============================================================================================="
         finally:
+            if(self.serverIssuedDoneCommand == False):
+                print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
+                self.sendCrashedCommandToServer()
+                print "INFO: CRASH Command was sent to the server"
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
@@ -272,7 +278,9 @@ class NetworkClient():
         #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!!!!!!!
         try:
             self.clientSocket.send("CRASHED")
+            print " "
             print "INFO: The CRASHED command was sent to the server"
+            print " "
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"

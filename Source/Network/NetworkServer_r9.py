@@ -115,9 +115,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "CRASHED command was received"
                         elif(self.checkForInvalidCommand(theInput)==True):
                             print "INVALIDINPUT command received"
+                        elif(self.checkForAltCrashCommand(theInput)==True):
+                            print "ALT CRASH COMMAND received"
                         else:
                             print "ERROR: unknown command received"
-                            print "The unknown command: " + theInput
+                            print "The unknown command: '" + theInput + "'"
 
                     except socket.timeout as inst:
                         print "Socket has timed out. No input from client detected."
@@ -437,7 +439,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
                 if(inboundString=="CRASHED"):
-                    print "NOTICE: A Client has issued the CRASHED command"
+                    print "WARNING: A Client has issued the CRASHED command"
                     return True
                 else:
                     return False
@@ -463,6 +465,25 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForInvalidCommand Try Block"
+                #the exception instance
+                print type(inst)
+                #srguments stored in .args
+                print inst.args
+                #_str_ allows args tto be printed directly
+                print inst
+                print "============================================================================================="
+
+            #ALT Crash Command
+        def checkForAltCrashCommand(self, inboundString): #checks for the " " string
+            try:
+                if(inboundString==""):
+                    print "WARNING: A Client has issued the ALT CRASH COMMAND"
+                    return True
+                else:
+                    return False
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the Server-Client Inbound checkForAltCrashCommand Try Block"
                 #the exception instance
                 print type(inst)
                 #srguments stored in .args
