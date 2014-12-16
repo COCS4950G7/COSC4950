@@ -194,10 +194,20 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "Socket has been closed"
                 for x in range(0, len(self.listOfClients)):
                     (sock, addr) = self.listOfClients[x]
-                    #sock.sendall("DONE")
-                    print "Before sending the DONE command"
-                    self.sendDoneCommandToClient(sock,addr)
-                    print "Sent DONE command to: " + str(addr)
+                    sock.sendall("DONE")
+                    print "Issued the DONE command to client: " + str(addr)
+                   # print "Before sending the DONE command"
+                   # try:
+                   #     self.sendDoneCommandToClient(sock,addr)
+                   #     print "Sent DONE command to: " + str(addr)
+                   # except Exception as inst:
+                   #     print "========================================================================================"
+                   #     print "ERROR: An exception has been thrown in the Finally block, sendDoneCommandToServer Try Block"
+                   #     print type(inst) #the exception instance
+                   #     print inst.args #srguments stored in .args
+                   #     print inst #_str_ allows args tto be printed directly
+                   #     print "========================================================================================"
+
             #End of Constructor Block
 
         #=================================================================================================
