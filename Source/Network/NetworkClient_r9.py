@@ -32,10 +32,10 @@ class NetworkClient():
         self.pipe = pipeendconnectedtocontroller
 
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print "INFO: client socket created successfully"
+        print "STATUS: client socket created successfully"
 
         try: #Main Client Loop
-            print "INFO: Entering Main Client Loop"
+            print "STATUS: Entering Main Client Loop"
 
             #getOS try block
             try:
@@ -81,9 +81,9 @@ class NetworkClient():
             #Retreive the server's IP from the controller class
 
             try:  #get serverIP try block
-                print "INFO: Attempting to get serverIP from controller"
+                print "STATUS: Attempting to get serverIP from controller"
                 self.receiveServerIPFromController()
-                print "INFO: successfully received serverIP from controller"
+                print "STATUS: Successfully received serverIP from controller"
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception was thrown in serverIP try block"
@@ -96,9 +96,9 @@ class NetworkClient():
                 print "========================================================================================"
 
             try:
-                print "INFO: Attempting to connect to server"
+                print "STATUS: Attempting to connect to server"
                 self.clientSocket.connect((self.serverIP, self.port))
-                print "INFO: Successfully connected to server"
+                print "STATUS: Successfully connected to server"
 
             except socket.timeout as msg:
                 print "========================================================================================"
@@ -127,7 +127,7 @@ class NetworkClient():
 
                     #checking for server commands try block
                     try:
-                        print "INFO: Checking for server commands..."
+                        print "STATUS: Checking for server commands..."
                         theInput = self.clientSocket.recv(2048)
                         if theInput == "DONE":
                             self.sendDoneCommandToController()
@@ -164,7 +164,7 @@ class NetworkClient():
                                 print "============================================================================================="
 
                     except socket.timeout as inst:
-                        print "INFO: Socket timed out. No new server command"
+                        print "STATUS: Socket timed out. No new server command"
 
                     except Exception as inst:
                         print "============================================================================================="
@@ -179,7 +179,7 @@ class NetworkClient():
 
                     ########################## Client - Controller Communication #########################################
                     #check for controller commands
-                    print "INFO: Checking for controller commands... "
+                    print "STATUS: Checking for controller commands... "
                     if(self.pipe.poll()):
                         recv = self.pipe.recv()  #Gets stuck on this line ##########
                         print "INFO: Received a controller command"
@@ -190,15 +190,16 @@ class NetworkClient():
                         #if controller says "found" then send "found" and the key to the server
                         elif(recv == "found"):
                             print "INFO: Received found command from controller"
-                            print "INFO: Retrieving key"
+                            print "STATUS: Retrieving key"
                             if(self.pipe.poll()):
                                 self.key = self.pipe.recv()
                                 print "INFO: the key has been received"
                                 self.sendFoundSolutionToServer()
                         else:
                             print "ERROR: unknown command was received"
+                            print "The unknown command: '" + recv + "'"
                     else:
-                        print "INFO: No command was received"
+                        print "INFO: No command was received from the controller class"
 
 
                 #end of server says keep searching while loop
