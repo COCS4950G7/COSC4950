@@ -225,6 +225,7 @@ class NetworkClient():
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
+            print " "
 
         #End of constructor block
 

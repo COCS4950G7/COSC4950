@@ -145,6 +145,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "Received reply stating whether the key has been found or not"
                             else:
                                 print "ERROR: Received an unknown command from the controller"
+                                print "The unknown command: '" + recv + "'"
                     except Exception as inst:
                         print "========================================================================================"
                         print "ERROR: An exception has been thrown in the Check for input from Controller class Try Block"
@@ -182,6 +183,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst.args #srguments stored in .args
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
+                    finally:
+                        print "Currently, there are " + str(len(self.listOfClients)) + " clients currently connected"
                 #END OF MAIN SERVER LOOP
             except Exception as inst: #Exception for Server Primary While Loop Try Block
                 print "========================================================================================"
