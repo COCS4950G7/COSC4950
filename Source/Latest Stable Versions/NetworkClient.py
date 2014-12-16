@@ -1,221 +1,432 @@
 __author__ = 'Chris Hamm'
-#NetworkClient_r7B
-#Created: 11/21/2014
+#NetworkClient_r9
+#Created: 12/5/2014
+
 
 #This is a restructured version of r7A
+#This was copied form rBugg
 
-try: #Master Try Block
+
+
+import socket
+import platform
+import Chunk
+
 #===================================================================
 #Client constructor/class definition
 #===================================================================
-    class NetworkClient(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
-        try: #NetworkClient class try block
-            #class variables
-            import socket
-            import platform
-            pipeendconnectedtocontroller =0 #This does not stay a number
-            port= 49200
-            clientSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            print "client socket created successfully"
-           # done= False #useed for the while loop
-            serverSaysKeepSearching= True
+#CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
+class NetworkClient():
+    #class variables
+    pipe = 0
+    port = 49200
+    clientSocket = 0
+    serverSaysKeepSearching = True
+    serverIssuedDoneCommand = False
+    serverIP = "127.0.1.1"
+    chunk = Chunk.Chunk()
+    key = 0
 
-            #======================================================================================
-            #CLIENT-CONTROLLER COMMUNICATION FUNCTIONS
-            #This section contains methods the client will use to communicate with the controller class
-            #======================================================================================
-            try: #client-controller communication functions try block
-                print "Inside the client controller comm block"
-                #Outbound communication functions with controller
-                    #done
-                def sendDoneCommandToController(self):
-                    self.pipe.send("done")
-                    print "The DONE command was sent to the Controller"
+    #constructor
+    def __init__(self, pipeendconnectedtocontroller):
+        self.pipe = pipeendconnectedtocontroller
 
-                    #connected
-                def sendConnectedCommandToCOntroller(self):
-                    self.pipe.send("connected")
-                    print "The CONNECTED command was sent to the Controller"
+        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print "STATUS: client socket created successfully"
 
-                    #doingStuff
-                def sendDoingStuffCommandToController(self):
-                    self.pipe.send("doingStuff")
-                    print "The DOINGSTUFF command was sent to the Controller"
+        try: #Main Client Loop
+            print "STATUS: Entering Main Client Loop"
+
+            #getOS try block
+            try:
+                print "*************************************"
+                print "    Network Client"
+                print "*************************************"
+                print "OS DETECTION:"
+
+                #Detecting Windows
+                if platform.system() == "Windows":
+                    print platform.system()
+                    print platform.win32_ver()
+
+                #Detecting GNU/Linux
+                elif platform.system() == "Linux":
+                    print platform.system()
+                    print platform.dist()
+
+                #Detecting OSX
+                elif platform.system() == "Darwin":
+                    print platform.system()
+                    print platform.mac_ver()
+
+                #Detecting an OS that is not listed
+                else:
+                    print platform.system()
+                    print platform.version()
+                    print platform.release()
+
+                print "*************************************"
 
             except Exception as inst:
-                print "============================================================================================="
-                print "An exception was thrown in the Client-Controller Communication Functions Try Block"
-                print type(inst) #the exception instance
-                print inst.args #srguments stored in .args
-                print inst #_str_ allows args tto be printed directly
-                print "============================================================================================="
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in getOS try block"
+                #the exception instance
+                print type(inst)
+                #arguments stored in .args
+                print inst.args
+                #_str_ allows args to be printed directly
+                print inst
+                print "========================================================================================"
 
-        #======================================================================================
-        #CLIENT-SERVER COMMUNICATION FUNCTIONS
-        #This section contains methods the client will use to communicate with the server.
-        #======================================================================================
-            try: #client-server communication functions try block
-                print "Inside the client server comm block"
-                #Outbound communication functions
-                    #NEXT
-                def sendNextCommandToServer(self):
-                    self.clientSocket.send("NEXT") #sends the NEXT command to the serve
-                    print "The NEXT command was sent to the server"
+            #Retreive the server's IP from the controller class
 
-                    #FOUNDSOLUTION
-                def sendFoundSolutionToServer(self):
-                    self.clientSocket.send("FOUNDSOLUTION") #sends the FOUNDSOLUTION command to the server
-                    print "The FOUNDSOLUTION command was sent to the server"
+            try:  #get serverIP try block
+                print "STATUS: Attempting to get serverIP from controller"
+                self.receiveServerIPFromController()
+                print "STATUS: Successfully received serverIP from controller"
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in serverIP try block"
+                #the exception instance
+                print type(inst)
+                #arguments stored in .args
+                print inst.args
+                #_str_ allows args to be printed directly
+                print inst
+                print "========================================================================================"
 
-                    #CRASHED
-                def sendCrashedCommandToServer(self):
-                    self.clientSocket.send("CRASHED") #sends the CRASHED command to the server
-                    print "The CRASHED command was sent to the server"
+            try:
+                print "STATUS: Attempting to connect to server"
+                self.clientSocket.connect((self.serverIP, self.port))
+                print "STATUS: Successfully connected to server"
 
-                    #INVALIDCOMMAND
-                def sendInvalidCommandToServer(self):
-                    self.clientSocket.send("INVALIDCOMMAND") #sends INVALIDCOMMAND command to server
-                    print "The INVALIDCOMMAND command was sent to the server"
+            except socket.timeout as msg:
+                print "========================================================================================"
+                print "ERROR: the connection has timed out. Check to see if you entered the correct IP Address."
+                print "Error code: " + str(msg[0]) + " Message: " + msg[1]
+                print "Socket timeout set to: " + self.clientSocket.gettimeout + " seconds"
+                print "========================================================================================"
+            except socket.error as msg:
+                print "========================================================================================"
+                print "ERROR: Failed to connect to server"
+                print "Error code: " + str(msg[0]) + " Message: " + msg[1]
+                raise Exception("Failed to connect to server")
+                #print "========================================================================================"
 
-                #Inbound communication functions
-                    #DONE
-                def checkForDoneCommand(inboundString):
-                    if(inboundString=="DONE"):
-                        return True
+            self.sendConnectedCommandToCOntroller()
+
+            #Client primary while loop
+            try:
+                #This should probably be 'while server days not done'
+                #   since we might be just waiting on server, before we get a job (or in-between)
+                #   Just my thoughts though --CJB
+                while self.serverSaysKeepSearching:
+                    self.clientSocket.settimeout(2.0)
+
+                    ######################## SERVER-CLIENT Communication #############################################
+
+                    #checking for server commands try block
+                    try:
+                        print "STATUS: Checking for server commands..."
+                        theInput = self.clientSocket.recv(2048)
+                        if theInput == "DONE":
+                            self.sendDoneCommandToController()
+
+                            #Make this line seperate from the other print statements
+                            print " "
+                            print "INFO: Server has issued the DONE command."
+                            print " "
+                            self.serverSaysKeepSearching = False
+                            self.serverIssuedDoneCommand = True
+                            break
+                        #If the server wants to give us the next chunk, take it
+                        #Server should be sending "NEXT" -> params -> data in seperate strings all to us
+                        elif theInput == "NEXT":
+                            try:
+                                #and store it locally till controller is ready for it
+                                self.chunk.params = self.clientSocket.recv(2048)
+                                self.chunk.data = self.clientSocket.recv(2048)
+                                #let controller know we're ready to give it a chunk
+                                self.sendDoingStuffCommandToController()
+
+                                #send chunk object to controller
+                                self.pipe.send(self.chunk)
+
+                            except Exception as inst:
+                                print "============================================================================================="
+                                print "ERROR: An exception was thrown in the checking for server commands Try Block"
+                                #the exception instance
+                                print type(inst)
+                                #srguments stored in .args
+                                print inst.args
+                                #_str_ allows args tto be printed directly
+                                print inst
+                                print "============================================================================================="
+
+                    except socket.timeout as inst:
+                        print "STATUS: Socket timed out. No new server command"
+
+                    except Exception as inst:
+                        print "============================================================================================="
+                        print "ERROR: An exception was thrown in the checking for server commands Try Block"
+                        #the exception instance
+                        print type(inst)
+                        #srguments stored in .args
+                        print inst.args
+                        #_str_ allows args tto be printed directly
+                        print inst
+                        print "============================================================================================="
+
+                    ########################## Client - Controller Communication #########################################
+                    #check for controller commands
+                    print "STATUS: Checking for controller commands... "
+                    if(self.pipe.poll()):
+                        recv = self.pipe.recv()  #Gets stuck on this line ##########
+                        print "INFO: Received a controller command"
+                        #if controller says next, say "next" to server
+                        if(recv == "next"):
+                            print "INFO: Received next command from controller"
+                            self.sendNextCommandToServer()
+                        #if controller says "found" then send "found" and the key to the server
+                        elif(recv == "found"):
+                            print "INFO: Received found command from controller"
+                            print "STATUS: Retrieving key"
+                            if(self.pipe.poll()):
+                                self.key = self.pipe.recv()
+                                print "INFO: the key has been received"
+                                self.sendFoundSolutionToServer()
+                        else:
+                            print "ERROR: unknown command was received"
+                            print "The unknown command: '" + recv + "'"
                     else:
-                        return False
+                        print "INFO: No command was received from the controller class"
 
-                    #next part of problem
-                #def checkForNextPartOfProblem(inboundString): #checks for the next part of the problem
-                    #not sure what to check for here
 
-                    #INVALIDCOMMAND
-                def checkForInvalidCommand(inboundString):
-                    if(inboundString=="INVALIDCOMMAND"):
-                        return True
-                    else:
-                        return False
-
+                #end of server says keep searching while loop
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Client-Server Communication FUnctions Try Block"
+                print "ERROR: An exception was thrown in the Client Primary Loop Try Block"
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
                 print "============================================================================================="
 
-            #constructor
-            def __init__(self,pipeendconnectedtocontroller):
-                self.pipe= pipeendconnectedtocontroller
-
-            try: #Main Client Loop
-                print "Entering Main Client Loop"
-                try: #getOS try block
-                    print "*************************************"
-                    print "    Network Client"
-                    print "*************************************"
-                    print "OS DETECTION:"
-                    if(platform.system()=="Windows"): #Detecting Windows
-                        print platform.system()
-                        print platform.win32_ver()
-                    elif(platform.system()=="Linux"): #Detecting Linux
-                        print platform.system()
-                        print platform.dist()
-                    elif(platform.system()=="Darwin"): #Detecting OSX
-                        print platform.system()
-                        print platform.mac_ver()
-                    else:                           #Detecting an OS that is not listed
-                        print platform.system()
-                        print platform.version()
-                        print platform.release()
-                    print "*************************************"
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception was thrown in getOS try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
-
-                #prompt user for the servers IP address
-                serverIPAddress= str(raw_input('What is the host (server) IP Address?'))
-                try:
-                    print "Attempting to connect to server"
-                    clientSocket.connect((serverIPAddress, port))
-                    print "Successfully connected to server"
-                except socket.timeout as msg:
-                    print "========================================================================================"
-                    print "ERROR: the connection has timed out. Check to see if you entered the correct IP Address."
-                    print "Error code: " + str(msg[0]) + " Message: " + msg[1]
-                    print "Socket timeout set to: " + clientSocket.gettimeout + " seconds"
-                    print "========================================================================================"
-                except socket.error as msg:
-                    print "========================================================================================"
-                    print "ERROR: Failed to connect to server"
-                    print "Error code: " + str(msg[0]) + " Message: " + msg[1]
-                    raise Exception("Failed to connect to server")
-                    print "========================================================================================"
-
-                #Client primary while loop
-                try: #client primary while loop
-                    while(serverSaysKeepSearching==True):
-                        clientSocket.settimeout(2.0)
-                        try: #checking for server commands try block
-                            print "Checking for server commands..."
-                            theInput= clientSocket.recv(2048)
-                            if(theInput=="DONE"):
-                                print " "  #Make this line seperate from the other print statements
-                                print "Server has issued the DONE command."
-                                print " "
-                                serverSaysKeepSearching= False
-                                break
-
-                        except socket.timeout as inst:
-                            print "Socket timed out. No new server command"
-                        except Exception as inst:
-                            print "============================================================================================="
-                            print "An exception was thrown in the checking for server commands Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "============================================================================================="
-
-                        #keep performing task
-                        #-------------------------
-                            #INSERT TASK HERE
-                        #-------------------------
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "An exception was thrown in the Client Primary Loop Try Block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "============================================================================================="
-            except Exception as inst:
-                print "============================================================================================="
-                print "An exception was thrown in the Main Client Loop Try Block"
-                print type(inst) #the exception instance
-                print inst.args #srguments stored in .args
-                print inst #_str_ allows args tto be printed directly
-                print "============================================================================================="
-            #End of constructor block
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Network Client class Try Block"
+            print "ERROR: An exception was thrown in the Main Client Loop Try Block"
             print type(inst) #the exception instance
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "============================================================================================="
         finally:
+            if(self.serverIssuedDoneCommand == False):
+                print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
+                self.sendCrashedCommandToServer()
+                print "INFO: CRASH Command was sent to the server"
             print "Closing the socket"
-            clientSocket.close()
+            self.clientSocket.close() #closes the socket safely
+            print "Socket has been closed"
+            print " "
 
-except Exception as inst:
-    print "============================================================================================="
-    print "An exception was thrown in the Master Try Block"
-    print type(inst) #the exception instance
-    print inst.args #srguments stored in .args
-    print inst #_str_ allows args tto be printed directly
-    print "============================================================================================="
-finally:
-    print "Program has ended"
+        #End of constructor block
+
+    #======================================================================================
+    #CLIENT-SERVER COMMUNICATION FUNCTIONS
+    #This section contains methods the client will use to communicate with the server.
+    #======================================================================================
+
+    #Outbound communication functions
+
+        #NEXT
+    def sendNextCommandToServer(self):
+        #sends the NEXT command to the serve
+        try:
+            self.clientSocket.send("NEXT")
+            print "INFO: The NEXT command was sent to the server"
+
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #FOUNDSOLUTION
+    def sendFoundSolutionToServer(self):
+        #sends the FOUNDSOLUTION command to the server, and key
+        try:
+            self.clientSocket.send("FOUNDSOLUTION")
+            self.clientSocket.send(self.key)
+            print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #CRASHED
+    def sendCrashedCommandToServer(self):
+        #sends the CRASHED command to the server
+
+        #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!!!!!!!
+        try:
+            self.clientSocket.send("CRASHED")
+            print " "
+            print "INFO: The CRASHED command was sent to the server"
+            print " "
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #INVALIDCOMMAND
+    def sendInvalidCommandToServer(self):
+        #sends INVALIDCOMMAND command to server
+        try:
+            self.clientSocket.send("INVALIDCOMMAND")
+            print "INFO: The INVALIDCOMMAND command was sent to the server"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+    #Inbound communication functions
+        #DONE
+    def checkForDoneCommand(self, inboundString):
+        try:
+            if inboundString == "DONE":
+                print "INFO: Received the DONE command"
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #next part of problem
+
+        #not sure what to check for here
+
+        #INVALIDCOMMAND
+    def checkForInvalidCommand(self, inboundString):
+        try:
+            if inboundString == "INVALIDCOMMAND":
+                print "INFO: Received the INVALIDCOMMAND command"
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server checkForInvalidCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+    #======================================================================================
+    #CLIENT-CONTROLLER COMMUNICATION FUNCTIONS
+    #This section contains methods the client will use to communicate with the controller class
+    #======================================================================================
+
+    #Outbound communication functions with controller
+        #done
+
+    def sendDoneCommandToController(self):
+        try:
+            self.pipe.send("done")
+            print "INFO: The DONE command was sent to the Controller"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #connected
+    def sendConnectedCommandToCOntroller(self):
+        try:
+            self.pipe.send("connected")
+            print "INFO: The CONNECTED command was sent to the Controller"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        #doingStuff
+    def sendDoingStuffCommandToController(self):
+        try:
+            self.pipe.send("doingStuff")
+            print "INFO: The DOINGSTUFF command was sent to the Controller"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        ######### NEW CODE########################################
+        #serverIP
+    def receiveServerIPFromController(self):
+        try:
+            #self.pipe.send("doingStuff")
+            print "INFO: Waiting to receive the serverIP from Controller (function block)"
+            self.serverIP = self.pipe.recv()
+            print "INFO: The ServerIP was received from the Controller (function block)"
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+
+
