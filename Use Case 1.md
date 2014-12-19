@@ -6,7 +6,7 @@
 
 **Goal in Context:** The user will run the program.
 
-**Scope:** End User/Program
+**Scope:** Computer Security Specialists / Password Auditing (Recovery) Specialists / System Administrators
 
 **Level:** Primary Function
 
@@ -103,5 +103,3 @@ rainbow table
 ###SCHEDULE
 
 **Due Date:** March 2015
-
-...any other schedule / staffing information you need…
