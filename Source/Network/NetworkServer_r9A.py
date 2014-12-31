@@ -81,7 +81,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
                     socket.connect(('google.com',0))
-                    print socket.getsockname()[0]
+                    print socket.getsockname()
                 elif(platform.system()=="Darwin"):
                     print socket.gethostbyname(socket.gethostname())
                 else:
