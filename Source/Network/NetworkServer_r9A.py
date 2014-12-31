@@ -81,6 +81,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
                     #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
+                    #Claims that this works on linux and windows machines
                     import fcntl
                     import struct
                     import os
@@ -106,6 +107,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 elif(platform.system()=="Darwin"):
                     print socket.gethostbyname(socket.gethostname())
                 else:
+                    #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
+                    print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                    print "INFO: System is using a generic IP detection method"
                     print socket.gethostbyname(socket.gethostname())
             except Exception as inst:
                 print "========================================================================================"
