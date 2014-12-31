@@ -80,6 +80,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 if(platform.system()=="Windows"):
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
+                    #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
                     import fcntl
                     import struct
                     import os
@@ -87,7 +88,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     def get_interface_ip(ifname):
                         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                         return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
-
+                    #end of def
                     def get_lan_ip():
                         ip = socket.gethostbyname(socket.gethostname())
                         if ip.startswith("127.") and os.name != "nt":
@@ -97,6 +98,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     ip = get_interface_ip(ifname)
                                     break
                                 except IOError:
+                                    print "IOError when connecting to " + str(ifname)
                                     pass
                         return ip
                     #end of def
