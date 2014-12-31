@@ -96,9 +96,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             for ifname in interfaces:
                                 try:
                                     ip = get_interface_ip(ifname)
+                                    print "IP address was retrieved from the " + str(ifname) + " interface."
                                     break
                                 except IOError:
-                                    print "IOError when connecting to " + str(ifname)
                                     pass
                         return ip
                     #end of def
