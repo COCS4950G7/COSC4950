@@ -80,8 +80,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 if(platform.system()=="Windows"):
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
-                    self.serverSocket.connect(('google.com',0))
-                    print self.serverSocket.getsockname()[0]
+                    socket.connect(('google.com',0))
+                    print socket.getsockname()[0]
                 elif(platform.system()=="Darwin"):
                     print socket.gethostbyname(socket.gethostname())
                 else:
