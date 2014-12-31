@@ -1,7 +1,9 @@
 __author__ = 'Chris Hamm'
-#NetworkClient_r9
-#Created: 12/5/2014
+#NetworkClient_r9A
+#Created: 12/31/2014
 
+#THIS VERSION FIXED THE LINUX IP DETECTION ISSUE
+#ALSO THIS VERSION INCLUDES IP DETECTION FOR THE INDIVIDUAL NODE
 
 #This is a restructured version of r7A
 #This was copied form rBugg
@@ -78,8 +80,51 @@ class NetworkClient():
                 print inst
                 print "========================================================================================"
 
-            #Retreive the server's IP from the controller class
+            #get the client IP address of this machine
+            try: #get client IP try block
+                print "STATUS: Getting your Network IP address"
+                if(platform.system()=="Windows"):
+                    print socket.gethostbyname(socket.gethostname())
+                elif(platform.system()=="Linux"):
+                    import fcntl
+                    import struct
+                    import os
 
+                    def get_interface_ip(ifname):
+                        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))[20:24])
+                    #end of def
+
+                    def get_lan_ip():
+                        ip = socket.gethostbyname(socket.gethostname())
+                        if ip.startswith("127.") and os.name != "nt":
+                            interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
+                            for ifname in interfaces:
+                                try:
+                                    ip = get_interface_ip(ifname)
+                                    print "IP address was retrieved from the " + str(ifname) + " interface."
+                                    break
+                                except IOError:
+                                    pass
+                        return ip
+                    #end of def
+                    print get_lan_ip()
+                elif(platform.system()=="Darwin"):
+                    print socket.gethostbyname(socket.gethostname())
+                else:
+                    #NOTE MAY REMOVE  THIS AND USE THE LINUX IP DETECTION METHOD FOR THIS IN THE FUTURE
+                    print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                    print "INFO: Using generic IP address retrieval method"
+                    print socket.gethostbyname(socket.gethostname())
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in get client IP try block"
+                print type(inst)
+                print inst.args
+                print inst
+                print "========================================================================================"
+
+            #Retreive the server's IP from the controller class
             try:  #get serverIP try block
                 print "STATUS: Attempting to get serverIP from controller"
                 self.receiveServerIPFromController()
