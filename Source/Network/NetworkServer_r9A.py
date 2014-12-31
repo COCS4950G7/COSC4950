@@ -74,9 +74,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
             try: #getIP tryblock
                 print "STATUS: Getting your network IP adddress"
-                print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "
-                print "(NOTE: This function works on Windows 7)"
-                print "(NOTE: This function works on OS X)"
+                #print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "
+                #print "(NOTE: This function works on Windows 7)"
+                #print "(NOTE: This function works on OS X)"
                 if(platform.system()=="Windows"):
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
