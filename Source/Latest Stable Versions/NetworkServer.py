@@ -1,11 +1,7 @@
-__author__ = 'Chris Hamm'
-#NetworkServer_r9A
-#Created: 12/30/2014
+__author__ = 'chris hamm'
+#NetworkServer_r9B
 
-#THIS VERSION ATTEMPTS TO IMPLEMENT A LINUX IP ADDRESS DETECTION
-
-#This is a restructured version of r7A.
-#This is modelled after rBugg version
+#This revision improves on the client crash detection system by telling the server the ip of the crashed client in the CRASHED command message
 
 import socket
 import platform
@@ -22,6 +18,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #list to store the socket and address of every client
         listOfClients = [] #This list is a list of tuples (socket, address)
         listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
+        listenForCrashedClientIP = False
 
         #constructor
         def __init__(self, pipeendconnectedtocontroller):
@@ -81,6 +78,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
                     #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
+                    #Claims that this works on linux and windows machines
                     import fcntl
                     import struct
                     import os
@@ -106,6 +104,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 elif(platform.system()=="Darwin"):
                     print socket.gethostbyname(socket.gethostname())
                 else:
+                    #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
+                    print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                    print "INFO: System is using a generic IP detection method"
                     print socket.gethostbyname(socket.gethostname())
             except Exception as inst:
                 print "========================================================================================"
@@ -143,6 +144,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: FOUNDSOLUTION command was received"
                         elif(self.checkForCrashedCommand(theInput)==True):
                             print "INFO: CRASHED command was received"
+                            self.listenForCrashedClientIP = True
                         #elif(self.checkForInvalidCommand(theInput)==True):
                          #   print "INVALIDINPUT command received"
                         elif(self.checkForAltCrashCommand(theInput)==True):
@@ -160,6 +162,29 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst.args #srguments stored in .args
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
+
+                    #Check for the IP of a crashed client if flag set to True
+                    if(self.listenForCrashedClientIP == True):
+                        print "STATUS: Listening for the crashed client's IP address."
+                        try: #check for the IP of a crashed client try block
+                            sock.settimeout(2.0)
+                            theInput = sock.recv(2048)
+                            print "INFO: Received the crashed client's IP Address"
+                            print "Crashed Client IP: " + theInput + " "
+
+                        except socket.timeout as inst:
+                            print "WARNING: No IP Address was received from the crashed client!"
+                        except Exception as inst:
+                            print "========================================================================================"
+                            print "ERROR: An exception has been thrown in the Check for IP of crashed client Try Block"
+                            print type(inst) #the exception instance
+                            print inst.args #srguments stored in .args
+                            print inst #_str_ allows args tto be printed directly
+                            print "========================================================================================"
+                        finally:
+                            self.listenForCrashedClientIP = False
+                    else:
+                        print "STATUS: Skipping the listen for crashed client IP address step."
 
                     #Check for input from controller class
                     print "STATUS: Checking for input from the Controller class..."
@@ -471,11 +496,39 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #CRASHED
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
-                if(inboundString=="CRASHED"):
-                    print "WARNING: A Client has issued the CRASHED command"
-                    return True
+                if(inboundString[0]=="C"):
+                    if(inboundString[1]=="R"):
+                        if(inboundString[2]=="A"):
+                            if(inboundString[3]=="S"):
+                                if(inboundString[4]=="H"):
+                                    if(inboundString[5]=="E"):
+                                        if(inboundString[6]=="D"):
+                                            print "WARNING: A Client has issued the CRASHED command"
+                                            tempCrashIP = ""
+                                            for i in range(7, len(inboundString)):
+                                                tempCrashIP = tempCrashIP + inboundString[i]
+                                            print "The Crashed Client IP: " + tempCrashIP
+                                            return True
+                                        else:
+                                            return False
+                                    else:
+                                        return False
+                                else:
+                                    return False
+                            else:
+                                return False
+                        else:
+                            return False
+                    else:
+                        return False
                 else:
                     return False
+
+                #if(inboundString=="CRASHED"):
+                 #   print "WARNING: A Client has issued the CRASHED command"
+                  #  return True
+                #else:
+                 #   return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"

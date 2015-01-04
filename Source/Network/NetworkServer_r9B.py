@@ -496,11 +496,39 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #CRASHED
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
-                if(inboundString=="CRASHED"):
-                    print "WARNING: A Client has issued the CRASHED command"
-                    return True
+                if(inboundString[0]=="C"):
+                    if(inboundString[1]=="R"):
+                        if(inboundString[2]=="A"):
+                            if(inboundString[3]=="S"):
+                                if(inboundString[4]=="H"):
+                                    if(inboundString[5]=="E"):
+                                        if(inboundString[6]=="D"):
+                                            print "WARNING: A Client has issued the CRASHED command"
+                                            tempCrashIP = ""
+                                            for i in range(7, len(inboundString)):
+                                                tempCrashIP = tempCrashIP + inboundString[i]
+                                            print "The Crashed Client IP: " + tempCrashIP
+                                            return True
+                                        else:
+                                            return False
+                                    else:
+                                        return False
+                                else:
+                                    return False
+                            else:
+                                return False
+                        else:
+                            return False
+                    else:
+                        return False
                 else:
                     return False
+
+                #if(inboundString=="CRASHED"):
+                 #   print "WARNING: A Client has issued the CRASHED command"
+                  #  return True
+                #else:
+                 #   return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"

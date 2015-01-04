@@ -1,14 +1,8 @@
-__author__ = 'Chris Hamm'
-#NetworkClient_r9A
-#Created: 12/31/2014
+__author__ = 'chris hamm'
+#NetworkClient_r9B
+#Created: 1/3/2015
 
-#THIS VERSION FIXED THE LINUX IP DETECTION ISSUE
-#ALSO THIS VERSION INCLUDES IP DETECTION FOR THE INDIVIDUAL NODE
-
-#This is a restructured version of r7A
-#This was copied form rBugg
-
-
+#this version improves the crash detection system by telling the server the ip address of the client that crashed in the CRASHED command message.
 
 import socket
 import platform
@@ -26,6 +20,8 @@ class NetworkClient():
     serverSaysKeepSearching = True
     serverIssuedDoneCommand = False
     serverIP = "127.0.1.1"
+    myOperatingSystem = None
+    myIPAddress = "127.0.1.1"
     chunk = Chunk.Chunk()
     key = 0
 
@@ -49,21 +45,25 @@ class NetworkClient():
                 #Detecting Windows
                 if platform.system() == "Windows":
                     print platform.system()
+                    self.myOperatingSystem = "Windows"
                     print platform.win32_ver()
 
                 #Detecting GNU/Linux
                 elif platform.system() == "Linux":
                     print platform.system()
+                    self.myOperatingSystem = "Linux"
                     print platform.dist()
 
                 #Detecting OSX
                 elif platform.system() == "Darwin":
                     print platform.system()
+                    self.myOperatingSystem = "Darwin"
                     print platform.mac_ver()
 
                 #Detecting an OS that is not listed
                 else:
                     print platform.system()
+                    self.myOperatingSystem = "Other"
                     print platform.version()
                     print platform.release()
 
@@ -84,7 +84,8 @@ class NetworkClient():
             try: #get client IP try block
                 print "STATUS: Getting your Network IP address"
                 if(platform.system()=="Windows"):
-                    print socket.gethostbyname(socket.gethostname())
+                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
+                    print str(self.myIPAddress)
                 elif(platform.system()=="Linux"):
                     import fcntl
                     import struct
@@ -108,14 +109,17 @@ class NetworkClient():
                                     pass
                         return ip
                     #end of def
-                    print get_lan_ip()
+                    self.myIPAddress = get_lan_ip()
+                    print self.myIPAddress
                 elif(platform.system()=="Darwin"):
-                    print socket.gethostbyname(socket.gethostname())
+                    self.myIPAddress= socket.gethostbyname(socket.gethostname())
+                    print self.myIPAddress
                 else:
                     #NOTE MAY REMOVE  THIS AND USE THE LINUX IP DETECTION METHOD FOR THIS IN THE FUTURE
                     print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
                     print "INFO: Using generic IP address retrieval method"
-                    print socket.gethostbyname(socket.gethostname())
+                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
+                    print self.myIPAddress
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception was thrown in get client IP try block"
@@ -327,6 +331,8 @@ class NetworkClient():
             self.clientSocket.send("CRASHED")
             print " "
             print "INFO: The CRASHED command was sent to the server"
+            self.clientSocket.send(" " + self.myIPAddress)
+            print "INFO: The IP Address of the crashed client was sent to the server."
             print " "
         except Exception as inst:
             print "============================================================================================="

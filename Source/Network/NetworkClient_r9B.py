@@ -331,7 +331,7 @@ class NetworkClient():
             self.clientSocket.send("CRASHED")
             print " "
             print "INFO: The CRASHED command was sent to the server"
-            self.clientSocket.send(self.myIPAddress)
+            self.clientSocket.send(" " + self.myIPAddress)
             print "INFO: The IP Address of the crashed client was sent to the server."
             print " "
         except Exception as inst:
