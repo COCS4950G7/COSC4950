@@ -505,7 +505,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                         if(inboundString[6]=="D"):
                                             print "WARNING: A Client has issued the CRASHED command"
                                             tempCrashIP = ""
-                                            for i in range(7, len(inboundString)):
+                                            #position 7 is a space between the ip address and the crashed message
+                                            for i in range(8, len(inboundString)):
                                                 tempCrashIP = tempCrashIP + inboundString[i]
                                             print "The Crashed Client IP: " + tempCrashIP
                                             return True
@@ -524,11 +525,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 else:
                     return False
 
-                #if(inboundString=="CRASHED"):
-                 #   print "WARNING: A Client has issued the CRASHED command"
-                  #  return True
-                #else:
-                 #   return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
