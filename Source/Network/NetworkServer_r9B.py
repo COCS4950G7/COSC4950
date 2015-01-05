@@ -509,6 +509,21 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                             for i in range(8, len(inboundString)):
                                                 tempCrashIP = tempCrashIP + inboundString[i]
                                             print "The Crashed Client IP: " + tempCrashIP
+                                            #look through listOfConnected clients and find the matching ip address
+                                            print "STATUS: Looking for matching IP address in list of clients..."
+                                            foundMatch= False
+                                            for index in range(0, len(self.listOfClients)):
+                                                tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
+                                                if(tempCrashIP == tempAddr):
+                                                    #THIS SECTION NEEDS TO BE REVISED!!!!!
+                                                    print "INFO: Matching IP address was found in the list of clients"
+                                                    foundMatch= True
+                                                    break
+                                                else:
+                                                    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr)
+                                            if(foundMatch == False):
+                                                print "WARNING: No Matching IP address was found in the list of clients"
+                                                print "INFO: Crashed IP: " +str(tempCrashIP) + " "
                                             return True
                                         else:
                                             return False
