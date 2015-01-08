@@ -18,7 +18,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #list to store the socket and address of every client
         listOfClients = [] #This list is a list of tuples (socket, address)
         listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
-        listenForCrashedClientIP = False
+        #listenForCrashedClientIP = False
 
         #constructor
         def __init__(self, pipeendconnectedtocontroller):
@@ -144,11 +144,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: FOUNDSOLUTION command was received"
                         elif(self.checkForCrashedCommand(theInput)==True):
                             print "INFO: CRASHED command was received"
-                            self.listenForCrashedClientIP = True
+                            #self.listenForCrashedClientIP = True
                         #elif(self.checkForInvalidCommand(theInput)==True):
                          #   print "INVALIDINPUT command received"
-                        elif(self.checkForAltCrashCommand(theInput)==True):
-                            print "INFO: ALT CRASH COMMAND received"
+                        #elif(self.checkForAltCrashCommand(theInput)==True):
+                         #   print "INFO: ALT CRASH COMMAND received"
                         else:
                             print "ERROR: unknown command received"
                             print "The unknown command: '" + theInput + "'"
@@ -163,8 +163,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
 
-                    #Check for the IP of a crashed client if flag set to True
-                    if(self.listenForCrashedClientIP == True):
+                    #Check for the IP of a crashed client if flag set to True (NOW OBSOLETE. the check for crashed function takes care of this)
+                    '''if(self.listenForCrashedClientIP == True):
                         print "STATUS: Listening for the crashed client's IP address."
                         try: #check for the IP of a crashed client try block
                             sock.settimeout(2.0)
@@ -184,7 +184,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         finally:
                             self.listenForCrashedClientIP = False
                     else:
-                        print "STATUS: Skipping the listen for crashed client IP address step."
+                        print "STATUS: Skipping the listen for crashed client IP address step." '''
 
                     #Check for input from controller class
                     print "STATUS: Checking for input from the Controller class..."
@@ -496,6 +496,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #CRASHED
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
+                if(len(inboundString) < 1):
+                    return False
                 if(inboundString[0]=="C"):
                     if(inboundString[1]=="R"):
                         if(inboundString[2]=="A"):
@@ -503,27 +505,42 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 if(inboundString[4]=="H"):
                                     if(inboundString[5]=="E"):
                                         if(inboundString[6]=="D"):
-                                            print "WARNING: A Client has issued the CRASHED command"
                                             tempCrashIP = ""
                                             #position 7 is a space between the ip address and the crashed message
                                             for i in range(8, len(inboundString)):
                                                 tempCrashIP = tempCrashIP + inboundString[i]
+                                            if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
+                                                return False
+                                            print "WARNING: A Client has issued the CRASHED command"
                                             print "The Crashed Client IP: " + tempCrashIP
                                             #look through listOfConnected clients and find the matching ip address
                                             print "STATUS: Looking for matching IP address in list of clients..."
                                             foundMatch= False
+                                            tempAddr2= ""
                                             for index in range(0, len(self.listOfClients)):
                                                 tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                                                if(tempCrashIP == tempAddr):
-                                                    #THIS SECTION NEEDS TO BE REVISED!!!!!
+                                                print "STATUS: Copying list of clients' IP Address to a new string"
+                                                tempAddr2+= str(tempAddr[0])
+                                                print "STATUS: Comparing IP Addresses..."
+                                                if(tempCrashIP == tempAddr2):
                                                     print "INFO: Matching IP address was found in the list of clients"
+                                                    #print "DEBUG: tempAddr=" + str(tempAddr)
+                                                    del self.listOfClients[index]
+                                                    print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
                                                     foundMatch= True
                                                     break
                                                 else:
-                                                    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr)
+                                                    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
+                                                #if(tempCrashIP == tempAddr):
+                                                    #THIS SECTION NEEDS TO BE REVISED!!!!!
+                                                #    print "INFO: Matching IP address was found in the list of clients"
+                                                 #   foundMatch= True
+                                                 #   break
+                                                #else:
+                                                #    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr)
                                             if(foundMatch == False):
                                                 print "WARNING: No Matching IP address was found in the list of clients"
-                                                print "INFO: Crashed IP: " +str(tempCrashIP) + " "
+                                                print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
                                             return True
                                         else:
                                             return False
@@ -539,7 +556,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         return False
                 else:
                     return False
-
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
@@ -572,8 +588,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
                 '''
 
-            #ALT Crash Command
-        def checkForAltCrashCommand(self, inboundString): #checks for the " " string
+            #ALT Crash Command (NO LONGER USED. The empty string is used to reset the socket recv.
+        '''def checkForAltCrashCommand(self, inboundString): #checks for the " " string
             try:
                 if(inboundString==""):
                     print "WARNING: A Client has issued the ALT CRASH COMMAND"
@@ -591,3 +607,4 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst
                 print "============================================================================================="
 
+        '''
