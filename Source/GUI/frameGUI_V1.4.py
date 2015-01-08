@@ -6,6 +6,7 @@ import Tkinter as Tk
 
 ########################################################################
 ## adding a hashinng button, used to test basic functionality of enter text.
+## Test commit for pycharm rebuild
 
 class MyApp(object):
     """"""
