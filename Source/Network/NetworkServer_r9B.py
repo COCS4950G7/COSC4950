@@ -497,6 +497,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
                 if(len(inboundString) < 1):
+                    print "INFO: Empty Crashed Message Received."
                     return False
                 if(inboundString[0]=="C"):
                     if(inboundString[1]=="R"):

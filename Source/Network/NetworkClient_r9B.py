@@ -334,7 +334,9 @@ class NetworkClient():
             self.clientSocket.send(" " + self.myIPAddress)
             print "INFO: The IP Address of the crashed client was sent to the server."
             print " "
-            self.clientSocket.send("") #clear the recv socket
+            #self.clientSocket.send("") #clear the recv socket
+            #print "INFO: Empty String Sent to Server to Clear the recv socket"
+            #print " "
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
