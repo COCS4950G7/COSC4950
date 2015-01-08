@@ -520,7 +520,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                             for index in range(0, len(self.listOfClients)):
                                                 tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
                                                 print "STATUS: Copying list of clients' IP Address to a new string"
-                                                tempAddr2+= str(tempAddr[0])
+                                                tempAddr2= str(tempAddr[0])
                                                 print "STATUS: Comparing IP Addresses..."
                                                 if(tempCrashIP == tempAddr2):
                                                     print "INFO: Matching IP address was found in the list of clients"
