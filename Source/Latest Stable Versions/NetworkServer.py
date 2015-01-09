@@ -141,8 +141,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: Received a message from a client."
                             if(self.checkForNextCommand(theInput)==True):
                                 print "INFO: NEXT command was received"
+                                self.sendNextChunkCommandToController()
+                                print "INFO: Sent the NextChunk Command to the Controller"
                             elif(self.checkForFoundSolutionCommand(theInput)==True):
                                 print "INFO: FOUNDSOLUTION command was received"
+                                self.sendDoneCommandToController()
+                                print "INFO: Sent the Done Command to the Controller"
                             elif(self.checkForCrashedCommand(theInput)==True):
                                 print "INFO: CRASHED command was received"
                                 #self.listenForCrashedClientIP = True
@@ -196,12 +200,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: Received a message from the controller"
                             if(self.checkForNextChunk(recv)==True):
                                 print "INFO: Received the reply to the NextChunk command"
-                                self.sendNextChunkCommandToController()
-                                print "INFO: Sent the Next Chunk Command to the Controller"
                             elif(self.checkForChunkAgain(recv)==True):
                                 print "INFO: Received the reply to the ChunkAgain command"
-                                self.sendChunkAgainCommandToController()
-                                print "INFO: Sent the Chunk Again Command to the Controller"
                             elif(self.checkForFound(recv)==True):
                                 print "INFO: Received reply stating whether the key has been found or not"
                             else:
