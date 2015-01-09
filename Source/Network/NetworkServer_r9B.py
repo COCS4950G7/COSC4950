@@ -137,22 +137,24 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     try: #check for client input try block
                         sock.settimeout(2.0)
                         theInput = sock.recv(2048) #listening for input
-                        print "INFO: Received a message from a client."
-                        if(self.checkForNextCommand(theInput)==True):
-                            print "INFO: NEXT command was received"
-                        elif(self.checkForFoundSolutionCommand(theInput)==True):
-                            print "INFO: FOUNDSOLUTION command was received"
-                        elif(self.checkForCrashedCommand(theInput)==True):
-                            print "INFO: CRASHED command was received"
-                            #self.listenForCrashedClientIP = True
-                        #elif(self.checkForInvalidCommand(theInput)==True):
-                         #   print "INVALIDINPUT command received"
-                        #elif(self.checkForAltCrashCommand(theInput)==True):
-                         #   print "INFO: ALT CRASH COMMAND received"
+                        if(len(theInput) >= 1):
+                            print "INFO: Received a message from a client."
+                            if(self.checkForNextCommand(theInput)==True):
+                                print "INFO: NEXT command was received"
+                            elif(self.checkForFoundSolutionCommand(theInput)==True):
+                                print "INFO: FOUNDSOLUTION command was received"
+                            elif(self.checkForCrashedCommand(theInput)==True):
+                                print "INFO: CRASHED command was received"
+                                #self.listenForCrashedClientIP = True
+                            #elif(self.checkForInvalidCommand(theInput)==True):
+                             #   print "INVALIDINPUT command received"
+                            #elif(self.checkForAltCrashCommand(theInput)==True):
+                             #   print "INFO: ALT CRASH COMMAND received"
+                            else:
+                                print "ERROR: unknown command received"
+                                print "The unknown command: '" + theInput + "'"
                         else:
-                            print "ERROR: unknown command received"
-                            print "The unknown command: '" + theInput + "'"
-
+                            print "INFO: The Empty String has been received."
                     except socket.timeout as inst:
                         print "STATUS: Socket has timed out. No input from client detected."
                     except Exception as inst:

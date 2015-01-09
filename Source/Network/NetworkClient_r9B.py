@@ -272,6 +272,9 @@ class NetworkClient():
                 print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
                 self.sendCrashedCommandToServer()
                 print "INFO: CRASH Command was sent to the server"
+                #SEND MESSAGE AGAIN JUST IN CASE
+                self.sendCrashedCommandToServer()
+                print "INFO: Aux Crash Command was sent to the server"
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
