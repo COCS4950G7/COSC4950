@@ -196,8 +196,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: Received a message from the controller"
                             if(self.checkForNextChunk(recv)==True):
                                 print "INFO: Received the reply to the NextChunk command"
+                                self.sendNextChunkCommandToController()
+                                print "INFO: Sent the Next Chunk Command to the Controller"
                             elif(self.checkForChunkAgain(recv)==True):
                                 print "INFO: Received the reply to the ChunkAgain command"
+                                self.sendChunkAgainCommandToController()
+                                print "INFO: Sent the Chunk Again Command to the Controller"
                             elif(self.checkForFound(recv)==True):
                                 print "INFO: Received reply stating whether the key has been found or not"
                             else:

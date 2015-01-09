@@ -272,6 +272,9 @@ class NetworkClient():
                 print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
                 self.sendCrashedCommandToServer()
                 print "INFO: CRASH Command was sent to the server"
+                #SEND MESSAGE AGAIN JUST IN CASE
+                self.sendCrashedCommandToServer()
+                print "INFO: Aux Crash Command was sent to the server"
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
@@ -328,12 +331,15 @@ class NetworkClient():
 
         #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!!!!!!!
         try:
-            self.clientSocket.send("CRASHED")
+            self.clientSocket.send("CRASHED " + self.myIPAddress)
             print " "
-            print "INFO: The CRASHED command was sent to the server"
-            self.clientSocket.send(" " + self.myIPAddress)
+            #print "INFO: The CRASHED command was sent to the server"
+            #self.clientSocket.send(" " + self.myIPAddress)
             print "INFO: The IP Address of the crashed client was sent to the server."
             print " "
+            #self.clientSocket.send("") #clear the recv socket
+            #print "INFO: Empty String Sent to Server to Clear the recv socket"
+            #print " "
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
