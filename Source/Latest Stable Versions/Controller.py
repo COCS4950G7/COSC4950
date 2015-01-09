@@ -343,7 +343,6 @@ class Controller():
                 elif state == "serverStartScreen":
 
                     #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "serverStartScreen"
                     print
@@ -357,42 +356,31 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"bruteForce", "rainbowMake", "rainbowUser", "dictionary", "back", "Back", "Exit", "exit"}
+                    goodNames = {"bruteForce", "brute", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "back", "Back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
-                    if userInput == "bruteForce":
+                        userInput = raw_input("Try Again: ")
 
-                        ###GUI.setState("serverBruteForceScreen")
+                    if userInput in ("bruteForce", "brute"):
+
                         self.state = "serverBruteForceScreen"
 
-                        #get info from GUI and pass to Brute_Force class
+                    elif userInput in ("rainbowMake", "make"):
 
-                    elif userInput == "rainbowMake":
-
-                        ###GUI.setState("serverRainMakerScreen")
                         self.state = "serverRainMakerScreen"
 
-                        #get info from GUI and pass to Rainbow Maker class
+                    elif userInput in ("rainbowUser", "use"):
 
-                    elif userInput == "rainbowUser":
-
-                        ###GUI.setState("serverRainUserScreen")
                         self.state = "serverRainUserScreen"
 
-                        #get info from GUI and pass to Rainbow User class
+                    elif userInput in ("dictionary", "dic"):
 
-                    elif userInput == "dictionary":
-
-                        ###GUI.setState("serverDictionaryScreen")
                         self.state = "serverDictionaryScreen"
 
-                        #get info from GUI and pass to Dictionary class
+                    elif userInput in ("back", "Back"):
 
-                    elif userInput == "back":
-
-                        ###GUI.setState("startScreen")
                         self.state = "startScreen"
 
                     else:
@@ -769,7 +757,7 @@ class Controller():
                         if rec == "nextChunk":
 
                             #chunk is a Chunk object
-                            chunk = self.dictionary.getNextChunk2()
+                            chunk = self.dictionary.getNextChunk()
 
                             self.controllerPipe.send(chunk)
 
@@ -780,7 +768,7 @@ class Controller():
                             params = self.controllerPipe.recv()
 
                             #Get the chunk again (again a Chunk object)
-                            chunk = self.dictionary.getThisChunk2(params)
+                            chunk = self.dictionary.getThisChunk(params)
 
                             #Send the chunk again
                             self.controllerPipe.send(chunk)
@@ -798,7 +786,9 @@ class Controller():
                             key = self.controllerPipe.recv()
 
                             #This will help for error checking later, though for now not so much
-                            isFound = self.dictionary.isKey2(key)
+                            #isFound = self.dictionary.isKey(key)
+
+                            self.dictionary.setKey(key)
 
                     elapsed = (time() - self.clock)
                     self.clock = elapsed

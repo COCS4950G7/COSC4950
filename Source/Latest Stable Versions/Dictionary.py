@@ -82,7 +82,18 @@ class Dictionary():
         self.hash = hash
 
     #Actually finds the hash in the file (hopefully)
-    def find(self, chunkList):
+    def find(self, chunk):
+
+        #Turns data from string to list
+        chunkList = chunk.data.split()
+
+        #turns params from string to list
+        paramsList = chunk.params.split()
+
+        #set some class params with new info
+        self.algorithm = paramsList[1]
+
+        self.hash = paramsList[2]
 
         #Sub chunk chunkList and call processes
         chunky = self.chunkIt(chunkList, 8)
@@ -334,7 +345,7 @@ class Dictionary():
 
         line = self.file.readline()
 
-        currentChunk = []
+        data = ""
 
         #keeps count of how many lines we've pu in currentChunk[]
         lineCounter = 0
@@ -344,7 +355,7 @@ class Dictionary():
 
         while not line == "":
 
-            currentChunk.append(line)
+            data += line
 
             line = self.file.readline()
 
@@ -368,7 +379,13 @@ class Dictionary():
 
         self.eof = eof
 
-        return currentChunk
+        chunk = Chunk.Chunk()
+
+        chunk.data = data
+
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 "
+
+        return chunk
 
     #Returns if eof
     def isEof(self):
@@ -390,58 +407,67 @@ class Dictionary():
         self.fileLocation = 0
         self.eof = False
 
-    #Sets the variables for node based on server string
-    def setVariables(self, serverString):
-
-        serverStringList = serverString.split()
-
-        self.hash = serverStringList.pop()
-
-        self.algorithm = serverStringList.pop()
-
-    #Returns string with all useful info for nodes from server
-    def serverString(self):
-
-        oneStringToRule = self.algorithm + " " + self.hash
-
-        return oneStringToRule
-
-    #################### BELOW '2' methods are fake versions to provide functionality for controller-network communication temporarily ####################
-
-    def getThisChunk2(self, params):
-
-        chunk = Chunk.Chunk()
-
-        chunk.params = params
-
-        chunk.data = "asdasdf"
-
-        return chunk
-
-    def getNextChunk2(self):
-
-        chunk = Chunk.Chunk()
-
-        chunk.params = "dictionary"
-
-        chunk.data = "asdasdf"
-
-        return chunk
-
-    def isKey2(self, key):
+    #Sets key
+    def setKey(self, key):
 
         self.key = key
 
-        return True
+    #Gets next chunk of file as list
+    def getThisChunk(self, params):
 
-    #modify to set how often a solution will be found (if needed)
-    def find2(self, chunk):
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
 
-        x = random.randint(1, 100)
+        #Get the chunk's fileLocation from params
+        #turns params from string to list
+        paramsList = params.split()
 
-        if x > 98:
+        #set fileLocation to equivalent params value
+        fileLocation = paramsList[7]
 
-            self.found = True
+        #Seek to where we left off in the file
+        self.file.seek(fileLocation)
 
+        line = self.file.readline()
 
+        data = ""
 
+        #keeps count of how many lines we've pu in currentChunk[]
+        lineCounter = 0
+
+        #to send to controller to say we're not done yet
+        eof = False
+
+        while not line == "":
+
+            data += line
+
+            line = self.file.readline()
+
+            if line == "":
+
+                eof = True
+
+            lineCounter += 1
+
+            #If our chunk is at least 1000 lines, stop adding to it
+            if lineCounter >= 10000:
+
+                line = ""
+
+                eof = False
+
+        #update class on where we are in the file
+        fileLocation = self.file.tell()
+
+        self.file.close()
+
+        self.eof = eof
+
+        chunk = Chunk.Chunk()
+
+        chunk.data = data
+
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(fileLocation) + " 0 0 "
+
+        return chunk
