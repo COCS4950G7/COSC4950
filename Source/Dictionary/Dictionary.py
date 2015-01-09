@@ -407,23 +407,67 @@ class Dictionary():
         self.fileLocation = 0
         self.eof = False
 
-    #Sets the variables for node based on server string
-    def setVariables(self, serverString):
-
-        serverStringList = serverString.split()
-
-        self.hash = serverStringList.pop()
-
-        self.algorithm = serverStringList.pop()
-
-    #Returns string with all useful info for nodes from server
-    def serverString(self):
-
-        oneStringToRule = self.algorithm + " " + self.hash
-
-        return oneStringToRule
-
     #Sets key
     def setKey(self, key):
 
         self.key = key
+
+    #Gets next chunk of file as list
+    def getThisChunk(self, params):
+
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Get the chunk's fileLocation from params
+        #turns params from string to list
+        paramsList = params.split()
+
+        #set fileLocation to equivalent params value
+        fileLocation = paramsList[7]
+
+        #Seek to where we left off in the file
+        self.file.seek(fileLocation)
+
+        line = self.file.readline()
+
+        data = ""
+
+        #keeps count of how many lines we've pu in currentChunk[]
+        lineCounter = 0
+
+        #to send to controller to say we're not done yet
+        eof = False
+
+        while not line == "":
+
+            data += line
+
+            line = self.file.readline()
+
+            if line == "":
+
+                eof = True
+
+            lineCounter += 1
+
+            #If our chunk is at least 1000 lines, stop adding to it
+            if lineCounter >= 10000:
+
+                line = ""
+
+                eof = False
+
+        #update class on where we are in the file
+        fileLocation = self.file.tell()
+
+        self.file.close()
+
+        self.eof = eof
+
+        chunk = Chunk.Chunk()
+
+        chunk.data = data
+
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(fileLocation) + " 0 0 "
+
+        return chunk
