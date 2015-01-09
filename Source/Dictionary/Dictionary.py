@@ -82,7 +82,18 @@ class Dictionary():
         self.hash = hash
 
     #Actually finds the hash in the file (hopefully)
-    def find(self, chunkList):
+    def find(self, chunk):
+
+        #Turns data from string to list
+        chunkList = chunk.data.split()
+
+        #turns params from string to list
+        paramsList = chunk.params.split()
+
+        #set some class params with new info
+        self.algorithm = paramsList[1]
+
+        self.hash = paramsList[2]
 
         #Sub chunk chunkList and call processes
         chunky = self.chunkIt(chunkList, 8)
@@ -334,7 +345,7 @@ class Dictionary():
 
         line = self.file.readline()
 
-        currentChunk = []
+        data = ""
 
         #keeps count of how many lines we've pu in currentChunk[]
         lineCounter = 0
@@ -344,7 +355,7 @@ class Dictionary():
 
         while not line == "":
 
-            currentChunk.append(line)
+            data += line
 
             line = self.file.readline()
 
@@ -368,7 +379,13 @@ class Dictionary():
 
         self.eof = eof
 
-        return currentChunk
+        chunk = Chunk.Chunk()
+
+        chunk.data = data
+
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 "
+
+        return chunk
 
     #Returns if eof
     def isEof(self):
@@ -406,42 +423,7 @@ class Dictionary():
 
         return oneStringToRule
 
-    #################### BELOW '2' methods are fake versions to provide functionality for controller-network communication temporarily ####################
-
-    def getThisChunk2(self, params):
-
-        chunk = Chunk.Chunk()
-
-        chunk.params = params
-
-        chunk.data = "asdasdf"
-
-        return chunk
-
-    def getNextChunk2(self):
-
-        chunk = Chunk.Chunk()
-
-        chunk.params = "dictionary"
-
-        chunk.data = "asdasdf"
-
-        return chunk
-
-    def isKey2(self, key):
+    #Sets key
+    def setKey(self, key):
 
         self.key = key
-
-        return True
-
-    #modify to set how often a solution will be found (if needed)
-    def find2(self, chunk):
-
-        x = random.randint(1, 100)
-
-        if x > 98:
-
-            self.found = True
-
-
-
