@@ -1,8 +1,14 @@
-__author__ = 'chris hamm'
-#NetworkClient_r9B
-#Created: 1/3/2015
+__author__ = 'Chris Hamm'
+#NetworkClient_r9A
+#Created: 12/31/2014
 
-#this version improves the crash detection system by telling the server the ip address of the client that crashed in the CRASHED command message.
+#THIS VERSION FIXED THE LINUX IP DETECTION ISSUE
+#ALSO THIS VERSION INCLUDES IP DETECTION FOR THE INDIVIDUAL NODE
+
+#This is a restructured version of r7A
+#This was copied form rBugg
+
+
 
 import socket
 import platform
@@ -20,8 +26,6 @@ class NetworkClient():
     serverSaysKeepSearching = True
     serverIssuedDoneCommand = False
     serverIP = "127.0.1.1"
-    myOperatingSystem = None
-    myIPAddress = "127.0.1.1"
     chunk = Chunk.Chunk()
     key = 0
 
@@ -45,25 +49,21 @@ class NetworkClient():
                 #Detecting Windows
                 if platform.system() == "Windows":
                     print platform.system()
-                    self.myOperatingSystem = "Windows"
                     print platform.win32_ver()
 
                 #Detecting GNU/Linux
                 elif platform.system() == "Linux":
                     print platform.system()
-                    self.myOperatingSystem = "Linux"
                     print platform.dist()
 
                 #Detecting OSX
                 elif platform.system() == "Darwin":
                     print platform.system()
-                    self.myOperatingSystem = "Darwin"
                     print platform.mac_ver()
 
                 #Detecting an OS that is not listed
                 else:
                     print platform.system()
-                    self.myOperatingSystem = "Other"
                     print platform.version()
                     print platform.release()
 
@@ -84,8 +84,7 @@ class NetworkClient():
             try: #get client IP try block
                 print "STATUS: Getting your Network IP address"
                 if(platform.system()=="Windows"):
-                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
-                    print str(self.myIPAddress)
+                    print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
                     import fcntl
                     import struct
@@ -109,17 +108,14 @@ class NetworkClient():
                                     pass
                         return ip
                     #end of def
-                    self.myIPAddress = get_lan_ip()
-                    print self.myIPAddress
+                    print get_lan_ip()
                 elif(platform.system()=="Darwin"):
-                    self.myIPAddress= socket.gethostbyname(socket.gethostname())
-                    print self.myIPAddress
+                    print socket.gethostbyname(socket.gethostname())
                 else:
                     #NOTE MAY REMOVE  THIS AND USE THE LINUX IP DETECTION METHOD FOR THIS IN THE FUTURE
                     print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
                     print "INFO: Using generic IP address retrieval method"
-                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
-                    print self.myIPAddress
+                    print socket.gethostbyname(socket.gethostname())
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception was thrown in get client IP try block"
@@ -272,9 +268,6 @@ class NetworkClient():
                 print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
                 self.sendCrashedCommandToServer()
                 print "INFO: CRASH Command was sent to the server"
-                #SEND MESSAGE AGAIN JUST IN CASE
-                self.sendCrashedCommandToServer()
-                print "INFO: Aux Crash Command was sent to the server"
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
@@ -331,15 +324,10 @@ class NetworkClient():
 
         #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!!!!!!!
         try:
-            self.clientSocket.send("CRASHED " + self.myIPAddress)
+            self.clientSocket.send("CRASHED")
             print " "
-            #print "INFO: The CRASHED command was sent to the server"
-            #self.clientSocket.send(" " + self.myIPAddress)
-            print "INFO: The IP Address of the crashed client was sent to the server."
+            print "INFO: The CRASHED command was sent to the server"
             print " "
-            #self.clientSocket.send("") #clear the recv socket
-            #print "INFO: Empty String Sent to Server to Clear the recv socket"
-            #print " "
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"

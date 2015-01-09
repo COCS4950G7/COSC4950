@@ -22,6 +22,7 @@ class NetworkClient():
     port = 49200
     clientSocket = 0
     serverSaysKeepSearching = True
+    serverIssuedDoneCommand = False
     serverIP = "127.0.1.1"
     chunk = Chunk.Chunk()
     key = 0
@@ -31,10 +32,10 @@ class NetworkClient():
         self.pipe = pipeendconnectedtocontroller
 
         self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print "client socket created successfully"
+        print "STATUS: client socket created successfully"
 
         try: #Main Client Loop
-            print "Entering Main Client Loop"
+            print "STATUS: Entering Main Client Loop"
 
             #getOS try block
             try:
@@ -48,7 +49,7 @@ class NetworkClient():
                     print platform.system()
                     print platform.win32_ver()
 
-                #Detecting Linux
+                #Detecting GNU/Linux
                 elif platform.system() == "Linux":
                     print platform.system()
                     print platform.dist()
@@ -80,9 +81,9 @@ class NetworkClient():
             #Retreive the server's IP from the controller class
 
             try:  #get serverIP try block
-                print "Attempting to get serverIP from controller"
+                print "STATUS: Attempting to get serverIP from controller"
                 self.receiveServerIPFromController()
-                print "successfully received serverIP from controller"
+                print "STATUS: Successfully received serverIP from controller"
             except Exception as inst:
                 print "========================================================================================"
                 print "ERROR: An exception was thrown in serverIP try block"
@@ -95,9 +96,9 @@ class NetworkClient():
                 print "========================================================================================"
 
             try:
-                print "Attempting to connect to server"
+                print "STATUS: Attempting to connect to server"
                 self.clientSocket.connect((self.serverIP, self.port))
-                print "Successfully connected to server"
+                print "STATUS: Successfully connected to server"
 
             except socket.timeout as msg:
                 print "========================================================================================"
@@ -126,17 +127,17 @@ class NetworkClient():
 
                     #checking for server commands try block
                     try:
-                        print "Checking for server commands..."
+                        print "STATUS: Checking for server commands..."
                         theInput = self.clientSocket.recv(2048)
                         if theInput == "DONE":
-
                             self.sendDoneCommandToController()
 
                             #Make this line seperate from the other print statements
                             print " "
-                            print "Server has issued the DONE command."
+                            print "INFO: Server has issued the DONE command."
                             print " "
                             self.serverSaysKeepSearching = False
+                            self.serverIssuedDoneCommand = True
                             break
                         #If the server wants to give us the next chunk, take it
                         #Server should be sending "NEXT" -> params -> data in seperate strings all to us
@@ -153,7 +154,7 @@ class NetworkClient():
 
                             except Exception as inst:
                                 print "============================================================================================="
-                                print "An exception was thrown in the checking for server commands Try Block"
+                                print "ERROR: An exception was thrown in the checking for server commands Try Block"
                                 #the exception instance
                                 print type(inst)
                                 #srguments stored in .args
@@ -163,11 +164,11 @@ class NetworkClient():
                                 print "============================================================================================="
 
                     except socket.timeout as inst:
-                        print "Socket timed out. No new server command"
+                        print "STATUS: Socket timed out. No new server command"
 
                     except Exception as inst:
                         print "============================================================================================="
-                        print "An exception was thrown in the checking for server commands Try Block"
+                        print "ERROR: An exception was thrown in the checking for server commands Try Block"
                         #the exception instance
                         print type(inst)
                         #srguments stored in .args
@@ -178,24 +179,33 @@ class NetworkClient():
 
                     ########################## Client - Controller Communication #########################################
                     #check for controller commands
-                    print "Checking for controller commands..."
-                    recv = self.pipe.recv()  #Gets stuck on this line ##########
-                    print "Received a controller command"
-                    #If controller says 'next', say 'next' to server
-                    if recv == "next":
+                    print "STATUS: Checking for controller commands... "
+                    if(self.pipe.poll()):
+                        recv = self.pipe.recv()  #Gets stuck on this line ##########
+                        print "INFO: Received a controller command"
+                        #if controller says next, say "next" to server
+                        if(recv == "next"):
+                            print "INFO: Received next command from controller"
+                            self.sendNextCommandToServer()
+                        #if controller says "found" then send "found" and the key to the server
+                        elif(recv == "found"):
+                            print "INFO: Received found command from controller"
+                            print "STATUS: Retrieving key"
+                            if(self.pipe.poll()):
+                                self.key = self.pipe.recv()
+                                print "INFO: the key has been received"
+                                self.sendFoundSolutionToServer()
+                        else:
+                            print "ERROR: unknown command was received"
+                            print "The unknown command: '" + recv + "'"
+                    else:
+                        print "INFO: No command was received from the controller class"
 
-                        self.sendNextCommandToServer()
 
-                    #if controller says 'found' then send 'found' and key to server
-                    elif recv == "found":
-
-                        self.key = self.pipe.recv()
-
-                        self.sendFoundSolutionToServer()
-                #end of while loop
+                #end of server says keep searching while loop
             except Exception as inst:
                 print "============================================================================================="
-                print "An exception was thrown in the Client Primary Loop Try Block"
+                print "ERROR: An exception was thrown in the Client Primary Loop Try Block"
                 print type(inst) #the exception instance
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
@@ -203,15 +213,20 @@ class NetworkClient():
 
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Main Client Loop Try Block"
+            print "ERROR: An exception was thrown in the Main Client Loop Try Block"
             print type(inst) #the exception instance
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "============================================================================================="
         finally:
+            if(self.serverIssuedDoneCommand == False):
+                print "ERROR: Quitting before Done Command was Issued. Sending CRASH Command to server."
+                self.sendCrashedCommandToServer()
+                print "INFO: CRASH Command was sent to the server"
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
+            print " "
 
         #End of constructor block
 
@@ -227,11 +242,11 @@ class NetworkClient():
         #sends the NEXT command to the serve
         try:
             self.clientSocket.send("NEXT")
-            print "The NEXT command was sent to the server"
+            print "INFO: The NEXT command was sent to the server"
 
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendNextCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -246,10 +261,10 @@ class NetworkClient():
         try:
             self.clientSocket.send("FOUNDSOLUTION")
             self.clientSocket.send(self.key)
-            print "The FOUNDSOLUTION command was sent to the server"
+            print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -265,10 +280,12 @@ class NetworkClient():
         #NOTICE: THIS COMMAND IS NOT IMPLEMENTED OR DOES NOT WORK, BUT STILL SENDS EMPTY STRING TO SERVER!!!!!!!
         try:
             self.clientSocket.send("CRASHED")
-            print "The CRASHED command was sent to the server"
+            print " "
+            print "INFO: The CRASHED command was sent to the server"
+            print " "
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -282,10 +299,10 @@ class NetworkClient():
         #sends INVALIDCOMMAND command to server
         try:
             self.clientSocket.send("INVALIDCOMMAND")
-            print "The INVALIDCOMMAND command was sent to the server"
+            print "INFO: The INVALIDCOMMAND command was sent to the server"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -299,12 +316,13 @@ class NetworkClient():
     def checkForDoneCommand(self, inboundString):
         try:
             if inboundString == "DONE":
+                print "INFO: Received the DONE command"
                 return True
             else:
                 return False
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -321,12 +339,13 @@ class NetworkClient():
     def checkForInvalidCommand(self, inboundString):
         try:
             if inboundString == "INVALIDCOMMAND":
+                print "INFO: Received the INVALIDCOMMAND command"
                 return True
             else:
                 return False
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Server checkForInvalidCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Server checkForInvalidCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -346,10 +365,10 @@ class NetworkClient():
     def sendDoneCommandToController(self):
         try:
             self.pipe.send("done")
-            print "The DONE command was sent to the Controller"
+            print "INFO: The DONE command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -362,10 +381,10 @@ class NetworkClient():
     def sendConnectedCommandToCOntroller(self):
         try:
             self.pipe.send("connected")
-            print "The CONNECTED command was sent to the Controller"
+            print "INFO: The CONNECTED command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -378,10 +397,10 @@ class NetworkClient():
     def sendDoingStuffCommandToController(self):
         try:
             self.pipe.send("doingStuff")
-            print "The DOINGSTUFF command was sent to the Controller"
+            print "INFO: The DOINGSTUFF command was sent to the Controller"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -395,12 +414,12 @@ class NetworkClient():
     def receiveServerIPFromController(self):
         try:
             #self.pipe.send("doingStuff")
-            print "Waiting to receive the serverIP from Controller (function block)"
+            print "INFO: Waiting to receive the serverIP from Controller (function block)"
             self.serverIP = self.pipe.recv()
-            print "The ServerIP was received from the Controller (function block)"
+            print "INFO: The ServerIP was received from the Controller (function block)"
         except Exception as inst:
             print "============================================================================================="
-            print "An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
+            print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args

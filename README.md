@@ -2,33 +2,40 @@
 ============================================
 
 Authors: Chris Hamm, John Wright, Nick Baum, Chris Bugg
-Group #7, *************
+Group #7, *************, (13-stars)
 
 Project Name: Mighty Cracker
 
 Description:
-This is a Python 2.7.8 Distributed, Multi-Process, Multi-Platform, GUI hash cracker. The goal of this project is to 
-take a hash and run through our different methods and return the un-hashed password. To start we can crack a password 
-that has been hashed using on of the following hashing algorithms. sha244, sha256, sha512, sha1, md5. In the future we 
-hope to include more hashing algorithms.
+Our project, Mighty Cracker, is a program designed to crack hashed passwords. It is stand-alone, GUI, and can run on Mac 10+,
+Linux 14+, and Windows 7+. It uses the power of multiprocessing to fully utilize every computer available, and can utilize
+a LAN to distribute the workload over up to 90 computers (nodes). For now, the algorithms that it can utilize are: sha 224,
+sha 256, sha 512, sha 1, and md5, which cover a fair amount of the common hashing algorithms used.
 
-Our methods include dictionary, brute force, and rainbow table. Dictionary will take a list of most common passwords
-and hash them using the selected algorithm and compare it to the hash that is given, when a match is found it will 
-return the un-hashed password. Brute Force will run through every possible combination of letters, numbers, and symbols
-and hash them until it is matched with the original hash. Rainbow table will use a rainbow table to compare hashes and
-return the un-hashed password.
+We've implemented three common "attack methods" to find an original password. 
+    Dictionary takes a list of passwords, hashes them, and compares the hashes to the original (user inputted) hash to 
+        find a match. 
+    Brute Force will iterate through any combination (up to 16 characters) of letters, numbers, and symbols to "brute-force" 
+        the password, returning an original if found. 
+    Rainbow Tables are pre-computed arrays of hashes, organized to to provide a time-cost trade-off. The creator creates 
+        tables to be used at a later time, and the user uses created tables. This gives one a huge advantage if you know 
+        what the password will consist of ahead of time.
 
-For this project we plan on having a GUI mode and a terminal mode. With these two modes a user can run the program in 
-either single user mode or network mode. Single user mode is only one computer working to find the password associated 
-with the hash algorithm. network mode will divide up the work between two or more computers to find the un-hashed 
-password faster.
+These three methods can all be used on either a single computer (single-user mode) or on a network of computers (similar
+to a Beowulf cluster). When using on headless systems, the program can run in terminal (text-only) mode with a "-C" command.
 
+Because of the distributed, multi-process, simple GUI approach this program takes, it is potentially more powerful and more user-friendly
+than most other hash cracking software out there today, making it more accessible for more people. Simply open the executable
+and crack passwords.
+
+In the future we'd like to add on the ability to crack the LMT-family of hashes (Windows) as well as add in GPU support for
+additional power. 
 
 For Grader:
 
 Our designs and concepts (along with an ER-ish Diagram) are in the Resources folder,
 which may be helpful to browse before delving into the source. At the moment we have several versions of each file,
-please assume that the most current version is the correct one to look at.
+please assume that the most current version (Latest Stable Versions) is the correct one to look at.
 
 The source contains Several files:
 

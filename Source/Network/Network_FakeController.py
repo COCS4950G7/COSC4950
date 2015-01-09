@@ -14,7 +14,7 @@ import os
 from multiprocessing import Process, Pipe, Lock
 
 import NetworkClient_r9
-import NetworkServer_r9
+import NetworkServer_r9B
 
 #try:
 class Network_FakeController():
@@ -28,8 +28,10 @@ class Network_FakeController():
     controllerPipe, networkPipe = Pipe()
 
     #defining network sub-processes
-    networkServer = Process(target=NetworkServer_r9.NetworkServer, args=(networkPipe,))
+    networkServer = Process(target=NetworkServer_r9B.NetworkServer, args=(networkPipe,))
     networkClient = Process(target=NetworkClient_r9.NetworkClient, args=(networkPipe,))
+
+
 
     #constructor
     def __init__(self):
