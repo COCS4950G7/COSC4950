@@ -1,10 +1,13 @@
 __author__ = 'chris hamm'
-#NetworkServer_r9B
+#NetworkServer_r9C
+#Created: 1/9/2015
 
-#This revision improves on the client crash detection system by telling the server the ip of the crashed client in the CRASHED command message
+#Removed several old and obsolete sections of code
+#Added addition section headings to make navigation easier
 
 import socket
 import platform
+import Chunk
 #=================================================================================================
 #SERVER CONSTRUCTOR/CLASS DEFINITION
 #=================================================================================================
@@ -20,7 +23,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
         #listenForCrashedClientIP = False
 
+        #--------------------------------------------------------------------------------
         #constructor
+        #--------------------------------------------------------------------------------
         def __init__(self, pipeendconnectedtocontroller):
             self.pipe= pipeendconnectedtocontroller
 
@@ -29,7 +34,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             self.serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print "STATUS: Server socket created successfully"
 
+            #..................................................................................
             #Bind the socket to local host and port
+            #..................................................................................
             try: #Bind socket try block
                 self.serverSocket.bind((self.host,self.port))
                 print "STATUS: Socket bind complete."
@@ -42,6 +49,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "========================================================================================"
                 raise Exception("Could not bind to socket! Server Must Shut Down.")
 
+            #..................................................................................
+            #Detect Operating System
+            #..................................................................................
             try: #getOS try block
                 print "*************************************"
                 print "    Network Server"
@@ -69,11 +79,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst #_str_ allows args tto be printed directly
                 print "========================================================================================"
 
+            #..................................................................................
+            #Get the IP Address
+            #..................................................................................
             try: #getIP tryblock
                 print "STATUS: Getting your network IP adddress"
-                #print "The server's IP address is (THIS MAY NOT WORK ON ALL OS's!): "
-                #print "(NOTE: This function works on Windows 7)"
-                #print "(NOTE: This function works on OS X)"
                 if(platform.system()=="Windows"):
                     print socket.gethostbyname(socket.gethostname())
                 elif(platform.system()=="Linux"):
@@ -116,11 +126,15 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst #_str_ allows args tto be printed directly
                 print "========================================================================================"
 
+            #..................................................................................
             #Start listening to socket
+            #..................................................................................
             self.serverSocket.listen(5)
             print "Waiting for initial client to connect..."
 
+            #..................................................................................
             #Waiting for initial Client to connect
+            #..................................................................................
             sock, addr= self.serverSocket.accept()
             print "INFO: First client has connected"
             print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
@@ -128,11 +142,15 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             print "STATUS: Client successfully added to the list of clients"
             #print str(len(self.listOfClients)) + " Client(s) are currently Connected."
 
+            #..................................................................................
             #Server PRIMARY WHILE LOOP
+            #..................................................................................
             try: #server primary while loop try block
                 while(self.serverIsRunning==True): #server primary while loop
 
+                    #/////////////////////////////////////////////////////////////////////////////////
                     #Check for input from clients
+                    #/////////////////////////////////////////////////////////////////////////////////
                     print "STATUS: Checking for input from client(s)..."
                     try: #check for client input try block
                         sock.settimeout(2.0)
@@ -150,10 +168,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             elif(self.checkForCrashedCommand(theInput)==True):
                                 print "INFO: CRASHED command was received"
                                 #self.listenForCrashedClientIP = True
-                            #elif(self.checkForInvalidCommand(theInput)==True):
-                             #   print "INVALIDINPUT command received"
-                            #elif(self.checkForAltCrashCommand(theInput)==True):
-                             #   print "INFO: ALT CRASH COMMAND received"
                             else:
                                 print "ERROR: unknown command received"
                                 print "The unknown command: '" + theInput + "'"
@@ -169,30 +183,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
 
-                    #Check for the IP of a crashed client if flag set to True (NOW OBSOLETE. the check for crashed function takes care of this)
-                    '''if(self.listenForCrashedClientIP == True):
-                        print "STATUS: Listening for the crashed client's IP address."
-                        try: #check for the IP of a crashed client try block
-                            sock.settimeout(2.0)
-                            theInput = sock.recv(2048)
-                            print "INFO: Received the crashed client's IP Address"
-                            print "Crashed Client IP: " + theInput + " "
-
-                        except socket.timeout as inst:
-                            print "WARNING: No IP Address was received from the crashed client!"
-                        except Exception as inst:
-                            print "========================================================================================"
-                            print "ERROR: An exception has been thrown in the Check for IP of crashed client Try Block"
-                            print type(inst) #the exception instance
-                            print inst.args #srguments stored in .args
-                            print inst #_str_ allows args tto be printed directly
-                            print "========================================================================================"
-                        finally:
-                            self.listenForCrashedClientIP = False
-                    else:
-                        print "STATUS: Skipping the listen for crashed client IP address step." '''
-
+                    #/////////////////////////////////////////////////////////////////////////////////
                     #Check for input from controller class
+                    #/////////////////////////////////////////////////////////////////////////////////
                     print "STATUS: Checking for input from the Controller class..."
                     try: #check for input from controller try block
                         if(self.pipe.poll()):
@@ -217,7 +210,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
 
+                    #/////////////////////////////////////////////////////////////////////////////////
                     #Distribute command to clients if needed
+                    #/////////////////////////////////////////////////////////////////////////////////
                     try: #distribute command try block
                         print "STATUS: Checking to see if a command needs to be send to the clients..."
                     except Exception as inst:
@@ -228,7 +223,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print inst #_str_ allows args tto be printed directly
                         print "========================================================================================"
 
+                    #/////////////////////////////////////////////////////////////////////////////////
                     #Check to see if another client is trying to connect
+                    #/////////////////////////////////////////////////////////////////////////////////
                     try: #check to see if another client is trying to connect try block
                         print "STATUS: Checking to see if another client is trying to connect..."
                         self.serverSocket.settimeout(2.0)
@@ -248,7 +245,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         print "========================================================================================"
                     finally:
                         print "INFO: Currently, there are " + str(len(self.listOfClients)) + " clients currently connected"
+                #..................................................................................
                 #END OF MAIN SERVER LOOP
+                #..................................................................................
             except Exception as inst: #Exception for Server Primary While Loop Try Block
                 print "========================================================================================"
                 print "ERROR: An exception has been thrown in the Server Primary While Loop Try Block"
@@ -264,26 +263,20 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     (sock, addr) = self.listOfClients[x]
                     sock.sendall("DONE")
                     print "STATUS: Issued the DONE command to client: " + str(addr)
-                   # print "Before sending the DONE command"
-                   # try:
-                   #     self.sendDoneCommandToClient(sock,addr)
-                   #     print "Sent DONE command to: " + str(addr)
-                   # except Exception as inst:
-                   #     print "========================================================================================"
-                   #     print "ERROR: An exception has been thrown in the Finally block, sendDoneCommandToServer Try Block"
-                   #     print type(inst) #the exception instance
-                   #     print inst.args #srguments stored in .args
-                   #     print inst #_str_ allows args tto be printed directly
-                   #     print "========================================================================================"
-
+            #--------------------------------------------------------------------------------
             #End of Constructor Block
+            #--------------------------------------------------------------------------------
 
         #=================================================================================================
         #SERVER-CONTROLLER COMMUNICATION FUNCTIONS
         #This section contains methods that the server will use to communicate with the controller class
         #=================================================================================================
+        #------------------------------------------------------------------------------
         #Outbound communication with Controller
-            #nextChunk
+        #------------------------------------------------------------------------------
+        #..............................................................................
+        #nextChunk
+        #..............................................................................
         def sendNextChunkCommandToController(self):
             try:
                 self.pipe.send("nextChunk")
@@ -298,8 +291,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #chunkAgain
+        #..............................................................................
+        #chunkAgain
+        #..............................................................................
         def sendChunkAgainCommandToController(self):
             try:
                 self.pipe.send("chunkAgain")
@@ -314,8 +308,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #waiting
+        #..............................................................................
+        #waiting
+        #..............................................................................
         def sendWaitingCommandToController(self):
             try:
                 self.pipe.send("waiting")
@@ -330,8 +325,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #done
+        #..............................................................................
+        #done
+        #..............................................................................
         def sendDoneCommandToController(self):
             try:
                 self.pipe.send("done")
@@ -346,9 +342,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
+        #------------------------------------------------------------------------------
         #Inbound communication with controller
-            #REPLY OT NEXTCHUNK
+        #------------------------------------------------------------------------------
+        #..............................................................................
+        #REPLY OT NEXTCHUNK
+        #..............................................................................
         def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
             try:
                 print "Checking to see if inboundString is the next part of problem..."
@@ -363,8 +362,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #REPLY TO CHUNKAGAIN
+        #..............................................................................
+        #REPLY TO CHUNKAGAIN
+        #..............................................................................
         def checkForChunkAgain(self,inboundString): #check to see if the string contains that chunk that was requested
             try:
                 print "Checking to see if inboundString is the requested chunk (chunkAgain)..."
@@ -379,8 +379,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #REPLY TO DONE
+        #..............................................................................
+        #REPLY TO DONE
+        #..............................................................................
         def checkForFound(self,inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
             try:
                 print "Checking to see if the key was found..."
@@ -411,8 +412,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
     #SERVER-CLIENT COMMUNICATION FUNCTIONS
     #This section contains methods used by the server to communicate with the clients
     #=================================================================================================
+        #------------------------------------------------------------------------------
         #Outbound communication functions
-            #DONE
+        #------------------------------------------------------------------------------
+        #..............................................................................
+        #DONE
+        #..............................................................................
         def sendDoneCommandToClient(recipientsSocket, recipientIPAddress): #sends the DONE command to a client
             try:
                 recipientsSocket.sendto("DONE", recipientIPAddress)
@@ -427,8 +432,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #next part in cracking problem
+        #..............................................................................
+        #next part in cracking problem
+        #..............................................................................
         def sendNextToClient(recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
@@ -443,9 +449,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #INVALIDCOMMAND
-        def sendInvalidCommandToClient(recipientsSocket, recipientIPAddress): #send the INVALIDCOMMAND String to the client
+        #..............................................................................
+        #INVALIDCOMMAND (No longer used, Error is thrown instead)
+        #..............................................................................
+        '''def sendInvalidCommandToClient(recipientsSocket, recipientIPAddress): #send the INVALIDCOMMAND String to the client
             try:
                 recipientsSocket.sendto("INVALIDCOMMAND", recipientIPAddress)
                 print "The INVALIDINPUT command was issued to: " + str(recipientIPAddress)
@@ -458,10 +465,13 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
-                print "============================================================================================="
-
+                print "=============================================================================================" '''
+        #------------------------------------------------------------------------------
         #Inbound communication functions
-            #NEXT
+        #------------------------------------------------------------------------------
+        #..............................................................................
+        #NEXT
+        #..............................................................................
         def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
                 if(inboundString=="NEXT"):
@@ -479,8 +489,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #FOUNDSOLUTION
+        #..............................................................................
+        #FOUNDSOLUTION
+        #..............................................................................
         def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
             try:
                 if(inboundString=="FOUNDSOLUTION"):
@@ -498,8 +509,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-
-            #CRASHED
+        #..............................................................................
+        #CRASHED
+        #..............................................................................
         def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
             try:
                 if(len(inboundString) < 1):
@@ -538,13 +550,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                     break
                                                 else:
                                                     print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
-                                                #if(tempCrashIP == tempAddr):
-                                                    #THIS SECTION NEEDS TO BE REVISED!!!!!
-                                                #    print "INFO: Matching IP address was found in the list of clients"
-                                                 #   foundMatch= True
-                                                 #   break
-                                                #else:
-                                                #    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr)
+
                                             if(foundMatch == False):
                                                 print "WARNING: No Matching IP address was found in the list of clients"
                                                 print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
@@ -574,44 +580,3 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst
                 print "============================================================================================="
 
-            #INVALIDCOMMAND
-                '''
-        def checkForInvalidCommand(self,inboundString): #checks for the "INVALIDCOMMAND" string
-            try:
-                if(inboundString=="INVALIDCOMMAND"):
-                    print "ERROR: A Client has issued the INVALIDCOMMAND command"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Inbound checkForInvalidCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
-                '''
-
-            #ALT Crash Command (NO LONGER USED. The empty string is used to reset the socket recv.
-        '''def checkForAltCrashCommand(self, inboundString): #checks for the " " string
-            try:
-                if(inboundString==""):
-                    print "WARNING: A Client has issued the ALT CRASH COMMAND"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Inbound checkForAltCrashCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
-
-        '''
