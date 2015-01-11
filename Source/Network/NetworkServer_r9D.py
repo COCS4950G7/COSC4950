@@ -2,7 +2,8 @@ __author__ = 'chris hamm'
 #NetworkServer_r9D
 #Created: 1/10/2015
 
-#Added functions to parse chunk objects
+#Added functions to parse chunk objects (Has now been decided that these will not be neeeded)
+#chunk object path: server-controller -> server (converted to string to be sent over network) -> client (convert back to chunk object) -> client-controller
 
 import socket
 import platform

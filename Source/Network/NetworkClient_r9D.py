@@ -2,7 +2,7 @@ __author__ = 'chris hamm'
 #NetworkClient_r9D
 #Created: 1/10/2015
 
-#Added functions to parse chunk objects
+#Added functions to parse chunk objects (Has now been decided that these will not be needed)
 
 import socket
 import platform
