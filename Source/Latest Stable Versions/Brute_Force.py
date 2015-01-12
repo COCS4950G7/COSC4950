@@ -3,14 +3,27 @@
 #   This class does all the Brute Forcing work,
 #   interacting with the Controller class.
 
-#   11/5/2014
-#   Rebuilt to check smaller chunks fed to a queue, added a WorkUnit class as a container for whatever information needs
-#   to be passed. Used a similar method of mutiprocessing to the one I added to demoCrack3, automatically creates the
-#   right number of processes for the available processors. Using synchronized, shared variables to update counts and
-#   end computation when solution is found. Also, it is currently broken for key lengths shorter than 5; finds the
-#   solution but never terminates and the time and speed calculations fail.
-#   Also added simple methods to allow the class to be called from other sources (ie. a controller) and set class
-#   variables without direct user input. These methods are more or less untested. Lots of terminal spam at the moment.
+#   1/12/2015
+#   Extracted prefix generation to get_prefix() and generalized it so the calling the get_prefix().next() method will
+#   yield a prefix compatible with either the crack_it or the get_chunk methods.
+#   Added get_chunk() method to generate an object of type Chunk to pass across the network.
+#   Added run_chunk() method to start cracking based on data from a passed Chunk object.
+#   Some oddities in run_chunk() still, basically works, but not finished.
+#   Added tedt_chunking() method to implement tests of get_chunk and run_chunk.
+
+#   In order to allow for the use of a space as an input I changed from a space separating fields in my use of Chunk to
+#   newline characters '/n'.
+
+#   Leaving this in latest stable despite the only semi-functional nature of the new methods because the methods
+#   previously available still work as they did before.
+
+#   These two methods are preliminary versions and at the moment multiprocessing is not available. I am working out
+#   a good way to chunk out work to network clients. There are really two choices, send many chunks and  each one is
+#   added to the queue on the client up to a total of, say, three times as many chunks as processors on the client.
+#   This would seem to be a good choice since it has some built in calibration based on machine capabilities. The other
+#   option would be to send much larger chunks, check the prefix over charsToCheck+1 which would be the equivalent of
+#   sending as many chunks as there are characters in the alphabet. This could be ten minutes or more for slower systems
+#   and/or large alphabets. on the other hand, it requires less code modification.
 
 #   Nick Baum
 
@@ -20,6 +33,7 @@ import os
 import itertools
 import string
 from multiprocessing import cpu_count, Process, Queue, Value
+import Chunk
 
 from time import time, sleep
 
@@ -56,6 +70,7 @@ class Brute_Force():
 
         #print num_processes, " processes"
         self.commandline()
+        #self.test_chunking("aaa999")
 
     def command_line_demo(self):
         self.commandline()
@@ -69,25 +84,120 @@ class Brute_Force():
         self.set_chars_to_check()
         self.run()
 
-    def from_controller_demo(self, alphabet, algorithm, key):
-        self.alphabet = alphabet
-        self.algorithm = algorithm
-        self.set_chars_to_check()
-        self.origHash = hashlib.new(self.algorithm, key).hexdigest()
-        self.what_we_got()
-        self.run()
+    def get_chunk(self):
 
-        print "That took: ", self.elapsed, " seconds."
+        #"method algorithm hash alphabetChoice minCharacters maxCharacters prefix fileLocation width height"
+        #"bruteforce sha1 7cacb75c4cc31d62a6c2a0774cf3c41a70f01bc0 d 1 12 1234 0 0 0"
+        for prefix in self.get_prefix():
+            if len(prefix) == 0:
+                min_length = self.minKeyLength
+                max_length = self.charactersToCheck
+            else:
+                min_length = len(prefix) + self.charactersToCheck
+                max_length = min_length
+            chunk = Chunk.Chunk()
+            chunk.params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" + str(min_length) + "\n" + str(max_length) + "\n" + prefix + "\n0\n0\n0"
+            yield chunk
 
-        if self.rec == "found":
+    def run_chunk(self, chunk):
+        #"method algorithm hash alphabetChoice minCharacters maxCharacters prefix fileLocation width height"
+        #"bruteforce sha1 7cacb75c4cc31d62a6c2a0774cf3c41a70f01bc0 d 1 12 1234 0 0 0"
+        settings = chunk.params
+        settings_list = settings.split()
+        self.algorithm = settings_list[1]
+        self.origHash = settings_list[2]
+        self.alphabet = settings_list[3]
+        self.minKeyLength = int(settings_list[4])
+        self.maxKeyLength = int(settings_list[5])
+        prefix = settings_list[6]
+        self.charactersToCheck = (self.charactersToCheck-1)
 
-            print "At about: ", self.speed, " hashes per second."
+        children = []
+        for j in range(0, self.num_processes):
+            children.append(Process(target=self.check_keys, args=(self.queue, self.countey, self.done)))
+            children[j].start()
+        for letter in self.alphabet:
+            if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
+                    self.queue.close()
+                    self.terminate_processes(children)
+                    return
+            self.queue.put(WorkUnit(prefix+letter, len(prefix)-1, self.alphabet))
+            with self.done.get_lock():
+                if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
+                    self.queue.close()
+                    self.terminate_processes(children)
+                    return
+
+        #wait while we burn through the remaining queue
+        while self.queue:
+            if self.done.value:
+                break
+
+        self.queue.close()
+        self.terminate_processes(children)
+
+        if self.done:
             return self.key
         else:
-            print "No bounce no play."
-            return
+            return "fail"
+
+
+
+    def test_chunking(self, testkey):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        self.what_we_got()
+        self.get_hash()
+
+        os.system('cls' if os.name == 'nt' else 'clear')
+        self.what_we_got()
+
+        self.set_chars_to_check()
+
+        chunk = self.get_chunk().next()
+        print "\n\nData from chunk:"
+        settings = chunk.params
+        settings_list = settings.split()
+        self.algorithm = settings_list[1]
+        print "Algorithm: " + self.algorithm
+        self.origHash = settings_list[2]
+        print "Hash: " + self.origHash
+        self.alphabet = settings_list[3]
+        print "Alphabet: " + self.alphabet
+        self.minKeyLength = int(settings_list[4])
+        self.maxKeyLength = int(settings_list[5])
+        print "Checking keys from " + str(self.minKeyLength) + " to " + str(self.maxKeyLength) + " characters."
+        prefix = settings_list[6]
+        print "Prefix: " + prefix
+        self.run_chunk(chunk)
+
+        print "That took: ", self.elapsed, " seconds."
+        self.speed = (self.countey.value * self.chunk_size)/self.elapsed
+        print "At about: ", self.speed, " hashes per second."
+
+        if self.done.value:
+            return self.key
+        else:
+            print "You lose."
+
+        exit()
+
+    def get_prefix(self):
+        if self.minKeyLength - self.charactersToCheck < 0:
+            starting_length = self.charactersToCheck
+        else:
+            starting_length = self.minKeyLength - self.charactersToCheck
+        for i in range(starting_length, (self.maxKeyLength - self.charactersToCheck + 1)):
+            prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
+            for prefix in prefixes:
+                yield ''.join(prefix)
+
 
     def set_chars_to_check(self):
+        self.charactersToCheck = 1
         iterations = self.alphabet.__len__()
         while True:
             iterations *= self.alphabet.__len__()
@@ -111,11 +221,8 @@ class Brute_Force():
         if self.minKeyLength < self.charactersToCheck:
             for i in range(self.minKeyLength, self.charactersToCheck+1):
                 self.queue.put(WorkUnit('', i, self.alphabet))
-        if self.minKeyLength - self.charactersToCheck < 0:
-            starting_length = self.charactersToCheck
-        else:
-            starting_length = self.minKeyLength - self.charactersToCheck
 
+        """
         print "Starting length = %d" % starting_length
         for i in range(starting_length, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
@@ -135,6 +242,24 @@ class Brute_Force():
                     self.queue.close()
                     self.terminate_processes(children)
                     return
+        """
+
+        for prefix in self.get_prefix():
+            if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
+                    self.queue.close()
+                    self.terminate_processes(children)
+                    return
+            self.queue.put(WorkUnit(prefix, len(prefix), self.alphabet))
+            with self.done.get_lock():
+                if self.done.value:
+                    while not self.queue.empty():
+                        self.queue.get()
+                    self.queue.close()
+                    self.terminate_processes(children)
+                    return
+
 
         #wait while we burn through the remaining queue
         while self.queue:
