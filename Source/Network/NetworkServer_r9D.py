@@ -272,24 +272,40 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     (sock, addr) = self.listOfClients[x]
                     sock.sendall("DONE")
                     print "STATUS: Issued the DONE command to client: " + str(addr)
-                print " "
-                print "Printing List of Crashed Clients"
-                print "---------------------------------"
-                if(len(self.listOfCrashedClients) < 1):
-                    print "No Clients Crashed During This Session"
-                else:
-                    for x in range(0, len(self.listOfCrashedClients)):
-                        print x + ") " + self.listOfCrashedClients[x] + " reported a Crash"
-                print "---------------------------------"
-                print " "
-                print "Printing Dictionary Of Clients Waiting For A Reply"
-                print "--------------------------------------------------"
-                if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
-                    print "No Clients Are Waiting For A Reply When The Session Ended"
-                else:
-                    for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems():
-                        print "[" + key + "] =" + value
-                print "--------------------------------"
+                try:
+                    print " "
+                    print "Printing List of Crashed Clients"
+                    print "---------------------------------"
+                    if(len(self.listOfCrashedClients) < 1):
+                        print "No Clients Crashed During This Session"
+                    else:
+                        for x in range(0, len(self.listOfCrashedClients)):
+                            print x + ") " + str(self.listOfCrashedClients[x]) + " reported a Crash"
+                    print "---------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print List of Crash Clients Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                try:
+                    print " "
+                    print "Printing Dictionary Of Clients Waiting For A Reply"
+                    print "--------------------------------------------------"
+                    if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
+                        print "No Clients Are Waiting For A Reply When The Session Ended"
+                    else:
+                        for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems():
+                            print "[" + key + "] =" + value
+                    print "--------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print Dictionary of Clients Waiting For A Reply Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
                 print " "
 
             #--------------------------------------------------------------------------------
@@ -584,7 +600,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                             tempCrashIP = ""
                                             #position 7 is a space between the ip address and the crashed message
                                             for i in range(8, len(inboundString)):
-                                                tempCrashIP = tempCrashIP + inboundString[i]
+                                                if(inboundString[i].isalpha()):
+                                                    print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
+                                                    break
+                                                else:
+                                                    tempCrashIP = tempCrashIP + inboundString[i]
                                             if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
                                                 return False
                                             print "WARNING: A Client has issued the CRASHED command"
