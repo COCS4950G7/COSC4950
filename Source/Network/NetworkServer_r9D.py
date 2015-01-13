@@ -4,7 +4,6 @@ __author__ = 'chris hamm'
 
 #Added lists for the server to use to keep track of things that have happened and still need to be done
     #A list that records all of the clients that have crashed (and have been detected as crashed)
-    #A list of clients that need something to do (in progress)
     #A list of clients that are waiting for a reply
     #A list of what each client is currently working on (in progress)
     #A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk) (in progress)
@@ -26,7 +25,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         serverIsRunning = True
         #list to store the socket and address of every client
         listOfClients = [] #This list is a list of tuples (socket, address)
-        listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
+        #listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
         listOfCrashedClients= [] #records the ip address of any client that has crashed during the last server run
         #listOfInactiveClients = [] #records the ip address of any client who needs something to do
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
@@ -307,9 +306,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #nextChunk
         #..............................................................................
-        def sendNextChunkCommandToController(self):
+        def sendNextChunkCommandToController(self, clientIP):
             try:
-                self.pipe.send("nextChunk")
+                self.pipe.send("nextChunk " + clientIP)
                 print "The NEXTCHUNK command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
@@ -358,9 +357,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #done
         #..............................................................................
-        def sendDoneCommandToController(self):
+        def sendDoneCommandToController(self, clientIP):
             try:
-                self.pipe.send("done")
+                self.pipe.send("done " + clientIP)
                 print "The DONE command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
