@@ -30,8 +30,8 @@ from multiprocessing import Process, Pipe, Lock
 #import RainbowMaker
 import Dictionary
 #import Brute_Force
-import NetworkClient_r9C
-import NetworkServer_r9C
+import NetworkClient_r9D
+import NetworkServer_r9D
 import Chunk
 
 class Controller():
@@ -46,9 +46,9 @@ class Controller():
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer_r9C.NetworkServer, args=(networkPipe,))
+    networkServer = Process(target=NetworkServer_r9D.NetworkServer, args=(networkPipe,))
     #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
-    networkClient = Process(target=NetworkClient_r9C.NetworkClient, args=(networkPipe,))
+    networkClient = Process(target=NetworkClient_r9D.NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
     serverIP = "127.0.1.1"

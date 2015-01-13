@@ -2,7 +2,13 @@ __author__ = 'chris hamm'
 #NetworkServer_r9D
 #Created: 1/10/2015
 
-#Added functions to parse chunk objects (Has now been decided that these will not be neeeded)
+#Added lists for the server to use to keep track of things that have happened and still need to be done
+    #A list that records all of the clients that have crashed (and have been detected as crashed)
+    #A list of clients that need something to do (in progress)
+    #A list of clients that are waiting for a reply
+    #A list of what each client is currently working on (in progress)
+    #A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk) (in progress)
+#Added functions to parse chunk objects (Has now been decided that these will not be needed)
 #chunk object path: server-controller -> server (converted to string to be sent over network) -> client (convert back to chunk object) -> client-controller
 
 import socket
@@ -21,7 +27,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #list to store the socket and address of every client
         listOfClients = [] #This list is a list of tuples (socket, address)
         listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
-        #listenForCrashedClientIP = False
+        listOfCrashedClients= [] #records the ip address of any client that has crashed during the last server run
+        #listOfInactiveClients = [] #records the ip address of any client who needs something to do
+        #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
+        dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
+        dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
 
         #--------------------------------------------------------------------------------
         #constructor
@@ -263,6 +273,26 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     (sock, addr) = self.listOfClients[x]
                     sock.sendall("DONE")
                     print "STATUS: Issued the DONE command to client: " + str(addr)
+                print " "
+                print "Printing List of Crashed Clients"
+                print "---------------------------------"
+                if(len(self.listOfCrashedClients) < 1):
+                    print "No Clients Crashed During This Session"
+                else:
+                    for x in range(0, len(self.listOfCrashedClients)):
+                        print x + ") " + self.listOfCrashedClients[x] + " reported a Crash"
+                print "---------------------------------"
+                print " "
+                print "Printing Dictionary Of Clients Waiting For A Reply"
+                print "--------------------------------------------------"
+                if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
+                    print "No Clients Are Waiting For A Reply When The Session Ended"
+                else:
+                    for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems():
+                        print "[" + key + "] =" + value
+                print "--------------------------------"
+                print " "
+
             #--------------------------------------------------------------------------------
             #End of Constructor Block
             #--------------------------------------------------------------------------------
@@ -474,9 +504,19 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
-                if(inboundString=="NEXT"):
-                    print "A Client has issued the NEXT command"
-                    return True
+                if(inboundString[0]=="N"):
+                    if(inboundString[1]=="E"):
+                        if(inboundString[2]=="X"):
+                            if(inboundString[3]=="T"):
+                                print "A Client has issued the NEXT command"
+                                #position 4 is a space
+                                tempIP= ""
+                                for i in range(5, len(inboundString)):
+                                    tempIP= tempIP + inboundString[i]
+                                self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
+                                print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
+                                return True
+
                 else:
                     return False
             except Exception as inst:
@@ -494,9 +534,27 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
             try:
-                if(inboundString=="FOUNDSOLUTION"):
-                    print "A Client has issued the FOUNDSOLUTION command"
-                    return True
+                if(inboundString[0]=="F"):
+                    if(inboundString[1]=="O"):
+                        if(inboundString[2]=="U"):
+                            if(inboundString[3]=="N"):
+                                if(inboundString[4]=="D"):
+                                    if(inboundString[5]=="S"):
+                                        if(inboundString[6]=="O"):
+                                            if(inboundString[7]=="L"):
+                                                if(inboundString[8]=="U"):
+                                                    if(inboundString[9]=="T"):
+                                                        if(inboundString[10]=="I"):
+                                                            if(inboundString[11]=="O"):
+                                                                if(inboundString[12]=="N"):
+                                                                    print "A Client has issued the FOUNDSOLUTION command"
+                                                                    #position 13 is a space
+                                                                    tempIP= ""
+                                                                    for i in range(14, len(inboundString)):
+                                                                        tempIP= tempIP + inboundString[i]
+                                                                    self.dictionaryOfClientsWaitingForAReply[tempIP] = "FOUNDSOLUTION"
+                                                                    print "INFO: Client (" + str(tempIP) + ") was added to the dictionaryOfClientsWaitingForAReply"
+                                                                    return True
                 else:
                     return False
             except Exception as inst:
@@ -532,6 +590,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                 return False
                                             print "WARNING: A Client has issued the CRASHED command"
                                             print "The Crashed Client IP: " + tempCrashIP
+                                            self.listOfCrashedClients.append(tempCrashIP)
+                                            print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
                                             #look through listOfConnected clients and find the matching ip address
                                             print "STATUS: Looking for matching IP address in list of clients..."
                                             foundMatch= False

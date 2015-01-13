@@ -311,7 +311,7 @@ class NetworkClient():
     def sendNextCommandToServer(self):
         #sends the NEXT command to the serve
         try:
-            self.clientSocket.send("NEXT")
+            self.clientSocket.send("NEXT" + self.myIPAddress)
             print "INFO: The NEXT command was sent to the server"
 
         except Exception as inst:
@@ -330,7 +330,7 @@ class NetworkClient():
     def sendFoundSolutionToServer(self):
         #sends the FOUNDSOLUTION command to the server, and key
         try:
-            self.clientSocket.send("FOUNDSOLUTION")
+            self.clientSocket.send("FOUNDSOLUTION" + self.myIPAddress)
             self.clientSocket.send(self.key)
             print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
         except Exception as inst:
