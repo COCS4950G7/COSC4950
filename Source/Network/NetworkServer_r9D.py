@@ -25,12 +25,13 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         serverIsRunning = True
         #list to store the socket and address of every client
         listOfClients = [] #This list is a list of tuples (socket, address)
-        #listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
+        listOfControllerMessages = [] #holds a list of strings that have been sent by the controller class
         listOfCrashedClients= [] #records the ip address of any client that has crashed during the last server run
         #listOfInactiveClients = [] #records the ip address of any client who needs something to do
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
         dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
         dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
+    
 
         #--------------------------------------------------------------------------------
         #constructor
@@ -149,6 +150,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
             self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
             print "STATUS: Client successfully added to the list of clients"
+            #When a client is added, they are also added to the dictionaryOfCurrentClientTasks
+            self.dictionaryOfCurrentClientTasks[addr] = "" #Not working on anything, so value is the empty string
+            print "STATUS: Client successfully added to the Dictionary of Current Client Tasks"
             #print str(len(self.listOfClients)) + " Client(s) are currently Connected."
 
             #..................................................................................
@@ -224,6 +228,56 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     #/////////////////////////////////////////////////////////////////////////////////
                     try: #distribute command try block
                         print "STATUS: Checking to see if a command needs to be send to the clients..."
+                        #check to see if there are any commands that the controller has sent to the server
+                        if(len(self.listOfControllerMessages) < 1):
+                            print "INFO: There are no new commands from the controller class"
+                        else:
+                            print "INFO: There are " + str(len(self.listOfControllerMessages)) + " new command(s) from the controller class"
+                            for i in range(0,len(self.listOfControllerMessages)):
+                                print i + ") " + str(self.listOfControllerMessages[i])
+                        print " "
+                        print "INFO: " + len(self.dictionaryOfClientsWaitingForAReply) + " Client(s) are currently waiting for a reply"
+                        #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                        #Figure out what each of the received commands are and who it needs to go to, then distribute accordingly
+                        #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                        print " "
+                        print "STATUS: Figuring Out What Each Command Is and Who It Needs To Be Sent To"
+                        for i in range(0, len(self.listOfControllerMessages)):
+                            print "Command " + i + ") " + str(self.listOfControllerMessages[i])
+                            analysisString= str(self.listOfControllerMessages[i])
+                            if(analysisString[0:8] == "NEXTCHUNK"): #looking for NEXTCHUNK command
+                                print "Command Type: NEXTCHUNK"
+                                #recall that position 9 is a space
+                                print "Need To Send To: " + analysisString[10:len(analysisString)]
+                                analysisIP= str(analysisString[10:len(analysisString)])
+                                print "INFO: Looking for matching IP address in listOfClients"
+                                foundMatchingIP= False
+                                for index in range(0,len(self.listOfClients)):
+                                    tempSock, tempAddr = self.listOfClients[index]
+                                    if(analysisIP == tempAddr):
+                                        print "Match was found"
+                                        foundMatchingIP= True
+                                        break
+                                    else:
+                                        print "No Match Found Yet. " + analysisIP + "!=" + tempAddr
+                                if(foundMatchingIP==False):
+                                    print "WARNING: No Matching IP Address was found for:" + analysisIP
+                                else:
+                                    print " "
+                                    print "Function Not yet Completed"
+                                    print " "
+                                   # self.sendNextToClient(tempSock,tempAddr,) #Send the message to the client
+                            elif(analysisString[0:3] == "DONE"): #looking for DONE Command
+                                print "Command Type: DONE"
+                                print " "
+                                print "Function Not Yet Completed"
+                                print " "
+                            else: #command is unknown
+                                print "WARNING: Received Unknown Command From Controller:" + analysisString
+                                print "INFO: Unknown Command is being ignored"
+                        print "STATUS: Clearing listOfControllerMessages..."
+                        del self.listOfControllerMessages[:]
+                        print "STATUS: listOfControllerMessages has been cleared"
                     except Exception as inst:
                         print "========================================================================================"
                         print "ERROR: An exception has been thrown in the Distribute command to clients Try Block"
@@ -243,6 +297,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         self.listOfClients.append((sock, addr))
                         print "INFO: Client successfully added to the list of clients"
                         print str(len(self.listOfClients)) + " Client(s) are currently Connected."
+                        self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
+                        print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
                     except socket.timeout as inst:
                         print "STATUS: Socket timed out. No client is trying to connect."
                     except Exception as inst:
@@ -395,8 +451,23 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
             try:
-                print "Checking to see if inboundString is the next part of problem..."
-                print "The function for this is not finished yet"
+                print "STATUS: Checking to see if inboundString is the next part of problem..."
+                if(len(inboundString) < 1):
+                    return False
+                if(inboundString[0] == "N"):
+                    if(inboundString[1] == "E"):
+                        if(inboundString[2] == "X"):
+                            if(inboundString[3] == "T"):
+                                if(inboundString[4] == "C"):
+                                    if(inboundString[5] == "H"):
+                                        if(inboundString[6] == "U"):
+                                            if(inboundString[7] == "N"):
+                                                if(inboundString[8] == "K"):
+                                                    #position 9 will be a space
+                                                    print "INFO: NEXTCHUNK command was received from the controller class"
+                                                    self.listOfControllerMessages.append(str(inboundString))
+                                                    print "INFO: NEXTCHUNK command was added to the listOfControllerMessages"
+                                                    return True
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
