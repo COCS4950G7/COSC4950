@@ -245,33 +245,66 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         for i in range(0, len(self.listOfControllerMessages)):
                             print "Command " + i + ") " + str(self.listOfControllerMessages[i])
                             analysisString= str(self.listOfControllerMessages[i])
+                            #***************************************************************************************
+                            #Looking for NEXTCHUNK command
+                            #***************************************************************************************
                             if(analysisString[0:8] == "NEXTCHUNK"): #looking for NEXTCHUNK command
-                                print "Command Type: NEXTCHUNK"
-                                #recall that position 9 is a space
-                                print "Need To Send To: " + analysisString[10:len(analysisString)]
-                                analysisIP= str(analysisString[10:len(analysisString)])
-                                print "INFO: Looking for matching IP address in listOfClients"
-                                foundMatchingIP= False
-                                for index in range(0,len(self.listOfClients)):
-                                    tempSock, tempAddr = self.listOfClients[index]
-                                    if(analysisIP == tempAddr):
-                                        print "Match was found"
-                                        foundMatchingIP= True
-                                        break
+                                try:  #looking for NEXTCHUNK in analysis string try block
+                                    print "Command Type: NEXTCHUNK"
+                                    #recall that position 9 is a space
+                                    #looking for the next space in the string which will be after the ip address
+                                    analysisIP= ""
+                                    endOfIPPosition= 10
+                                    for x in range(10,len(analysisString)):
+                                        if(analysisString[x] == " "): #if it is a space
+                                            endOfIPPosition= x
+                                            break
+                                        else:
+                                            analysisIP= analysisIP + str(analysisString[x])
+                                    print "Need To Send To: " + analysisIP
+                                    print "INFO: Looking for matching IP address in listOfClients"
+                                    foundMatchingIP= False
+                                    for index in range(0,len(self.listOfClients)):
+                                        tempSock, tempAddr = self.listOfClients[index]
+                                        if(analysisIP == tempAddr):
+                                            print "Match was found"
+                                            foundMatchingIP= True
+                                            break
+                                        else:
+                                            print "No Match Found Yet. " + analysisIP + "!=" + tempAddr
+                                    if(foundMatchingIP==False):
+                                        print "WARNING: No Matching IP Address was found for:" + analysisIP
                                     else:
-                                        print "No Match Found Yet. " + analysisIP + "!=" + tempAddr
-                                if(foundMatchingIP==False):
-                                    print "WARNING: No Matching IP Address was found for:" + analysisIP
-                                else:
-                                    print " "
-                                    print "Function Not yet Completed"
-                                    print " "
-                                   # self.sendNextToClient(tempSock,tempAddr,) #Send the message to the client
+                                        print "STATUS: Sending Message To Client..."
+                                        try: #send NEXTCHUNK message to client try block
+                                            theMessage= analysisString[endOfIPPosition+1:len(analysisString)]
+                                            self.sendNextToClient(tempSock,tempAddr,theMessage)
+                                            print "STATUS: Sent Message to the client"
+                                        except Exception as inst:
+                                            print "========================================================================================"
+                                            print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
+                                            print type(inst) #the exception instance
+                                            print inst.args #srguments stored in .args
+                                            print inst #_str_ allows args tto be printed directly
+                                            print "========================================================================================"
+                                except Exception as inst:
+                                    print "========================================================================================"
+                                    print "ERROR: An exception has been thrown in the looking for NEXTCHUNK in analysis string Try Block"
+                                    print type(inst) #the exception instance
+                                    print inst.args #srguments stored in .args
+                                    print inst #_str_ allows args tto be printed directly
+                                    print "========================================================================================"
+                            #***************************************************************************************
+                            #Looking for DONE command
+                            #***************************************************************************************
                             elif(analysisString[0:3] == "DONE"): #looking for DONE Command
                                 print "Command Type: DONE"
                                 print " "
                                 print "Function Not Yet Completed"
                                 print " "
+                            #***************************************************************************************
+                            #Command is unknown
+                            #***************************************************************************************
                             else: #command is unknown
                                 print "WARNING: Received Unknown Command From Controller:" + analysisString
                                 print "INFO: Unknown Command is being ignored"
