@@ -3,7 +3,7 @@ __author__ = 'chris hamm'
 #Created: 1/10/2015
 
 #Added lists for the server to use to keep track of things that have happened and still need to be done
-    #(In progress) A list of all messages that have been received from clients and who sent them
+    #(In progress) (May not be implemented) A list of all messages that have been received from clients and who sent them
     #A list that records all of the clients that have crashed (and have been detected as crashed)
     #A list of clients that are waiting for a reply
     #(In Progress) A list of what each client is currently working on
@@ -507,6 +507,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                            #                             self.listOfControllerMessages.append(str(inboundString))
                             #                            print "INFO: NEXTCHUNK command was added to the listOfControllerMessages"
                              #                           return True
+                else:
+                    return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
@@ -523,7 +525,16 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def checkForChunkAgain(self,inboundString): #check to see if the string contains that chunk that was requested
             try:
                 print "Checking to see if inboundString is the requested chunk (chunkAgain)..."
-                print "The function for this is not finished"
+                if(len(inboundString) < 1):
+                    return False
+                if(inboundString[0:9] == "CHUNKAGAIN"):
+                    #position 10 will be a space
+                    print "INFO: CHUNKAGAIN command was received from the controller class"
+                    self.listOfControllerMessages.append(str(inboundString))
+                    print "INFO: CHUNKAGAIN command was added to the listOfControllerMessages"
+                    return True
+                else:
+                    return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Inbound checkForChunkAgain Try Block"
@@ -539,19 +550,34 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForFound(self,inboundString): #checks to see if the inboundString says it found the key (or if it didnt)
             try:
-                print "Checking to see if the key was found..."
-                print "The function for this is not finished"
-                if(inboundString=="Found"):
-                    print "The Controller says that the key has been Found"
+                print "STATUS: Checking to see if the key was found..."
+                if(len(inboundString) < 1):
+                    return False
+                if(inboundString[0:4] == "Found"):
+                    print "INFO: The Controller Says that the key has been Found"
+                    print " "
+                    print "This section of the code is NOT FINISHED YET"
+                    print " -Need To Issue Done Command To All CLients at this point"
                     return True
-                elif(inboundString=="notFound"):
-                    return False
+                elif(inboundString[0:7] == "notFound"):
+                    print "INFO: The Controller says that the key has no been found yet"
+                    print " "
+                    print "This Section of the code is NOT FINISHED YET"
+                    print " -Need to tell client that no solution was found, request for the next chunk"
+                    return True
                 else:
-                    print "==================================================="
-                    print "ERROR: Invalid input from the Controller class"
-                    print "The Invalid input: '" + inboundString + "'"
-                    print "==================================================="
                     return False
+               # if(inboundString=="Found"): #OLD METHOD
+                #    print "The Controller says that the key has been Found"
+                 #   return True
+               # elif(inboundString=="notFound"):
+                #    return False
+              #  else:
+              #      print "==================================================="
+               #     print "ERROR: Invalid input from the Controller class"
+               #     print "The Invalid input: '" + inboundString + "'"
+                #    print "==================================================="
+                #    return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Inbound checkForFound Try Block"
