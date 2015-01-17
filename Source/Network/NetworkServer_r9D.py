@@ -174,11 +174,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             if(self.checkForNextCommand(theInput)==True):
                                 print "INFO: NEXT command was received"
                                 self.sendNextChunkCommandToController(theInput)
-                                print "INFO: Sent the NextChunk Command to the Controller"
+                                #print "INFO: Sent the NextChunk Command to the Controller" #repetative print statement
                             elif(self.checkForFoundSolutionCommand(theInput)==True):
                                 print "INFO: FOUNDSOLUTION command was received"
                                 self.sendDoneCommandToController()
-                                print "INFO: Sent the Done Command to the Controller"
+                                #print "INFO: Sent the Done Command to the Controller" #repetative print statement
                             elif(self.checkForCrashedCommand(theInput)==True):
                                 print "INFO: CRASHED command was received"
                                 #self.listenForCrashedClientIP = True
@@ -213,7 +213,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "INFO: Received reply stating whether the key has been found or not"
                             else:
                                 print "ERROR: Received an unknown command from the controller"
-                                print "The unknown command: '" + recv + "'"
+                                print "The unknown command: '" + str(recv) + "'"
                         else:
                             print "STATUS: No command was received from the controller class"
                     except Exception as inst:
@@ -436,7 +436,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendNextChunkCommandToController(self, clientMessage):
             try:
                 self.pipe.send("nextChunk") #+ clientMessage)
-                print "INFO: The NEXTCHUNK command was sent to the Controller"
+                print "I/O: The NEXTCHUNK command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
@@ -453,7 +453,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendChunkAgainCommandToController(self):
             try:
                 self.pipe.send("chunkAgain")
-                print "INFO: The CHUNKAGAIN command was sent to the Controller"
+                print "I/O: The CHUNKAGAIN command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
@@ -470,7 +470,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendWaitingCommandToController(self):
             try:
                 self.pipe.send("waiting")
-                print "INFO: The WAITING command was sent to the Controller"
+                print "I/O: The WAITING command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
@@ -487,7 +487,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendDoneCommandToController(self, clientIP):
             try:
                 self.pipe.send("done " + clientIP)
-                print "INFO: The DONE command was sent to the Controller"
+                print "I/O: The DONE command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
@@ -511,7 +511,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
                 if(inboundString[0:8] == "NEXTCHUNK"):
                     #position 9 will be a space
-                    print "INFO: NEXTCHUNK command was received from the controller class"
+                    print "I/O: NEXTCHUNK command was received from the controller class"
                     self.listOfControllerMessages.append(str(inboundString))
                     print "INFO: NEXTCHUNK command was added to the listOfControllerMessages"
                     return True
@@ -551,7 +551,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     return False
                 if(inboundString[0:9] == "CHUNKAGAIN"):
                     #position 10 will be a space
-                    print "INFO: CHUNKAGAIN command was received from the controller class"
+                    print "I/O: CHUNKAGAIN command was received from the controller class"
                     self.listOfControllerMessages.append(str(inboundString))
                     print "INFO: CHUNKAGAIN command was added to the listOfControllerMessages"
                     return True
@@ -576,7 +576,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 if(len(inboundString) < 1):
                     return False
                 if(inboundString[0:4] == "Found"):
-                    print "INFO: The Controller Says that the key has been Found"
+                    print "I/O: The Controller Says that the key has been Found"
                     print " "
                     print "This section of the code is NOT FINISHED YET"
                     print " -Need To Issue Done Command To All CLients at this point"
@@ -626,7 +626,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendDoneCommandToClient(recipientsSocket, recipientIPAddress): #sends the DONE command to a client
             try:
                 recipientsSocket.sendto("DONE", recipientIPAddress)
-                print "INFO: The DONE command was issued to: " + str(recipientIPAddress)
+                print "I/O: The DONE command was issued to: " + str(recipientIPAddress)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
@@ -643,7 +643,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def sendNextToClient(recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
-                print "INFO: The next part of the problem was sent to: " + str(recipientIPAddress)
+                print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
@@ -692,7 +692,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     if(inboundString[1]=="E"):
                         if(inboundString[2]=="X"):
                             if(inboundString[3]=="T"):
-                                print "A Client has issued the NEXT command"
+                                print "I/O: A Client has issued the NEXT command"
                                 #position 4 is a space
                                 tempIP= ""
                                 for i in range(5, len(inboundString)):
@@ -718,7 +718,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
             try:
                 if(inboundString[0:12] == "FOUNDSOLUTION"):
-                    print "INFO: A Client has issued the FOUNDSOLUTION command"
+                    print "I/O: A Client has issued the FOUNDSOLUTION command"
                     #position 13 is a space
                     tempIP= ""
                     for i in range(14, len(inboundString)):
