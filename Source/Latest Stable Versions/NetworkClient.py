@@ -1,10 +1,13 @@
 __author__ = 'chris hamm'
-#NetworkClient_r9C
-#Created: 1/9/2015
+#NetworkClient_r9D
+#Created: 1/10/2015
 
-#Removed old and obsolete pieces of code
-#Added error handling for incorrect input from the server
-#Added additional heading to make navigation easier
+#Added functions to parse chunk objects (Has now been decided that these will not be needed)
+#Added a command logging system that records what commands has been received and sent to server/controller. These will be displayed after the client shuts down and after the socket is closed
+    #-Record of commands sent to Controller from the Client
+    #-Record of Commands sent to Server from the Client
+    #-Record of Commands received from the Controller
+    #-Record of Commands received from the Server
 
 import socket
 import platform
@@ -26,6 +29,10 @@ class NetworkClient():
     myIPAddress = "127.0.1.1"
     chunk = Chunk.Chunk()
     key = 0
+    recordOfOutboundCommandsFromClientToController = {} #dictionary that keeps a record of how many commands were sent to the controller
+    recordOfOutboundCommandsFromClientToServer = {} #dictionary that keeps a record of how many commands were sent to the server
+    recordOfInboundCommandsFromController = {} #dictionary that keeps a record of how many commands were received from the controller
+    recordOfInboundCommandsFromServer = {} #dictionary that keeps a record of how many commands were received from the server
 
     #-----------------------------------------------------------------------
     #constructor
@@ -134,6 +141,18 @@ class NetworkClient():
                 print inst.args
                 print inst
                 print "========================================================================================"
+            #......................................................................
+            #Setup the initial Command record values in the dictionaries
+            #......................................................................
+            self.recordOfOutboundCommandsFromClientToController['done'] = 0
+            self.recordOfOutboundCommandsFromClientToController['connected'] = 0
+            self.recordOfOutboundCommandsFromClientToController['doingStuff'] = 0
+            self.recordOfOutboundCommandsFromClientToServer['NEXT'] = 0
+            self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
+            self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = 0
+            self.recordOfInboundCommandsFromController['serverIP'] = 0
+            self.recordOfInboundCommandsFromServer['DONE'] = 0
+
             #......................................................................
             #Retreive the server's IP from the controller class
             #......................................................................
@@ -296,6 +315,102 @@ class NetworkClient():
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
             print " "
+            try:
+                print " "
+                print "COMMAND RECORDS: Part 1/4"
+                print "Printing Outbound Commands From Client to Controller"
+                print "-----------------------------------------------------"
+                #print done
+                if(self.recordOfOutboundCommandsFromClientToController['done'] > 0):
+                    print "# of done Commands sent to Controller: " + str(self.recordOfOutboundCommandsFromClientToController['done'])
+                else:
+                    print "# of done Commands sent to Controller: 0"
+                #print connected
+                if(self.recordOfOutboundCommandsFromClientToController['connected'] > 0):
+                    print "# of connected Commands sent to Controller: " + str(self.recordOfOutboundCommandsFromClientToController['connected'])
+                else:
+                    print "# of connected Commands sent to Controller: 0"
+                #print doingStuff
+                if(self.recordOfOutboundCommandsFromClientToController['doingStuff'] > 0):
+                    print "# of doingStuff Commands sent to Controller: " + str(self.recordOfOutboundCommandsFromClientToController['doingStuff'])
+                else:
+                    print "# of doingStuff Commands sent to Controller: 0"
+                print "(END OF OUTBOUND COMMANDS FROM CLIENT TO CONTROLLER)"
+                print "-------------------------------------------------------"
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the Finally Block, Print Outbound commands from client to controller section"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "============================================================================================="
+            try:
+                print " "
+                print "COMMAND RECORDS: Part 2/4"
+                print "Printing Outbound Commands From Client To Server"
+                print "--------------------------------------------------"
+                #print NEXT
+                if(self.recordOfOutboundCommandsFromClientToServer['NEXT'] > 0):
+                    print "# of NEXT Commands sent to Server: " + str(self.recordOfOutboundCommandsFromClientToServer['NEXT'])
+                else:
+                    print "# of NEXT Commands sent to Server: 0"
+                #print FOUNDSOLUTION
+                if(self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] > 0):
+                    print "# of FOUNDSOLUTION Commands sent to Server: " + str(self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'])
+                else:
+                    print "# of FOUNDSOLUTION Commands sent to to Server: 0"
+                #print CRASHED
+                if(self.recordOfOutboundCommandsFromClientToServer['CRASHED'] > 0):
+                    print "# of CRASHED Commands sent to Server: " + str(self.recordOfOutboundCommandsFromClientToServer['CRASHED'])
+                else:
+                    print "# of CRASHED Commands sent to Server: 0"
+                print "(END OF OUTBOUND COMMANDS FROM CLIENT TO SERVER)"
+                print "--------------------------------------------------"
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the Finally Block, Print Outbound Commands From Client to Server Section"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "============================================================================================="
+            try:
+                print " "
+                print "COMMAND RECORDS: Part 3/4"
+                print "Printing Inbound Commands From The Controller"
+                print "-----------------------------------------------"
+                #print serverIP
+                if(self.recordOfInboundCommandsFromController['serverIP'] > 0):
+                    print "# of serverIP Commands  received from Controller: " + str(self.recordOfInboundCommandsFromController['serverIP'])
+                else:
+                    print "# of serverIP Commands received from Controller: 0"
+                print "(END OF INBOUND COMMANDS FROM CONTROLLER)"
+                print "-----------------------------------------------"
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the Finally Block, Print Inbound Commands from Controller Section"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "============================================================================================="
+            try:
+                print " "
+                print "COMMAND RECORDS: Part 4/4"
+                print "Printing Inbound Commands from the Server"
+                print "-----------------------------------------------"
+                #print DONE
+                if(self.recordOfInboundCommandsFromServer['DONE'] > 0):
+                    print "# of DONE Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['DONE'])
+                else:
+                    print "# of DONE Commands received from the Server: 0"
+                print "(END OF INBOUND COMMANDS FROM THE SERVER)"
+                print "------------------------------------------------"
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the Finally Block, Print Inbound Commands from the Server Section"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "============================================================================================="
         #-----------------------------------------------------------------------
         #End of constructor block
         #-----------------------------------------------------------------------
@@ -313,9 +428,9 @@ class NetworkClient():
     def sendNextCommandToServer(self):
         #sends the NEXT command to the serve
         try:
-            self.clientSocket.send("NEXT")
+            self.clientSocket.send("NEXT " + self.myIPAddress)
             print "INFO: The NEXT command was sent to the server"
-
+            self.recordOfOutboundCommandsFromClientToServer['NEXT'] = (self.recordOfOutboundCommandsFromClientToServer['NEXT'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
@@ -332,9 +447,10 @@ class NetworkClient():
     def sendFoundSolutionToServer(self):
         #sends the FOUNDSOLUTION command to the server, and key
         try:
-            self.clientSocket.send("FOUNDSOLUTION")
+            self.clientSocket.send("FOUNDSOLUTION " + self.myIPAddress)
             self.clientSocket.send(self.key)
             print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
+            self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
@@ -355,6 +471,7 @@ class NetworkClient():
             print " "
             print "INFO: The IP Address of the crashed client was sent to the server."
             print " "
+            self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = (self.recordOfOutboundCommandsFromClientToServer['CRASHED'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
@@ -393,6 +510,7 @@ class NetworkClient():
         try:
             if inboundString == "DONE":
                 print "INFO: Received the DONE command"
+                self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
                 return True
             else:
                 return False
@@ -446,6 +564,7 @@ class NetworkClient():
         try:
             self.pipe.send("done")
             print "INFO: The DONE command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['done'] = (self.recordOfOutboundCommandsFromClientToController['done'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
@@ -463,6 +582,7 @@ class NetworkClient():
         try:
             self.pipe.send("connected")
             print "INFO: The CONNECTED command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['connected'] = (self.recordOfOutboundCommandsFromClientToController['connected'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
@@ -480,6 +600,7 @@ class NetworkClient():
         try:
             self.pipe.send("doingStuff")
             print "INFO: The DOINGSTUFF command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['doingStuff'] = (self.recordOfOutboundCommandsFromClientToController['doingStuff'] + 1)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
@@ -490,6 +611,9 @@ class NetworkClient():
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #---------------------------------------------------------------------
+    #Inbound communications from Controller
+    #---------------------------------------------------------------------
     #......................................................................
     #serverIP
     #......................................................................
@@ -499,6 +623,8 @@ class NetworkClient():
             print "INFO: Waiting to receive the serverIP from Controller (function block)"
             self.serverIP = self.pipe.recv()
             print "INFO: The ServerIP was received from the Controller (function block)"
+            self.recordOfInboundCommandsFromController['serverIP'] = (self.recordOfInboundCommandsFromController['serverIP'] + 1)
+
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
@@ -510,5 +636,47 @@ class NetworkClient():
             print inst
             print "============================================================================================="
 
+    #==================================================================================================
+    #CHUNK PARSING FUNCTIONS
+    #==================================================================================================
+        #-------------------------------------------------------------------------------------------------
+        #Determine the method being used (bruteforce,dictionary,rainbowmaker,rainbowuser)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the algorithm being used (md5,sha1,sha256,sha512)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Obtain the hash code
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the Alphabet Choice (a,A,m,M,d)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the minCharacters (1,10,16)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the maxCharacters (1,10,16)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the Prefix (adf,234,qw3#k)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the File Location (0,1213,23665)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the Width (1,100,100000)
+        #-------------------------------------------------------------------------------------------------
+
+        #-------------------------------------------------------------------------------------------------
+        #Determine the Height (1,100,10000)
+        #-------------------------------------------------------------------------------------------------
 
 

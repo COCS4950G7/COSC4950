@@ -402,6 +402,8 @@ class NetworkClient():
                     print "# of DONE Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['DONE'])
                 else:
                     print "# of DONE Commands received from the Server: 0"
+                print "(END OF INBOUND COMMANDS FROM THE SERVER)"
+                print "------------------------------------------------"
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Finally Block, Print Inbound Commands from the Server Section"
