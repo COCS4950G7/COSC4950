@@ -444,7 +444,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "========================================================================================"
                 try:
                     print " "
-                    print "COMMAND RECORDS: Part 1"
+                    print "COMMAND RECORDS: Part 1/4"
                     print "Printing Record of OutBound Commands from Server to Controller"
                     print "----------------------------------------------------------------"
                     #print nextChunk records
@@ -478,7 +478,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "========================================================================================"
                 try:
                     print " "
-                    print "COMMAND RECORDS: Part 2"
+                    print "COMMAND RECORDS: Part 2/4"
                     print "Printing Record of Outbound Commands from Server to Client(s)"
                     print "------------------------------------------------------------"
                     #print the DONE records
@@ -502,7 +502,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "========================================================================================"
                 try:
                     print " "
-                    print "COMMAND RECORDS: Part 3"
+                    print "COMMAND RECORDS: Part 3/4"
                     print "Printing Record of Inbound Commands from Controller to Server"
                     print "--------------------------------------------------------------"
                     #print the REPLY TO NEXT CHUNK
@@ -531,7 +531,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "========================================================================================"
                 try:
                     print " "
-                    print "COMMANDS RECORDS: Part 4"
+                    print "COMMANDS RECORDS: Part 4/4"
                     print "Printing Inbound Commands from Client(s) to Server"
                     print "----------------------------------------------------"
                     #print NEXT
