@@ -173,7 +173,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: Received a message from a client."
                             if(self.checkForNextCommand(theInput)==True):
                                 print "INFO: NEXT command was received"
-                                self.sendNextChunkCommandToController()
+                                self.sendNextChunkCommandToController(theInput)
                                 print "INFO: Sent the NextChunk Command to the Controller"
                             elif(self.checkForFoundSolutionCommand(theInput)==True):
                                 print "INFO: FOUNDSOLUTION command was received"
@@ -433,9 +433,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #nextChunk
         #..............................................................................
-        def sendNextChunkCommandToController(self, clientIP):
+        def sendNextChunkCommandToController(self, clientMessage):
             try:
-                self.pipe.send("nextChunk " + clientIP)
+                self.pipe.send("nextChunk") #+ clientMessage)
                 print "INFO: The NEXTCHUNK command was sent to the Controller"
             except Exception as inst:
                 print "============================================================================================="
@@ -580,6 +580,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print " "
                     print "This section of the code is NOT FINISHED YET"
                     print " -Need To Issue Done Command To All CLients at this point"
+                    #print "STATUS: Issuing the DONE command to all clients..."
+                    #for x in range(0, len(self.listOfClients))
                     return True
                 elif(inboundString[0:7] == "notFound"):
                     print "INFO: The Controller says that the key has no been found yet"
@@ -677,27 +679,27 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
-                if(inboundString[0:3] == "NEXT"):
-                    print "INFO: A Client has issued the NEXT command"
-                    #position 4 is a space
-                    tempIP= ""
-                    for i in range(5, len(inboundString)):
-                        tempIP= tempIP + inboundString[i]
-                    self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
-                    print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
-                    return True
-               # if(inboundString[0]=="N"): #OLD METHOD
-                #    if(inboundString[1]=="E"):
-                 #       if(inboundString[2]=="X"):
-                  #          if(inboundString[3]=="T"):
-                   #             print "A Client has issued the NEXT command"
-                    #            #position 4 is a space
-                     #           tempIP= ""
-                      #          for i in range(5, len(inboundString)):
-                       #             tempIP= tempIP + inboundString[i]
-                        #        self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
-                         #       print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
-                          #      return True
+                #if(inboundString[0:3] == "NEXT"):
+                 #   print "INFO: A Client has issued the NEXT command"
+                 #   #position 4 is a space
+                 #   tempIP= ""
+                 #   for i in range(5, len(inboundString)):
+                 #       tempIP= tempIP + inboundString[i]
+                  #  self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
+                  #  print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
+                  #  return True
+                if(inboundString[0]=="N"): #OLD METHOD
+                    if(inboundString[1]=="E"):
+                        if(inboundString[2]=="X"):
+                            if(inboundString[3]=="T"):
+                                print "A Client has issued the NEXT command"
+                                #position 4 is a space
+                                tempIP= ""
+                                for i in range(5, len(inboundString)):
+                                    tempIP= tempIP + inboundString[i]
+                                self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
+                                print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
+                                return True
                 else:
                     return False
             except Exception as inst:
