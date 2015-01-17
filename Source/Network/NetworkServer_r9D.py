@@ -8,6 +8,11 @@ __author__ = 'chris hamm'
     #A list of clients that are waiting for a reply
     #(In Progress) A list of what each client is currently working on
     #(in progress) A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
+    #dictionary that records how many times each command has been issued by the server
+        #-Outbound Commands from server to controller
+        #-Outbound Commands from server to client
+        #-Inbound Commands from Controller to server
+        #-Inbound Commands for Client to server
 #Added functions to parse chunk objects (Has now been decided that these will not be needed)
 #chunk object path: server-controller -> server (converted to string to be sent over network) -> client (convert back to chunk object) -> client-controller
 
@@ -32,7 +37,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
         dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
         dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
-    
+        recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
+        recordOfInboundCommandsFromControllerToServer = {} #dictionary that records how many times the server received a command from the controller
+        recordOfOutboundCommandsFromServerToClient = {} #dictionary that records how many times the server has issued a command to the client
+        recordOfInboundCommandsFromClientToServer = {} #dictionary that records how many times the server received a command from from the client(s)
 
         #--------------------------------------------------------------------------------
         #constructor
@@ -136,6 +144,22 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print inst.args #srguments stored in .args
                 print inst #_str_ allows args tto be printed directly
                 print "========================================================================================"
+
+            #..................................................................................
+            #Preset the dictionary counters
+            #..................................................................................
+            self.recordOfOutboundCommandsFromServerToController['nextChunk'] = 0
+            self.recordOfOutboundCommandsFromServerToController['chunkAgain'] = 0
+            self.recordOfOutboundCommandsFromServerToController['waiting'] = 0
+            self.recordOfOutboundCommandsFromServerToController['done'] = 0
+            self.recordOfOutboundCommandsFromServerToClient['DONE'] = 0
+            self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = 0
+            self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] = 0
+            self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = 0
+            self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = 0
+            self.recordOfInboundCommandsFromClientToServer['NEXT'] = 0
+            self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
+            self.recordOfInboundCommandsFromClientToServer['CRASHED'] = 0
 
             #..................................................................................
             #Start listening to socket
@@ -418,6 +442,122 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print inst.args #srguments stored in .args
                     print inst #_str_ allows args tto be printed directly
                     print "========================================================================================"
+                try:
+                    print " "
+                    print "COMMAND RECORDS: Part 1"
+                    print "Printing Record of OutBound Commands from Server to Controller"
+                    print "----------------------------------------------------------------"
+                    #print nextChunk records
+                    if(self.recordOfOutboundCommandsFromServerToController['nextChunk'] > 0):
+                        print "# of nextChunk Commands sent from Server to Controller: " + str(self.recordOfOutboundCommandsFromServerToController['nextChunk'])
+                    else:
+                        print "# of nextChunk Commands sent from Server to Controller: 0"
+                    #print chunkAgain records
+                    if(self.recordOfOutboundCommandsFromServerToController['chunkAgain'] > 0):
+                        print "# of chunkAgain Commands sent from Server to Controller: " + str(self.recordOfOutboundCommandsFromServerToController['chunkAgain'])
+                    else:
+                        print "# of chunkAgain Commands sent from Server to Controller: 0"
+                    #print waiting records
+                    if(self.recordOfOutboundCommandsFromServerToController['waiting'] > 0):
+                        print "# of waiting Commands sent from Server to Controller: " + str(self.recordOfOutboundCommandsFromServerToController['waiting'])
+                    else:
+                        print "# of waiting Commands sent from Server to Controller: 0"
+                    #print done records
+                    if(self.recordOfOutboundCommandsFromServerToController['done'] > 0):
+                        print "# of done Commands sent from Server to Controller: " + str(self.recordOfOutboundCommandsFromServerToController['done'])
+                    else:
+                        print "# of done Commands sent from Server to Controller: 0"
+                    print "(END OF RECORD OF OUTBOUND COMMANDS FROM SERVER TO CONTROLLER)"
+                    print "---------------------------------------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print Record of Outbound Commands from Server to Controller Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                try:
+                    print " "
+                    print "COMMAND RECORDS: Part 2"
+                    print "Printing Record of Outbound Commands from Server to Client(s)"
+                    print "------------------------------------------------------------"
+                    #print the DONE records
+                    if(self.recordOfOutboundCommandsFromServerToClient['DONE'] > 0):
+                        print "# of DONE Commands sent from Server to Client(s): " + str(self.recordOfOutboundCommandsFromServerToClient['DONE'])
+                    else:
+                        print "# of DONE Commands sent from Server to Client(s): 0"
+                    #print the nextChunk records
+                    if(self.recordOfOutboundCommandsFromServerToClient['nextChunk'] > 0):
+                        print "# of nextChunk Commands sent from Server to Client(s): " + str(self.recordOfOutboundCommandsFromServerToClient['nextChunk'])
+                    else:
+                        print "# of nextChunk Commands sent from Server to Client(s): 0"
+                    print "(END OF RECORD OF OUTBOUND COMMANDS FROM SERVER TO CLIENT"
+                    print "-----------------------------------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print Record of Outbound Commands from Server to Client(s) Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                try:
+                    print " "
+                    print "COMMAND RECORDS: Part 3"
+                    print "Printing Record of Inbound Commands from Controller to Server"
+                    print "--------------------------------------------------------------"
+                    #print the REPLY TO NEXT CHUNK
+                    if(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] > 0):
+                        print "# of REPLY TO NEXT CHUNK Commands received from Controller: " + str(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'])
+                    else:
+                        print "# of REPLY TO NEXT CHUNK Commands received from Controller: 0"
+                    #print the REPLY TO CHUNK AGAIN
+                    if(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] > 0):
+                        print "# of REPLY TO CHUNK AGAIN Commands received from Controller: " + str(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'])
+                    else:
+                        print "# of REPLY TO CHUNK AGAIN Commands received from Controller: 0"
+                    #print the REPLY TO DONE
+                    if(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] > 0):
+                        print "# of REPLY TO DONE Commands reeived from Controller: " + str(self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'])
+                    else:
+                        print "# of REPLY TO DONE Commands received from Controller: 0"
+                    print "(END OF RECORD OF INBOUND COMMANDS FROM THE CONTROLLER)"
+                    print "------------------------------------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print Record of Inbound Commands from Controller Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                try:
+                    print " "
+                    print "COMMANDS RECORDS: Part 4"
+                    print "Printing Inbound Commands from Client(s) to Server"
+                    print "----------------------------------------------------"
+                    #print NEXT
+                    if(self.recordOfInboundCommandsFromClientToServer['NEXT'] > 0):
+                        print "# of NEXT Commands received from Client(s): " + str(self.recordOfInboundCommandsFromClientToServer['NEXT'])
+                    else:
+                        print "# of NEXT Commands received from Client(s): 0"
+                    #print FOUNDSOLUTION
+                    if(self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] > 0):
+                        print "# of FOUNDSOLUTION Commands received from Client(s): " + str(self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'])
+                    else:
+                        print "# of FOUNDSOLUTION COmmands received from Client(s): 0"
+                    #print CRASHED
+                    if(self.recordOfInboundCommandsFromClientToServer['CRASHED'] > 0):
+                        print "# of CRASHED Commands received from Client(s): " + str(self.recordOfInboundCommandsFromClientToServer['CRASHED'])
+                    else:
+                        print "# of CRASHED Commands received from Client(s): 0"
+                    print "(END OF RECORD OF INBOUND COMMANDS FROM CLIENT(S))"
+                    print "------------------------------------------------------"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Finally Block, in the print Record of Inbound Commands from Client(s) Section"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
                 print " "
             #--------------------------------------------------------------------------------
             #End of Constructor Block
@@ -437,6 +577,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             try:
                 self.pipe.send("nextChunk") #+ clientMessage)
                 print "I/O: The NEXTCHUNK command was sent to the Controller"
+                #increment record counter
+                self.recordOfOutboundCommandsFromServerToController['nextChunk'] = (self.recordOfOutboundCommandsFromServerToController['nextChunk'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
@@ -454,6 +596,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             try:
                 self.pipe.send("chunkAgain")
                 print "I/O: The CHUNKAGAIN command was sent to the Controller"
+                #increment the record counter
+                self.recordOfOutboundCommandsFromServerToController['chunkAgain'] = (self.recordOfOutboundCommandsFromServerToController['chunkAgain'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
@@ -471,6 +615,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             try:
                 self.pipe.send("waiting")
                 print "I/O: The WAITING command was sent to the Controller"
+                #increment the record counter
+                self.recordOfOutboundCommandsFromServerToController['waiting'] = (self.recordOfOutboundCommandsFromServerToController['waiting'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
@@ -486,8 +632,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def sendDoneCommandToController(self, clientIP):
             try:
-                self.pipe.send("done " + clientIP)
+                self.pipe.send("done ") #+ clientIP)
                 print "I/O: The DONE command was sent to the Controller"
+                #increment the record counter
+                self.recordOfOutboundCommandsFromServerToController['done'] = (self.recordOfOutboundCommandsFromServerToController['done'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
@@ -502,7 +650,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #Inbound communication with controller
         #------------------------------------------------------------------------------
         #..............................................................................
-        #REPLY OT NEXTCHUNK
+        #REPLY TO NEXTCHUNK
         #..............................................................................
         def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
             try:
@@ -514,6 +662,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "I/O: NEXTCHUNK command was received from the controller class"
                     self.listOfControllerMessages.append(str(inboundString))
                     print "INFO: NEXTCHUNK command was added to the listOfControllerMessages"
+                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] + 1)
                     return True
                 # if(inboundString[0] == "N"): #OLD METHOD
                  #       if(inboundString[1] == "E"):
@@ -554,6 +703,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "I/O: CHUNKAGAIN command was received from the controller class"
                     self.listOfControllerMessages.append(str(inboundString))
                     print "INFO: CHUNKAGAIN command was added to the listOfControllerMessages"
+                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] + 1)
                     return True
                 else:
                     return False
@@ -582,12 +732,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print " -Need To Issue Done Command To All CLients at this point"
                     #print "STATUS: Issuing the DONE command to all clients..."
                     #for x in range(0, len(self.listOfClients))
+                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
                     return True
                 elif(inboundString[0:7] == "notFound"):
                     print "INFO: The Controller says that the key has no been found yet"
                     print " "
                     print "This Section of the code is NOT FINISHED YET"
                     print " -Need to tell client that no solution was found, request for the next chunk"
+                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
                     return True
                 else:
                     return False
@@ -623,10 +775,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #DONE
         #..............................................................................
-        def sendDoneCommandToClient(recipientsSocket, recipientIPAddress): #sends the DONE command to a client
+        def sendDoneCommandToClient(self,recipientsSocket, recipientIPAddress): #sends the DONE command to a client
             try:
                 recipientsSocket.sendto("DONE", recipientIPAddress)
                 print "I/O: The DONE command was issued to: " + str(recipientIPAddress)
+                #increment the record counter
+                self.recordOfOutboundCommandsFromServerToClient['DONE'] = (self.recordOfOutboundCommandsFromServerToClient['DONE'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
@@ -640,10 +794,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #next part in cracking problem
         #..............................................................................
-        def sendNextToClient(recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
+        def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
                 print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
+                #increment the record counter
+                self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
@@ -699,6 +855,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     tempIP= tempIP + inboundString[i]
                                 self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
                                 print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
+                                self.recordOfInboundCommandsFromClientToServer['NEXT'] = (self.recordOfInboundCommandsFromClientToServer['NEXT'] + 1)
                                 return True
                 else:
                     return False
@@ -725,6 +882,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         tempIP= tempIP + inboundString[i]
                     self.dictionaryOfClientsWaitingForAReply[tempIP] = "FOUNDSOLUTION"
                     print "INFO: Client (" + str(tempIP) + ") was added to the dictionaryOfClientsWaitingForAReply"
+                    self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
                     return True
                # if(inboundString[0]=="F"): #OLD METHOD
                 #    if(inboundString[1]=="O"):
@@ -804,6 +962,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     if(foundMatch == False):
                         print "WARNING: No Matching IP address was found in the list of clients"
                         print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+                    else:
+                        self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
                     return True
                 else:
                     return False
