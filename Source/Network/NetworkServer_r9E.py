@@ -203,7 +203,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "INFO: Received a message from a client."
                             if(self.checkForNextCommand(theInput)==True):
                                 print "INFO: NEXT command was received"
-                                self.sendNextChunkCommandToController(theInput)
+                                self.sendNextChunkCommandToController()
                                 #print "INFO: Sent the NextChunk Command to the Controller" #repetative print statement
                             elif(self.checkForFoundSolutionCommand(theInput)==True):
                                 print "INFO: FOUNDSOLUTION command was received"
@@ -239,7 +239,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #Determine what type of object the controller has sent the server
                             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                             if(type(recv) is Chunk):
-                                print "INFO: Received a Chunk Object From the Controller"
+                                print "I/O: Received a Chunk Object From the Controller"
                                 self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] = (self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] + 1)
                                 inputChunkParams = recv.params #copy the parameters from the received object to the inputChunk
                                 print "DEBUG: The recv.params: " + str(recv.params)
@@ -252,7 +252,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "-Need to begin to read information from the params lines"
                                 print " "
                             elif(type(recv) is str):
-                                print "INFO: Received a String Object From the Controller"
+                                print "I/O: Received a String Object From the Controller"
                                 if(self.checkForNextChunk(recv)==True):
                                     print "INFO: Received the reply to the NextChunk command"
                                 elif(self.checkForChunkAgain(recv)==True):
@@ -606,9 +606,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #nextChunk
         #..............................................................................
-        def sendNextChunkCommandToController(self, clientMessage):
+        def sendNextChunkCommandToController(self):
             try:
-                self.pipe.send("nextChunk") #+ clientMessage)
+                self.pipe.send("nextChunk")
                 print "I/O: The NEXTCHUNK command was sent to the Controller"
                 #increment record counter
                 self.recordOfOutboundCommandsFromServerToController['nextChunk'] = (self.recordOfOutboundCommandsFromServerToController['nextChunk'] + 1)
@@ -663,9 +663,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         #done
         #..............................................................................
-        def sendDoneCommandToController(self, clientIP):
+        def sendDoneCommandToController(self):
             try:
-                self.pipe.send("done ") #+ clientIP)
+                self.pipe.send("done ")
                 print "I/O: The DONE command was sent to the Controller"
                 #increment the record counter
                 self.recordOfOutboundCommandsFromServerToController['done'] = (self.recordOfOutboundCommandsFromServerToController['done'] + 1)
@@ -843,23 +843,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
-        #..............................................................................
-        #INVALIDCOMMAND (No longer used, Error is thrown instead)
-        #..............................................................................
-        '''def sendInvalidCommandToClient(recipientsSocket, recipientIPAddress): #send the INVALIDCOMMAND String to the client
-            try:
-                recipientsSocket.sendto("INVALIDCOMMAND", recipientIPAddress)
-                print "The INVALIDINPUT command was issued to: " + str(recipientIPAddress)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the SServer-Client Outbound sendInvalidCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "=============================================================================================" '''
         #------------------------------------------------------------------------------
         #Inbound communication functions
         #------------------------------------------------------------------------------
@@ -868,15 +851,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
-                #if(inboundString[0:3] == "NEXT"):
-                 #   print "INFO: A Client has issued the NEXT command"
-                 #   #position 4 is a space
-                 #   tempIP= ""
-                 #   for i in range(5, len(inboundString)):
-                 #       tempIP= tempIP + inboundString[i]
-                  #  self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
-                  #  print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
-                  #  return True
                 if(inboundString[0]=="N"): #OLD METHOD
                     if(inboundString[1]=="E"):
                         if(inboundString[2]=="X"):
@@ -958,105 +932,107 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 if(len(inboundString) < 1):
                     print "INFO: Empty Crashed Message Received."
                     return False
-                if(inboundString[0:6] == "CRASHED"):
-                    tempCrashIP = ""
+               # if(inboundString[0:6] == "CRASHED"): #NEW DETECTION SYSTEM, VERY FAULTY
+                #    tempCrashIP = ""
                     #position 7 is a space between the ip address and the crashed message
-                    for i in range(8, len(inboundString)):
-                        if(inboundString[i].isalpha()):
-                            print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
-                            break
-                        else:
-                            tempCrashIP = tempCrashIP + inboundString[i]
-                    if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
-                        return False
-                    print "WARNING: A Client has issued the CRASHED command"
-                    print "The Crashed Client IP: " + tempCrashIP
-                    self.listOfCrashedClients.append(tempCrashIP)
-                    print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
+                #    for i in range(8, len(inboundString)):
+                #        if(inboundString[i].isalpha()):
+                 #           print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
+                  #          break
+                  #      else:
+                  #          tempCrashIP = tempCrashIP + inboundString[i]
+                  #  if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
+                  #      return False
+                  #  print "WARNING: A Client has issued the CRASHED command"
+                  #  print "The Crashed Client IP: " + tempCrashIP
+                   # self.listOfCrashedClients.append(tempCrashIP)
+                  #  print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
                     #look through listOfConnected clients and find the matching ip address
-                    print "STATUS: Looking for matching IP address in list of clients..."
-                    foundMatch= False
-                    tempAddr2= ""
-                    for index in range(0, len(self.listOfClients)):
-                        tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                        print "STATUS: Copying list of clients' IP Address to a new string"
-                        tempAddr2= str(tempAddr[0])
-                        print "STATUS: Comparing IP Addresses..."
-                        if(tempCrashIP == tempAddr2):
-                            print "INFO: Matching IP address was found in the list of clients"
-                            #print "DEBUG: tempAddr=" + str(tempAddr)
-                            del self.listOfClients[index]
-                            print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
-                            foundMatch= True
-                            break
-                        else:
-                            print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
+                  #  print "STATUS: Looking for matching IP address in list of clients..."
+                  #  foundMatch= False
+                   # tempAddr2= ""
+                   # for index in range(0, len(self.listOfClients)):
+                    #    tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
+                    #    print "STATUS: Copying list of clients' IP Address to a new string"
+                     #   tempAddr2= str(tempAddr[0])
+                      #  print "STATUS: Comparing IP Addresses..."
+                       # if(tempCrashIP == tempAddr2):
+                        #    print "INFO: Matching IP address was found in the list of clients"
+                        #    #print "DEBUG: tempAddr=" + str(tempAddr)
+                        #    del self.listOfClients[index]
+                         #   print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
+                         #   foundMatch= True
+                          #  break
+                       # else:
+                        #    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
 
-                    if(foundMatch == False):
-                        print "WARNING: No Matching IP address was found in the list of clients"
-                        print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+              #      if(foundMatch == False):
+               #         print "WARNING: No Matching IP address was found in the list of clients"
+                #        print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+                 #   else:
+                  #      self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
+                   # return True
+               # else:
+                #    return False
+                if(inboundString[0]=="C"): #OLD METHOD
+                    if(inboundString[1]=="R"):
+                        if(inboundString[2]=="A"):
+                            if(inboundString[3]=="S"):
+                                if(inboundString[4]=="H"):
+                                    if(inboundString[5]=="E"):
+                                        if(inboundString[6]=="D"):
+                                            tempCrashIP = ""
+                                            #position 7 is a space between the ip address and the crashed message
+                                            for i in range(8, len(inboundString)):
+                                                if(inboundString[i].isalpha()):
+                                                    print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
+                                                    break
+                                                else:
+                                                    tempCrashIP = tempCrashIP + inboundString[i]
+                                            if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
+                                                return False
+                                            print "WARNING: A Client has issued the CRASHED command"
+                                            print "The Crashed Client IP: " + tempCrashIP
+                                            self.listOfCrashedClients.append(tempCrashIP)
+                                            print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
+                                            #look through listOfConnected clients and find the matching ip address
+                                            print "STATUS: Looking for matching IP address in list of clients..."
+                                            foundMatch= False
+                                            tempAddr2= ""
+                                            for index in range(0, len(self.listOfClients)):
+                                                tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
+                                                print "STATUS: Copying list of clients' IP Address to a new string"
+                                                tempAddr2= str(tempAddr[0])
+                                                print "STATUS: Comparing IP Addresses..."
+                                                if(tempCrashIP == tempAddr2):
+                                                    print "INFO: Matching IP address was found in the list of clients"
+                                                    #print "DEBUG: tempAddr=" + str(tempAddr)
+                                                    del self.listOfClients[index]
+                                                    print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
+                                                    foundMatch= True
+                                                    self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
+                                                    break
+                                                else:
+                                                    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
+
+                                            if(foundMatch == False):
+                                                print "WARNING: No Matching IP address was found in the list of clients"
+                                                print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+                                            return True
+                                        else:
+                                            return False
+                                    else:
+                                        return False
+                                else:
+                                    return False
+                            else:
+                                return False
+                        else:
+                            return False
                     else:
-                        self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
-                    return True
+                        return False
                 else:
-                    return False
-                #if(inboundString[0]=="C"): #OLD METHOD
-                 #   if(inboundString[1]=="R"):
-                  #      if(inboundString[2]=="A"):
-                   #         if(inboundString[3]=="S"):
-                     #           if(inboundString[4]=="H"):
-                    #                if(inboundString[5]=="E"):
-                      #                  if(inboundString[6]=="D"):
-                       #                     tempCrashIP = ""
-                        #                    #position 7 is a space between the ip address and the crashed message
-                         #                   for i in range(8, len(inboundString)):
-                          #                      if(inboundString[i].isalpha()):
-                           #                         print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
-                            #                        break
-                             #                   else:
-                              #                      tempCrashIP = tempCrashIP + inboundString[i]
-                               #             if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
-                                #                return False
-                                 #           print "WARNING: A Client has issued the CRASHED command"
-                                  #          print "The Crashed Client IP: " + tempCrashIP
-                                   #         self.listOfCrashedClients.append(tempCrashIP)
-                                    #        print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
-                                     #       #look through listOfConnected clients and find the matching ip address
-                                      #      print "STATUS: Looking for matching IP address in list of clients..."
-                                       #     foundMatch= False
-                                        #    tempAddr2= ""
-                                         #   for index in range(0, len(self.listOfClients)):
-                                          #      tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                                           #     print "STATUS: Copying list of clients' IP Address to a new string"
-                                            #    tempAddr2= str(tempAddr[0])
-                                             #   print "STATUS: Comparing IP Addresses..."
-                                              #  if(tempCrashIP == tempAddr2):
-                                               #     print "INFO: Matching IP address was found in the list of clients"
-                                                #    #print "DEBUG: tempAddr=" + str(tempAddr)
-                                                 #   del self.listOfClients[index]
-                                                  #  print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
-                                                   # foundMatch= True
-                                                    #break
-                                          #      else:
-                                           #         print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
-#
- #                                           if(foundMatch == False):
-  #                                              print "WARNING: No Matching IP address was found in the list of clients"
-   #                                             print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
-    #                                        return True
-     #                                   else:
-      #                                      return False
-       #                             else:
-        #                                return False
-         #                       else:
-          #                          return False
-           #                 else:
-            #                    return False
-             #           else:
-              #              return False
-               #     else:
-                #else:
-                  #  return False
+                  return False
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
