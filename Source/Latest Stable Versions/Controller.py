@@ -233,11 +233,15 @@ class Controller():
                         #If the server says we're done
                         if rec == "done":
 
+                            self.controllerPipe.send("done")
+
                             #Exit our loop and go to next screen
                             done = True
 
                         #If the server says we're connected (or still connected)
                         elif rec == "connected":
+
+                            self.controllerPipe.send("connected")
 
                             #Clear the screen and re-draw
                             os.system('cls' if os.name == 'nt' else 'clear')
@@ -246,6 +250,8 @@ class Controller():
 
                         #If the server says we're doing stuff
                         elif rec == "doingStuff":
+
+                            self.controllerPipe.send("doingStuff")
 
                             #Clear the screen and re-draw
                             os.system('cls' if os.name == 'nt' else 'clear')
@@ -759,6 +765,8 @@ class Controller():
                             #chunk is a Chunk object
                             chunk = self.dictionary.getNextChunk()
 
+                            self.controllerPipe.send("nextChunk")
+
                             self.controllerPipe.send(chunk)
 
                         #If the server needs a chunk again
@@ -770,17 +778,23 @@ class Controller():
                             #Get the chunk again (again a Chunk object)
                             chunk = self.dictionary.getThisChunk(params)
 
+                            self.controllerPipe.send("chunkAgain")
+
                             #Send the chunk again
                             self.controllerPipe.send(chunk)
 
                         #if the server is waiting for nodes to finish
                         elif rec == "waiting":
 
+                            self.controllerPipe.send("waiting")
+
                             #Placeholder
                             chrisHamm = True
 
                         #If the server has a key
                         elif rec == "found":
+
+                            self.controllerPipe.send("found")
 
                             #Get the key
                             key = self.controllerPipe.recv()
