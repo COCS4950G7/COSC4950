@@ -1,7 +1,8 @@
 #   Chunk.py
 
 #   Defines a general chunk object to be used
-#   with Controller, Networks, and Attack Method classes
+#   with Controller, Networks, and Attack Method classes.
+#   Basically, it's an object that holds two strings (params and data).
 
 
 class Chunk():

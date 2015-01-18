@@ -67,7 +67,7 @@ class Controller():
         #If we didn't get the argument "-c" in command-line
         #if not args.pop() == "-c":
 
-         #   x=2 #Placeholder
+            #x=2 #Placeholder
             #run in standard GUI mode
             #GUI.GUI()
 
@@ -233,22 +233,25 @@ class Controller():
                     #If the server says we're done
                     if rec == "done":
 
+                        self.controllerPipe.send("done")
+
                         #Exit our loop and go to next screen
                         done = True
 
                     #If the server says we're connected (or still connected)
                     elif rec == "connected":
 
+                        self.controllerPipe.send("connected")
+
                         #Clear the screen and re-draw
                         os.system('cls' if os.name == 'nt' else 'clear')
                         print "============="
                         print "nodeConnectedToScreen"
 
-                        #First command that requests
-                        self.controllerPipe.send("next")
-
                     #If the server says we're doing stuff
                     elif rec == "doingStuff":
+
+                        self.controllerPipe.send("doingStuff")
 
                         #Clear the screen and re-draw
                         os.system('cls' if os.name == 'nt' else 'clear')
@@ -346,7 +349,6 @@ class Controller():
             elif state == "serverStartScreen":
 
                 #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "serverStartScreen"
                 print
@@ -360,42 +362,31 @@ class Controller():
                 userInput = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"bruteForce", "rainbowMake", "rainbowUser", "dictionary", "back", "Back", "Exit", "exit"}
+                goodNames = {"bruteForce", "brute", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "back", "Back", "Exit", "exit"}
                 while not userInput in goodNames:
 
                     print "Input Error!"
 
-                if userInput == "bruteForce":
+                    userInput = raw_input("Try Again: ")
 
-                    ###GUI.setState("serverBruteForceScreen")
+                if userInput in ("bruteForce", "brute"):
+
                     self.state = "serverBruteForceScreen"
 
-                    #get info from GUI and pass to Brute_Force class
+                elif userInput in ("rainbowMake", "make"):
 
-                elif userInput == "rainbowMake":
-
-                    ###GUI.setState("serverRainMakerScreen")
                     self.state = "serverRainMakerScreen"
 
-                    #get info from GUI and pass to Rainbow Maker class
+                elif userInput in ("rainbowUser", "use"):
 
-                elif userInput == "rainbowUser":
-
-                    ###GUI.setState("serverRainUserScreen")
                     self.state = "serverRainUserScreen"
 
-                    #get info from GUI and pass to Rainbow User class
+                elif userInput in ("dictionary", "dic"):
 
-                elif userInput == "dictionary":
-
-                    ###GUI.setState("serverDictionaryScreen")
                     self.state = "serverDictionaryScreen"
 
-                    #get info from GUI and pass to Dictionary class
+                elif userInput in ("back", "Back"):
 
-                elif userInput == "back":
-
-                    ###GUI.setState("startScreen")
                     self.state = "startScreen"
 
                 else:
@@ -652,7 +643,7 @@ class Controller():
             elif state == "serverDictionaryScreen":
 
                 #Start up the networkServer class (as sub-process in the background)
-                #self.networkServer.start()
+                self.networkServer.start()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -733,9 +724,6 @@ class Controller():
                 print "============="
                 print "serverDictionarySearchingScreen"
 
-                #Start up the networkServer class (as sub-process in the background)
-                self.networkServer.start()
-
                 self.clock = time()
 
                 #Have another dictionary (ie server-size) that chunks the data
@@ -775,7 +763,9 @@ class Controller():
                     if rec == "nextChunk":
 
                         #chunk is a Chunk object
-                        chunk = self.dictionary.getNextChunk2()
+                        chunk = self.dictionary.getNextChunk()
+
+                        self.controllerPipe.send("nextChunk")
 
                         self.controllerPipe.send(chunk)
 
@@ -786,7 +776,9 @@ class Controller():
                         params = self.controllerPipe.recv()
 
                         #Get the chunk again (again a Chunk object)
-                        chunk = self.dictionary.getThisChunk2(params)
+                        chunk = self.dictionary.getThisChunk(params)
+
+                        self.controllerPipe.send("chunkAgain")
 
                         #Send the chunk again
                         self.controllerPipe.send(chunk)
@@ -794,17 +786,23 @@ class Controller():
                     #if the server is waiting for nodes to finish
                     elif rec == "waiting":
 
+                        self.controllerPipe.send("waiting")
+
                         #Placeholder
                         chrisHamm = True
 
                     #If the server has a key
                     elif rec == "found":
 
+                        self.controllerPipe.send("found")
+
                         #Get the key
                         key = self.controllerPipe.recv()
 
                         #This will help for error checking later, though for now not so much
-                        isFound = self.dictionary.isKey2(key)
+                        #isFound = self.dictionary.isKey(key)
+
+                        self.dictionary.setKey(key)
 
                 elapsed = (time() - self.clock)
                 self.clock = elapsed

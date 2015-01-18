@@ -11,6 +11,7 @@ import time
 from multiprocessing import Process, Pipe, Lock
 import os
 import string
+import Chunk
 
 class RainbowMaker():
 
@@ -351,20 +352,20 @@ class RainbowMaker():
         #Open the file for writing
         self.file = open(self.fileName, 'w')
 
-        self.file.write(self.algorithm
-                        + " " + self.numChars
-                        + " " + self.alphabetChoice
-                        + " " + str(self.width) + "\n")
+        self.file.write(self.algorithm + " " + str(self.numChars) + " " + self.alphabetChoice + " " + str(self.width) + "\n")
 
         self.fileLocation = self.file.tell()
 
         self.file.close()
 
 
-    #Gives processes chunk back to server to be put in the file
-    def giveChunk(self, chunkOfDone):
+    #Puts a done chunk (already processed by a node) into the table (file)
+    def putChunkInFile(self, chunkOfDone):
 
         #put chunkOfDone in our file
+
+        #Split chunkOfDone's data into a list
+        linesList = chunkOfDone.data.split
 
         #Open the file for writing
         self.file = open(self.fileName, 'r+')
@@ -372,7 +373,7 @@ class RainbowMaker():
         #Seek to where we left off in the file
         self.file.seek(self.fileLocation)
 
-        for x in chunkOfDone:
+        for x in linesList:
 
             #print to file
             self.file.write(x)
