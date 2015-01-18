@@ -643,7 +643,7 @@ class Controller():
             elif state == "serverDictionaryScreen":
 
                 #Start up the networkServer class (as sub-process in the background)
-                self.networkServer.start()
+                #self.networkServer.start()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -719,6 +719,9 @@ class Controller():
 
             #if we're at the singleDictionarySearchingScreen state (Screen)
             elif state == "serverDictionarySearchingScreen":
+
+                #Start up the networkServer class (as sub-process in the background)
+                self.networkServer.start()
 
                 #display results and wait for user interaction
                 print "============="
