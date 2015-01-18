@@ -690,7 +690,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "STATUS: Checking to see if inboundString is the next part of problem..."
                 if(len(inboundString) < 1):
                     return False
-                if(inboundString[0:8] == "NEXTCHUNK"):
+                if inboundString == "nextChunk":
                     #position 9 will be a space
                     print "I/O: NEXTCHUNK command was received from the controller class"
                     self.listOfControllerMessages.append(str(inboundString))
