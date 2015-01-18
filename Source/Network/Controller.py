@@ -271,7 +271,7 @@ class Controller():
 
                             #This is the client's dictionary class,
                             #   and this is where it searches (will be unresponsive during search)
-                            self.dictionary.find2(chunk)
+                            self.dictionary.find(chunk)
 
                             #If it's found something
                             if self.dictionary.isFound():
@@ -1418,7 +1418,7 @@ class Controller():
                 dictionary2 = Dictionary.Dictionary()
 
                 #Give new dictionary (node) info it needs through a string (sent over network)
-                dictionary2.setVariables(self.dictionary.serverString())
+                #dictionary2.setVariables(self.dictionary.serverString())
 
                 #Stuff for those pretty status pictures stuff
                 starCounter = 0
@@ -1441,11 +1441,11 @@ class Controller():
                         whiteL = whiteL + " "
                         whiteR = whiteR[:-1]
 
-                    #Serve up the next chunk from the server-side dictionary class
-                    chunkList = self.dictionary.getNextChunk()
+                    #Serve up the next chunk
+                    chunk = self.dictionary.getNextChunk()
 
                     #and process it using the node-side client
-                    dictionary2.find(chunkList)
+                    dictionary2.find(chunk)
 
                 elapsed = (time() - self.clock)
                 self.clock = elapsed
