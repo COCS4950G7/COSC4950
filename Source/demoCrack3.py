@@ -17,7 +17,7 @@
 #   10/13/14
 #       ->  Now runs on Windows systems
 #           Put another lock on subprocess progress display to solve overwriting on Windows
-#           (Latest Stable Versions)
+#           (Latest_Stable_Versions)
 
 #   10/24/2013
 #       Replaced the hashing code with an optimized version, showing around 17% speedup.
@@ -222,7 +222,7 @@ class DemoCrack():
 
         for x in alphabet:
 
-            #Processes were overwriting, so locking this print too --Latest Stable Versions
+            #Processes were overwriting, so locking this print too --Latest_Stable_Versions
             lock.acquire()
 
             print "Searching ...", x, "*****"

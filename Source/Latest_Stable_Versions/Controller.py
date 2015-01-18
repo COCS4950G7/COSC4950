@@ -7,13 +7,13 @@
 #   Chris Bugg
 #   10/7/14
 
-#   Update - 10/11/14 (Latest Stable Versions)
+#   Update - 10/11/14 (Latest_Stable_Versions)
 #               -> Main layout is complete, just needs more actual methods
 #               ->  from supporting classes.
 
 #   NOTE: Diagrams of the layout (approximate names) are at bottom of file
 
-#   Update - 10/30/14 (Latest Stable Versions)
+#   Update - 10/30/14 (Latest_Stable_Versions)
 #               -> Works in Console-only mode with Dictionary class (single-user only)
 #                   -> use "-c" argument to activate console-only mode
 #               -> More friendly UI, W/TIMER, AND STATUS BAR!!!!!
@@ -1543,7 +1543,7 @@ Controller()
 
 
 ''''
-Two versions of a diagram grouped differently--Latest Stable Versions
+Two versions of a diagram grouped differently--Latest_Stable_Versions
 
 startScreen
 
