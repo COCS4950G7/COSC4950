@@ -33,7 +33,7 @@ import hashlib
 import time
 from multiprocessing import Process, Pipe, Lock
 import os
-import Chunk
+from Source.Latest_Stable_Versions.Chunk import Chunk
 import random
 
 class Dictionary():

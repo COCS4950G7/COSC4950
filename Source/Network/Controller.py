@@ -24,38 +24,38 @@
 from time import time
 import sys
 import os
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe
 
 #import GUI
-#import RainbowMaker
-import Dictionary
-#import Brute_Force
-import NetworkClient_r9E
-import NetworkServer_r9E
-import Chunk
+
+from Source.Latest_Stable_Versions.Dictionary import Dictionary
+from Source.Latest_Stable_Versions.Brute_Force import Brute_Force
+from Source.Network.NetworkClient_r9E import NetworkClient
+from Source.Network.NetworkServer_r9E import NetworkServer
+from Source.Latest_Stable_Versions.Chunk import Chunk
+from Source.Latest_Stable_Versions.RainbowMaker import RainbowMaker
+
 
 class Controller():
 
     #Class variables
     done = False
-    #rainbowMaker = RainbowMaker.RainbowMaker()
-    #rainbowUser = RainbowUser.RainbowUser()
-    dictionary = Dictionary.Dictionary()
-    #brute_force = Brute_Force.Brute_Force()
+    rainbowMaker = RainbowMaker()
+    #rainbowUser = RainbowUser()
+    dictionary = Dictionary()
+    #brute_force = Brute_Force()
 
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer_r9E.NetworkServer, args=(networkPipe,))
-    #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
-    networkClient = Process(target=NetworkClient_r9E.NetworkClient, args=(networkPipe,))
+    networkServer = Process(target=NetworkServer, args=(networkPipe,))
+    networkClient = Process(target=NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
     serverIP = "127.0.1.1"
 
     #tempGUI Variables
     state = "startScreen"
-    #userInput = ""
 
     #Constructor
     def __init__(self):
@@ -67,7 +67,7 @@ class Controller():
         #If we didn't get the argument "-c" in command-line
         #if not args.pop() == "-c":
 
-            #x=2 #Placeholder
+         #   x=2 #Placeholder
             #run in standard GUI mode
             #GUI.GUI()
 
@@ -643,7 +643,7 @@ class Controller():
             elif state == "serverDictionaryScreen":
 
                 #Start up the networkServer class (as sub-process in the background)
-                #self.networkServer.start()
+                self.networkServer.start()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -719,9 +719,6 @@ class Controller():
 
             #if we're at the singleDictionarySearchingScreen state (Screen)
             elif state == "serverDictionarySearchingScreen":
-
-                #Start up the networkServer class (as sub-process in the background)
-                self.networkServer.start()
 
                 #display results and wait for user interaction
                 print "============="
@@ -1245,7 +1242,7 @@ class Controller():
 
                 #Have one ranbowMaker (ie server-size) that chunks the data
                 #   So you don't have to send the whole file to every node
-                rainbowMaker2 = RainbowMaker.RainbowMaker()
+                rainbowMaker2 = RainbowMaker()
 
                 #Give new rainbowMaker (node) info it needs through a string (sent over network)
                 rainbowMaker2.setVariables(self.rainbowMaker.serverString())
@@ -1415,7 +1412,7 @@ class Controller():
 
                 #Have another dictionary (ie server-size) that chunks the data
                 #   So you don't have to send the whole file to every node
-                dictionary2 = Dictionary.Dictionary()
+                dictionary2 = Dictionary()
 
                 #Give new dictionary (node) info it needs through a string (sent over network)
                 #dictionary2.setVariables(self.dictionary.serverString())

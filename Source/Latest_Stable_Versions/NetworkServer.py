@@ -18,7 +18,7 @@ __author__ = 'chris hamm'
 
 import socket
 import platform
-import Chunk
+from Source.Latest_Stable_Versions.Chunk import Chunk
 #=================================================================================================
 #SERVER CONSTRUCTOR/CLASS DEFINITION
 #=================================================================================================

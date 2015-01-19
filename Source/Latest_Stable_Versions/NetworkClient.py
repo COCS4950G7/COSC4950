@@ -11,7 +11,7 @@ __author__ = 'chris hamm'
 
 import socket
 import platform
-import Chunk
+from Source.Latest_Stable_Versions.Chunk import Chunk
 
 #===================================================================
 #Client constructor/class definition

@@ -11,7 +11,8 @@ import time
 from multiprocessing import Process, Pipe, Lock
 import os
 import string
-import Chunk
+
+from Source.Latest_Stable_Versions.Chunk import Chunk
 
 class RainbowMaker():
 

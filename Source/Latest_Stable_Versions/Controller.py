@@ -24,38 +24,38 @@
 from time import time
 import sys
 import os
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe
 
 #import GUI
-#import RainbowMaker
-import Dictionary
-#import Brute_Force
-import NetworkClient
-import NetworkServer
-import Chunk
+
+from Source.Latest_Stable_Versions.Dictionary import Dictionary
+from Source.Latest_Stable_Versions.Brute_Force import Brute_Force
+from Source.Latest_Stable_Versions.NetworkClient import NetworkClient
+from Source.Latest_Stable_Versions.NetworkServer import NetworkServer
+from Source.Latest_Stable_Versions.Chunk import Chunk
+from Source.Latest_Stable_Versions.RainbowMaker import RainbowMaker
+
 
 class Controller():
 
     #Class variables
     done = False
-    #rainbowMaker = RainbowMaker.RainbowMaker()
+    rainbowMaker = RainbowMaker()
     #rainbowUser = RainbowUser.RainbowUser()
-    dictionary = Dictionary.Dictionary()
-    #brute_force = Brute_Force.Brute_Force()
+    dictionary = Dictionary()
+    #brute_force = Brute_Force()
 
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer.NetworkServer, args=(networkPipe,))
-    #networkClient = Process(target=NetworkClient.NetworkClient(networkPipe))
-    networkClient = Process(target=NetworkClient.NetworkClient, args=(networkPipe,))
+    networkServer = Process(target=NetworkServer, args=(networkPipe,))
+    networkClient = Process(target=NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
     serverIP = "127.0.1.1"
 
     #tempGUI Variables
     state = "startScreen"
-    #userInput = ""
 
     #Constructor
     def __init__(self):
@@ -1242,7 +1242,7 @@ class Controller():
 
                     #Have one ranbowMaker (ie server-size) that chunks the data
                     #   So you don't have to send the whole file to every node
-                    rainbowMaker2 = RainbowMaker.RainbowMaker()
+                    rainbowMaker2 = RainbowMaker()
 
                     #Give new rainbowMaker (node) info it needs through a string (sent over network)
                     rainbowMaker2.setVariables(self.rainbowMaker.serverString())
@@ -1412,7 +1412,7 @@ class Controller():
 
                     #Have another dictionary (ie server-size) that chunks the data
                     #   So you don't have to send the whole file to every node
-                    dictionary2 = Dictionary.Dictionary()
+                    dictionary2 = Dictionary()
 
                     #Give new dictionary (node) info it needs through a string (sent over network)
                     #dictionary2.setVariables(self.dictionary.serverString())
