@@ -11,7 +11,7 @@ __author__ = 'chris hamm'
 
 import socket
 import platform
-from Source.Latest_Stable_Versions.Chunk import Chunk
+from Chunk import Chunk
 
 #===================================================================
 #Client constructor/class definition
@@ -27,7 +27,7 @@ class NetworkClient():
     serverIP = "127.0.1.1"
     myOperatingSystem = None
     myIPAddress = "127.0.1.1"
-    chunk = Chunk.Chunk()
+    chunk = Chunk()
     key = 0
     recordOfOutboundCommandsFromClientToController = {} #dictionary that keeps a record of how many commands were sent to the controller
     recordOfOutboundCommandsFromClientToServer = {} #dictionary that keeps a record of how many commands were sent to the server

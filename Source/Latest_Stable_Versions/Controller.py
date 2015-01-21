@@ -28,12 +28,12 @@ from multiprocessing import Process, Pipe
 
 #import GUI
 
-from Source.Latest_Stable_Versions.Dictionary import Dictionary
-from Source.Latest_Stable_Versions.Brute_Force import Brute_Force
-from Source.Latest_Stable_Versions.NetworkClient import NetworkClient
-from Source.Latest_Stable_Versions.NetworkServer import NetworkServer
-from Source.Latest_Stable_Versions.Chunk import Chunk
-from Source.Latest_Stable_Versions.RainbowMaker import RainbowMaker
+from Chunk import Chunk
+from Dictionary import Dictionary
+#from Brute_Force import Brute_Force
+from NetworkClient import NetworkClient
+from NetworkServer import NetworkServer
+from RainbowMaker import RainbowMaker
 
 
 class Controller():
@@ -643,7 +643,7 @@ class Controller():
                 elif state == "serverDictionaryScreen":
 
                     #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer.start()
+                    #self.networkServer.start()
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
@@ -723,6 +723,9 @@ class Controller():
                     #display results and wait for user interaction
                     print "============="
                     print "serverDictionarySearchingScreen"
+
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkServer.start()
 
                     self.clock = time()
 
