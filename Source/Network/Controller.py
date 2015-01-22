@@ -66,1825 +66,1825 @@ class Controller():
         clock = 0
 
         #If we didn't get the argument "-c" in command-line
-        if not args.pop() == "-c":
+        #if not args.pop() == "-c":
 
-            x=2 #Placeholder
+         #   x=2 #Placeholder
             #run in standard GUI mode
             #GUI.GUI()
 
         #if we did get the argument "-c" in command-line
-        else:
+        #else:
 
-            #Loop till we're done
-            while not self.done:
+        #Loop till we're done
+        while not self.done:
 
-                #Get current screen
-                state = self.state
+            #Get current screen
+            state = self.state
 
-                #Clear the screen and re-draw
-                os.system('cls' if os.name == 'nt' else 'clear')
+            #Clear the screen and re-draw
+            os.system('cls' if os.name == 'nt' else 'clear')
 
-                #run in console-only mode
-                print "...Console-Only Mode..."
+            #run in console-only mode
+            print "...Console-Only Mode..."
 
-                #Lots of if statements
+            #Lots of if statements
 
-                #############################################
-                #############################################
-                #if we're at the start state
-                if state == "startScreen":
+            #############################################
+            #############################################
+            #if we're at the start state
+            if state == "startScreen":
 
-                    #What did the user pick? (Node, Server, Single, Exit)
-                    print "============="
-                    print "startScreen"
-                    print
-                    print "(Node)"
-                    print "(Server)"
-                    print "(Single)"
-                    print
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                #What did the user pick? (Node, Server, Single, Exit)
+                print "============="
+                print "startScreen"
+                print
+                print "(Node)"
+                print "(Server)"
+                print "(Single)"
+                print
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
 
-                    #Sterolize inputs
-                    goodNames = {"Node", "node", "Server", "server", "Single", "single", "Exit", "exit"}
-                    while not userInput in goodNames:
+                #Sterolize inputs
+                goodNames = {"Node", "node", "Server", "server", "Single", "single", "Exit", "exit"}
+                while not userInput in goodNames:
 
-                        print "Input Error!"
+                    print "Input Error!"
 
-                        userInput = raw_input("Try Again: ")
+                    userInput = raw_input("Try Again: ")
 
-                    #If user picks Node, tell GUI to go to Node start screen
-                    if userInput in ("Node", "node"):
+                #If user picks Node, tell GUI to go to Node start screen
+                if userInput in ("Node", "node"):
 
-                        self.state = "nodeStartScreen"
-
-                    elif userInput in ("Server", "server"):
-
-                        self.state = "serverStartScreen"
-
-                    elif userInput in ("single", "Single"):
-
-                        self.state = "singleStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ##################################################################################
-                ###################################### NODE ######################################
-                ################################################################################## vvv
-
-                #############################################
-                #############################################
-                #if we're at the node start state (Screen)
-                elif state == "nodeStartScreen":
-
-                    #What did the user pick? (Be a node, Back, Exit)
-                    print "============="
-                    print "nodeStartScreen"
-                    print
-
-                    #Get the server's IP:
-                    self.serverIP = raw_input("What's the server's IP: ")
-
-                    print "Ready?"
-                    print "(Node)"
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Node", "node", "back", "Back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Node", "node"):
-
-                        self.state = "nodeConnectingScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "startScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the node connecting... state (Screen)
-                elif state == "nodeConnectingScreen":
-
-                    #Start up the networkServer class (as sub-process in the background)
-                    #self.networkClient = Process(target=NetworkClient.NetworkClient(self.networkPipe))
-                    self.networkClient.start()
-
-                    #What did the user pick? (Be a Node, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "nodeConnectingScreen"
-                    print
-
-                    #userInput = raw_input("Choice: ")
-
-                    #wait for server connection
-                    #then switch to nodeConnectedToScreen
-
-                    #Send the server IP over the pipe to network class
-                    self.controllerPipe.send(self.serverIP)
-
-                    #Get response from network class, (looking for "connected")
-                    rec = self.controllerPipe.recv()
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    #While not connected, print a "connecting" bar
-                    while not rec == "connected":
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Connecting--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                    #Got connected, so switch screens
-                    self.state = "nodeConnectedToScreen"
-
-                #############################################
-                #############################################
-                #if we're at the node connected state (Screen)
-                elif state == "nodeConnectedToScreen":
-
-                    #First command that requests
-                    self.controllerPipe.send("next")
-
-                    done = False
-
-                    #While the current job is not done
-                    while not done:
-
-                        #Receive the next (or first) command
-                        rec = self.controllerPipe.recv()
-
-                        #If the server says we're done
-                        if rec == "done":
-
-                            self.controllerPipe.send("done")
-
-                            #Exit our loop and go to next screen
-                            done = True
-
-                        #If the server says we're connected (or still connected)
-                        elif rec == "connected":
-
-                            self.controllerPipe.send("connected")
-
-                            #Clear the screen and re-draw
-                            os.system('cls' if os.name == 'nt' else 'clear')
-                            print "============="
-                            print "nodeConnectedToScreen"
-
-                        #If the server says we're doing stuff
-                        elif rec == "doingStuff":
-
-                            self.controllerPipe.send("doingStuff")
-
-                            #Clear the screen and re-draw
-                            os.system('cls' if os.name == 'nt' else 'clear')
-                            print "============="
-                            print "nodeDoingStuffScreen"
-
-                            #'chunk' is an object that has attributes 'params' and 'data' (both are strings for network passing)
-
-                            #Receive our chunk object
-                            chunk = self.controllerPipe.recv()
-
-                            #Get the params as a list from chunk object
-                            paramsList = chunk.params.split()
-
-                            ##### add other types later
-                            if paramsList[0] == "dictionary":
-
-                                #This is the client's dictionary class,
-                                #   and this is where it searches (will be unresponsive during search)
-                                self.dictionary.find(chunk)
-
-                                #If it's found something
-                                if self.dictionary.isFound():
-
-                                    #get the key from local dictionary class
-                                    key = self.dictionary.showKey()
-
-                                    #send "found" over pipe to networkClient
-                                    self.controllerPipe.send("found")
-
-                                    #send the key we found to networkClient
-                                    self.controllerPipe.send(key)
-
-                                    #stop searching and get done
-                                    done = True
-
-                                else:
-
-                                    #if it didn't find anything (but is done)
-                                    #get next command (which might be chunk or done or something else)
-                                    self.controllerPipe.send("next")
-
-                            elif paramsList[0] == "rainbowmaker":
-
-                                #This line will be unreponsive during creation
-                                chunkOfDone = self.rainbowMaker.create(chunk)
-
-                                #Tell the server we're done, and here's a chunk
-                                self.controllerPipe.send("doneChunk")
-
-                                #Send the server the chunk of done
-                                self.controllerPipe.send(chunkOfDone)
-
-                                #Ask the server for another chunk
-                                self.controllerPipe.send("next")
-
-                    self.networkClient.join()
-                    #self.networkClient.terminate()
-
-                    #Go back to the nodeStart screen since we're done here
                     self.state = "nodeStartScreen"
 
-                #############################################
-                #############################################
-                #Ignore for now, implemented in nodeConnectedScreen
-                #if we're at the node doing stuff state (Screen)
-                elif state == "nodeDoingStuffScreen":
+                elif userInput in ("Server", "server"):
 
-                    #What did the user pick? (Be a Node, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "nodeDoingStuffScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                    self.state = "serverStartScreen"
 
-                    #wait to get done with our stuff
-                    #then switch to nodeConnectedToScreen or nodeConnectingScreen depending
+                elif userInput in ("single", "Single"):
 
-                    if userInput == "back":
+                    self.state = "singleStartScreen"
 
-                        ###GUI.setState("nodeStartScreen")
-                        self.state = "nodeStartScreen"
+                else:
 
+                    #We're done
+                    self.done = True
+
+            ##################################################################################
+            ###################################### NODE ######################################
+            ################################################################################## vvv
+
+            #############################################
+            #############################################
+            #if we're at the node start state (Screen)
+            elif state == "nodeStartScreen":
+
+                #What did the user pick? (Be a node, Back, Exit)
+                print "============="
+                print "nodeStartScreen"
+                print
+
+                #Get the server's IP:
+                self.serverIP = raw_input("What's the server's IP: ")
+
+                print "Ready?"
+                print "(Node)"
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Node", "node", "back", "Back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Node", "node"):
+
+                    self.state = "nodeConnectingScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "startScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the node connecting... state (Screen)
+            elif state == "nodeConnectingScreen":
+
+                #Start up the networkServer class (as sub-process in the background)
+                #self.networkClient = Process(target=NetworkClient.NetworkClient(self.networkPipe))
+                self.networkClient.start()
+
+                #What did the user pick? (Be a Node, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "nodeConnectingScreen"
+                print
+
+                #userInput = raw_input("Choice: ")
+
+                #wait for server connection
+                #then switch to nodeConnectedToScreen
+
+                #Send the server IP over the pipe to network class
+                self.controllerPipe.send(self.serverIP)
+
+                #Get response from network class, (looking for "connected")
+                rec = self.controllerPipe.recv()
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While not connected, print a "connecting" bar
+                while not rec == "connected":
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Connecting--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        #We're done
-                        self.done = True
+                #Got connected, so switch screens
+                self.state = "nodeConnectedToScreen"
 
-                ####################################################################################
-                ###################################### SERVER ######################################
-                #################################################################################### vvv
+            #############################################
+            #############################################
+            #if we're at the node connected state (Screen)
+            elif state == "nodeConnectedToScreen":
 
-                #############################################
-                #############################################
-                #if we're at the Server start state (Screen)
-                elif state == "serverStartScreen":
+                #First command that requests
+                self.controllerPipe.send("next")
 
-                    #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
-                    print "============="
-                    print "serverStartScreen"
-                    print
-                    print "(bruteForce)"
-                    print "(rainbowMake)"
-                    print "(rainbowUser)"
-                    print "(dictionary)"
-                    print
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                done = False
 
-                    #Sterolize inputs
-                    goodNames = {"bruteForce", "brute", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "back", "Back", "Exit", "exit"}
-                    while not userInput in goodNames:
+                #While the current job is not done
+                while not done:
 
-                        print "Input Error!"
+                    #Receive the next (or first) command
+                    rec = self.controllerPipe.recv()
 
-                        userInput = raw_input("Try Again: ")
+                    #If the server says we're done
+                    if rec == "done":
 
-                    if userInput in ("bruteForce", "brute"):
+                        self.controllerPipe.send("done")
 
-                        self.state = "serverBruteForceScreen"
+                        #Exit our loop and go to next screen
+                        done = True
 
-                    elif userInput in ("rainbowMake", "make"):
+                    #If the server says we're connected (or still connected)
+                    elif rec == "connected":
 
-                        self.state = "serverRainMakerScreen"
-
-                    elif userInput in ("rainbowUser", "use"):
-
-                        self.state = "serverRainUserScreen"
-
-                    elif userInput in ("dictionary", "dic"):
-
-                        self.state = "serverDictionaryScreen"
-
-                    elif userInput in ("back", "Back"):
-
-                        self.state = "startScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### BRUTE-FORCE (SERVER) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the serverBruteForceScreen state (Screen)
-                elif state == "serverBruteForceScreen":
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "crackIt":
-
-                        #GUI.setState("serverBruteSearchingScreen")
-                        x=1
-                        #get info from GUI and pass to Brute_Force class
-
-                    elif userInput == "back":
-                        x=1
-                        #GUI.setState("serverForceScreen")
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverBruteSearchingScreen state (Screen)
-                elif state == "serverBruteSearchingScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverBruteForceScreen")
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverBruteFoundScreen state (Screen)
-                elif state == "serverBruteFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverBruteForceScreen")
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverBruteNotFoundScreen state (Screen)
-                elif state == "serverBruteNotFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-                        x=1
-                        #GUI.setState("serverBruteForceScreen")
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### RAINBOW USER (SERVER) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the serverRainUserScreen state (Screen)
-                elif state == "serverRainUserScreen":
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "serverRainUserScreen"
-                    print "(crackIt)"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    if userInput == "crackIt":
-
-                        ###GUI.setState("serverRainUserSearchingScreen")
-                        self.state = "serverRainUserSearchingScreen"
-
-                        #get info from GUI and pass to Brute_Force class
-
-                    elif userInput == "back":
-
-                        ###GUI.setState("serverStartScreen")
-                        self.state = "serverStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverRainUserSearchingScreen state (Screen)
-                elif state == "serverRainUserSearchingScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "serverRainUserSearchingScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    if userInput == "back":
-
-                        ###GUI.setState("serverRainUserScreen")
-                        self.state = "serverRainUserScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverRainUserFoundScreen state (Screen)
-                elif state == "serverRainUserFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "serverRainUserFoundScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    if userInput == "back":
-
-                        ###GUI.setState("serverRainUserScreen")
-                        self.state = "serverRainUserScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverRainUserNotFoundScreen state (Screen)
-                elif state == "serverRainUserNotFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "serverRainUserNotFoundScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    if userInput == "back":
-
-                        ###GUI.setState("serverRainUserScreen")
-                        self.state = "serverRainUserScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### RAINBOW MAKER (SERVER) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the serverRainMakerScreen state (Screen)
-                elif state == "serverRainMakerScreen":
-
-                    print "============="
-                    print "serverRainMakerScreen"
-                    print
-
-                    #Get the algorithm
-                    print "What's the algorithm: "
-                    print "(md5)"
-                    print "(sha1)"
-                    print "(sha256)"
-                    print "(sha512)"
-                    print
-                    algo = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"md5", "sha1", "sha256", "sha512"}
-                    while not algo in goodNames:
-
-                        print "Input Error!"
-
-                        algo = raw_input("Try Again: ")
-
-                    #Set algorithm of RainbowMaker to user input of 'algo'
-                    self.rainbowMaker.setAlgorithm(algo)
-
-                    #Get the Number of chars of key
-                    print
-                    numChars = raw_input("How many characters will the key be? ")
-                    while not self.isInt(numChars):
-
-                        print "Input Error, Not an Integer!"
-
-                        numChars = raw_input("Try Again: ")
-
-                    self.rainbowMaker.setNumChars(numChars)
-
-                    #Get the alphabet to be used
-                    print
-                    print "What's the alphabet: "
-                    print "0-9(d)"
-                    print "a-z(a)"
-                    print "A-Z(A)"
-                    print "a-z&A-Z(m)"
-                    print "a-z&A-Z&0-9(M)"
-                    print
-                    alphabet = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"d", "a", "A", "m", "M"}
-                    while not alphabet in goodNames:
-
-                        print "Input Error!"
-
-                        alphabet = raw_input("Try Again: ")
-                    self.rainbowMaker.setAlphabet(alphabet)
-
-                    #Get dimensions
-                    print
-                    chainLength = raw_input("How long will the chains be? ")
-                    while not self.isInt(chainLength):
-
-                        print "Input Error, Not an Integer!"
-
-                        chainLength = raw_input("Try Again: ")
-
-                    print
-                    numRows = raw_input("How many rows will there be? ")
-                    while not self.isInt(numRows):
-
-                        print "Input Error, Not an Integer!"
-
-                        numRows = raw_input("Try Again: ")
-
-                    self.rainbowMaker.setDimensions(chainLength, numRows)
-
-                    #Get the file name
-                    print
-                    fileName = raw_input("What's the file name: ")
-                    self.rainbowMaker.setFileName(fileName)
-
-                    #Get the go-ahead
-                    print
-                    print "Ready to go?"
-                    print
-                    print "(Create)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Create", "create"):
-
-                        self.state = "serverRainMakerSearchingScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "serverStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the serverRainMakerSearchingScreen state (Screen)
-                elif state == "serverRainMakerSearchingScreen":
-
-                    #display results and wait for user interaction
-                    print "============="
-                    print "serverRainMakerSearchingScreen"
-
-                    #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer.start()
-
-                    self.clock = time()
-
-
-                    #rainbowMaker2 = RainbowMaker()
-
-                    #Give new rainbowMaker (node) info it needs through a string (sent over network)
-                    #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
-                    paramsChunk = self.rainbowMaker.makeParamsChunk()
-
-                    #Get the file ready (put info in first line)
-                    self.rainbowMaker.setupFile()
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not self.rainbowMaker.isDone():
+                        self.controllerPipe.send("connected")
 
                         #Clear the screen and re-draw
                         os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Creating--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
+                        print "============="
+                        print "nodeConnectedToScreen"
 
+                    #If the server says we're doing stuff
+                    elif rec == "doingStuff":
 
-                        #What's the server saying:
-                        rec = self.controllerPipe.recv()
+                        self.controllerPipe.send("doingStuff")
 
-                        #If the server needs a chunk, give one. (this should be the first thing server says)
-                        if rec == "nextChunk":
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print "============="
+                        print "nodeDoingStuffScreen"
 
-                            self.controllerPipe.send("nextChunk")
+                        #'chunk' is an object that has attributes 'params' and 'data' (both are strings for network passing)
 
-                            self.controllerPipe.send(paramsChunk)
+                        #Receive our chunk object
+                        chunk = self.controllerPipe.recv()
 
-                        #If the server needs a chunk again
-                        elif rec == "chunkAgain":
+                        #Get the params as a list from chunk object
+                        paramsList = chunk.params.split()
 
-                            #Get the parameters of the chunk (non-function for rainbowmaker)
-                            params = self.controllerPipe.recv()
+                        ##### add other types later
+                        if paramsList[0] == "dictionary":
 
-                            self.controllerPipe.send("chunkAgain")
+                            #This is the client's dictionary class,
+                            #   and this is where it searches (will be unresponsive during search)
+                            self.dictionary.find(chunk)
 
-                            self.controllerPipe.send(paramsChunk)
+                            #If it's found something
+                            if self.dictionary.isFound():
 
-                        #if the server is waiting for nodes to finish
-                        elif rec == "waiting":
+                                #get the key from local dictionary class
+                                key = self.dictionary.showKey()
 
-                            self.controllerPipe.send("waiting")
+                                #send "found" over pipe to networkClient
+                                self.controllerPipe.send("found")
 
-                            #Placeholder
-                            chrisHamm = True
+                                #send the key we found to networkClient
+                                self.controllerPipe.send(key)
 
-                        #If the server has a done Chunk
-                        elif rec == "doneChunk":
+                                #stop searching and get done
+                                done = True
 
-                            chunkOfDone = self.controllerPipe.recv()
+                            else:
 
+                                #if it didn't find anything (but is done)
+                                #get next command (which might be chunk or done or something else)
+                                self.controllerPipe.send("next")
+
+                        elif paramsList[0] == "rainbowmaker":
+
+                            #This line will be unreponsive during creation
+                            chunkOfDone = self.rainbowMaker.create(chunk)
+
+                            #Tell the server we're done, and here's a chunk
                             self.controllerPipe.send("doneChunk")
 
-                            self.rainbowMaker.putChunkInFile(chunkOfDone)
+                            #Send the server the chunk of done
+                            self.controllerPipe.send(chunkOfDone)
 
-                        #Serve up the next chunk from the server-side dictionary class
-                        #chunkList = self.rainbowMaker.getNextChunk()
+                            #Ask the server for another chunk
+                            self.controllerPipe.send("next")
 
-                        #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
-                        #IE: number of total rows user picked divided into __ different chunks
-                        #chunkSize = self.rainbowMaker.numRows()/100
+                self.networkClient.join()
+                #self.networkClient.terminate()
 
-                        #and process it using the node-side client
-                        #chunkOfDone = rainbowMaker2.create(paramsChunk)
+                #Go back to the nodeStart screen since we're done here
+                self.state = "nodeStartScreen"
 
-                        #Then give the result back to the server
-                        #self.rainbowMaker.putChunkInFile(chunkOfDone)
+            #############################################
+            #############################################
+            #Ignore for now, implemented in nodeConnectedScreen
+            #if we're at the node doing stuff state (Screen)
+            elif state == "nodeDoingStuffScreen":
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
+                #What did the user pick? (Be a Node, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "nodeDoingStuffScreen"
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
 
-                    #Let the network  class know to be done
-                    self.controllerPipe.send("done")
+                #wait to get done with our stuff
+                #then switch to nodeConnectedToScreen or nodeConnectingScreen depending
 
-                    #Done, next screen
-                    self.state = "serverRainMakerDoneScreen"
+                if userInput == "back":
 
-                #############################################
-                #############################################
-                #if we're at the serverRainMakerDoneScreen state (Screen)
-                elif state == "serverRainMakerDoneScreen":
+                    ###GUI.setState("nodeStartScreen")
+                    self.state = "nodeStartScreen"
 
-                    #display results and wait for user interaction
-                    print "============="
-                    print "singleRainMakerDoneScreen"
+                else:
 
-                    print "We just made ", self.rainbowMaker.getFileName()
-                    print "With chain length of ", self.rainbowMaker.getLength()
-                    print "And ", self.rainbowMaker.numRows(), "rows."
-                    print "And it took", self.clock, "seconds."
+                    #We're done
+                    self.done = True
 
-                    print "(Back)"
-                    print "(Exit)"
-                    self.rainbowMaker.reset()
-                    userInput = raw_input("Choice: ")
+            ####################################################################################
+            ###################################### SERVER ######################################
+            #################################################################################### vvv
 
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
+            #############################################
+            #############################################
+            #if we're at the Server start state (Screen)
+            elif state == "serverStartScreen":
 
-                        print "Input Error!"
+                #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
+                print "============="
+                print "serverStartScreen"
+                print
+                print "(bruteForce)"
+                print "(rainbowMake)"
+                print "(rainbowUser)"
+                print "(dictionary)"
+                print
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
 
-                        userInput = raw_input("Try Again: ")
+                #Sterolize inputs
+                goodNames = {"bruteForce", "brute", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "back", "Back", "Exit", "exit"}
+                while not userInput in goodNames:
 
-                    if userInput in ("Back", "back"):
+                    print "Input Error!"
 
-                        self.state = "serverRainMakerScreen"
+                    userInput = raw_input("Try Again: ")
 
+                if userInput in ("bruteForce", "brute"):
+
+                    self.state = "serverBruteForceScreen"
+
+                elif userInput in ("rainbowMake", "make"):
+
+                    self.state = "serverRainMakerScreen"
+
+                elif userInput in ("rainbowUser", "use"):
+
+                    self.state = "serverRainUserScreen"
+
+                elif userInput in ("dictionary", "dic"):
+
+                    self.state = "serverDictionaryScreen"
+
+                elif userInput in ("back", "Back"):
+
+                    self.state = "startScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### BRUTE-FORCE (SERVER) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the serverBruteForceScreen state (Screen)
+            elif state == "serverBruteForceScreen":
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "crackIt":
+
+                    #GUI.setState("serverBruteSearchingScreen")
+                    x=1
+                    #get info from GUI and pass to Brute_Force class
+
+                elif userInput == "back":
+                    x=1
+                    #GUI.setState("serverForceScreen")
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverBruteSearchingScreen state (Screen)
+            elif state == "serverBruteSearchingScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+                    x=1
+                    #GUI.setState("serverBruteForceScreen")
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverBruteFoundScreen state (Screen)
+            elif state == "serverBruteFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+                    x=1
+                    #GUI.setState("serverBruteForceScreen")
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverBruteNotFoundScreen state (Screen)
+            elif state == "serverBruteNotFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+                    x=1
+                    #GUI.setState("serverBruteForceScreen")
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### RAINBOW USER (SERVER) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the serverRainUserScreen state (Screen)
+            elif state == "serverRainUserScreen":
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "serverRainUserScreen"
+                print "(crackIt)"
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                if userInput == "crackIt":
+
+                    ###GUI.setState("serverRainUserSearchingScreen")
+                    self.state = "serverRainUserSearchingScreen"
+
+                    #get info from GUI and pass to Brute_Force class
+
+                elif userInput == "back":
+
+                    ###GUI.setState("serverStartScreen")
+                    self.state = "serverStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverRainUserSearchingScreen state (Screen)
+            elif state == "serverRainUserSearchingScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "serverRainUserSearchingScreen"
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                if userInput == "back":
+
+                    ###GUI.setState("serverRainUserScreen")
+                    self.state = "serverRainUserScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverRainUserFoundScreen state (Screen)
+            elif state == "serverRainUserFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "serverRainUserFoundScreen"
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                if userInput == "back":
+
+                    ###GUI.setState("serverRainUserScreen")
+                    self.state = "serverRainUserScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverRainUserNotFoundScreen state (Screen)
+            elif state == "serverRainUserNotFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "serverRainUserNotFoundScreen"
+                print "(back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                if userInput == "back":
+
+                    ###GUI.setState("serverRainUserScreen")
+                    self.state = "serverRainUserScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### RAINBOW MAKER (SERVER) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the serverRainMakerScreen state (Screen)
+            elif state == "serverRainMakerScreen":
+
+                print "============="
+                print "serverRainMakerScreen"
+                print
+
+                #Get the algorithm
+                print "What's the algorithm: "
+                print "(md5)"
+                print "(sha1)"
+                print "(sha256)"
+                print "(sha512)"
+                print
+                algo = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"md5", "sha1", "sha256", "sha512"}
+                while not algo in goodNames:
+
+                    print "Input Error!"
+
+                    algo = raw_input("Try Again: ")
+
+                #Set algorithm of RainbowMaker to user input of 'algo'
+                self.rainbowMaker.setAlgorithm(algo)
+
+                #Get the Number of chars of key
+                print
+                numChars = raw_input("How many characters will the key be? ")
+                while not self.isInt(numChars):
+
+                    print "Input Error, Not an Integer!"
+
+                    numChars = raw_input("Try Again: ")
+
+                self.rainbowMaker.setNumChars(numChars)
+
+                #Get the alphabet to be used
+                print
+                print "What's the alphabet: "
+                print "0-9(d)"
+                print "a-z(a)"
+                print "A-Z(A)"
+                print "a-z&A-Z(m)"
+                print "a-z&A-Z&0-9(M)"
+                print
+                alphabet = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"d", "a", "A", "m", "M"}
+                while not alphabet in goodNames:
+
+                    print "Input Error!"
+
+                    alphabet = raw_input("Try Again: ")
+                self.rainbowMaker.setAlphabet(alphabet)
+
+                #Get dimensions
+                print
+                chainLength = raw_input("How long will the chains be? ")
+                while not self.isInt(chainLength):
+
+                    print "Input Error, Not an Integer!"
+
+                    chainLength = raw_input("Try Again: ")
+
+                print
+                numRows = raw_input("How many rows will there be? ")
+                while not self.isInt(numRows):
+
+                    print "Input Error, Not an Integer!"
+
+                    numRows = raw_input("Try Again: ")
+
+                self.rainbowMaker.setDimensions(chainLength, numRows)
+
+                #Get the file name
+                print
+                fileName = raw_input("What's the file name: ")
+                self.rainbowMaker.setFileName(fileName)
+
+                #Get the go-ahead
+                print
+                print "Ready to go?"
+                print
+                print "(Create)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Create", "create"):
+
+                    self.state = "serverRainMakerSearchingScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "serverStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the serverRainMakerSearchingScreen state (Screen)
+            elif state == "serverRainMakerSearchingScreen":
+
+                #display results and wait for user interaction
+                print "============="
+                print "serverRainMakerSearchingScreen"
+
+                #Start up the networkServer class (as sub-process in the background)
+                self.networkServer.start()
+
+                self.clock = time()
+
+
+                #rainbowMaker2 = RainbowMaker()
+
+                #Give new rainbowMaker (node) info it needs through a string (sent over network)
+                #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
+                paramsChunk = self.rainbowMaker.makeParamsChunk()
+
+                #Get the file ready (put info in first line)
+                self.rainbowMaker.setupFile()
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While we haven't gotten all through the file or found the key...
+                while not self.rainbowMaker.isDone():
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Creating--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        #We're done
-                        self.done = True
 
-                ###################################### DICTIONARY (SERVER) ######################################
+                    #What's the server saying:
+                    rec = self.controllerPipe.recv()
 
-                #############################################
-                #############################################
-                #if we're at the serverDictionaryScreen state (Screen)
-                elif state == "serverDictionaryScreen":
+                    #If the server needs a chunk, give one. (this should be the first thing server says)
+                    if rec == "nextChunk":
 
-                    #Start up the networkServer class (as sub-process in the background)
-                    #self.networkServer.start()
+                        self.controllerPipe.send("nextChunk")
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "serverDictionaryScreen"
-                    print
+                        self.controllerPipe.send(paramsChunk)
 
-                    #Get the algorithm
+                    #If the server needs a chunk again
+                    elif rec == "chunkAgain":
 
-                    print "What's the algorithm: "
-                    print
-                    print "(md5)"
-                    print "(sha1)"
-                    print "(sha256)"
-                    print "(sha512)"
-                    print
-                    algo = raw_input("Choice: ")
+                        #Get the parameters of the chunk (non-function for rainbowmaker)
+                        params = self.controllerPipe.recv()
 
-                    #Sterolize inputs
-                    goodNames = {"md5", "sha1", "sha256", "sha512"}
-                    while not algo in goodNames:
+                        self.controllerPipe.send("chunkAgain")
 
-                        print "Input Error!"
+                        self.controllerPipe.send(paramsChunk)
 
-                        algo = raw_input("Try Again: ")
+                    #if the server is waiting for nodes to finish
+                    elif rec == "waiting":
 
-                    #Set algorithm of dictionary to user input of 'algo'
-                    self.dictionary.setAlgorithm(algo)
+                        self.controllerPipe.send("waiting")
 
-                    #Get the file name
-                    print
-                    fileName = raw_input("What's the file name: ")
-                    while not self.dictionary.setFileName(fileName) == "Good":
+                        #Placeholder
+                        chrisHamm = True
 
-                        print "File not found..."
-                        fileName = raw_input("What's the file name: ")
+                    #If the server has a done Chunk
+                    elif rec == "doneChunk":
 
-                    #Get the hash
-                    print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
+                        chunkOfDone = self.controllerPipe.recv()
 
-                    #Get the go-ahead
+                        self.controllerPipe.send("doneChunk")
 
-                    print
-                    print "Ready to go?"
-                    print
-                    print "(Crack)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Crack", "crack"):
-
-                        self.state = "serverDictionarySearchingScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "serverStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleDictionarySearchingScreen state (Screen)
-                elif state == "serverDictionarySearchingScreen":
-
-                    #display results and wait for user interaction
-                    print "============="
-                    print "serverDictionarySearchingScreen"
-
-                    #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer.start()
-
-                    self.clock = time()
-
-                    #Have another dictionary (ie server-size) that chunks the data
-                    #   So you don't have to send the whole file to every node
-                    #dictionary2 = Dictionary.Dictionary()
-
-                    #Give new dictionary (node) info it needs through a string (sent over network)
-                    #dictionary2.setVariables(self.dictionary.serverString())
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    isFound = False
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.dictionary.isEof() or isFound):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #What's the server saying:
-                        rec = self.controllerPipe.recv()
-
-                        #If the server needs a chunk, give one. (this should be the first thing server says)
-                        if rec == "nextChunk":
-
-                            #chunk is a Chunk object
-                            chunk = self.dictionary.getNextChunk()
-
-                            self.controllerPipe.send("nextChunk")
-
-                            self.controllerPipe.send(chunk)
-
-                        #If the server needs a chunk again
-                        elif rec == "chunkAgain":
-
-                            #Get the parameters of the chunk
-                            params = self.controllerPipe.recv()
-
-                            #Get the chunk again (again a Chunk object)
-                            chunk = self.dictionary.getThisChunk(params)
-
-                            self.controllerPipe.send("chunkAgain")
-
-                            #Send the chunk again
-                            self.controllerPipe.send(chunk)
-
-                        #if the server is waiting for nodes to finish
-                        elif rec == "waiting":
-
-                            self.controllerPipe.send("waiting")
-
-                            #Placeholder
-                            chrisHamm = True
-
-                        #If the server has a key
-                        elif rec == "found":
-
-                            self.controllerPipe.send("found")
-
-                            #Get the key
-                            key = self.controllerPipe.recv()
-
-                            #This will help for error checking later, though for now not so much
-                            #isFound = self.dictionary.isKey(key)
-
-                            self.dictionary.setKey(key)
-
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #Let the network  class know to be done
-                    self.controllerPipe.send("done")
-
-                    #if the key has been found
-                    if isFound:
-
-                        self.state = "serverDictionaryFoundScreen"
-
-                    else:
-
-                        self.state = "serverDictionaryNotFoundScreen"
-
-                #############################################
-                #############################################
-                #if we're at the singleDictionaryFoundScreen state (Screen)
-                elif state == "serverDictionaryFoundScreen":
-
-                    self.networkServer.join()
-                    #self.networkServer.terminate()
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "serverDictionaryFoundScreen"
-
-                    print "Key is: ", self.dictionary.showKey()
-                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
-                    print "And it took", self.clock, "seconds."
-
-                    print "(Back)"
-                    print "(Exit)"
-                    self.dictionary.reset()
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Back", "back"):
-
-                        self.state = "serverDictionaryScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleDictionaryNotFoundScreen state (Screen)
-                elif state == "serverDictionaryNotFoundScreen":
-
-                    #Start up the networkServer class (as sub-process in the background)
-                    self.networkServer.join()
-                    #self.networkServer.terminate()
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "serverDictionaryNotFoundScreen"
-                    print
-                    print "Sorry, we didn't find it."
-                    print "Just FYI though, that took", self.clock, "seconds."
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    self.dictionary.reset()
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Back", "back"):
-
-                        self.state = "serverDictionaryScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #########################################################################################
-                ###################################### SINGLE-USER ######################################
-                ######################################################################################### vvv
-
-                #############################################
-                #############################################
-                #if we're at the Single-User start state (Screen)
-                elif state == "singleStartScreen":
-
-                    #What did the user pick? (Brute-Force, Rainbow, Dictionary, Back, Exit)
-                    print "============="
-                    print "Single-User Mode StartScreen"
-                    print
-                    print "(BruteForce)"
-                    print "(RainbowMake)"
-                    print "(RainbowUse)"
-                    print "(Dictionary)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("BruteForce", "bruteforce", "Brute", "brute"):
-
-                        self.state = "singleBruteForceScreen"
-
-                    elif userInput in ("RainbowMake", "rainbowmake", "rainmake", "make"):
-
-                        self.state = "singleRainMakerScreen"
-
-                    elif userInput in ("RainbowUse", "rainbowuse", "rainuse", "use"):
-
-                        self.state = "singleRainUserScreen"
-
-                    elif userInput in ("Dictionary", "dictionary", "dic"):
-
-                        self.state = "singleDictionaryScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "startScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### BRUTE-FORCE (SINGLE) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the  singleBruteForceScreen state (Screen)
-                elif state == "singleBruteForceScreen":
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "crackIt":
-
-                        self.state = "singlerRainMakerScreen"
-
-                        #get info from GUI and pass to Brute_Force class
-
-                    elif userInput == "back":
-
-                        self.state = "singleStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleBruteSearchingScreen state (Screen)
-                elif state == "singleBruteSearchingScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleBruteFoundScreen state (Screen)
-                elif state == "singleBruteFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleBruteNotFoundScreen state (Screen)
-                elif state == "singleBruteNotFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
-
-                    if userInput == "back":
-
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### RAINBOW USER (SINGLE) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the singleRainUserScreen state (Screen)
-                elif state == "singleRainUserScreen":
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "singleRainUserScreen"
-                    print
-
-                    #Get the file name
-                    print
-                    fileName = raw_input("What's the file name: ")
-                    while not self.rainbowUser.setFileName(fileName) == "Good":
-
-                        print "File not found..."
-                        fileName = raw_input("What's the file name: ")
-
-                    #Get the hash
-                    print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.rainbowUser.setHash(hash)
-
-                    #Get the go-ahead
-
-                    print
-                    print "Ready to go?"
-                    print
-                    print "(Crack)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Crack", "crack"):
-
-                        self.state = "singleRainUserSearchingScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "singleStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleRainUserSearchingScreen state (Screen)
-                elif state == "singleRainUserSearchingScreen":
-
-                    #display results and wait for user interaction
-                    print "============="
-                    print "singleRainUserSearchingScreen"
-
-                    self.clock = time()
-
-                    #Gets and sets variables from file for setup
-                    self.rainbowUser.gatherInfo()
-
-                    #Have another dictionary (ie server-size) that chunks the data
-                    #   So you don't have to send the whole file to every node
-                    rainbowUser2 = RainbowUser()
-
-                    #Give new dictionary (node) info it needs through a string (sent over network)
-                    #dictionary2.setVariables(self.dictionary.serverString())
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.rainbowUser.isEof() or rainbowUser2.isFound()):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #Serve up the next chunk
-                        chunk = self.rainbowUser.getNextChunk()
-
-                        #and process it using the node-side client
-                        rainbowUser2.find(chunk)
-
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #if a(the) node finds a key
-                    if rainbowUser2.isFound():
-
-                        #Let the server know what the key is
-                        self.rainbowUser.key = rainbowUser2.getKey()
-                        self.state = "singleRainUserFoundScreen"
-
-                    else:
-
-                        self.state = "singleRainUserNotFoundScreen"
-
-                #############################################
-                #############################################
-                #if we're at the singleRainUserFoundScreen state (Screen)
-                elif state == "singleRainUserFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "singleRainUserFoundScreen"
-
-                    print "Key is: ", self.rainbowUser.getKey()
-                    print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
-                    print "And it took", self.clock, "seconds."
-
-                    print "(Back)"
-                    print "(Exit)"
-                    self.rainbowUser.reset()
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Back", "back"):
-
-                        self.state = "singleRainbowUserScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleRainUserNotFoundScreen state (Screen)
-                elif state == "singleRainUserNotFoundScreen":
-
-                    #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "singleRainUserNotFoundScreen"
-                    print
-                    print "Sorry, we didn't find it."
-                    print "Just FYI though, that took", self.clock, "seconds."
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    self.dictionary.reset()
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Back", "back"):
-
-                        self.state = "singleRainbowUserScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                ###################################### RAINBOW MAKER (SINGLE) ######################################
-
-                #############################################
-                #############################################
-                #if we're at the singleRainMakerScreen state (Screen)
-                elif state == "singleRainMakerScreen":
-
-                    print "============="
-                    print "singleRainMakerScreen"
-                    print
-
-                    #Get the algorithm
-                    print "What's the algorithm: "
-                    print "(md5)"
-                    print "(sha1)"
-                    print "(sha256)"
-                    print "(sha512)"
-                    print
-                    algo = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"md5", "sha1", "sha256", "sha512"}
-                    while not algo in goodNames:
-
-                        print "Input Error!"
-
-                        algo = raw_input("Try Again: ")
-
-                    #Set algorithm of RainbowMaker to user input of 'algo'
-                    self.rainbowMaker.setAlgorithm(algo)
-
-                    #Get the Number of chars of key
-                    print
-                    numChars = raw_input("How many characters will the key be? ")
-                    while not self.isInt(numChars):
-
-                        print "Input Error, Not an Integer!"
-
-                        numChars = raw_input("Try Again: ")
-
-                    self.rainbowMaker.setNumChars(numChars)
-
-                    #Get the alphabet to be used
-                    print
-                    print "What's the alphabet: "
-                    print "0-9(d)"
-                    print "a-z(a)"
-                    print "A-Z(A)"
-                    print "a-z&A-Z(m)"
-                    print "a-z&A-Z&0-9(M)"
-                    print
-                    alphabet = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"d", "a", "A", "m", "M"}
-                    while not alphabet in goodNames:
-
-                        print "Input Error!"
-
-                        alphabet = raw_input("Try Again: ")
-                    self.rainbowMaker.setAlphabet(alphabet)
-
-                    #Get dimensions
-                    print
-                    chainLength = raw_input("How long will the chains be? ")
-                    while not self.isInt(chainLength):
-
-                        print "Input Error, Not an Integer!"
-
-                        chainLength = raw_input("Try Again: ")
-
-                    print
-                    numRows = raw_input("How many rows will there be? ")
-                    while not self.isInt(numRows):
-
-                        print "Input Error, Not an Integer!"
-
-                        numRows = raw_input("Try Again: ")
-
-                    self.rainbowMaker.setDimensions(chainLength, numRows)
-
-                    #Get the file name
-                    print
-                    fileName = raw_input("What's the file name: ")
-                    self.rainbowMaker.setFileName(fileName)
-
-                    #Get the go-ahead
-                    print
-                    print "Ready to go?"
-                    print
-                    print "(Create)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #Sterolize inputs
-                    goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
-
-                        print "Input Error!"
-
-                        userInput = raw_input("Try Again: ")
-
-                    if userInput in ("Create", "create"):
-
-                        self.state = "singleRainMakerDoingScreen"
-
-                    elif userInput in ("Back", "back"):
-
-                        self.state = "singleStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-
-                #############################################
-                #############################################
-                #if we're at the singleRainMakerSearchingScreen state (Screen)
-                elif state == "singleRainMakerDoingScreen":
-
-                    #display results and wait for user interaction
-                    print "============="
-                    print "singleRainMakerDoingScreen"
-
-                    self.clock = time()
-
-                    #Have one ranbowMaker (ie server-size) that chunks the data
-                    #   So you don't have to send the whole file to every node
-                    rainbowMaker2 = RainbowMaker()
-
-                    #Give new rainbowMaker (node) info it needs through a string (sent over network)
-                    #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
-                    paramsChunk = self.rainbowMaker.makeParamsChunk()
-
-                    #Get the file ready (put info in first line)
-                    self.rainbowMaker.setupFile()
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not self.rainbowMaker.isDone():
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Creating--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #Serve up the next chunk from the server-side dictionary class
-                        #chunkList = self.rainbowMaker.getNextChunk()
-
-                        #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
-                        #IE: number of total rows user picked divided into __ different chunks
-                        #chunkSize = self.rainbowMaker.numRows()/100
-
-                        #and process it using the node-side client
-                        chunkOfDone = rainbowMaker2.create(paramsChunk)
-
-                        #Then give the result back to the server
                         self.rainbowMaker.putChunkInFile(chunkOfDone)
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
+                    #Serve up the next chunk from the server-side dictionary class
+                    #chunkList = self.rainbowMaker.getNextChunk()
 
-                    #Done, next screen
-                    self.state = "singleRainMakerDoneScreen"
+                    #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
+                    #IE: number of total rows user picked divided into __ different chunks
+                    #chunkSize = self.rainbowMaker.numRows()/100
 
-                #############################################
-                #############################################
-                #if we're at the singleRainMakerDoneScreen state (Screen)
-                elif state == "singleRainMakerDoneScreen":
+                    #and process it using the node-side client
+                    #chunkOfDone = rainbowMaker2.create(paramsChunk)
 
-                    #display results and wait for user interaction
+                    #Then give the result back to the server
+                    #self.rainbowMaker.putChunkInFile(chunkOfDone)
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "singleRainMakerDoneScreen"
+                elapsed = (time() - self.clock)
+                self.clock = elapsed
 
-                    print "We just made ", self.rainbowMaker.getFileName()
-                    print "With chain length of ", self.rainbowMaker.getLength()
-                    print "And ", self.rainbowMaker.numRows(), "rows."
-                    print "And it took", self.clock, "seconds."
+                #Let the network  class know to be done
+                self.controllerPipe.send("done")
 
-                    print "(Back)"
-                    print "(Exit)"
-                    self.rainbowMaker.reset()
-                    userInput = raw_input("Choice: ")
+                #Done, next screen
+                self.state = "serverRainMakerDoneScreen"
 
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
+            #############################################
+            #############################################
+            #if we're at the serverRainMakerDoneScreen state (Screen)
+            elif state == "serverRainMakerDoneScreen":
 
-                        print "Input Error!"
+                #display results and wait for user interaction
+                print "============="
+                print "singleRainMakerDoneScreen"
 
-                        userInput = raw_input("Try Again: ")
+                print "We just made ", self.rainbowMaker.getFileName()
+                print "With chain length of ", self.rainbowMaker.getLength()
+                print "And ", self.rainbowMaker.numRows(), "rows."
+                print "And it took", self.clock, "seconds."
 
-                    if userInput in ("Back", "back"):
+                print "(Back)"
+                print "(Exit)"
+                self.rainbowMaker.reset()
+                userInput = raw_input("Choice: ")
 
-                        self.state = "singleRainMakerScreen"
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
 
-                    else:
+                    print "Input Error!"
 
-                        #We're done
-                        self.done = True
+                    userInput = raw_input("Try Again: ")
 
-                ###################################### DICTIONARY (SINGLE) ######################################
+                if userInput in ("Back", "back"):
 
-                #############################################
-                #############################################
-                #if we're at the singleDictionaryScreen state (Screen)
-                elif state == "singleDictionaryScreen":
+                    self.state = "serverRainMakerScreen"
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "singleDictionaryScreen"
-                    print
+                else:
 
-                    #Get the algorithm
+                    #We're done
+                    self.done = True
 
-                    print "What's the algorithm: "
-                    print "(md5)"
-                    print "(sha1)"
-                    print "(sha256)"
-                    print "(sha512)"
-                    print
-                    algo = raw_input("Choice: ")
+            ###################################### DICTIONARY (SERVER) ######################################
 
-                    #Sterolize inputs
-                    goodNames = {"md5", "sha1", "sha256", "sha512"}
-                    while not algo in goodNames:
+            #############################################
+            #############################################
+            #if we're at the serverDictionaryScreen state (Screen)
+            elif state == "serverDictionaryScreen":
 
-                        print "Input Error!"
+                #Start up the networkServer class (as sub-process in the background)
+                #self.networkServer.start()
 
-                        algo = raw_input("Try Again: ")
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "serverDictionaryScreen"
+                print
 
-                    #Set algorithm of dictionary to user input of 'algo'
-                    self.dictionary.setAlgorithm(algo)
+                #Get the algorithm
 
-                    #Get the file name
-                    print
+                print "What's the algorithm: "
+                print
+                print "(md5)"
+                print "(sha1)"
+                print "(sha256)"
+                print "(sha512)"
+                print
+                algo = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"md5", "sha1", "sha256", "sha512"}
+                while not algo in goodNames:
+
+                    print "Input Error!"
+
+                    algo = raw_input("Try Again: ")
+
+                #Set algorithm of dictionary to user input of 'algo'
+                self.dictionary.setAlgorithm(algo)
+
+                #Get the file name
+                print
+                fileName = raw_input("What's the file name: ")
+                while not self.dictionary.setFileName(fileName) == "Good":
+
+                    print "File not found..."
                     fileName = raw_input("What's the file name: ")
-                    while not self.dictionary.setFileName(fileName) == "Good":
 
-                        print "File not found..."
-                        fileName = raw_input("What's the file name: ")
+                #Get the hash
+                print
+                hash = raw_input("What's the hash we're searching for: ")
+                self.dictionary.setHash(hash)
 
-                    #Get the hash
-                    print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
+                #Get the go-ahead
 
-                    #Get the go-ahead
+                print
+                print "Ready to go?"
+                print
+                print "(Crack)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
 
-                    print
-                    print "Ready to go?"
-                    print
-                    print "(Crack)"
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                #Sterolize inputs
+                goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
 
-                    #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
+                    print "Input Error!"
 
-                        print "Input Error!"
+                    userInput = raw_input("Try Again: ")
 
-                        userInput = raw_input("Try Again: ")
+                if userInput in ("Crack", "crack"):
 
-                    if userInput in ("Crack", "crack"):
+                    self.state = "serverDictionarySearchingScreen"
 
-                        self.state = "singleDictionarySearchingScreen"
+                elif userInput in ("Back", "back"):
 
-                    elif userInput in ("Back", "back"):
+                    self.state = "serverStartScreen"
 
-                        self.state = "singleStartScreen"
+                else:
 
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionarySearchingScreen state (Screen)
+            elif state == "serverDictionarySearchingScreen":
+
+                #display results and wait for user interaction
+                print "============="
+                print "serverDictionarySearchingScreen"
+
+                #Start up the networkServer class (as sub-process in the background)
+                self.networkServer.start()
+
+                self.clock = time()
+
+                #Have another dictionary (ie server-size) that chunks the data
+                #   So you don't have to send the whole file to every node
+                #dictionary2 = Dictionary.Dictionary()
+
+                #Give new dictionary (node) info it needs through a string (sent over network)
+                #dictionary2.setVariables(self.dictionary.serverString())
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                isFound = False
+
+                #While we haven't gotten all through the file or found the key...
+                while not (self.dictionary.isEof() or isFound):
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        #We're done
-                        self.done = True
+                    #What's the server saying:
+                    rec = self.controllerPipe.recv()
 
-                #############################################
-                #############################################
-                #if we're at the singleDictionarySearchingScreen state (Screen)
-                elif state == "singleDictionarySearchingScreen":
+                    #If the server needs a chunk, give one. (this should be the first thing server says)
+                    if rec == "nextChunk":
 
-                    #display results and wait for user interaction
-                    print "============="
-                    print "singleDictionarySearchingScreen"
-
-                    self.clock = time()
-
-                    #Have another dictionary (ie server-size) that chunks the data
-                    #   So you don't have to send the whole file to every node
-                    dictionary2 = Dictionary()
-
-                    #Give new dictionary (node) info it needs through a string (sent over network)
-                    #dictionary2.setVariables(self.dictionary.serverString())
-
-                    #Stuff for those pretty status pictures stuff
-                    starCounter = 0
-                    whiteL = ""
-                    whiteR = "            "
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.dictionary.isEof() or dictionary2.isFound()):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #Serve up the next chunk
+                        #chunk is a Chunk object
                         chunk = self.dictionary.getNextChunk()
 
-                        #and process it using the node-side client
-                        dictionary2.find(chunk)
+                        self.controllerPipe.send("nextChunk")
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
+                        self.controllerPipe.send(chunk)
 
-                    #if a(the) node finds a key
-                    if dictionary2.isFound():
+                    #If the server needs a chunk again
+                    elif rec == "chunkAgain":
 
-                        #Let the server know what the key is
-                        self.dictionary.key = dictionary2.showKey()
-                        self.state = "singleDictionaryFoundScreen"
+                        #Get the parameters of the chunk
+                        params = self.controllerPipe.recv()
 
+                        #Get the chunk again (again a Chunk object)
+                        chunk = self.dictionary.getThisChunk(params)
+
+                        self.controllerPipe.send("chunkAgain")
+
+                        #Send the chunk again
+                        self.controllerPipe.send(chunk)
+
+                    #if the server is waiting for nodes to finish
+                    elif rec == "waiting":
+
+                        self.controllerPipe.send("waiting")
+
+                        #Placeholder
+                        chrisHamm = True
+
+                    #If the server has a key
+                    elif rec == "found":
+
+                        self.controllerPipe.send("found")
+
+                        #Get the key
+                        key = self.controllerPipe.recv()
+
+                        #This will help for error checking later, though for now not so much
+                        #isFound = self.dictionary.isKey(key)
+
+                        self.dictionary.setKey(key)
+
+                elapsed = (time() - self.clock)
+                self.clock = elapsed
+
+                #Let the network  class know to be done
+                self.controllerPipe.send("done")
+
+                #if the key has been found
+                if isFound:
+
+                    self.state = "serverDictionaryFoundScreen"
+
+                else:
+
+                    self.state = "serverDictionaryNotFoundScreen"
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionaryFoundScreen state (Screen)
+            elif state == "serverDictionaryFoundScreen":
+
+                self.networkServer.join()
+                #self.networkServer.terminate()
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "serverDictionaryFoundScreen"
+
+                print "Key is: ", self.dictionary.showKey()
+                print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                print "And it took", self.clock, "seconds."
+
+                print "(Back)"
+                print "(Exit)"
+                self.dictionary.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "serverDictionaryScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionaryNotFoundScreen state (Screen)
+            elif state == "serverDictionaryNotFoundScreen":
+
+                #Start up the networkServer class (as sub-process in the background)
+                self.networkServer.join()
+                #self.networkServer.terminate()
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "serverDictionaryNotFoundScreen"
+                print
+                print "Sorry, we didn't find it."
+                print "Just FYI though, that took", self.clock, "seconds."
+                print
+                print "(Back)"
+                print "(Exit)"
+                self.dictionary.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "serverDictionaryScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #########################################################################################
+            ###################################### SINGLE-USER ######################################
+            ######################################################################################### vvv
+
+            #############################################
+            #############################################
+            #if we're at the Single-User start state (Screen)
+            elif state == "singleStartScreen":
+
+                #What did the user pick? (Brute-Force, Rainbow, Dictionary, Back, Exit)
+                print "============="
+                print "Single-User Mode StartScreen"
+                print
+                print "(BruteForce)"
+                print "(RainbowMake)"
+                print "(RainbowUse)"
+                print "(Dictionary)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("BruteForce", "bruteforce", "Brute", "brute"):
+
+                    self.state = "singleBruteForceScreen"
+
+                elif userInput in ("RainbowMake", "rainbowmake", "rainmake", "make"):
+
+                    self.state = "singleRainMakerScreen"
+
+                elif userInput in ("RainbowUse", "rainbowuse", "rainuse", "use"):
+
+                    self.state = "singleRainUserScreen"
+
+                elif userInput in ("Dictionary", "dictionary", "dic"):
+
+                    self.state = "singleDictionaryScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "startScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### BRUTE-FORCE (SINGLE) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the  singleBruteForceScreen state (Screen)
+            elif state == "singleBruteForceScreen":
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "crackIt":
+
+                    self.state = "singlerRainMakerScreen"
+
+                    #get info from GUI and pass to Brute_Force class
+
+                elif userInput == "back":
+
+                    self.state = "singleStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleBruteSearchingScreen state (Screen)
+            elif state == "singleBruteSearchingScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+
+                    #GUI.setState("singleBruteForceScreen")
+                    self.state = "singlerRainMakerScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleBruteFoundScreen state (Screen)
+            elif state == "singleBruteFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+
+                    #GUI.setState("singleBruteForceScreen")
+                    self.state = "singlerRainMakerScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleBruteNotFoundScreen state (Screen)
+            elif state == "singleBruteNotFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                #userInput = GUI.getInput()
+
+                if userInput == "back":
+
+                    #GUI.setState("singleBruteForceScreen")
+                    self.state = "singlerRainMakerScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### RAINBOW USER (SINGLE) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the singleRainUserScreen state (Screen)
+            elif state == "singleRainUserScreen":
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "singleRainUserScreen"
+                print
+
+                #Get the file name
+                print
+                fileName = raw_input("What's the file name: ")
+                while not self.rainbowUser.setFileName(fileName) == "Good":
+
+                    print "File not found..."
+                    fileName = raw_input("What's the file name: ")
+
+                #Get the hash
+                print
+                hash = raw_input("What's the hash we're searching for: ")
+                self.rainbowUser.setHash(hash)
+
+                #Get the go-ahead
+
+                print
+                print "Ready to go?"
+                print
+                print "(Crack)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Crack", "crack"):
+
+                    self.state = "singleRainUserSearchingScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "singleStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleRainUserSearchingScreen state (Screen)
+            elif state == "singleRainUserSearchingScreen":
+
+                #display results and wait for user interaction
+                print "============="
+                print "singleRainUserSearchingScreen"
+
+                self.clock = time()
+
+                #Gets and sets variables from file for setup
+                self.rainbowUser.gatherInfo()
+
+                #Have another dictionary (ie server-size) that chunks the data
+                #   So you don't have to send the whole file to every node
+                rainbowUser2 = RainbowUser()
+
+                #Give new dictionary (node) info it needs through a string (sent over network)
+                #dictionary2.setVariables(self.dictionary.serverString())
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While we haven't gotten all through the file or found the key...
+                while not (self.rainbowUser.isEof() or rainbowUser2.isFound()):
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        self.state = "singleDictionaryNotFoundScreen"
+                    #Serve up the next chunk
+                    chunk = self.rainbowUser.getNextChunk()
 
-                #############################################
-                #############################################
-                #if we're at the singleDictionaryFoundScreen state (Screen)
-                elif state == "singleDictionaryFoundScreen":
+                    #and process it using the node-side client
+                    rainbowUser2.find(chunk)
 
-                    #display results and wait for user interaction
+                elapsed = (time() - self.clock)
+                self.clock = elapsed
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "singleDictionaryFoundScreen"
+                #if a(the) node finds a key
+                if rainbowUser2.isFound():
 
-                    print "Key is: ", self.dictionary.showKey()
-                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
-                    print "And it took", self.clock, "seconds."
+                    #Let the server know what the key is
+                    self.rainbowUser.key = rainbowUser2.getKey()
+                    self.state = "singleRainUserFoundScreen"
 
-                    print "(Back)"
-                    print "(Exit)"
-                    self.dictionary.reset()
-                    userInput = raw_input("Choice: ")
+                else:
 
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
+                    self.state = "singleRainUserNotFoundScreen"
 
-                        print "Input Error!"
+            #############################################
+            #############################################
+            #if we're at the singleRainUserFoundScreen state (Screen)
+            elif state == "singleRainUserFoundScreen":
 
-                        userInput = raw_input("Try Again: ")
+                #display results and wait for user interaction
 
-                    if userInput in ("Back", "back"):
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "singleRainUserFoundScreen"
 
-                        self.state = "singleDictionaryScreen"
+                print "Key is: ", self.rainbowUser.getKey()
+                print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
+                print "And it took", self.clock, "seconds."
 
+                print "(Back)"
+                print "(Exit)"
+                self.rainbowUser.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "singleRainbowUserScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleRainUserNotFoundScreen state (Screen)
+            elif state == "singleRainUserNotFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "singleRainUserNotFoundScreen"
+                print
+                print "Sorry, we didn't find it."
+                print "Just FYI though, that took", self.clock, "seconds."
+                print
+                print "(Back)"
+                print "(Exit)"
+                self.dictionary.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "singleRainbowUserScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### RAINBOW MAKER (SINGLE) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the singleRainMakerScreen state (Screen)
+            elif state == "singleRainMakerScreen":
+
+                print "============="
+                print "singleRainMakerScreen"
+                print
+
+                #Get the algorithm
+                print "What's the algorithm: "
+                print "(md5)"
+                print "(sha1)"
+                print "(sha256)"
+                print "(sha512)"
+                print
+                algo = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"md5", "sha1", "sha256", "sha512"}
+                while not algo in goodNames:
+
+                    print "Input Error!"
+
+                    algo = raw_input("Try Again: ")
+
+                #Set algorithm of RainbowMaker to user input of 'algo'
+                self.rainbowMaker.setAlgorithm(algo)
+
+                #Get the Number of chars of key
+                print
+                numChars = raw_input("How many characters will the key be? ")
+                while not self.isInt(numChars):
+
+                    print "Input Error, Not an Integer!"
+
+                    numChars = raw_input("Try Again: ")
+
+                self.rainbowMaker.setNumChars(numChars)
+
+                #Get the alphabet to be used
+                print
+                print "What's the alphabet: "
+                print "0-9(d)"
+                print "a-z(a)"
+                print "A-Z(A)"
+                print "a-z&A-Z(m)"
+                print "a-z&A-Z&0-9(M)"
+                print
+                alphabet = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"d", "a", "A", "m", "M"}
+                while not alphabet in goodNames:
+
+                    print "Input Error!"
+
+                    alphabet = raw_input("Try Again: ")
+                self.rainbowMaker.setAlphabet(alphabet)
+
+                #Get dimensions
+                print
+                chainLength = raw_input("How long will the chains be? ")
+                while not self.isInt(chainLength):
+
+                    print "Input Error, Not an Integer!"
+
+                    chainLength = raw_input("Try Again: ")
+
+                print
+                numRows = raw_input("How many rows will there be? ")
+                while not self.isInt(numRows):
+
+                    print "Input Error, Not an Integer!"
+
+                    numRows = raw_input("Try Again: ")
+
+                self.rainbowMaker.setDimensions(chainLength, numRows)
+
+                #Get the file name
+                print
+                fileName = raw_input("What's the file name: ")
+                self.rainbowMaker.setFileName(fileName)
+
+                #Get the go-ahead
+                print
+                print "Ready to go?"
+                print
+                print "(Create)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Create", "create"):
+
+                    self.state = "singleRainMakerDoingScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "singleStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleRainMakerSearchingScreen state (Screen)
+            elif state == "singleRainMakerDoingScreen":
+
+                #display results and wait for user interaction
+                print "============="
+                print "singleRainMakerDoingScreen"
+
+                self.clock = time()
+
+                #Have one ranbowMaker (ie server-size) that chunks the data
+                #   So you don't have to send the whole file to every node
+                rainbowMaker2 = RainbowMaker()
+
+                #Give new rainbowMaker (node) info it needs through a string (sent over network)
+                #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
+                paramsChunk = self.rainbowMaker.makeParamsChunk()
+
+                #Get the file ready (put info in first line)
+                self.rainbowMaker.setupFile()
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While we haven't gotten all through the file or found the key...
+                while not self.rainbowMaker.isDone():
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Creating--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        #We're done
-                        self.done = True
+                    #Serve up the next chunk from the server-side dictionary class
+                    #chunkList = self.rainbowMaker.getNextChunk()
 
-                #############################################
-                #############################################
-                #if we're at the singleDictionaryNotFoundScreen state (Screen)
-                elif state == "singleDictionaryNotFoundScreen":
+                    #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
+                    #IE: number of total rows user picked divided into __ different chunks
+                    #chunkSize = self.rainbowMaker.numRows()/100
 
-                    #display results and wait for user interaction
+                    #and process it using the node-side client
+                    chunkOfDone = rainbowMaker2.create(paramsChunk)
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    print "============="
-                    print "singleDictionaryNotFoundScreen"
-                    print
-                    print "Sorry, we didn't find it."
-                    print "Just FYI though, that took", self.clock, "seconds."
-                    print
-                    print "(Back)"
-                    print "(Exit)"
-                    self.dictionary.reset()
-                    userInput = raw_input("Choice: ")
+                    #Then give the result back to the server
+                    self.rainbowMaker.putChunkInFile(chunkOfDone)
 
-                    #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
-                    while not userInput in goodNames:
+                elapsed = (time() - self.clock)
+                self.clock = elapsed
 
-                        print "Input Error!"
+                #Done, next screen
+                self.state = "singleRainMakerDoneScreen"
 
-                        userInput = raw_input("Try Again: ")
+            #############################################
+            #############################################
+            #if we're at the singleRainMakerDoneScreen state (Screen)
+            elif state == "singleRainMakerDoneScreen":
 
-                    if userInput in ("Back", "back"):
+                #display results and wait for user interaction
 
-                        self.state = "singleDictionaryScreen"
+                #What did the user pick? (Crack it!, Back, Exit)
+                ###userInput = GUI.getInput()
+                print "============="
+                print "singleRainMakerDoneScreen"
 
+                print "We just made ", self.rainbowMaker.getFileName()
+                print "With chain length of ", self.rainbowMaker.getLength()
+                print "And ", self.rainbowMaker.numRows(), "rows."
+                print "And it took", self.clock, "seconds."
+
+                print "(Back)"
+                print "(Exit)"
+                self.rainbowMaker.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "singleRainMakerScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            ###################################### DICTIONARY (SINGLE) ######################################
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionaryScreen state (Screen)
+            elif state == "singleDictionaryScreen":
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "singleDictionaryScreen"
+                print
+
+                #Get the algorithm
+
+                print "What's the algorithm: "
+                print "(md5)"
+                print "(sha1)"
+                print "(sha256)"
+                print "(sha512)"
+                print
+                algo = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"md5", "sha1", "sha256", "sha512"}
+                while not algo in goodNames:
+
+                    print "Input Error!"
+
+                    algo = raw_input("Try Again: ")
+
+                #Set algorithm of dictionary to user input of 'algo'
+                self.dictionary.setAlgorithm(algo)
+
+                #Get the file name
+                print
+                fileName = raw_input("What's the file name: ")
+                while not self.dictionary.setFileName(fileName) == "Good":
+
+                    print "File not found..."
+                    fileName = raw_input("What's the file name: ")
+
+                #Get the hash
+                print
+                hash = raw_input("What's the hash we're searching for: ")
+                self.dictionary.setHash(hash)
+
+                #Get the go-ahead
+
+                print
+                print "Ready to go?"
+                print
+                print "(Crack)"
+                print
+                print "(Back)"
+                print "(Exit)"
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Crack", "crack"):
+
+                    self.state = "singleDictionarySearchingScreen"
+
+                elif userInput in ("Back", "back"):
+
+                    self.state = "singleStartScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionarySearchingScreen state (Screen)
+            elif state == "singleDictionarySearchingScreen":
+
+                #display results and wait for user interaction
+                print "============="
+                print "singleDictionarySearchingScreen"
+
+                self.clock = time()
+
+                #Have another dictionary (ie server-size) that chunks the data
+                #   So you don't have to send the whole file to every node
+                dictionary2 = Dictionary()
+
+                #Give new dictionary (node) info it needs through a string (sent over network)
+                #dictionary2.setVariables(self.dictionary.serverString())
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While we haven't gotten all through the file or found the key...
+                while not (self.dictionary.isEof() or dictionary2.isFound()):
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
                     else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
 
-                        #We're done
-                        self.done = True
+                    #Serve up the next chunk
+                    chunk = self.dictionary.getNextChunk()
+
+                    #and process it using the node-side client
+                    dictionary2.find(chunk)
+
+                elapsed = (time() - self.clock)
+                self.clock = elapsed
+
+                #if a(the) node finds a key
+                if dictionary2.isFound():
+
+                    #Let the server know what the key is
+                    self.dictionary.key = dictionary2.showKey()
+                    self.state = "singleDictionaryFoundScreen"
+
+                else:
+
+                    self.state = "singleDictionaryNotFoundScreen"
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionaryFoundScreen state (Screen)
+            elif state == "singleDictionaryFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "singleDictionaryFoundScreen"
+
+                print "Key is: ", self.dictionary.showKey()
+                print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                print "And it took", self.clock, "seconds."
+
+                print "(Back)"
+                print "(Exit)"
+                self.dictionary.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "singleDictionaryScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
+
+            #############################################
+            #############################################
+            #if we're at the singleDictionaryNotFoundScreen state (Screen)
+            elif state == "singleDictionaryNotFoundScreen":
+
+                #display results and wait for user interaction
+
+                #What did the user pick? (Crack it!, Back, Exit)
+                print "============="
+                print "singleDictionaryNotFoundScreen"
+                print
+                print "Sorry, we didn't find it."
+                print "Just FYI though, that took", self.clock, "seconds."
+                print
+                print "(Back)"
+                print "(Exit)"
+                self.dictionary.reset()
+                userInput = raw_input("Choice: ")
+
+                #Sterolize inputs
+                goodNames = {"Back", "back", "Exit", "exit"}
+                while not userInput in goodNames:
+
+                    print "Input Error!"
+
+                    userInput = raw_input("Try Again: ")
+
+                if userInput in ("Back", "back"):
+
+                    self.state = "singleDictionaryScreen"
+
+                else:
+
+                    #We're done
+                    self.done = True
 
     #returns true/false if value is int
     def isInt(self, value):
