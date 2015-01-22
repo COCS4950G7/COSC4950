@@ -1,6 +1,8 @@
 __author__ = 'Chris Hamm'
 #Network_FakeController
 
+#AS OF REVISION 9D, this is now an obsolete function. Use the Network Controller instead.
+
 #This is used to simulate the controller class since i cant modify the existing one
 #and I need to test the Network classes
 #This also allows for me to manually select which network class I want to start up
