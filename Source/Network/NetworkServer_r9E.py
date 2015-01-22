@@ -1149,8 +1149,20 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 return False
 
         #check for m
+        def checkForLowerCaseAlphaNumeric(self,inboundString):
+            if(inboundString[0] == "m"):
+                print "Chunk AlphaNumeric: m"
+                return True
+            else:
+                return False
 
         #check for M
+        def checkForUpperCaseAlphaNumeric(self,inboundString):
+            if(inboundString[0] == "M"):
+                print "Chunk AlphaNumeric: M"
+                return True
+            else:
+                return False
 
         #check for d
         def checkForDigitsAlphabet(self,inboundString):
