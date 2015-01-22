@@ -12,6 +12,8 @@ from multiprocessing import Process, Pipe, Lock
 import os
 import string
 
+from Chunk import Chunk
+
 class RainbowMaker():
 
     #Class Variables
@@ -132,6 +134,7 @@ class RainbowMaker():
 
         return self.done
 
+    '''
     #Make the table
     def makeTable(self):
 
@@ -174,37 +177,12 @@ class RainbowMaker():
 
         #Close the file
         self.file.close()
-
+        '''
 
     #Hashes key
     def hashThis(self, key):
 
-        if self.algorithm == "sha256":
-
-            tempKey = hashlib.sha256()
-
-        elif self.algorithm == "sha512":
-
-            tempKey = hashlib.sha512()
-
-        elif self.algorithm == "md5":
-
-            tempKey = hashlib.md5()
-
-        elif self.algorithm == "sha1":
-
-            tempKey = hashlib.sha1()
-
-        #Convert to bytes to give update()
-        byteKey = str.encode(key)
-
-        type(byteKey)
-
-        tempKey.update(byteKey)
-
-        thisHash = tempKey.hexdigest()
-
-        return thisHash
+        return hashlib.new(self.algorithm, key).hexdigest()
 
 
     #Produces seeded key
@@ -237,7 +215,7 @@ class RainbowMaker():
 
         return randKey
 
-
+    '''
     #Finds and fixes collisions in the final hash list
     def collisionFixer(self):
 
@@ -335,8 +313,8 @@ class RainbowMaker():
             self.file.close()
 
             return 0
-
-
+    '''
+    '''
     #Import table
     def importTable(self):
 
@@ -367,7 +345,7 @@ class RainbowMaker():
 
         #Close the file
         self.file.close()
-
+    '''
 
     #Sets up the file initially (put info in first line)
     def setupFile(self):
@@ -375,20 +353,18 @@ class RainbowMaker():
         #Open the file for writing
         self.file = open(self.fileName, 'w')
 
-        self.file.write(self.algorithm
-                        + " " + self.numChars
-                        + " " + self.alphabetChoice
-                        + " " + str(self.width) + "\n")
+        self.file.write(self.algorithm + " " + str(self.numChars) + " " + self.alphabetChoice + " " + str(self.width) + "\n")
 
         self.fileLocation = self.file.tell()
 
         self.file.close()
 
 
-    #Gives processes chunk back to server to be put in the file
-    def giveChunk(self, chunkOfDone):
+    #Puts a done chunk (already processed by a node) into the table (file)
+    def putChunkInFile(self, chunkOfDone):
 
-        #put chunkOfDone in our file
+        #Split chunkOfDone's data into a list
+        linesList = chunkOfDone.data.splitlines()
 
         #Open the file for writing
         self.file = open(self.fileName, 'r+')
@@ -396,10 +372,10 @@ class RainbowMaker():
         #Seek to where we left off in the file
         self.file.seek(self.fileLocation)
 
-        for x in chunkOfDone:
+        for x in linesList:
 
             #print to file
-            self.file.write(x)
+            self.file.write(x + "\n")
 
             #And increment count
             self.chunkCount += 1
@@ -417,7 +393,10 @@ class RainbowMaker():
 
 
     #Create (and return) a chunk of the table, and do all that sub-process stuff
-    def create(self):
+    def create(self, paramsChunk):
+
+        #Set variables to that of server, get from parameter(-bearing) chunk
+        self.setVariables(paramsChunk.params)
 
         #ChunkSize is the number of rows in the file that we're creating in this, 'chunk'
 
@@ -431,7 +410,7 @@ class RainbowMaker():
         #Then we're done once they've sent their lists (return)
 
         #big list containing all the lines from the nodes
-        bigChunk = []
+        bigChunk = ""
 
         #sub-process's chunk size (num rows to calculate)
         #subChunkSize = chunkSize / 8
@@ -516,21 +495,26 @@ class RainbowMaker():
                 rec = parentPipe.recv()
 
                 #while the list(sub-chunk) from node is not empty
-                while rec:
+                #while rec:
 
                     #Put a line of the list in our bigChunk
-                    bigChunk.append(rec.pop())
+
+                bigChunk += rec
 
                 count += 1
 
-        return bigChunk
+        returnChunk = Chunk()
+
+        returnChunk.data = bigChunk
+
+        return returnChunk
 
 
     #The sub-process function
     def subProcess(self, pipe, lock, chunkSize):
 
         #The list to return with strings to be the lines of the file
-        daList = []
+        daList = ""
 
         for x in range(chunkSize):
 
@@ -548,7 +532,7 @@ class RainbowMaker():
 
             hash = self.hashThis(reduced)
 
-            daList.append(randKey + " " + hash + "\n")
+            daList += randKey + " " + hash + "\n"
 
         lock.acquire()
 
@@ -587,27 +571,30 @@ class RainbowMaker():
         self.done = False
 
 
-    #Sets all class variables to ones given from server
-    def setVariables(self, serverString):
+    #Sets all class variables to ones given from server (params)
+    def setVariables(self, paramsString):
 
-        serverStringList = serverString.split()
+        paramsList = paramsString.split()
 
-        self.height = int(serverStringList.pop())
+        self.algorithm = paramsList[1]
 
-        self.width = int(serverStringList.pop())
-
-        self.numChars = int(serverStringList.pop())
-
-        self.alphabetChoice = serverStringList.pop()
+        self.alphabetChoice = paramsList[3]
 
         self.setAlphabet(self.alphabetChoice)
 
-        self.algorithm = serverStringList.pop()
+        self.numChars = int(paramsList[4])
+
+        self.width = int(paramsList[8])
+
+        self.height = int(paramsList[9])
 
 
-    #Returns a string with all variables needed by nodes
-    def serverString(self):
+    #Returns a chunk with all variables needed by nodes
+    def makeParamsChunk(self):
 
-        oneStringToRule = self.algorithm + " " + self.alphabetChoice + " " + str(self.numChars) + " " + str(self.width) + " " + str(self.height)
+        tempChunk = Chunk()
 
-        return oneStringToRule
+        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
+        tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
+
+        return tempChunk

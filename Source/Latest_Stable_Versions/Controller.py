@@ -294,6 +294,20 @@ class Controller():
                                     #get next command (which might be chunk or done or something else)
                                     self.controllerPipe.send("next")
 
+                            elif paramsList[0] == "rainbowmaker":
+
+                                #This line will be unreponsive during creation
+                                chunkOfDone = self.rainbowMaker.create(chunk)
+
+                                #Tell the server we're done, and here's a chunk
+                                self.controllerPipe.send("doneChunk")
+
+                                #Send the server the chunk of done
+                                self.controllerPipe.send(chunkOfDone)
+
+                                #Ask the server for another chunk
+                                self.controllerPipe.send("next")
+
                     self.networkClient.join()
                     #self.networkClient.terminate()
 
@@ -567,25 +581,109 @@ class Controller():
                 #if we're at the serverRainMakerScreen state (Screen)
                 elif state == "serverRainMakerScreen":
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "serverRainMakerScreen"
-                    print "(makeIt)"
-                    print "(back)"
+                    print
+
+                    #Get the algorithm
+                    print "What's the algorithm: "
+                    print "(md5)"
+                    print "(sha1)"
+                    print "(sha256)"
+                    print "(sha512)"
+                    print
+                    algo = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"md5", "sha1", "sha256", "sha512"}
+                    while not algo in goodNames:
+
+                        print "Input Error!"
+
+                        algo = raw_input("Try Again: ")
+
+                    #Set algorithm of RainbowMaker to user input of 'algo'
+                    self.rainbowMaker.setAlgorithm(algo)
+
+                    #Get the Number of chars of key
+                    print
+                    numChars = raw_input("How many characters will the key be? ")
+                    while not self.isInt(numChars):
+
+                        print "Input Error, Not an Integer!"
+
+                        numChars = raw_input("Try Again: ")
+
+                    self.rainbowMaker.setNumChars(numChars)
+
+                    #Get the alphabet to be used
+                    print
+                    print "What's the alphabet: "
+                    print "0-9(d)"
+                    print "a-z(a)"
+                    print "A-Z(A)"
+                    print "a-z&A-Z(m)"
+                    print "a-z&A-Z&0-9(M)"
+                    print
+                    alphabet = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"d", "a", "A", "m", "M"}
+                    while not alphabet in goodNames:
+
+                        print "Input Error!"
+
+                        alphabet = raw_input("Try Again: ")
+                    self.rainbowMaker.setAlphabet(alphabet)
+
+                    #Get dimensions
+                    print
+                    chainLength = raw_input("How long will the chains be? ")
+                    while not self.isInt(chainLength):
+
+                        print "Input Error, Not an Integer!"
+
+                        chainLength = raw_input("Try Again: ")
+
+                    print
+                    numRows = raw_input("How many rows will there be? ")
+                    while not self.isInt(numRows):
+
+                        print "Input Error, Not an Integer!"
+
+                        numRows = raw_input("Try Again: ")
+
+                    self.rainbowMaker.setDimensions(chainLength, numRows)
+
+                    #Get the file name
+                    print
+                    fileName = raw_input("What's the file name: ")
+                    self.rainbowMaker.setFileName(fileName)
+
+                    #Get the go-ahead
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Create)"
+                    print
+                    print "(Back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "makeIt":
+                    #Sterolize inputs
+                    goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("serverRainMakerSearchingScreen")
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Create", "create"):
+
                         self.state = "serverRainMakerSearchingScreen"
 
-                        #get info from GUI and pass to Brute_Force class
+                    elif userInput in ("Back", "back"):
 
-                    elif userInput == "back":
-
-                        ###GUI.setState("serverStartScreen")
                         self.state = "serverStartScreen"
 
                     else:
@@ -597,41 +695,132 @@ class Controller():
                 elif state == "serverRainMakerSearchingScreen":
 
                     #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "serverRainMakerSearchingScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    #Start up the networkServer class (as sub-process in the background)
+                    self.networkServer.start()
 
-                        ###GUI.setState("serverRainMakerScreen")
-                        self.state = "serverRainMakerScreen"
+                    self.clock = time()
 
-                    else:
 
-                        #We're done
-                        self.done = True
+                    #rainbowMaker2 = RainbowMaker()
+
+                    #Give new rainbowMaker (node) info it needs through a string (sent over network)
+                    #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
+                    paramsChunk = self.rainbowMaker.makeParamsChunk()
+
+                    #Get the file ready (put info in first line)
+                    self.rainbowMaker.setupFile()
+
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
+
+                    #While we haven't gotten all through the file or found the key...
+                    while not self.rainbowMaker.isDone():
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Creating--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+
+                        #What's the server saying:
+                        rec = self.controllerPipe.recv()
+
+                        #If the server needs a chunk, give one. (this should be the first thing server says)
+                        if rec == "nextChunk":
+
+                            self.controllerPipe.send("nextChunk")
+
+                            self.controllerPipe.send(paramsChunk)
+
+                        #If the server needs a chunk again
+                        elif rec == "chunkAgain":
+
+                            #Get the parameters of the chunk (non-function for rainbowmaker)
+                            params = self.controllerPipe.recv()
+
+                            self.controllerPipe.send("chunkAgain")
+
+                            self.controllerPipe.send(paramsChunk)
+
+                        #if the server is waiting for nodes to finish
+                        elif rec == "waiting":
+
+                            self.controllerPipe.send("waiting")
+
+                            #Placeholder
+                            chrisHamm = True
+
+                        #If the server has a done Chunk
+                        elif rec == "doneChunk":
+
+                            chunkOfDone = self.controllerPipe.recv()
+
+                            self.controllerPipe.send("doneChunk")
+
+                            self.rainbowMaker.putChunkInFile(chunkOfDone)
+
+                        #Serve up the next chunk from the server-side dictionary class
+                        #chunkList = self.rainbowMaker.getNextChunk()
+
+                        #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
+                        #IE: number of total rows user picked divided into __ different chunks
+                        #chunkSize = self.rainbowMaker.numRows()/100
+
+                        #and process it using the node-side client
+                        #chunkOfDone = rainbowMaker2.create(paramsChunk)
+
+                        #Then give the result back to the server
+                        #self.rainbowMaker.putChunkInFile(chunkOfDone)
+
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
+
+                    #Let the network  class know to be done
+                    self.controllerPipe.send("done")
+
+                    #Done, next screen
+                    self.state = "serverRainMakerDoneScreen"
 
                 #if we're at the serverRainMakerDoneScreen state (Screen)
                 elif state == "serverRainMakerDoneScreen":
 
                     #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainMakerDoneScreen"
-                    print "(back)"
+                    print "singleRainMakerDoneScreen"
+
+                    print "We just made ", self.rainbowMaker.getFileName()
+                    print "With chain length of ", self.rainbowMaker.getLength()
+                    print "And ", self.rainbowMaker.numRows(), "rows."
+                    print "And it took", self.clock, "seconds."
+
+                    print "(Back)"
                     print "(Exit)"
+                    self.rainbowMaker.reset()
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("serverRainMakerScreen")
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
                         self.state = "serverRainMakerScreen"
 
                     else:
@@ -1167,11 +1356,12 @@ class Controller():
                     print "a-z(a)"
                     print "A-Z(A)"
                     print "a-z&A-Z(m)"
+                    print "a-z&A-Z&0-9(M)"
                     print
                     alphabet = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"d", "a", "A", "m"}
+                    goodNames = {"d", "a", "A", "m", "M"}
                     while not alphabet in goodNames:
 
                         print "Input Error!"
@@ -1248,7 +1438,8 @@ class Controller():
                     rainbowMaker2 = RainbowMaker()
 
                     #Give new rainbowMaker (node) info it needs through a string (sent over network)
-                    rainbowMaker2.setVariables(self.rainbowMaker.serverString())
+                    #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
+                    paramsChunk = self.rainbowMaker.makeParamsChunk()
 
                     #Get the file ready (put info in first line)
                     self.rainbowMaker.setupFile()
@@ -1282,10 +1473,10 @@ class Controller():
                         #chunkSize = self.rainbowMaker.numRows()/100
 
                         #and process it using the node-side client
-                        chunkOfDone = rainbowMaker2.create()
+                        chunkOfDone = rainbowMaker2.create(paramsChunk)
 
                         #Then give the result back to the server
-                        self.rainbowMaker.giveChunk(chunkOfDone)
+                        self.rainbowMaker.putChunkInFile(chunkOfDone)
 
                     elapsed = (time() - self.clock)
                     self.clock = elapsed

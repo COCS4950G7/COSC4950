@@ -12,7 +12,7 @@ from multiprocessing import Process, Pipe, Lock
 import os
 import string
 
-from Source.Latest_Stable_Versions.Chunk import Chunk
+from Chunk import Chunk
 
 class RainbowMaker():
 
@@ -363,10 +363,8 @@ class RainbowMaker():
     #Puts a done chunk (already processed by a node) into the table (file)
     def putChunkInFile(self, chunkOfDone):
 
-        #put chunkOfDone in our file
-
         #Split chunkOfDone's data into a list
-        linesList = chunkOfDone.data.split
+        linesList = chunkOfDone.data.splitlines()
 
         #Open the file for writing
         self.file = open(self.fileName, 'r+')
@@ -377,7 +375,7 @@ class RainbowMaker():
         for x in linesList:
 
             #print to file
-            self.file.write(x)
+            self.file.write(x + "\n")
 
             #And increment count
             self.chunkCount += 1
@@ -395,7 +393,10 @@ class RainbowMaker():
 
 
     #Create (and return) a chunk of the table, and do all that sub-process stuff
-    def create(self):
+    def create(self, paramsChunk):
+
+        #Set variables to that of server, get from parameter(-bearing) chunk
+        self.setVariables(paramsChunk.params)
 
         #ChunkSize is the number of rows in the file that we're creating in this, 'chunk'
 
@@ -409,7 +410,7 @@ class RainbowMaker():
         #Then we're done once they've sent their lists (return)
 
         #big list containing all the lines from the nodes
-        bigChunk = []
+        bigChunk = ""
 
         #sub-process's chunk size (num rows to calculate)
         #subChunkSize = chunkSize / 8
@@ -494,21 +495,26 @@ class RainbowMaker():
                 rec = parentPipe.recv()
 
                 #while the list(sub-chunk) from node is not empty
-                while rec:
+                #while rec:
 
                     #Put a line of the list in our bigChunk
-                    bigChunk.append(rec.pop())
+
+                bigChunk += rec
 
                 count += 1
 
-        return bigChunk
+        returnChunk = Chunk()
+
+        returnChunk.data = bigChunk
+
+        return returnChunk
 
 
     #The sub-process function
     def subProcess(self, pipe, lock, chunkSize):
 
         #The list to return with strings to be the lines of the file
-        daList = []
+        daList = ""
 
         for x in range(chunkSize):
 
@@ -526,7 +532,7 @@ class RainbowMaker():
 
             hash = self.hashThis(reduced)
 
-            daList.append(randKey + " " + hash + "\n")
+            daList += randKey + " " + hash + "\n"
 
         lock.acquire()
 
@@ -565,27 +571,30 @@ class RainbowMaker():
         self.done = False
 
 
-    #Sets all class variables to ones given from server
-    def setVariables(self, serverString):
+    #Sets all class variables to ones given from server (params)
+    def setVariables(self, paramsString):
 
-        serverStringList = serverString.split()
+        paramsList = paramsString.split()
 
-        self.height = int(serverStringList.pop())
+        self.algorithm = paramsList[1]
 
-        self.width = int(serverStringList.pop())
-
-        self.numChars = int(serverStringList.pop())
-
-        self.alphabetChoice = serverStringList.pop()
+        self.alphabetChoice = paramsList[3]
 
         self.setAlphabet(self.alphabetChoice)
 
-        self.algorithm = serverStringList.pop()
+        self.numChars = int(paramsList[4])
+
+        self.width = int(paramsList[8])
+
+        self.height = int(paramsList[9])
 
 
-    #Returns a string with all variables needed by nodes
-    def serverString(self):
+    #Returns a chunk with all variables needed by nodes
+    def makeParamsChunk(self):
 
-        oneStringToRule = self.algorithm + " " + self.alphabetChoice + " " + str(self.numChars) + " " + str(self.width) + " " + str(self.height)
+        tempChunk = Chunk()
 
-        return oneStringToRule
+        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
+        tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
+
+        return tempChunk
