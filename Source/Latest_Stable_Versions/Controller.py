@@ -34,6 +34,7 @@ from Dictionary import Dictionary
 from NetworkClient import NetworkClient
 from NetworkServer import NetworkServer
 from RainbowMaker import RainbowMaker
+from RainbowUser import RainbowUser
 
 
 class Controller():
@@ -41,7 +42,7 @@ class Controller():
     #Class variables
     done = False
     rainbowMaker = RainbowMaker()
-    #rainbowUser = RainbowUser.RainbowUser()
+    rainbowUser = RainbowUser()
     dictionary = Dictionary()
     #brute_force = Brute_Force()
 
@@ -88,6 +89,8 @@ class Controller():
 
                 #Lots of if statements
 
+                #############################################
+                #############################################
                 #if we're at the start state
                 if state == "startScreen":
 
@@ -128,8 +131,12 @@ class Controller():
                         #We're done
                         self.done = True
 
-                ################### NODE ################### vvv
+                ##################################################################################
+                ###################################### NODE ######################################
+                ################################################################################## vvv
 
+                #############################################
+                #############################################
                 #if we're at the node start state (Screen)
                 elif state == "nodeStartScreen":
 
@@ -168,6 +175,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the node connecting... state (Screen)
                 elif state == "nodeConnectingScreen":
 
@@ -216,6 +225,8 @@ class Controller():
                     #Got connected, so switch screens
                     self.state = "nodeConnectedToScreen"
 
+                #############################################
+                #############################################
                 #if we're at the node connected state (Screen)
                 elif state == "nodeConnectedToScreen":
 
@@ -314,24 +325,8 @@ class Controller():
                     #Go back to the nodeStart screen since we're done here
                     self.state = "nodeStartScreen"
 
-                    '''
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #wait for job or disconnect
-                    #then switch to nodeDoingStuffScreen or nodeConnectingScreen depending
-
-                    if userInput == "back":
-
-                        ###GUI.setState("nodeStartScreen")
-                        self.state = "nodeStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
-                    '''
+                #############################################
+                #############################################
                 #Ignore for now, implemented in nodeConnectedScreen
                 #if we're at the node doing stuff state (Screen)
                 elif state == "nodeDoingStuffScreen":
@@ -357,8 +352,12 @@ class Controller():
                         #We're done
                         self.done = True
 
-                ################### SERVER ################### vvv
+                ####################################################################################
+                ###################################### SERVER ######################################
+                #################################################################################### vvv
 
+                #############################################
+                #############################################
                 #if we're at the Server start state (Screen)
                 elif state == "serverStartScreen":
 
@@ -408,6 +407,10 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### BRUTE-FORCE (SERVER) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the serverBruteForceScreen state (Screen)
                 elif state == "serverBruteForceScreen":
 
@@ -429,6 +432,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverBruteSearchingScreen state (Screen)
                 elif state == "serverBruteSearchingScreen":
 
@@ -446,6 +451,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverBruteFoundScreen state (Screen)
                 elif state == "serverBruteFoundScreen":
 
@@ -463,6 +470,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverBruteNotFoundScreen state (Screen)
                 elif state == "serverBruteNotFoundScreen":
 
@@ -480,6 +489,10 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### RAINBOW USER (SERVER) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the serverRainUserScreen state (Screen)
                 elif state == "serverRainUserScreen":
 
@@ -509,6 +522,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverRainUserSearchingScreen state (Screen)
                 elif state == "serverRainUserSearchingScreen":
 
@@ -532,6 +547,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverRainUserFoundScreen state (Screen)
                 elif state == "serverRainUserFoundScreen":
 
@@ -555,6 +572,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverRainUserNotFoundScreen state (Screen)
                 elif state == "serverRainUserNotFoundScreen":
 
@@ -578,6 +597,10 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### RAINBOW MAKER (SERVER) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the serverRainMakerScreen state (Screen)
                 elif state == "serverRainMakerScreen":
 
@@ -691,6 +714,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the serverRainMakerSearchingScreen state (Screen)
                 elif state == "serverRainMakerSearchingScreen":
 
@@ -794,6 +819,8 @@ class Controller():
                     #Done, next screen
                     self.state = "serverRainMakerDoneScreen"
 
+                #############################################
+                #############################################
                 #if we're at the serverRainMakerDoneScreen state (Screen)
                 elif state == "serverRainMakerDoneScreen":
 
@@ -828,7 +855,11 @@ class Controller():
                         #We're done
                         self.done = True
 
-                 #if we're at the serverDictionaryScreen state (Screen)
+                ###################################### DICTIONARY (SERVER) ######################################
+
+                #############################################
+                #############################################
+                #if we're at the serverDictionaryScreen state (Screen)
                 elif state == "serverDictionaryScreen":
 
                     #Start up the networkServer class (as sub-process in the background)
@@ -906,6 +937,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionarySearchingScreen state (Screen)
                 elif state == "serverDictionarySearchingScreen":
 
@@ -1011,6 +1044,8 @@ class Controller():
 
                         self.state = "serverDictionaryNotFoundScreen"
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionaryFoundScreen state (Screen)
                 elif state == "serverDictionaryFoundScreen":
 
@@ -1049,6 +1084,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionaryNotFoundScreen state (Screen)
                 elif state == "serverDictionaryNotFoundScreen":
 
@@ -1087,8 +1124,12 @@ class Controller():
                         #We're done
                         self.done = True
 
-                ################### SINGLE-USER ################### vvv
+                #########################################################################################
+                ###################################### SINGLE-USER ######################################
+                ######################################################################################### vvv
 
+                #############################################
+                #############################################
                 #if we're at the Single-User start state (Screen)
                 elif state == "singleStartScreen":
 
@@ -1138,6 +1179,10 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### BRUTE-FORCE (SINGLE) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the  singleBruteForceScreen state (Screen)
                 elif state == "singleBruteForceScreen":
 
@@ -1159,6 +1204,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleBruteSearchingScreen state (Screen)
                 elif state == "singleBruteSearchingScreen":
 
@@ -1177,6 +1224,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleBruteFoundScreen state (Screen)
                 elif state == "singleBruteFoundScreen":
 
@@ -1195,6 +1244,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleBruteNotFoundScreen state (Screen)
                 elif state == "singleBruteNotFoundScreen":
 
@@ -1213,29 +1264,56 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### RAINBOW USER (SINGLE) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the singleRainUserScreen state (Screen)
                 elif state == "singleRainUserScreen":
 
                     #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainUserScreen"
-                    print "(crackIt)"
-                    print "(back)"
+                    print
+
+                    #Get the file name
+                    print
+                    fileName = raw_input("What's the file name: ")
+                    while not self.rainbowUser.setFileName(fileName) == "Good":
+
+                        print "File not found..."
+                        fileName = raw_input("What's the file name: ")
+
+                    #Get the hash
+                    print
+                    hash = raw_input("What's the hash we're searching for: ")
+                    self.rainbowUser.setHash(hash)
+
+                    #Get the go-ahead
+
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Crack)"
+                    print
+                    print "(Back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "crackIt":
+                    #Sterolize inputs
+                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("singleRainUserSearchingScreen")
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Crack", "crack"):
+
                         self.state = "singleRainUserSearchingScreen"
 
-                        #get info from GUI and pass to Brute_Force class
+                    elif userInput in ("Back", "back"):
 
-
-                    elif userInput == "back":
-
-                        ###GUI.setState("singleStartScreen")
                         self.state = "singleStartScreen"
 
                     else:
@@ -1243,29 +1321,67 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleRainUserSearchingScreen state (Screen)
                 elif state == "singleRainUserSearchingScreen":
 
                     #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainUserSearchingScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    self.clock = time()
 
-                        ###GUI.setState("singleRainUserScreen")
-                        self.state = "singleRainUserScreen"
+                    #Have another dictionary (ie server-size) that chunks the data
+                    #   So you don't have to send the whole file to every node
+                    rainbowUser2 = RainbowUser()
+
+                    #Give new dictionary (node) info it needs through a string (sent over network)
+                    #dictionary2.setVariables(self.dictionary.serverString())
+
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
+
+                    #While we haven't gotten all through the file or found the key...
+                    while not (self.rainbowUser.isEof() or rainbowUser2.isFound()):
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+                        #Serve up the next chunk
+                        chunk = self.rainbowUser.getNextChunk()
+
+                        #and process it using the node-side client
+                        rainbowUser2.find(chunk)
+
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
+
+                    #if a(the) node finds a key
+                    if rainbowUser2.isFound():
+
+                        #Let the server know what the key is
+                        self.rainbowUser.key = rainbowUser2.getKey()
+                        self.state = "singleRainUserFoundScreen"
 
                     else:
 
-                        #We're done
-                        self.done = True
+                        self.state = "singleRainUserNotFoundScreen"
 
+                #############################################
+                #############################################
                 #if we're at the singleRainUserFoundScreen state (Screen)
                 elif state == "singleRainUserFoundScreen":
 
@@ -1275,20 +1391,35 @@ class Controller():
                     ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainUserFoundScreen"
-                    print "(back)"
+
+                    print "Key is: ", self.rainbowUser.getKey()
+                    print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
+                    print "And it took", self.clock, "seconds."
+
+                    print "(Back)"
                     print "(Exit)"
+                    self.rainbowUser.reset()
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
 
-                        ###GUI.setState("singleRainUserScreen")
-                        self.state = "singleRainUserScreen"
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "singleRainbowUserScreen"
 
                     else:
 
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleRainUserNotFoundScreen state (Screen)
                 elif state == "singleRainUserNotFoundScreen":
 
@@ -1298,19 +1429,36 @@ class Controller():
                     ###userInput = GUI.getInput()
                     print "============="
                     print "singleRainUserNotFoundScreen"
-                    print "(back)"
+                    print
+                    print "Sorry, we didn't find it."
+                    print "Just FYI though, that took", self.clock, "seconds."
+                    print
+                    print "(Back)"
                     print "(Exit)"
+                    self.dictionary.reset()
                     userInput = raw_input("Choice: ")
 
-                    if userInput == "back":
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
 
-                        self.state = "singleRainUserScreen"
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "singleRainbowUserScreen"
 
                     else:
 
                         #We're done
                         self.done = True
 
+                ###################################### RAINBOW MAKER (SINGLE) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the singleRainMakerScreen state (Screen)
                 elif state == "singleRainMakerScreen":
 
@@ -1424,6 +1572,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleRainMakerSearchingScreen state (Screen)
                 elif state == "singleRainMakerDoingScreen":
 
@@ -1484,6 +1634,8 @@ class Controller():
                     #Done, next screen
                     self.state = "singleRainMakerDoneScreen"
 
+                #############################################
+                #############################################
                 #if we're at the singleRainMakerDoneScreen state (Screen)
                 elif state == "singleRainMakerDoneScreen":
 
@@ -1521,6 +1673,10 @@ class Controller():
                         #We're done
                         self.done = True
 
+                ###################################### DICTIONARY (SINGLE) ######################################
+
+                #############################################
+                #############################################
                 #if we're at the singleDictionaryScreen state (Screen)
                 elif state == "singleDictionaryScreen":
 
@@ -1595,6 +1751,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionarySearchingScreen state (Screen)
                 elif state == "singleDictionarySearchingScreen":
 
@@ -1652,6 +1810,8 @@ class Controller():
 
                         self.state = "singleDictionaryNotFoundScreen"
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionaryFoundScreen state (Screen)
                 elif state == "singleDictionaryFoundScreen":
 
@@ -1687,6 +1847,8 @@ class Controller():
                         #We're done
                         self.done = True
 
+                #############################################
+                #############################################
                 #if we're at the singleDictionaryNotFoundScreen state (Screen)
                 elif state == "singleDictionaryNotFoundScreen":
 
