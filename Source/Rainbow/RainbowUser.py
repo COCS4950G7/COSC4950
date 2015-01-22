@@ -33,6 +33,10 @@ class RainbowUser():
     fileLocation = 1
     chunkCount = 0
     hash = 0
+    eof = False
+    found = False
+    key = ""
+    iteration = 100000
 
     #Constructor
     def __init__(self):
@@ -397,10 +401,12 @@ class RainbowUser():
 
     #Sets all class variables to ones given from server (params)
     def setVariables(self, paramsString):
-
+        #print paramsString
         paramsList = paramsString.split()
-
+        #print paramsList
         self.algorithm = paramsList[1]
+
+        self.hash = paramsList[2]
 
         self.alphabetChoice = paramsList[3]
 
@@ -410,15 +416,249 @@ class RainbowUser():
 
         self.width = int(paramsList[8])
 
-        self.height = int(paramsList[9])
+        self.iteration = self.width * 2
 
-
+    '''
     #Returns a chunk with all variables needed by nodes
     def makeParamsChunk(self):
 
         tempChunk = Chunk()
 
-        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
+        tempChunk.params = "rainbowuser " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
         tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
 
         return tempChunk
+    '''
+
+    #Returns if eof
+    def isEof(self):
+
+        return self.eof
+
+
+    #Returns T/F if found or not
+    def isFound(self):
+
+        return self.found
+
+    #Returns key
+    def getKey(self):
+
+        return self.key
+
+    #Gets the next chunk from the file to process
+    def getNextChunk(self):
+
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Seek to where we left off in the file
+        self.file.seek(self.fileLocation)
+
+        line = self.file.readline()
+
+        data = ""
+
+        #keeps count of how many lines we've pu in currentChunk[]
+        lineCounter = 0
+
+        #to send to controller to say we're not done yet
+        eof = False
+
+        while not line == "":
+
+            data += line
+
+            line = self.file.readline()
+
+            if line == "":
+
+                eof = True
+
+            lineCounter += 1
+
+            #If our chunk is at least 1000 lines, stop adding to it
+            if lineCounter >= 100:
+
+                line = ""
+
+                eof = False
+
+        #update class on where we are in the file
+        self.fileLocation = self.file.tell()
+
+        self.file.close()
+
+        self.eof = eof
+
+        chunk = Chunk()
+
+        chunk.data = data
+
+        chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabetChoice)
+        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 "
+
+        return chunk
+
+
+    #Searches the chunk for the key (given the hash in the chunk.params)
+    def find(self, chunk):
+
+        x=1
+
+        #Set class variables based on parameters from the chunk
+        self.setVariables(chunk.params)
+
+        #Split the data (as a string) into a list of lines
+        linesList = chunk.data.splitlines()
+
+        #First, we'll take the data and put it into two lists for searching
+
+        #Make two lists, one for each key and one for each hash of the lines
+        keyList = []
+        hashList = []
+
+        tempCounter = 0
+
+        #For every line in the list
+        for x in linesList:
+
+            #Split the line into a list of the two elements
+            lineList = x.split()
+
+            #Put the key in the key list
+            #keyList[tempCounter] = lineList[0]
+
+            keyList.append(lineList[0])
+
+            #put the hash in the hash list
+            #hashList[tempCounter] = lineList[1]
+            hashList.append(lineList[1])
+
+        #Second, we'll actually do the searching
+        #print keyList
+        #print
+        #print hashList
+        #print
+
+        done = False
+
+        tempHash = self.hash
+
+        #Which line we found the hash on
+        where = 0
+
+        timeout = 0
+
+        #Did we find a matching line? (Y=1/N=0)
+        signal = 0
+
+        while not done:
+
+            #For every hash in the list
+            for x in hashList:
+
+                #If our hash matches the one in the list
+                if tempHash == x:
+
+                    #We found the line that matches, now just search the line for the key
+                    done = True
+                    #print "Found 1"
+                    #print tempHash
+                    #print x
+                    signal = 1
+
+                    #Which line we found the hash on (index location)
+                    where = hashList.index(x)
+                    #print where
+
+            if not done:
+
+                tempReduced = self.getSeededKey(tempHash)
+
+                tempHash = self.hashThis(tempReduced)
+
+            timeout += 1
+
+            #If we've searched farther than we're supposed to, stop
+            if timeout > self.iteration:
+
+                done = True
+
+        #If we found a matching line
+        if signal == 1:
+
+            #Set our key to the starting key of that line
+            tempKey = keyList[where]
+            #print tempKey
+            #print self.width
+            #For as wide as our table is plus one
+            for y in range(self.width + 1):
+
+                #hash our tempKey
+                tempHash = self.hashThis(tempKey)
+
+                #print "tempHash: " + tempHash
+                #print "tempKey:  " + tempKey
+
+                #And compare to original key
+                if self.hash == tempHash:
+
+                    #FOUND THE KEY!
+                    print "Key found!"
+
+                    self.key = tempKey
+
+                    self.found = True
+
+                    self.done = True
+
+                else:
+
+                    #If not, reduce the hash and try again
+                    tempKey = self.getSeededKey(tempHash)
+
+            if self.found == False:
+
+                #If we got this far,
+                print "Collision Detected!"
+
+        else:
+
+            #No matching line found
+            self.done = True
+
+            print "No key found!"
+
+
+    #Reads the first line of file to setup variables
+    def gatherInfo(self):
+
+        #Open the file for reading
+        self.file = open(self.fileName, 'r')
+
+        #Read the first line
+        line = self.file.readline()
+
+        #Update class on where we are in the file (hopefully, second line)
+        self.fileLocation = self.file.tell()
+
+        #Close the file, since we're done with it
+        self.file.close()
+        #print line
+        #Split the line into a list, and assign list elements to variables
+        varsList = line.split()
+        #print varsList
+        self.algorithm = varsList[0]
+
+        self.numChars = int(varsList[1])
+
+        self.alphabetChoice = varsList[2]
+
+        self.width = int(varsList[3])
+        #print self.width
+
+    #Returns the original hash
+    def getHash(self):
+
+        return self.hash

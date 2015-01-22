@@ -1332,6 +1332,9 @@ class Controller():
 
                     self.clock = time()
 
+                    #Gets and sets variables from file for setup
+                    self.rainbowUser.gatherInfo()
+
                     #Have another dictionary (ie server-size) that chunks the data
                     #   So you don't have to send the whole file to every node
                     rainbowUser2 = RainbowUser()
