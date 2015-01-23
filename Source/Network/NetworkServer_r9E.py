@@ -40,7 +40,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         listOfCrashedClients= [] #records the ip address of any client that has crashed during the last server run
         #listOfInactiveClients = [] #records the ip address of any client who needs something to do
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
-        dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
+        #dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
+        listOfClientsWaitingForAReply= []
         dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
         recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
         recordOfInboundCommandsFromControllerToServer = {} #dictionary that records how many times the server received a command from the controller
@@ -289,7 +290,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             for i in range(0,len(self.listOfControllerMessages)):
                                 print str(i) + ") " + str(self.listOfControllerMessages[i])
                         print " "
-                        print "INFO: " + str(len(self.dictionaryOfClientsWaitingForAReply)) + " Client(s) are currently waiting for a reply"
+                        #print "INFO: " + str(len(self.dictionaryOfClientsWaitingForAReply)) + " Client(s) are currently waiting for a reply"
+                        print "INFO: " + str(len(self.listOfClientsWaitingForAReply)) + " Client(s) are currently waiting for a reply"
                         #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                         #Figure out what each of the received commands are and who it needs to go to, then distribute accordingly
                         #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -313,13 +315,29 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                             if(analysisString[8] == "k"):
                                                                 try:  #looking for NEXTCHUNK in analysis string try block
                                                                     print "Command Type: nextChunk"
+                                                                    #get ip address of client waiting for reply
+                                                                    try:
+                                                                        #tempSock, tempAddr= self.dictionaryOfClientsWaitingForAReply[0]
+                                                                        tempAddr= self.listOfClientsWaitingForAReply[0]
+                                                                        self.sendNextToClient(tempAddr,"TEST")
+                                                                        print "DEBUG: MESSAGE SENT TO CLIENT " + str(tempAddr)
+                                                                    except Exception as inst:
+                                                                            print "========================================================================================"
+                                                                            print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
+                                                                            print type(inst) #the exception instance
+                                                                            print inst.args #srguments stored in .args
+                                                                            print inst #_str_ allows args tto be printed directly
+                                                                            print "========================================================================================"
                                                                     #recall that position 9 is a space
                                                                     #looking for the next space in the string which will be after the ip address
-                                                                    analysisIP= ""
+
+                                                                    '''analysisIP= ""
                                                                     endOfIPPosition= 10
                                                                     for x in range(10,len(analysisString)):
-                                                                        if(analysisString[x] == " "): #if it is a space
+                                                                       # if(analysisString[x] == " "): #if it is a space
+                                                                        if(analysisString[x].isspace()):
                                                                             endOfIPPosition= x
+                                                                            print "DEBUG: analysisString index x=" + str(x)
                                                                             break
                                                                         else:
                                                                             analysisIP= str(analysisIP + str(analysisString[x]))
@@ -348,7 +366,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                                             print type(inst) #the exception instance
                                                                             print inst.args #srguments stored in .args
                                                                             print inst #_str_ allows args tto be printed directly
-                                                                            print "========================================================================================"
+                                                                            print "========================================================================================" '''
                                                                 except Exception as inst:
                                                                     print "========================================================================================"
                                                                     print "ERROR: An exception has been thrown in the looking for NEXTCHUNK in analysis string Try Block"
@@ -445,14 +463,16 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "========================================================================================"
                 try:
                     print " "
-                    print "Printing Dictionary Of Clients Waiting For A Reply"
+                    print "Printing List Of Clients Waiting For A Reply"
                     print "--------------------------------------------------"
-                    if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
+                    if(len(self.listOfClientsWaitingForAReply) < 1):
+                    #if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
                         print "No Clients Are Waiting For A Reply When The Session Ended"
                     else:
-                        for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems():
-                            print "[" + key + "] =" + value
-                    print "(END OF DICTIONARY OF CLIENTS WAITING FOR A REPLY)"
+                        #for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems(): #(OLD METHOD)
+                        for x in range(0,len(self.listOfClientsWaitingForAReply)):
+                            print "[" + x + "] =" + self.listOfClientsWaitingForAReply[x]
+                    print "(END OF LIST OF CLIENTS WAITING FOR A REPLY)"
                     print "--------------------------------"
                 except Exception as inst:
                     print "========================================================================================"
@@ -837,6 +857,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #next part in cracking problem
         #..............................................................................
         def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
+        #def sendNextToClient(self,recipientIPAddress, theNextPart): (FAILED ATTEMPT AT NEW METHOD)
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
                 print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
@@ -860,7 +881,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #..............................................................................
         def checkForNextCommand(self,inboundString): #checks for the NEXT command
             try:
-                if(inboundString[0]=="N"): #OLD METHOD
+                if(inboundString[0]=="N"):
                     if(inboundString[1]=="E"):
                         if(inboundString[2]=="X"):
                             if(inboundString[3]=="T"):
@@ -869,8 +890,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 tempIP= ""
                                 for i in range(5, len(inboundString)):
                                     tempIP= tempIP + inboundString[i]
-                                self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
-                                print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
+                                self.listOfClientsWaitingForAReply.append(tempIP)
+                                #self.dictionaryOfClientsWaitingForAReply[tempIP] = "NEXTCHUNK"
+                                print "INFO: Client (" + str(tempIP) + ") was added the listOfClientsWaitingForAReply"
+                                #print "INFO: Client (" + str(tempIP) + ") was added the dictionaryOfClientsWaitingForAReply"
                                 self.recordOfInboundCommandsFromClientToServer['NEXT'] = (self.recordOfInboundCommandsFromClientToServer['NEXT'] + 1)
                                 return True
                 else:
@@ -896,8 +919,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     tempIP= ""
                     for i in range(14, len(inboundString)):
                         tempIP= tempIP + inboundString[i]
-                    self.dictionaryOfClientsWaitingForAReply[tempIP] = "FOUNDSOLUTION"
-                    print "INFO: Client (" + str(tempIP) + ") was added to the dictionaryOfClientsWaitingForAReply"
+                    #self.dictionaryOfClientsWaitingForAReply[tempIP] = "FOUNDSOLUTION"
+                    self.listOfClientsWaitingForAReply.append(tempIP)
+                    #print "INFO: Client (" + str(tempIP) + ") was added to the dictionaryOfClientsWaitingForAReply"
+                    print "INFO: Client (" + str(tempIP) + ") was added to the listOfClientsWaitingForAReply"
                     self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
                     return True
                # if(inboundString[0]=="F"): #OLD METHOD
@@ -1329,3 +1354,4 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 return True
             else:
                 return False
+
