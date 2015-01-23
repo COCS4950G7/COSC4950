@@ -4,7 +4,6 @@ __author__ = 'chris hamm'
 
 #THINGS ADDED FROM THIS REVISION
 #Now able to receive a chunk object from the controller class
-#Implemented a dictionary to keep track of client's sockets
 #(In progress)Extract information from a chunk object
 #(In progress)Send extracted information over the network to the client
 #Changed data type of dictionary of clients waiting for a reply to a list
@@ -44,7 +43,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
         #dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
         listOfClientsWaitingForAReply= []
-        dictionaryOfClientPorts = {} #dictionary that holds each clients socket as a value, using the IP address as the key
         dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
         recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
         recordOfInboundCommandsFromControllerToServer = {} #dictionary that records how many times the server received a command from the controller
@@ -185,26 +183,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
             self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
             print "STATUS: Client successfully added to the list of clients"
-            clientIP= addr[0] #copy the IP address
-            #ignore the first two characters which are (' and isolate the IP address
-            #for x in range(2,len(addr)):
-             #   if(addr[x] == "'"):
-              #      print "DEBUG: Apostraphe detected, end of IP address"
-               #     break
-              #  else:
-               #     clientIP= str(clientIP) + str(addr[x])
-                #    print "DEBUG: " + str(addr[x]) + " was added to clientIP."
-            #ignore the first three characters after the last character of the IP, which are ', (space) then record the port
-            clientPort = addr[1] #copy the port
-            #for x in range(len(clientIP) + 3,len(addr)):
-             #   if(addr[x] == ")"):
-              #      print "DEBUG: Closing parenthesis detected, end of port."
-               #     break
-               # else:
-               #     clientPort= str(clientPort) + str(addr[x])
-                #    print "DEBUG: " + str(addr[x]) + " was added to clientPort"
-            self.dictionaryOfClientPorts[clientIP] = clientPort
-            print "INFO: Client " +str(clientIP) + " successfully added to the dictionary of client port, with port of " +str(clientPort)
             #When a client is added, they are also added to the dictionaryOfCurrentClientTasks
             self.dictionaryOfCurrentClientTasks[addr] = "" #Not working on anything, so value is the empty string
             print "STATUS: Client successfully added to the Dictionary of Current Client Tasks"
@@ -338,16 +316,20 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                             if(analysisString[8] == "k"):
                                                                 try:  #looking for NEXTCHUNK in analysis string try block
                                                                     print "Command Type: nextChunk"
+                                                                    #extract information from chunk
+
                                                                     #get ip address of client waiting for reply
-                                                                    try:
+                                                                    try: #send nextChunk message to client try block
                                                                         tempAddr= self.listOfClientsWaitingForAReply[0]
                                                                         tempSock, tempAddr2= self.findClientSocket(tempAddr)
                                                                         clientMessage= "TEST"
                                                                         #if(tempSock is None):
                                                                          #   raise Exception("tempSock is of type None! Unable to send message")
                                                                         self.sendNextToClient(tempSock,tempAddr2,clientMessage)
-                                                                        print "DEBUG: AFTER MESSAGE WAS (SUPPOSEDLY) SENT TO CLIENT " + str(tempAddr)
-                                                                        print "DEBUG: Message: " + str(clientMessage)
+                                                                        del self.listOfClientsWaitingForAReply[0]
+                                                                        print "INFO: Removed client from the listOfClientsWaitingForAReply"
+                                                                        #print "DEBUG: AFTER MESSAGE WAS (SUPPOSEDLY) SENT TO CLIENT " + str(tempAddr)
+                                                                        #print "DEBUG: Message: " + str(clientMessage)
                                                                     except Exception as inst:
                                                                             print "========================================================================================"
                                                                             print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
@@ -398,10 +380,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         self.listOfClients.append((sock, addr))
                         print "INFO: Client successfully added to the list of clients"
                         print str(len(self.listOfClients)) + " Client(s) are currently Connected."
-                        clientIP= addr[0] #copy the IP
-                        clientPort= addr[1] #copy the port
-                        self.dictionaryOfClientPorts[clientIP] = clientPort
-                        print "INFO: Client " + str(clientIP) + " Successfully added to the dictionary of client ports, with port " + str(clientPort)
                         self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
                         print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
                     except socket.timeout as inst:
