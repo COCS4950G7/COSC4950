@@ -4,8 +4,10 @@ __author__ = 'chris hamm'
 
 #THINGS ADDED FROM THIS REVISION
 #Now able to receive a chunk object from the controller class
+#Implemented a dictionary to keep track of client's sockets
 #(In progress)Extract information from a chunk object
 #(In progress)Send extracted information over the network to the client
+#Changed data type of dictionary of clients waiting for a reply to a list
 
 #THINGS ADDED FROM REVISION 9D
 #Added lists for the server to use to keep track of things that have happened and still need to be done
@@ -42,6 +44,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #dictionary (below) that holds the ip of each client that is waiting for a reply as the key and what it is waiting for as the value
         #dictionaryOfClientsWaitingForAReply = {} #Possible values: "NEXTCHUNK", "FOUNDSOLUTION"
         listOfClientsWaitingForAReply= []
+        dictionaryOfClientPorts = {} #dictionary that holds each clients socket as a value, using the IP address as the key
         dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
         recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
         recordOfInboundCommandsFromControllerToServer = {} #dictionary that records how many times the server received a command from the controller
@@ -182,6 +185,26 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
             self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
             print "STATUS: Client successfully added to the list of clients"
+            clientIP= addr[0] #copy the IP address
+            #ignore the first two characters which are (' and isolate the IP address
+            #for x in range(2,len(addr)):
+             #   if(addr[x] == "'"):
+              #      print "DEBUG: Apostraphe detected, end of IP address"
+               #     break
+              #  else:
+               #     clientIP= str(clientIP) + str(addr[x])
+                #    print "DEBUG: " + str(addr[x]) + " was added to clientIP."
+            #ignore the first three characters after the last character of the IP, which are ', (space) then record the port
+            clientPort = addr[1] #copy the port
+            #for x in range(len(clientIP) + 3,len(addr)):
+             #   if(addr[x] == ")"):
+              #      print "DEBUG: Closing parenthesis detected, end of port."
+               #     break
+               # else:
+               #     clientPort= str(clientPort) + str(addr[x])
+                #    print "DEBUG: " + str(addr[x]) + " was added to clientPort"
+            self.dictionaryOfClientPorts[clientIP] = clientPort
+            print "INFO: Client " +str(clientIP) + " successfully added to the dictionary of client port, with port of " +str(clientPort)
             #When a client is added, they are also added to the dictionaryOfCurrentClientTasks
             self.dictionaryOfCurrentClientTasks[addr] = "" #Not working on anything, so value is the empty string
             print "STATUS: Client successfully added to the Dictionary of Current Client Tasks"
@@ -317,10 +340,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                                     print "Command Type: nextChunk"
                                                                     #get ip address of client waiting for reply
                                                                     try:
-                                                                        #tempSock, tempAddr= self.dictionaryOfClientsWaitingForAReply[0]
                                                                         tempAddr= self.listOfClientsWaitingForAReply[0]
-                                                                        self.sendNextToClient(tempAddr,"TEST")
-                                                                        print "DEBUG: MESSAGE SENT TO CLIENT " + str(tempAddr)
+                                                                        tempSock, tempAddr2= self.findClientSocket(tempAddr)
+                                                                        clientMessage= "TEST"
+                                                                        #if(tempSock is None):
+                                                                         #   raise Exception("tempSock is of type None! Unable to send message")
+                                                                        self.sendNextToClient(tempSock,tempAddr2,clientMessage)
+                                                                        print "DEBUG: AFTER MESSAGE WAS (SUPPOSEDLY) SENT TO CLIENT " + str(tempAddr)
+                                                                        print "DEBUG: Message: " + str(clientMessage)
                                                                     except Exception as inst:
                                                                             print "========================================================================================"
                                                                             print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
@@ -328,45 +355,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                                             print inst.args #srguments stored in .args
                                                                             print inst #_str_ allows args tto be printed directly
                                                                             print "========================================================================================"
-                                                                    #recall that position 9 is a space
-                                                                    #looking for the next space in the string which will be after the ip address
-
-                                                                    '''analysisIP= ""
-                                                                    endOfIPPosition= 10
-                                                                    for x in range(10,len(analysisString)):
-                                                                       # if(analysisString[x] == " "): #if it is a space
-                                                                        if(analysisString[x].isspace()):
-                                                                            endOfIPPosition= x
-                                                                            print "DEBUG: analysisString index x=" + str(x)
-                                                                            break
-                                                                        else:
-                                                                            analysisIP= str(analysisIP + str(analysisString[x]))
-                                                                    print "Need To Send To: " + analysisIP
-                                                                    print "INFO: Looking for matching IP address in listOfClients"
-                                                                    foundMatchingIP= False
-                                                                    for index in range(0,len(self.listOfClients)):
-                                                                        tempSock, tempAddr = self.listOfClients[index]
-                                                                        if(analysisIP == tempAddr):
-                                                                            print "Match was found"
-                                                                            foundMatchingIP= True
-                                                                            break
-                                                                        else:
-                                                                            print "No Match Found Yet. " + str(analysisIP) + "!=" + str(tempAddr)
-                                                                    if(foundMatchingIP==False):
-                                                                        print "WARNING: No Matching IP Address was found for:" + analysisIP
-                                                                    else:
-                                                                        print "STATUS: Sending Message To Client..."
-                                                                        try: #send NEXTCHUNK message to client try block
-                                                                            theMessage= str(analysisString[endOfIPPosition+1:len(analysisString)])
-                                                                            self.sendNextToClient(tempSock,tempAddr,theMessage)
-                                                                            print "STATUS: Sent Message to the client"
-                                                                        except Exception as inst:
-                                                                            print "========================================================================================"
-                                                                            print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
-                                                                            print type(inst) #the exception instance
-                                                                            print inst.args #srguments stored in .args
-                                                                            print inst #_str_ allows args tto be printed directly
-                                                                            print "========================================================================================" '''
                                                                 except Exception as inst:
                                                                     print "========================================================================================"
                                                                     print "ERROR: An exception has been thrown in the looking for NEXTCHUNK in analysis string Try Block"
@@ -410,6 +398,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         self.listOfClients.append((sock, addr))
                         print "INFO: Client successfully added to the list of clients"
                         print str(len(self.listOfClients)) + " Client(s) are currently Connected."
+                        clientIP= addr[0] #copy the IP
+                        clientPort= addr[1] #copy the port
+                        self.dictionaryOfClientPorts[clientIP] = clientPort
+                        print "INFO: Client " + str(clientIP) + " Successfully added to the dictionary of client ports, with port " + str(clientPort)
                         self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
                         print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
                     except socket.timeout as inst:
@@ -471,7 +463,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     else:
                         #for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems(): #(OLD METHOD)
                         for x in range(0,len(self.listOfClientsWaitingForAReply)):
-                            print "[" + x + "] =" + self.listOfClientsWaitingForAReply[x]
+                            print "[" + str(x) + "] =" + str(self.listOfClientsWaitingForAReply[x])
                     print "(END OF LIST OF CLIENTS WAITING FOR A REPLY)"
                     print "--------------------------------"
                 except Exception as inst:
@@ -860,6 +852,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #def sendNextToClient(self,recipientIPAddress, theNextPart): (FAILED ATTEMPT AT NEW METHOD)
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
+                #self.serverSocket.sendto(theNextPart, (recipientsSocket,recipientIPAddress))
                 print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
                 #increment the record counter
                 self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
@@ -1355,3 +1348,30 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             else:
                 return False
 
+    #=============================================
+    #Find the socket that matches the IP address
+    #=============================================
+        def findClientSocket(self,clientIPAddress):
+            try:
+                foundMatch= False
+                for x in range(0, len(self.listOfClients)):
+                    tempSock, tempAddr = self.listOfClients[x]
+                    if(clientIPAddress == tempAddr[0]):
+                        print "INFO: Found client's corresponding socket"
+                        foundMatch= True
+                        return (tempSock,tempAddr)
+                    else:
+                        print "INFO: No corresponding socket found yet. " + str(clientIPAddress) + "!=" + str(tempAddr[0])
+                if(foundMatch == False):
+                    print "WARNING: No corresponding socket was found to match the IP: " + str(clientIPAddress)
+                    return None
+            except Exception as inst:
+                print "============================================================================================="
+                print "ERROR: An exception was thrown in the findClientSocket Try Block"
+                #the exception instance
+                print type(inst)
+                #srguments stored in .args
+                print inst.args
+                #_str_ allows args tto be printed directly
+                print inst
+                print "============================================================================================="
