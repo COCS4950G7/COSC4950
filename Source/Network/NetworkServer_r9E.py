@@ -4,7 +4,7 @@ __author__ = 'chris hamm'
 
 #THINGS ADDED FROM THIS REVISION
 #Now able to receive a chunk object from the controller class
-#(In progress)Extract information from a chunk object
+#Extract information from a chunk object
 #(In progress)Send extracted information over the network to the client
 #Changed data type of dictionary of clients waiting for a reply to a list
 
@@ -240,7 +240,36 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                             #Determine what type of object the controller has sent the server
                             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                            if(type(recv) is Chunk):
+                            #assume that a chunk object has been received, if not try again as a string
+                            print "STATUS: Extracting String from received object..."
+                            extractedTheString = False #variable that records whether the success of the extraction
+                            try: #attempt to extract params from a chunk object
+                                chunkParams = recv.params
+                                print "INFO: String has been extracted from a chunk object"
+                                extractedTheString= True
+                            except Exception as inst:
+                                #print "========================================================================================"
+                               # print "ERROR: An exception has been thrown in the extract params from chunk object Try Block"
+                                print "Received object is not a chunk object."
+                                #print type(inst) #the exception instance
+                                #print inst.args #srguments stored in .args
+                                #print inst #_str_ allows args tto be printed directly
+                                #print "========================================================================================"
+                            if(extractedTheString == False):
+                                chunkParams = recv
+                                print "INFO: String extracted from a String Object"
+                            else: #if extractedTheString == True (meaning a chunk object)
+                                print "STATUS: Extracting data from chunk object..."
+                                chunkData = recv.data
+                                print "INFO: Successfully extracted data from chunk object"
+                                print "DEBUG: Data that was extracted: '" +str(chunkData) + "'"
+                            if(len(chunkParams) < 1):
+                                print "WARNING: Extracted the empty string from the chunk params"
+                            else:
+                                print "INFO: Successfully extracted params from chunk"
+                                print "DEBUG: Info extracted from the received object: '" + str(chunkParams) + "'"
+
+                            '''if(type(recv) is Chunk): #Determination by type definition
                                 print "I/O: Received a Chunk Object From the Controller"
                                 self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] = (self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] + 1)
                                 inputChunkParams = recv.params #copy the parameters from the received object to the inputChunk
@@ -267,7 +296,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             else:
                                 print " "
                                 print "ERROR: Received a message with an invalid type: " + str(type(recv))
-                                print " "
+                                print " " '''
                         else:
                             print "STATUS: No command was received from the controller class"
                     except Exception as inst:
