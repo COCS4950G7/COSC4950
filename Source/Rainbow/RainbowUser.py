@@ -1,6 +1,8 @@
 #   RainbowUser.py
 
-#   DESCRIPTION HERE
+#   A companion to RainbowMaker.py, RainbowUser uses a pre-computed
+#   rainbow table to search for a given hash, attempting to find the
+#   associated key.
 
 #   Chris Bugg
 #   10/7/14
@@ -124,14 +126,6 @@ class RainbowUser():
         return self.fileName
 
 
-    #Get dimensions of the table
-    def setDimensions(self, chainLength, numRows):
-
-        self.width = int(chainLength)
-
-        self.height = int(numRows)
-
-
     #Returns whether or not we're done creating
     def isDone(self):
 
@@ -173,202 +167,6 @@ class RainbowUser():
             randKey = randKey + random.choice(self.alphabet)
 
         return randKey
-
-
-    #Sets up the file initially (put info in first line)
-    def setupFile(self):
-
-        #Open the file for writing
-        self.file = open(self.fileName, 'w')
-
-        self.file.write(self.algorithm + " " + str(self.numChars) + " " + self.alphabetChoice + " " + str(self.width) + "\n")
-
-        self.fileLocation = self.file.tell()
-
-        self.file.close()
-
-
-    #Puts a done chunk (already processed by a node) into the table (file)
-    def putChunkInFile(self, chunkOfDone):
-
-        #Split chunkOfDone's data into a list
-        linesList = chunkOfDone.data.splitlines()
-
-        #Open the file for writing
-        self.file = open(self.fileName, 'r+')
-
-        #Seek to where we left off in the file
-        self.file.seek(self.fileLocation)
-
-        for x in linesList:
-
-            #print to file
-            self.file.write(x + "\n")
-
-            #And increment count
-            self.chunkCount += 1
-
-        #Save where we are in file
-        self.fileLocation = self.file.tell()
-
-        #Close the file
-        self.file.close()
-
-        #Check if we've gotten all the chunks we need
-        if self.chunkCount >= self.height:
-
-            self.done = True
-
-
-    #Create (and return) a chunk of the table, and do all that sub-process stuff
-    def create(self, paramsChunk):
-
-        #Set variables to that of server, get from parameter(-bearing) chunk
-        self.setVariables(paramsChunk.params)
-
-        #ChunkSize is the number of rows in the file that we're creating in this, 'chunk'
-
-        #return chunkSize
-
-        #We're creating the children
-        #Then setting them up with an equal sub-chunksize
-        #IE: chunksize/numSubprocesses = sub-chunksize
-
-        #Then we listen for them to get done and send us a list
-        #Then we're done once they've sent their lists (return)
-
-        #big list containing all the lines from the nodes
-        bigChunk = ""
-
-        #sub-process's chunk size (num rows to calculate)
-        #subChunkSize = chunkSize / 8
-        subChunkSize = 1
-
-        #Create lock
-        lock = Lock()
-
-        #Create the pipes
-        parentPipe, childPipe = Pipe()
-
-        #Create the children
-        child1 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child2 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child3 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child4 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child5 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child6 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child7 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        child8 = Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, ))
-
-        #start the children
-        child1.start()
-
-        child2.start()
-
-        child3.start()
-
-        child4.start()
-
-        child5.start()
-
-        child6.start()
-
-        child7.start()
-
-        child8.start()
-
-        #Count our iterations of responses
-        count = 0
-
-        #Are we done yet?
-        done = False
-
-        rec = 0
-
-        while not done:
-
-            #If all the nodes have given us their lists
-            if count > 7:
-
-                child1.join()
-
-                child2.join()
-
-                child3.join()
-
-                child4.join()
-
-                child5.join()
-
-                child6.join()
-
-                child7.join()
-
-                child8.join()
-
-                #self.done = True
-
-                done = True
-
-            else:
-
-                #Get a sub-chunk from a node
-                rec = parentPipe.recv()
-
-                #while the list(sub-chunk) from node is not empty
-                #while rec:
-
-                    #Put a line of the list in our bigChunk
-
-                bigChunk += rec
-
-                count += 1
-
-        returnChunk = Chunk()
-
-        returnChunk.data = bigChunk
-
-        return returnChunk
-
-
-    #The sub-process function
-    def subProcess(self, pipe, lock, chunkSize):
-
-        #The list to return with strings to be the lines of the file
-        daList = ""
-
-        for x in range(chunkSize):
-
-            randKey = self.getRandKey()
-
-            reduced = randKey
-
-            #hash = self.hashThis(reduced)
-
-            for y in range(self.width):
-
-                hash = self.hashThis(reduced)
-
-                reduced = self.getSeededKey(hash)
-
-            hash = self.hashThis(reduced)
-
-            daList += randKey + " " + hash + "\n"
-
-        lock.acquire()
-
-        pipe.send(daList)
-
-        pipe.close()
-
-        lock.release()
 
 
     #Returns number of rows in table
@@ -418,17 +216,6 @@ class RainbowUser():
 
         self.iteration = self.width * 2
 
-    '''
-    #Returns a chunk with all variables needed by nodes
-    def makeParamsChunk(self):
-
-        tempChunk = Chunk()
-
-        tempChunk.params = "rainbowuser " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
-        tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
-
-        return tempChunk
-    '''
 
     #Returns if eof
     def isEof(self):
@@ -500,11 +287,8 @@ class RainbowUser():
 
         return chunk
 
-
     #Searches the chunk for the key (given the hash in the chunk.params)
     def find(self, chunk):
-
-        x=1
 
         #Set class variables based on parameters from the chunk
         self.setVariables(chunk.params)
@@ -512,7 +296,8 @@ class RainbowUser():
         #Split the data (as a string) into a list of lines
         linesList = chunk.data.splitlines()
 
-        #First, we'll take the data and put it into two lists for searching
+        #
+        # First, we'll take the data and put it into two lists for searching
 
         #Make two lists, one for each key and one for each hash of the lines
         keyList = []
@@ -527,19 +312,121 @@ class RainbowUser():
             lineList = x.split()
 
             #Put the key in the key list
-            #keyList[tempCounter] = lineList[0]
-
             keyList.append(lineList[0])
 
             #put the hash in the hash list
-            #hashList[tempCounter] = lineList[1]
             hashList.append(lineList[1])
 
-        #Second, we'll actually do the searching
-        #print keyList
-        #print
-        #print hashList
-        #print
+        #divides up list into smaller lists, that we will feed the sub-processes
+        keySubList = self.chunkIt(keyList, 8)
+        hashSubList = self.chunkIt(hashList, 8)
+
+        #
+        # Second, we'll actually do the searching
+
+        lock = Lock()
+
+        parentPipe, childPipe = Pipe()
+
+        child1 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[0], hashSubList[0]))
+
+        child2 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[1], hashSubList[1]))
+
+        child3 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[2], hashSubList[2]))
+
+        child4 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[3], hashSubList[3]))
+
+        child5 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[4], hashSubList[4]))
+
+        child6 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[5], hashSubList[5]))
+
+        child7 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[6], hashSubList[6]))
+
+        child8 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[7], hashSubList[7]))
+
+        child1.start()
+
+        child2.start()
+
+        child3.start()
+
+        child4.start()
+
+        child5.start()
+
+        child6.start()
+
+        child7.start()
+
+        child8.start()
+
+        count = 0
+
+        done = False
+
+        rec = 0
+
+        while not done:
+
+            if count > 7:
+
+                child1.join()
+
+                child2.join()
+
+                child3.join()
+
+                child4.join()
+
+                child5.join()
+
+                child6.join()
+
+                child7.join()
+
+                child8.join()
+
+                self.found = False
+
+                self.done = True
+
+                done = True
+
+            else:
+
+                rec = parentPipe.recv()
+
+                if rec == "found":
+
+                    self.key = parentPipe.recv()
+
+                    child1.terminate()
+
+                    child2.terminate()
+
+                    child3.terminate()
+
+                    child4.terminate()
+
+                    child5.terminate()
+
+                    child6.terminate()
+
+                    child7.terminate()
+
+                    child8.terminate()
+
+                    done = True
+
+                    self.found = True
+
+                    self.done = True
+
+                count += 1
+
+
+    #The sub-process function
+    def subProcess(self, pipe, lock, keyList, hashList):
 
         done = False
 
@@ -563,14 +450,11 @@ class RainbowUser():
 
                     #We found the line that matches, now just search the line for the key
                     done = True
-                    #print "Found 1"
-                    #print tempHash
-                    #print x
+
                     signal = 1
 
                     #Which line we found the hash on (index location)
                     where = hashList.index(x)
-                    #print where
 
             if not done:
 
@@ -590,28 +474,31 @@ class RainbowUser():
 
             #Set our key to the starting key of that line
             tempKey = keyList[where]
-            #print tempKey
-            #print self.width
+
             #For as wide as our table is plus one
             for y in range(self.width + 1):
 
                 #hash our tempKey
                 tempHash = self.hashThis(tempKey)
 
-                #print "tempHash: " + tempHash
-                #print "tempKey:  " + tempKey
-
                 #And compare to original key
                 if self.hash == tempHash:
 
                     #FOUND THE KEY!
-                    print "Key found!"
-
-                    self.key = tempKey
 
                     self.found = True
 
                     self.done = True
+
+                    lock.acquire()
+
+                    pipe.send("found")
+
+                    pipe.send(tempKey)
+
+                    pipe.close()
+
+                    lock.release()
 
                 else:
 
@@ -620,15 +507,28 @@ class RainbowUser():
 
             if self.found == False:
 
-                #If we got this far,
-                print "Collision Detected!"
+                self.done = True
+
+                lock.acquire()
+
+                pipe.send("collisionDetected")
+
+                pipe.close()
+
+                lock.release()
 
         else:
 
             #No matching line found
             self.done = True
 
-            print "No key found!"
+            lock.acquire()
+
+            pipe.send("notFound")
+
+            pipe.close()
+
+            lock.release()
 
 
     #Reads the first line of file to setup variables
@@ -662,3 +562,11 @@ class RainbowUser():
     def getHash(self):
 
         return self.hash
+
+
+    #Divides up a list, and stores those sub-lists in a big list
+    def chunkIt(self, list, pieces):
+
+        chunky = [list[i::pieces] for i in range(pieces)]
+
+        return chunky

@@ -1414,7 +1414,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainbowUserScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1451,7 +1451,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainbowUserScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1669,7 +1669,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainMakerScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 

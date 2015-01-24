@@ -1,6 +1,10 @@
 #   RainbowMaker.py
 
-#   DESCRIPTION HERE
+#   A companion to RainbowUser.py, RainbowMaker creates rainbow
+#   tables for a time/cost trade-off. Essentially, it will pre-compute
+#   a large amount of hashes so that they can be used later to
+#   find a key (given a hash), in a manner that is many times
+#   faster than a regular brute-force approach.
 
 #   Chris Bugg
 #   10/7/14
@@ -33,28 +37,7 @@ class RainbowMaker():
 
     #Constructor
     def __init__(self):
-        '''
-        #Make the table
-        self.makeTable()
 
-        #Start the timer
-        start = time.clock()
-
-        #Import Table
-        self.importTable()
-
-        #Check for collisions
-        while self.collisionFixer() == 1:
-
-            #Import Table
-            self.importTable()
-
-        #Check on timer
-        elapsed = (time.clock() - start)
-        print("That took: ", elapsed, " seconds.")
-
-        exit = input("Done! Hit (Enter/Return) to quit ")
-        '''
         x=0
 
     #Sets the algorithm choice
@@ -133,51 +116,6 @@ class RainbowMaker():
     def isDone(self):
 
         return self.done
-
-    '''
-    #Make the table
-    def makeTable(self):
-
-        #Start the timer
-        start = time.clock()
-
-        print("Working...")
-
-        #Create/open file
-        self.file = open(self.fileName, 'w')
-
-        #Put useful info in first line
-        self.file.write(self.algorithm
-                        + " " + self.numChars
-                        + " " + self.alphabetChoice
-                        + " " + str(self.width) + "\n")
-
-        for x in range(self.height):
-
-            randKey = self.getRandKey()
-
-            reduced = randKey
-
-            #hash = self.hashThis(reduced)
-
-            for y in range(self.width):
-
-                hash = self.hashThis(reduced)
-
-                reduced = self.getSeededKey(hash)
-
-            hash = self.hashThis(reduced)
-
-            #Print to file
-            self.file.write(randKey + " " + hash + "\n")
-
-        #Check on timer
-        elapsed = (time.clock() - start)
-        print("That took: ", elapsed, " seconds.")
-
-        #Close the file
-        self.file.close()
-        '''
 
     #Hashes key
     def hashThis(self, key):
