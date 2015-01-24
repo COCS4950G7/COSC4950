@@ -247,6 +247,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 chunkParams = recv.params
                                 print "INFO: String has been extracted from a chunk object"
                                 extractedTheString= True
+                                self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] = (self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] + 1)
                             except Exception as inst:
                                 #print "========================================================================================"
                                # print "ERROR: An exception has been thrown in the extract params from chunk object Try Block"
@@ -268,6 +269,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             else:
                                 print "INFO: Successfully extracted params from chunk"
                                 print "DEBUG: Info extracted from the received object: '" + str(chunkParams) + "'"
+                                self.listOfControllerMessages.append(chunkParams)
+                                print "INFO: The extracted string has been added to the listOfControllerMessages"
 
                             '''if(type(recv) is Chunk): #Determination by type definition
                                 print "I/O: Received a Chunk Object From the Controller"
@@ -351,14 +354,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                                                     try: #send nextChunk message to client try block
                                                                         tempAddr= self.listOfClientsWaitingForAReply[0]
                                                                         tempSock, tempAddr2= self.findClientSocket(tempAddr)
-                                                                        clientMessage= "TEST"
+                                                                        clientMessage= str(analysisString)
                                                                         #if(tempSock is None):
                                                                          #   raise Exception("tempSock is of type None! Unable to send message")
                                                                         self.sendNextToClient(tempSock,tempAddr2,clientMessage)
                                                                         del self.listOfClientsWaitingForAReply[0]
                                                                         print "INFO: Removed client from the listOfClientsWaitingForAReply"
                                                                         #print "DEBUG: AFTER MESSAGE WAS (SUPPOSEDLY) SENT TO CLIENT " + str(tempAddr)
-                                                                        #print "DEBUG: Message: " + str(clientMessage)
+                                                                        print "DEBUG: Message: " + str(clientMessage)
                                                                     except Exception as inst:
                                                                             print "========================================================================================"
                                                                             print "ERROR: An exception has been thrown in the Send NEXTCHUNK message to client try block"
