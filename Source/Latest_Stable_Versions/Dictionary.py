@@ -267,7 +267,7 @@ class Dictionary():
 
                 pipe.close()
 
-                lock. release()
+                lock.release()
 
                 return 0
 

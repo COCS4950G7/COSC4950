@@ -199,9 +199,9 @@ class RainbowUser():
 
     #Sets all class variables to ones given from server (params)
     def setVariables(self, paramsString):
-        #print paramsString
+
         paramsList = paramsString.split()
-        #print paramsList
+
         self.algorithm = paramsList[1]
 
         self.hash = paramsList[2]
