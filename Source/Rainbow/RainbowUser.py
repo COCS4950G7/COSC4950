@@ -11,7 +11,7 @@
 import hashlib
 import random
 import time
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe, Lock, cpu_count
 import os
 import string
 
@@ -39,6 +39,7 @@ class RainbowUser():
     found = False
     key = ""
     iteration = 100000
+    numProcesses = cpu_count()
 
     #Constructor
     def __init__(self):
@@ -67,41 +68,49 @@ class RainbowUser():
     #Get the alphabet and direction to be searched
     def setAlphabet(self, alphabetChoice):
 
-        self.alphabetChoice = alphabetChoice
+        choicesList = list(alphabetChoice)
 
-        #Setup the lookup alphabet
-        mixedAlphaNumeric = "abcdefghijklmnopqrstuvwxyz_0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        mixedAlphabet = "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        self.alphabetChoice = ""
+
+        for x in choicesList:
+
+            self.alphabetChoice += str(x)
+
         lowerAlphabet = "abcdefghijklmnopqrstuvwxyz_"
         upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
         digits = "0123456789_"
+        punctuation = string.punctuation
 
-        mixedAlphaNumericList = list(mixedAlphaNumeric)
-        mixedAlphabetList = list(mixedAlphabet)
         lowerAlphabetList = list(lowerAlphabet)
         upperAlphabetList = list(upperAlphabet)
         digitsList = list(digits)
+        punctuationList = list(punctuation)
 
-        #set alphabet
-        if self.alphabetChoice == "a":
+        self.alphabet = []
 
-            self.alphabet = lowerAlphabetList
+        for choice in choicesList:
 
-        elif self.alphabetChoice == "A":
+            if choice == "a":
 
-            self.alphabet = upperAlphabetList
+                self.alphabet += lowerAlphabetList
 
-        elif self.alphabetChoice == "m":
+            elif choice == "A":
 
-            self.alphabet = mixedAlphabetList
+                self.alphabet += upperAlphabetList
 
-        elif self.alphabetChoice == "M":
+            elif choice == "p":
 
-            self.alphabet = mixedAlphaNumericList
+                self.alphabet += punctuationList
 
-        elif self.alphabetChoice == "d":
+            elif choice == "d":
 
-            self.alphabet = digitsList
+                self.alphabet += digitsList
+
+            else:
+
+                return False
+
+        return True
 
 
     #Get file name
@@ -318,8 +327,8 @@ class RainbowUser():
             hashList.append(lineList[1])
 
         #divides up list into smaller lists, that we will feed the sub-processes
-        keySubList = self.chunkIt(keyList, 8)
-        hashSubList = self.chunkIt(hashList, 8)
+        keySubList = self.chunkIt(keyList, self.numProcesses)
+        hashSubList = self.chunkIt(hashList, self.numProcesses)
 
         #
         # Second, we'll actually do the searching
@@ -328,37 +337,11 @@ class RainbowUser():
 
         parentPipe, childPipe = Pipe()
 
-        child1 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[0], hashSubList[0]))
+        children = []
 
-        child2 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[1], hashSubList[1]))
-
-        child3 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[2], hashSubList[2]))
-
-        child4 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[3], hashSubList[3]))
-
-        child5 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[4], hashSubList[4]))
-
-        child6 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[5], hashSubList[5]))
-
-        child7 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[6], hashSubList[6]))
-
-        child8 = Process(target=self.subProcess, args=(childPipe, lock, keySubList[7], hashSubList[7]))
-
-        child1.start()
-
-        child2.start()
-
-        child3.start()
-
-        child4.start()
-
-        child5.start()
-
-        child6.start()
-
-        child7.start()
-
-        child8.start()
+        for i in range(0, self.numProcesses):
+            children.append(Process(target=self.subProcess, args=(childPipe, lock, keySubList[i], hashSubList[i], )))
+            children[i].start()
 
         count = 0
 
@@ -368,29 +351,17 @@ class RainbowUser():
 
         while not done:
 
-            if count > 7:
+            if count > (self.numProcesses - 1):
 
-                child1.join()
+                for i in range(0, self.numProcesses):
 
-                child2.join()
+                    children[i].join()
 
-                child3.join()
+                    self.found = False
 
-                child4.join()
+                    self.done = True
 
-                child5.join()
-
-                child6.join()
-
-                child7.join()
-
-                child8.join()
-
-                self.found = False
-
-                self.done = True
-
-                done = True
+                    done = True
 
             else:
 
@@ -400,21 +371,9 @@ class RainbowUser():
 
                     self.key = parentPipe.recv()
 
-                    child1.terminate()
+                    for i in range(0, self.numProcesses):
 
-                    child2.terminate()
-
-                    child3.terminate()
-
-                    child4.terminate()
-
-                    child5.terminate()
-
-                    child6.terminate()
-
-                    child7.terminate()
-
-                    child8.terminate()
+                        children[i].terminate()
 
                     done = True
 

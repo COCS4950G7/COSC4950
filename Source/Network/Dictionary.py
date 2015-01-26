@@ -31,7 +31,7 @@
 #Imports
 import hashlib
 import time
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe, Lock, cpu_count, Queue, Value
 import os
 from Chunk import Chunk
 import random
@@ -50,6 +50,8 @@ class Dictionary():
     allLinesList = []
     fileLocation = 0
     eof = False
+    numProcesses = cpu_count()
+    #queue = Queue(numProcesses * 5)
 
     #Constructor
     def __init__(self):
@@ -96,75 +98,21 @@ class Dictionary():
         self.hash = paramsList[2]
 
         #Sub chunk chunkList and call processes
-        chunky = self.chunkIt(chunkList, 8)
-
-        chunk1 = chunky.pop()
-
-        chunk2 = chunky.pop()
-
-        chunk3 = chunky.pop()
-
-        chunk4 = chunky.pop()
-
-        chunk5 = chunky.pop()
-
-        chunk6 = chunky.pop()
-
-        chunk7 = chunky.pop()
-
-        chunk8 = chunky.pop()
+        chunky = self.chunkIt(chunkList, self.numProcesses)
 
         lock = Lock()
 
         parentPipe, childPipe = Pipe()
 
-        child1 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        children = []
 
-        child2 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        for i in range(0, self.numProcesses):
+            children.append(Process(target=self.subProcess, args=(childPipe, lock, )))
+            children[i].start()
 
-        child3 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        for chunk in chunky:
 
-        child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child5 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child6 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child7 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child8 = Process(target=self.subProcess, args=(childPipe, lock, ))
-
-        child1.start()
-
-        child2.start()
-
-        child3.start()
-
-        child4.start()
-
-        child5.start()
-
-        child6.start()
-
-        child7.start()
-
-        child8.start()
-
-        parentPipe.send(chunk1)
-
-        parentPipe.send(chunk2)
-
-        parentPipe.send(chunk3)
-
-        parentPipe.send(chunk4)
-
-        parentPipe.send(chunk5)
-
-        parentPipe.send(chunk6)
-
-        parentPipe.send(chunk7)
-
-        parentPipe.send(chunk8)
+            parentPipe.send(chunk)
 
         count = 0
 
@@ -174,29 +122,17 @@ class Dictionary():
 
         while not done:
 
-            if count > 7:
+            if count > (self.numProcesses - 1):
 
-                child1.join()
+                for i in range(0, self.numProcesses):
 
-                child2.join()
+                    children[i].join()
 
-                child3.join()
+                    self.found = False
 
-                child4.join()
+                    self.done = True
 
-                child5.join()
-
-                child6.join()
-
-                child7.join()
-
-                child8.join()
-
-                self.found = False
-
-                self.done = True
-
-                done = True
+                    done = True
 
             else:
 
@@ -206,21 +142,9 @@ class Dictionary():
 
                     self.key = parentPipe.recv()
 
-                    child1.terminate()
+                    for i in range(0, self.numProcesses):
 
-                    child2.terminate()
-
-                    child3.terminate()
-
-                    child4.terminate()
-
-                    child5.terminate()
-
-                    child6.terminate()
-
-                    child7.terminate()
-
-                    child8.terminate()
+                        children[i].terminate()
 
                     done = True
 
@@ -267,7 +191,7 @@ class Dictionary():
 
                 pipe.close()
 
-                lock. release()
+                lock.release()
 
                 return 0
 

@@ -25,6 +25,7 @@ from time import time
 import sys
 import os
 from multiprocessing import Process, Pipe
+import string
 
 #import GUI
 
@@ -1504,23 +1505,26 @@ class Controller():
 
                     #Get the alphabet to be used
                     print
-                    print "What's the alphabet: "
+                    #print "What's the alphabet: "
+                    print "Choose your alphabet: "
                     print "0-9(d)"
                     print "a-z(a)"
                     print "A-Z(A)"
-                    print "a-z&A-Z(m)"
-                    print "a-z&A-Z&0-9(M)"
+                    print "!-~(p)"
                     print
+                    print "Add letters together to add"
+                    print " multiple alphabets together."
+                    print "IE: dap = 0-9 & a-z & !-~"
+                    print
+
                     alphabet = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"d", "a", "A", "m", "M"}
-                    while not alphabet in goodNames:
+                    while not self.rainbowMaker.setAlphabet(alphabet):
 
                         print "Input Error!"
 
                         alphabet = raw_input("Try Again: ")
-                    self.rainbowMaker.setAlphabet(alphabet)
 
                     #Get dimensions
                     print
@@ -1721,6 +1725,7 @@ class Controller():
                     print
 
                     print "We just made ", self.rainbowMaker.getFileName()
+                    print "Using the alphabet ", ''.join(self.rainbowMaker.alphabet)
                     print "With chain length of ", self.rainbowMaker.getLength()
                     print "And ", self.rainbowMaker.numRows(), "rows."
                     print "And it took", self.clock, "seconds."
