@@ -1,7 +1,10 @@
 __author__ = 'chris hamm'
-#NetworkClient_r9D
-#Created: 1/10/2015
+#NetworkClient_r9E
+#Created: 1/17/2015
 
+#THINGS ADDED/CHANGED FROM THIS REVISION
+    #Removed some old commented lines of code that have been there forever
+#THINGS ADDED FROM REVISION 9D
 #Added functions to parse chunk objects (Has now been decided that these will not be needed)
 #Added a command logging system that records what commands has been received and sent to server/controller. These will be displayed after the client shuts down and after the socket is closed
     #-Record of commands sent to Controller from the Client
@@ -11,7 +14,7 @@ __author__ = 'chris hamm'
 
 import socket
 import platform
-from Chunk import Chunk
+import Chunk
 
 #===================================================================
 #Client constructor/class definition
@@ -27,7 +30,7 @@ class NetworkClient():
     serverIP = "127.0.1.1"
     myOperatingSystem = None
     myIPAddress = "127.0.1.1"
-    chunk = Chunk()
+    chunk = Chunk.Chunk()
     key = 0
     recordOfOutboundCommandsFromClientToController = {} #dictionary that keeps a record of how many commands were sent to the controller
     recordOfOutboundCommandsFromClientToServer = {} #dictionary that keeps a record of how many commands were sent to the server
@@ -190,7 +193,7 @@ class NetworkClient():
                 print "ERROR: Failed to connect to server"
                 print "Error code: " + str(msg[0]) + " Message: " + msg[1]
                 raise Exception("Failed to connect to server")
-                #print "========================================================================================"
+                print "========================================================================================"
 
             self.sendConnectedCommandToCOntroller()
 
@@ -310,7 +313,7 @@ class NetworkClient():
                 print "INFO: CRASH Command was sent to the server"
                 #SEND MESSAGE AGAIN JUST IN CASE
                 self.sendCrashedCommandToServer()
-                print "INFO: Aux Crash Command was sent to the server"
+                print "INFO: Aux Crash Command was sent to the server" #THIS FUNCTION IS NOW OBSOLETE!!!!!!!!!
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
@@ -482,24 +485,7 @@ class NetworkClient():
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
-    #......................................................................
-    #INVALIDCOMMAND (No longer used, Throws an Error instead)
-    #......................................................................
-    '''def sendInvalidCommandToServer(self):
-        #sends INVALIDCOMMAND command to server
-        try:
-            self.clientSocket.send("INVALIDCOMMAND")
-            print "INFO: The INVALIDCOMMAND command was sent to the server"
-        except Exception as inst:
-            print "============================================================================================="
-            print "ERROR: An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
-            #the exception instance
-            print type(inst)
-            #srguments stored in .args
-            print inst.args
-            #_str_ allows args tto be printed directly
-            print inst
-            print "=============================================================================================" '''
+
     #-----------------------------------------------------------------------
     #Inbound communication functions
     #-----------------------------------------------------------------------
@@ -525,9 +511,6 @@ class NetworkClient():
             print inst
             print "============================================================================================="
 
-        #next part of problem
-
-        #not sure what to check for here
     #......................................................................
     #INVALIDCOMMAND
     #......................................................................
@@ -619,7 +602,6 @@ class NetworkClient():
     #......................................................................
     def receiveServerIPFromController(self):
         try:
-            #self.pipe.send("doingStuff")
             print "INFO: Waiting to receive the serverIP from Controller (function block)"
             self.serverIP = self.pipe.recv()
             print "INFO: The ServerIP was received from the Controller (function block)"
@@ -637,46 +619,276 @@ class NetworkClient():
             print "============================================================================================="
 
     #==================================================================================================
-    #CHUNK PARSING FUNCTIONS
+    #CHUNK PARSING FUNCTIONS (FUNCTIONS ARE OBSOLETE AND NO LONGER USED)
     #==================================================================================================
         #-------------------------------------------------------------------------------------------------
         #Determine the method being used (bruteforce,dictionary,rainbowmaker,rainbowuser)
         #-------------------------------------------------------------------------------------------------
+        #check for bruteforce
+        def checkForBruteForceMethod(self,inboundString):
+            if(inboundString[0:9] == "bruteforce"):
+                print "Chunk Method: bruteforce"
+                return True
+            else:
+                return False
 
+        #check for dictionary
+        def checkForDictionaryMethod(self,inboundString):
+            if(inboundString[0:9] == "dictionary"):
+                print "Chunk Method: dictionary"
+                return True
+            else:
+                return False
+
+        #check for rainbowmaker
+        def checkForRainbowMakerMethod(self,inboundString):
+            if(inboundString[0:11] == "rainbowmaker"):
+                print "Chunk Method: rainbowmaker"
+                return True
+            else:
+                return False
+
+        #check for rainbowuser
+        def checkForRainbowUserMethod(self,inboundString):
+            if(inboundString[0:10] == "rainbowuser"):
+                print "Chunk Method: rainbowuser"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the algorithm being used (md5,sha1,sha256,sha512)
         #-------------------------------------------------------------------------------------------------
+        #check for md5
+        def checkForMD5Algorithm(self,inboundString):
+            if(inboundString[0:2] == "md5"):
+                print "Chunk Algorithm: md5"
+                return True
+            else:
+                return False
 
+        #check for sha1
+        def checkForSHA1Algorithm(self,inboundString):
+            if(inboundString[0:3] == "sha1"):
+                print "Chunk Algorithm: sha1"
+                return True
+            else:
+                return False
+
+        #check for sha256
+        def checkForSHA256Algorithm(self,inboundString):
+            if(inboundString[0:5] == "sha256"):
+                print "Chunk Algorithm: sha256"
+                return True
+            else:
+                return False
+
+        #check for sha512
+        def checkForSHA512Algorithm(self,inboundString):
+            if(inboundString[0:5] == "sha512"):
+                print "Chunk Algorithm: sha512"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Obtain the hash code
         #-------------------------------------------------------------------------------------------------
-
+        #No function needed for this
         #-------------------------------------------------------------------------------------------------
         #Determine the Alphabet Choice (a,A,m,M,d)
         #-------------------------------------------------------------------------------------------------
+        #check for a
+        def checkForLowerCaseAlphabet(self,inboundString):
+            if(inboundString[0] == "a"):
+                print "Chunk Alphabet: a"
+                return True
+            else:
+                return False
 
+        #check for A
+        def checkForUpperCaseAlphabet(self,inboundString):
+            if(inboundString[0] == "A"):
+                print "Chunk Alphabet: A"
+                return True
+            else:
+                return False
+
+        #check for m
+        def checkForLowerCaseAlphaNumeric(self,inboundString):
+            if(inboundString[0] == "m"):
+                print "Chunk AlphaNumeric: m"
+                return True
+            else:
+                return False
+
+        #check for M
+        def checkForUpperCaseAlphaNumeric(self,inboundString):
+            if(inboundString[0] == "M"):
+                print "Chunk AlphaNumeric: M"
+                return True
+            else:
+                return False
+
+        #check for d
+        def checkForDigitsAlphabet(self,inboundString):
+            if(inboundString[0] == "d"):
+                print "Chunk Alphabet: d"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the minCharacters (1,10,16)
         #-------------------------------------------------------------------------------------------------
+        #check for 1
+        def checkForMinCharacter1(self,inboundString):
+            if(inboundString[0] == "1"):
+                print "Chunk minCharacter: 1"
+                return True
+            else:
+                return False
 
+        #check for 10
+        def checkForMinCharacter10(self,inboundString):
+            if(inboundString[0:1] == "10"):
+                print "Chunk minCharacter: 10"
+                return True
+            else:
+                return False
+
+        #check for 16
+        def checkForMinCharacter16(self,inboundString):
+            if(inboundString[0:1] == "16"):
+                print "Chunk minCharacter: 16"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the maxCharacters (1,10,16)
         #-------------------------------------------------------------------------------------------------
+        #check for 1
+        def checkForMaxCharacter1(self,inboundString):
+            if(inboundString[0] == "1"):
+                print "Chunk maxCharacter: 1"
+                return True
+            else:
+                return False
 
+        #check for 10
+        def checkForMaxCharacter10(self,inboundString):
+            if(inboundString[0:1] == "10"):
+                print "Chunk maxCharacter: 10"
+                return True
+            else:
+                return False
+
+        #check for 16
+        def checkForMaxCharacter16(self,inboundString):
+            if(inboundString[0:1] == "16"):
+                print "Chunk maxCharacter: 16"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the Prefix (adf,234,qw3#k)
         #-------------------------------------------------------------------------------------------------
+        #check for adf
+        def checkForADFPrefix(self,inboundtSring):
+            if(inboundtSring[0:2] == "adf"):
+                print "Chunk Prefix: adf"
+                return True
+            else:
+                return False
 
+        #check for 234
+        def checkFor234Prefix(self,inboundString):
+            if(inboundString[0:2] == "234"):
+                print "Chunk Prefix: 234"
+                return True
+            else:
+                return False
+
+        #check for qw3#k
+        def checkForQW3Prefix(self,inboundString):
+            if(inboundString[0:4] == "qw3#k"):
+                print "Chunk Prefix: qw3#k"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the File Location (0,1213,23665)
         #-------------------------------------------------------------------------------------------------
+        #check for 0
+        def checkForFileLocation0(self,inboundString):
+            if(inboundString[0] == "0"):
+                print "Chunk File Location: 0"
+                return True
+            else:
+                return False
 
+        #check for 1213
+        def checkForFileLocation1213(self,inboundString):
+            if(inboundString[0:3] == "1213"):
+                print "Chunk File Location: 1213"
+                return True
+            else:
+                return False
+
+        #check for 23665
+        def checkForFileLocation23665(self,inboundString):
+            if(inboundString[0:4] == "23665"):
+                print "Chunk File Location: 23665"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the Width (1,100,100000)
         #-------------------------------------------------------------------------------------------------
+        #check for 1
+        def checkForWidth1(self,inboundString):
+            if(inboundString[0] == "1"):
+                print "Chunk Width: 1"
+                return True
+            else:
+                return False
 
+        #check for 100
+        def checkForWidth100(self,inboundString):
+            if(inboundString[0:2] == "100"):
+                print "Chunk Width: 100"
+                return True
+            else:
+                return False
+
+        #check for 100000
+        def checkForWidth100000(self,inboundString):
+            if(inboundString[0:5] == "100000"):
+                print "Chunk Width: 100000"
+                return True
+            else:
+                return False
         #-------------------------------------------------------------------------------------------------
         #Determine the Height (1,100,10000)
         #-------------------------------------------------------------------------------------------------
+        #check for 1
+        def checkForHeight1(self,inboundString):
+            if(inboundString[0] == "1"):
+                print "Chunk Height: 1"
+                return True
+            else:
+                return False
 
+        #check for 100
+        def checkForHeight100(self,inboundString):
+            if(inboundString[0:2] == "100"):
+                print "Chunk Height: 100"
+                return True
+            else:
+                return False
+
+        #check for 10000
+        def checkForHeight10000(self,inboundString):
+            if(inboundString[0:5] == "10000"):
+                print "Chunk Height: 10000"
+                return True
+            else:
+                return False
 

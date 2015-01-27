@@ -2,8 +2,8 @@ __author__ = 'chris hamm'
 #NetworkClient_r9E
 #Created: 1/17/2015
 
-#THINGS ADDED FROM THIS REVISION
-
+#THINGS ADDED/CHANGED FROM THIS REVISION
+    #Removed some old commented lines of code that have been there forever
 #THINGS ADDED FROM REVISION 9D
 #Added functions to parse chunk objects (Has now been decided that these will not be needed)
 #Added a command logging system that records what commands has been received and sent to server/controller. These will be displayed after the client shuts down and after the socket is closed
@@ -193,7 +193,7 @@ class NetworkClient():
                 print "ERROR: Failed to connect to server"
                 print "Error code: " + str(msg[0]) + " Message: " + msg[1]
                 raise Exception("Failed to connect to server")
-                #print "========================================================================================"
+                print "========================================================================================"
 
             self.sendConnectedCommandToCOntroller()
 
@@ -313,7 +313,7 @@ class NetworkClient():
                 print "INFO: CRASH Command was sent to the server"
                 #SEND MESSAGE AGAIN JUST IN CASE
                 self.sendCrashedCommandToServer()
-                print "INFO: Aux Crash Command was sent to the server"
+                print "INFO: Aux Crash Command was sent to the server" #THIS FUNCTION IS NOW OBSOLETE!!!!!!!!!
             print "Closing the socket"
             self.clientSocket.close() #closes the socket safely
             print "Socket has been closed"
@@ -485,24 +485,7 @@ class NetworkClient():
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
-    #......................................................................
-    #INVALIDCOMMAND (No longer used, Throws an Error instead)
-    #......................................................................
-    '''def sendInvalidCommandToServer(self):
-        #sends INVALIDCOMMAND command to server
-        try:
-            self.clientSocket.send("INVALIDCOMMAND")
-            print "INFO: The INVALIDCOMMAND command was sent to the server"
-        except Exception as inst:
-            print "============================================================================================="
-            print "ERROR: An exception was thrown in the Client-Server sendInvalidCommand Function Try Block"
-            #the exception instance
-            print type(inst)
-            #srguments stored in .args
-            print inst.args
-            #_str_ allows args tto be printed directly
-            print inst
-            print "=============================================================================================" '''
+
     #-----------------------------------------------------------------------
     #Inbound communication functions
     #-----------------------------------------------------------------------
@@ -528,9 +511,6 @@ class NetworkClient():
             print inst
             print "============================================================================================="
 
-        #next part of problem
-
-        #not sure what to check for here
     #......................................................................
     #INVALIDCOMMAND
     #......................................................................
@@ -622,7 +602,6 @@ class NetworkClient():
     #......................................................................
     def receiveServerIPFromController(self):
         try:
-            #self.pipe.send("doingStuff")
             print "INFO: Waiting to receive the serverIP from Controller (function block)"
             self.serverIP = self.pipe.recv()
             print "INFO: The ServerIP was received from the Controller (function block)"
@@ -640,7 +619,7 @@ class NetworkClient():
             print "============================================================================================="
 
     #==================================================================================================
-    #CHUNK PARSING FUNCTIONS
+    #CHUNK PARSING FUNCTIONS (FUNCTIONS ARE OBSOLETE AND NO LONGER USED)
     #==================================================================================================
         #-------------------------------------------------------------------------------------------------
         #Determine the method being used (bruteforce,dictionary,rainbowmaker,rainbowuser)

@@ -2,9 +2,9 @@ __author__ = 'chris hamm'
 #NetworkServer_r9E
 #Created: 1/17/2015
 
-#THINGS ADDED FROM THIS REVISION
+#THINGS ADDED/CHANGED FROM THIS REVISION
 #Now able to receive a chunk object from the controller class
-#Extract information from a chunk object
+#Extract information from a chunk object (THESE FUNCTIONS ARE NO LONGER NEEDED)
 #(In progress)Send extracted information over the network to the client
 #Changed data type of dictionary of clients waiting for a reply to a list
 
@@ -206,14 +206,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             if(self.checkForNextCommand(theInput)==True):
                                 print "INFO: NEXT command was received"
                                 self.sendNextChunkCommandToController()
-                                #print "INFO: Sent the NextChunk Command to the Controller" #repetative print statement
                             elif(self.checkForFoundSolutionCommand(theInput)==True):
                                 print "INFO: FOUNDSOLUTION command was received"
                                 self.sendDoneCommandToController()
-                                #print "INFO: Sent the Done Command to the Controller" #repetative print statement
                             elif(self.checkForCrashedCommand(theInput)==True):
                                 print "INFO: CRASHED command was received"
-                                #self.listenForCrashedClientIP = True
                             else:
                                 print "ERROR: unknown command received"
                                 print "The unknown command: '" + theInput + "'"
@@ -336,7 +333,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #***************************************************************************************
                             #Looking for NEXTCHUNK command
                             #***************************************************************************************
-                            #if(analysisString[0:8] == "NEXTCHUNK"): #looking for NEXTCHUNK command
                             if(analysisString[0] == "n"):
                                 if(analysisString[1] == "e"):
                                     if(analysisString[2] == "x"):
@@ -468,10 +464,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "Printing List Of Clients Waiting For A Reply"
                     print "--------------------------------------------------"
                     if(len(self.listOfClientsWaitingForAReply) < 1):
-                    #if(len(self.dictionaryOfClientsWaitingForAReply) < 1):
                         print "No Clients Are Waiting For A Reply When The Session Ended"
                     else:
-                        #for key, value in self.dictionaryOfClientsWaitingForAReply.iteritems(): #(OLD METHOD)
                         for x in range(0,len(self.listOfClientsWaitingForAReply)):
                             print "[" + str(x) + "] =" + str(self.listOfClientsWaitingForAReply[x])
                     print "(END OF LIST OF CLIENTS WAITING FOR A REPLY)"
@@ -795,7 +789,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "This section of the code is NOT FINISHED YET"
                     print " -Need To Issue Done Command To All CLients at this point"
                     #print "STATUS: Issuing the DONE command to all clients..."
-                    #for x in range(0, len(self.listOfClients))
                     self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
                     return True
                 elif(inboundString[0:7] == "notFound"):
@@ -859,10 +852,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #next part in cracking problem
         #..............................................................................
         def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
-        #def sendNextToClient(self,recipientIPAddress, theNextPart): (FAILED ATTEMPT AT NEW METHOD)
             try:
                 recipientsSocket.sendto(theNextPart, recipientIPAddress)
-                #self.serverSocket.sendto(theNextPart, (recipientsSocket,recipientIPAddress))
                 print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
                 #increment the record counter
                 self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
@@ -922,7 +913,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     tempIP= ""
                     for i in range(14, len(inboundString)):
                         tempIP= tempIP + inboundString[i]
-                    #self.dictionaryOfClientsWaitingForAReply[tempIP] = "FOUNDSOLUTION"
                     self.listOfClientsWaitingForAReply.append(tempIP)
                     #print "INFO: Client (" + str(tempIP) + ") was added to the dictionaryOfClientsWaitingForAReply"
                     print "INFO: Client (" + str(tempIP) + ") was added to the listOfClientsWaitingForAReply"
@@ -1011,7 +1001,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                    # return True
                # else:
                 #    return False
-                if(inboundString[0]=="C"): #OLD METHOD
+                if(inboundString[0]=="C"):
                     if(inboundString[1]=="R"):
                         if(inboundString[2]=="A"):
                             if(inboundString[3]=="S"):
@@ -1082,7 +1072,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "============================================================================================="
 
     #==================================================================================================
-    #CHUNK PARSING FUNCTIONS
+    #CHUNK PARSING FUNCTIONS (THESE FUNCTIONS ARE ALL OBSOLETE)
     #==================================================================================================
         #-------------------------------------------------------------------------------------------------
         #Determine the method being used (bruteforce,dictionary,rainbowmaker,rainbowuser)
