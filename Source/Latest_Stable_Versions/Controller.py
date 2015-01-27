@@ -25,6 +25,7 @@ from time import time
 import sys
 import os
 from multiprocessing import Process, Pipe
+import string
 
 #import GUI
 
@@ -58,12 +59,14 @@ class Controller():
     #tempGUI Variables
     state = "startScreen"
 
+    clock = 0
+    colidingClock = 0
+    colidingClock2 = 0
+
     #Constructor
     def __init__(self):
 
         args = sys.argv
-
-        clock = 0
 
         #If we didn't get the argument "-c" in command-line
         if not args.pop() == "-c":
@@ -1414,7 +1417,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainbowUserScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1451,7 +1454,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainbowUserScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1502,23 +1505,26 @@ class Controller():
 
                     #Get the alphabet to be used
                     print
-                    print "What's the alphabet: "
+                    #print "What's the alphabet: "
+                    print "Choose your alphabet: "
                     print "0-9(d)"
                     print "a-z(a)"
                     print "A-Z(A)"
-                    print "a-z&A-Z(m)"
-                    print "a-z&A-Z&0-9(M)"
+                    print "!-~(p)"
                     print
+                    print "Add letters together to add"
+                    print " multiple alphabets together."
+                    print "IE: dap = 0-9 & a-z & !-~"
+                    print
+
                     alphabet = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"d", "a", "A", "m", "M"}
-                    while not alphabet in goodNames:
+                    while not self.rainbowMaker.setAlphabet(alphabet):
 
                         print "Input Error!"
 
                         alphabet = raw_input("Try Again: ")
-                    self.rainbowMaker.setAlphabet(alphabet)
 
                     #Get dimensions
                     print
@@ -1586,12 +1592,8 @@ class Controller():
 
                     self.clock = time()
 
-                    #Have one ranbowMaker (ie server-size) that chunks the data
-                    #   So you don't have to send the whole file to every node
                     rainbowMaker2 = RainbowMaker()
 
-                    #Give new rainbowMaker (node) info it needs through a string (sent over network)
-                    #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
                     paramsChunk = self.rainbowMaker.makeParamsChunk()
 
                     #Get the file ready (put info in first line)
@@ -1618,21 +1620,96 @@ class Controller():
                             whiteL = whiteL + " "
                             whiteR = whiteR[:-1]
 
-                        #Serve up the next chunk from the server-side dictionary class
-                        #chunkList = self.rainbowMaker.getNextChunk()
 
-                        #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
-                        #IE: number of total rows user picked divided into __ different chunks
-                        #chunkSize = self.rainbowMaker.numRows()/100
-
-                        #and process it using the node-side client
                         chunkOfDone = rainbowMaker2.create(paramsChunk)
 
-                        #Then give the result back to the server
                         self.rainbowMaker.putChunkInFile(chunkOfDone)
 
                     elapsed = (time() - self.clock)
                     self.clock = elapsed
+
+                    #If there are 10,000 or less rows, run collision detection
+                    if self.rainbowMaker.getHeight() <= 10000:
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+
+                        print "Collision Detector Running..."
+                        print "(This should take less than a minute)"
+
+                        self.colidingClock = time()
+
+                        collisions = self.rainbowMaker.collisionFinder()
+
+                        print "Collision Detector Complete"
+
+                        elapsed = (time() - self.colidingClock)
+                        self.colidingClock = elapsed
+                        print "And it took", self.colidingClock, "seconds."
+                        print
+
+                        if collisions > 0:
+
+                            percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
+
+                            print str(collisions) + " Collisions found."
+                            print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
+
+                            #Get the go-ahead
+                            print
+                            print "Did you want to run the Collision Fixer?"
+                            print
+                            print "This will take at lease twice as long as"
+                            print " the Collision Detector. It probably won't"
+                            print " finish if you have more than 50% collisions."
+                            print
+                            print "If more than 20% of your lines have collisions:"
+                            print " it's probably a problem with how you constructed"
+                            print " the table or how small your key-space is. If you"
+                            print " must use that keys-space, try shorter chains"
+                            print " (thin width) and a bigger file (tall height)"
+                            print " to reduce collisions"
+                            print
+                            print "(Yes)"
+                            print "(no)"
+                            print
+
+                            userInput = raw_input("Choice: ")
+
+                            #Sterolize inputs
+                            goodNames = {"Yes", "yes", "No", "no", "Y", "n"}
+                            while not userInput in goodNames:
+
+                                print "Input Error!"
+
+                                userInput = raw_input("Try Again: ")
+
+                            if userInput in ("Yes", "yes", "Y"):
+
+                                self.colidingClock2 = time()
+
+                                while collisions > 0:
+
+                                    #Clear the screen and re-draw
+                                    os.system('cls' if os.name == 'nt' else 'clear')
+                                    #Ohhh, pretty status pictures
+                                    print "Fixing--> [" + whiteL + "*" + whiteR + "]"
+                                    print "Collisions Still Detected: " + str(collisions)
+                                    if starCounter > 11:
+                                        starCounter = 0
+                                        whiteL = ""
+                                        whiteR = "            "
+                                    else:
+                                        starCounter += 1
+                                        whiteL = whiteL + " "
+                                        whiteR = whiteR[:-1]
+
+                                    self.rainbowMaker.collisionFixer()
+
+                                    collisions = self.rainbowMaker.collisionFinder()
+
+                                elapsed = (time() - self.colidingClock2)
+                                self.colidingClock2 = elapsed
 
                     #Done, next screen
                     self.state = "singleRainMakerDoneScreen"
@@ -1643,17 +1720,20 @@ class Controller():
                 elif state == "singleRainMakerDoneScreen":
 
                     #display results and wait for user interaction
-
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    ###userInput = GUI.getInput()
                     print "============="
-                    print "singleRainMakerDoneScreen"
+                    print "single RainMaker Done Screen"
+                    print
 
                     print "We just made ", self.rainbowMaker.getFileName()
+                    print "Using the alphabet ", ''.join(self.rainbowMaker.alphabet)
                     print "With chain length of ", self.rainbowMaker.getLength()
                     print "And ", self.rainbowMaker.numRows(), "rows."
                     print "And it took", self.clock, "seconds."
+                    print
+                    print "Plus ", self.colidingClock, " seconds for Collision Detection"
+                    print "And ", self.colidingClock2, " seconds for Collision Repair"
 
+                    print
                     print "(Back)"
                     print "(Exit)"
                     self.rainbowMaker.reset()
@@ -1669,7 +1749,7 @@ class Controller():
 
                     if userInput in ("Back", "back"):
 
-                        self.state = "singleRainMakerScreen"
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1711,16 +1791,53 @@ class Controller():
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the file name: ")
+                    fileName = raw_input("What's the dictionary file name: ")
                     while not self.dictionary.setFileName(fileName) == "Good":
 
                         print "File not found..."
-                        fileName = raw_input("What's the file name: ")
+                        fileName = raw_input("What's the dictionary file name: ")
 
                     #Get the hash
                     print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
+                    print "Are we searching for a single hash, or from a file of hashes?"
+                    print
+                    print "(single)"
+                    print "(file)"
+                    print
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"single", "s", "file", "f", "Single", "File"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("single", "s", "Single"):
+
+                        #Get the hash
+                        print
+                        hash = raw_input("What's the hash we're searching for: ")
+                        self.dictionary.setHash(hash)
+                        self.dictionary.singleHash = True
+
+                    elif userInput in ("file", "f", "File"):
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's the hash file name: ")
+                        while not self.dictionary.setHashFileName(fileName) == "Good":
+
+                            print "File not found..."
+                            fileName = raw_input("What's the hash file name: ")
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's file name that we'll put the results: ")
+                        self.dictionary.setDoneFileName(fileName)
+
+                        self.dictionary.singleHash = False
 
                     #Get the go-ahead
 
@@ -1769,49 +1886,98 @@ class Controller():
                     #   So you don't have to send the whole file to every node
                     dictionary2 = Dictionary()
 
-                    #Give new dictionary (node) info it needs through a string (sent over network)
-                    #dictionary2.setVariables(self.dictionary.serverString())
+                    dictionary2.singleHash = self.dictionary.singleHash
 
                     #Stuff for those pretty status pictures stuff
                     starCounter = 0
                     whiteL = ""
                     whiteR = "            "
 
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.dictionary.isEof() or dictionary2.isFound()):
+                    #### Single Hash #########################
+                    if self.dictionary.singleHash == True:
 
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
+                        #While we haven't gotten all through the file or found the key...
+                        while not (self.dictionary.isEof() or dictionary2.isFound()):
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
+
+                            #Serve up the next chunk
+                            chunk = self.dictionary.getNextChunk()
+
+                            #and process it using the node-side client
+                            dictionary2.find(chunk)
+
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
+
+                        #if a(the) node finds a key
+                        if dictionary2.isFound():
+
+                            #Let the server know what the key is
+                            self.dictionary.key = dictionary2.showKey()
+                            self.dictionary.hash = dictionary2.hash
+                            self.state = "singleDictionaryFoundScreen"
+
                         else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
 
-                        #Serve up the next chunk
-                        chunk = self.dictionary.getNextChunk()
+                            self.state = "singleDictionaryNotFoundScreen"
 
-                        #and process it using the node-side client
-                        dictionary2.find(chunk)
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #if a(the) node finds a key
-                    if dictionary2.isFound():
-
-                        #Let the server know what the key is
-                        self.dictionary.key = dictionary2.showKey()
-                        self.state = "singleDictionaryFoundScreen"
-
+                    #### Hash File #####################
                     else:
 
-                        self.state = "singleDictionaryNotFoundScreen"
+                        doneList = []
+
+                        #While we haven't gotten all through the file or found the key...
+                        while not self.dictionary.isEof():
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
+
+                            #Serve up the next chunk
+                            chunk = self.dictionary.getNextChunk()
+
+                            #and process it using the node-side client
+                            doneList += dictionary2.find(chunk)
+
+                            dictionary2.doneList = []
+
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
+
+                        #if a(the) node finds a key
+                        if dictionary2.isFound():
+
+                            #Let the server know what the key is
+                            self.dictionary.key = dictionary2.showKey()
+                            self.dictionary.hash = dictionary2.hash
+                            self.dictionary.makeDoneFile(doneList)
+                            self.state = "singleDictionaryFoundScreen"
+
+                        else:
+
+                            self.state = "singleDictionaryNotFoundScreen"
 
                 #############################################
                 #############################################
@@ -1824,8 +1990,12 @@ class Controller():
                     print "============="
                     print "singleDictionaryFoundScreen"
 
-                    print "Key is: ", self.dictionary.showKey()
-                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                    if self.dictionary.singleHash == True:
+                        print "Key is: ", self.dictionary.showKey()
+                        print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+
+                    else:
+                        print "Your File, (", self.dictionary.doneFileName, ") of hash/key pairs is ready."
                     print "And it took", self.clock, "seconds."
 
                     print "(Back)"
@@ -1861,7 +2031,7 @@ class Controller():
                     print "============="
                     print "singleDictionaryNotFoundScreen"
                     print
-                    print "Sorry, we didn't find it."
+                    print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
                     print "(Back)"

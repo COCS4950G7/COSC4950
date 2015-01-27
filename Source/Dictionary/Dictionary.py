@@ -31,9 +31,9 @@
 #Imports
 import hashlib
 import time
-from multiprocessing import Process, Pipe, Lock
+from multiprocessing import Process, Pipe, Lock, cpu_count, Queue, Value
 import os
-import Chunk
+from Chunk import Chunk
 import random
 
 class Dictionary():
@@ -42,14 +42,22 @@ class Dictionary():
     done = False
     algorithm = ""
     fileName = ""
+    hashFileName = ""
+    doneFileName = ""
     hash = ""
     status = ""
     found = False
     file = 0
+    hashFile = 0
+    doneFile = 0
     key = ""
     allLinesList = []
     fileLocation = 0
     eof = False
+    numProcesses = cpu_count()
+    listOfHashes = []
+    doneList = []
+    singleHash = True
 
     #Constructor
     def __init__(self):
@@ -76,6 +84,63 @@ class Dictionary():
 
         return "Good"
 
+
+    #Sets the dictionary file's name
+    def setHashFileName(self, fileName):
+
+        self.hashFileName = fileName
+
+        #Checks for filenotfound and returns code to caller class
+        try:
+            file = open(fileName, "r")
+            file.close()
+
+        except (OSError, IOError):
+            return "Fail"
+
+        #Import file to set as hash
+
+        #Open the file for reading
+        self.hashFile = open(self.hashFileName, 'r')
+
+        #Put all the lines of the file in a list
+        self.listOfHashes = list(self.hashFile)
+
+        self.hashFile.close()
+
+        self.hash = ""
+
+        #For every hash in the list
+        for x in self.listOfHashes:
+
+            x = x.rstrip()
+
+            #add it to the string, self.hash, with a deliniating char
+            self.hash += str(x) + "$"
+
+        return "Good"
+
+
+    #Sets the dictionary file's name
+    def setDoneFileName(self, fileName):
+
+        self.doneFileName = fileName
+
+
+    #Creates the results file with keys and hashes
+    def makeDoneFile(self, doneList):
+
+        self.doneFile = open(self.doneFileName, 'w')
+
+        doneList = list(set(doneList))
+
+        for line in doneList:
+
+            self.doneFile.write(line + "\n")
+
+        self.doneFile.close()
+
+
     #Sets the original hash we're looking for
     def setHash(self, hash):
 
@@ -83,9 +148,6 @@ class Dictionary():
 
     #Actually finds the hash in the file (hopefully)
     def find(self, chunk):
-
-        #Turns data from string to list
-        chunkList = chunk.data.split()
 
         #turns params from string to list
         paramsList = chunk.params.split()
@@ -95,140 +157,129 @@ class Dictionary():
 
         self.hash = paramsList[2]
 
+        #Turns data from string to list
+        chunkList = chunk.data.split()
+
         #Sub chunk chunkList and call processes
-        chunky = self.chunkIt(chunkList, 8)
-
-        chunk1 = chunky.pop()
-
-        chunk2 = chunky.pop()
-
-        chunk3 = chunky.pop()
-
-        chunk4 = chunky.pop()
-
-        chunk5 = chunky.pop()
-
-        chunk6 = chunky.pop()
-
-        chunk7 = chunky.pop()
-
-        chunk8 = chunky.pop()
+        chunky = self.chunkIt(chunkList, self.numProcesses)
 
         lock = Lock()
 
         parentPipe, childPipe = Pipe()
 
-        child1 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        children = []
 
-        child2 = Process(target=self.subProcess, args=(childPipe, lock, ))
+        #### List of Hashes ####
+        if '$' in self.hash:
 
-        child3 = Process(target=self.subProcess, args=(childPipe, lock, ))
+            #Split the string into a list
+            self.listOfHashes = self.hash.split('$')
 
-        child4 = Process(target=self.subProcess, args=(childPipe, lock, ))
+            #Take out '$' deliniators from the hashes
+            for x in self.listOfHashes:
 
-        child5 = Process(target=self.subProcess, args=(childPipe, lock, ))
+                x = x.strip('$')
 
-        child6 = Process(target=self.subProcess, args=(childPipe, lock, ))
+            #Startup some processes.
+            for i in range(0, self.numProcesses):
 
-        child7 = Process(target=self.subProcess, args=(childPipe, lock, ))
+                children.append(Process(target=self.subProcess2, args=(childPipe, lock, )))
 
-        child8 = Process(target=self.subProcess, args=(childPipe, lock, ))
+                children[i].start()
 
-        child1.start()
+            for chunk in chunky:
 
-        child2.start()
+                parentPipe.send(chunk)
 
-        child3.start()
+            count = 0
 
-        child4.start()
+            done = False
 
-        child5.start()
+            rec = 0
 
-        child6.start()
+            while not done:
 
-        child7.start()
+                if count > (self.numProcesses - 1):
 
-        child8.start()
+                    for i in range(0, self.numProcesses):
 
-        parentPipe.send(chunk1)
+                        children[i].join()
 
-        parentPipe.send(chunk2)
+                        self.done = True
 
-        parentPipe.send(chunk3)
+                        done = True
 
-        parentPipe.send(chunk4)
+                else:
 
-        parentPipe.send(chunk5)
+                    rec = parentPipe.recv()
 
-        parentPipe.send(chunk6)
+                    if rec == "found":
 
-        parentPipe.send(chunk7)
+                        self.key = parentPipe.recv()
 
-        parentPipe.send(chunk8)
+                        self.hash = parentPipe.recv()
 
-        count = 0
+                        self.doneList.append(self.hash + " " + self.key)
 
-        done = False
+                        self.found = True
 
-        rec = 0
+                    count += 1
 
-        while not done:
+            return self.doneList
 
-            if count > 7:
 
-                child1.join()
+        ### Single Hash ####
+        else:
 
-                child2.join()
+            for i in range(0, self.numProcesses):
 
-                child3.join()
+                children.append(Process(target=self.subProcess, args=(childPipe, lock, )))
 
-                child4.join()
+                children[i].start()
 
-                child5.join()
+            for chunk in chunky:
 
-                child6.join()
+                parentPipe.send(chunk)
 
-                child7.join()
+            count = 0
 
-                child8.join()
+            done = False
 
-                self.found = False
+            rec = 0
 
-                self.done = True
+            while not done:
 
-                done = True
+                if count > (self.numProcesses - 1):
 
-            else:
+                    for i in range(0, self.numProcesses):
 
-                rec = parentPipe.recv()
+                        children[i].join()
 
-                if rec == "found":
+                        self.found = False
 
-                    self.key = parentPipe.recv()
+                        self.done = True
 
-                    child1.terminate()
+                        done = True
 
-                    child2.terminate()
+                else:
 
-                    child3.terminate()
+                    rec = parentPipe.recv()
 
-                    child4.terminate()
+                    if rec == "found":
 
-                    child5.terminate()
+                        self.key = parentPipe.recv()
 
-                    child6.terminate()
+                        for i in range(0, self.numProcesses):
 
-                    child7.terminate()
+                            children[i].terminate()
 
-                    child8.terminate()
+                        done = True
 
-                    done = True
+                        self.found = True
 
-                    self.found = True
+                        self.done = True
 
-                    self.done = True
-
-                count += 1
+                    count += 1
 
     #The sub-process function
     def subProcess(self, pipe, lock):
@@ -267,9 +318,60 @@ class Dictionary():
 
                 pipe.close()
 
-                lock. release()
+                lock.release()
 
-                return 0
+        lock.acquire()
+
+        pipe.send("not found")
+
+        pipe.close()
+
+        lock.release()
+
+    #The sub-process function
+    def subProcess2(self, pipe, lock):
+
+        lock.acquire()
+
+        chunkList = pipe.recv()
+
+        lock.release()
+
+        #for every item in the allLinesList list
+        for x in chunkList:
+
+            #Split the string ['able\r\n'] into a list ['able','\r','\n']
+            xLineToList = x.split()
+
+            #Check if it's NOT empty (or eof)
+            if xLineToList:
+
+                #If it's not, extract the word (leaving an '/n')
+                newX = xLineToList.pop()
+
+            else:
+
+                #Otherwise give it an empty value that doesn't crash the program
+                newX = ""
+
+            for hash in self.listOfHashes:
+
+                #if the hashes match, YAY, return to get out of function
+                if self.hashThis(newX) == hash:
+
+                    lock.acquire()
+
+                    pipe.send("found")
+
+                    pipe.send(newX)
+
+                    pipe.send(hash)
+
+                    pipe.close()
+
+                    lock.release()
+
+                    return 0
 
         lock.acquire()
 
@@ -379,7 +481,7 @@ class Dictionary():
 
         self.eof = eof
 
-        chunk = Chunk.Chunk()
+        chunk = Chunk()
 
         chunk.data = data
 
@@ -464,7 +566,7 @@ class Dictionary():
 
         self.eof = eof
 
-        chunk = Chunk.Chunk()
+        chunk = Chunk()
 
         chunk.data = data
 
