@@ -1791,16 +1791,53 @@ class Controller():
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the file name: ")
+                    fileName = raw_input("What's the dictionary file name: ")
                     while not self.dictionary.setFileName(fileName) == "Good":
 
                         print "File not found..."
-                        fileName = raw_input("What's the file name: ")
+                        fileName = raw_input("What's the dictionary file name: ")
 
                     #Get the hash
                     print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
+                    print "Are we searching for a single hash, or from a file of hashes?"
+                    print
+                    print "(single)"
+                    print "(file)"
+                    print
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"single", "s", "file", "f", "Single", "File"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("single", "s", "Single"):
+
+                        #Get the hash
+                        print
+                        hash = raw_input("What's the hash we're searching for: ")
+                        self.dictionary.setHash(hash)
+                        self.dictionary.singleHash = True
+
+                    elif userInput in ("file", "f", "File"):
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's the hash file name: ")
+                        while not self.dictionary.setHashFileName(fileName) == "Good":
+
+                            print "File not found..."
+                            fileName = raw_input("What's the hash file name: ")
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's file name that we'll put the results: ")
+                        self.dictionary.setDoneFileName(fileName)
+
+                        self.dictionary.singleHash = False
 
                     #Get the go-ahead
 
@@ -1849,49 +1886,98 @@ class Controller():
                     #   So you don't have to send the whole file to every node
                     dictionary2 = Dictionary()
 
-                    #Give new dictionary (node) info it needs through a string (sent over network)
-                    #dictionary2.setVariables(self.dictionary.serverString())
+                    dictionary2.singleHash = self.dictionary.singleHash
 
                     #Stuff for those pretty status pictures stuff
                     starCounter = 0
                     whiteL = ""
                     whiteR = "            "
 
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.dictionary.isEof() or dictionary2.isFound()):
+                    #### Single Hash #########################
+                    if self.dictionary.singleHash == True:
 
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
+                        #While we haven't gotten all through the file or found the key...
+                        while not (self.dictionary.isEof() or dictionary2.isFound()):
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
+
+                            #Serve up the next chunk
+                            chunk = self.dictionary.getNextChunk()
+
+                            #and process it using the node-side client
+                            dictionary2.find(chunk)
+
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
+
+                        #if a(the) node finds a key
+                        if dictionary2.isFound():
+
+                            #Let the server know what the key is
+                            self.dictionary.key = dictionary2.showKey()
+                            self.dictionary.hash = dictionary2.hash
+                            self.state = "singleDictionaryFoundScreen"
+
                         else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
 
-                        #Serve up the next chunk
-                        chunk = self.dictionary.getNextChunk()
+                            self.state = "singleDictionaryNotFoundScreen"
 
-                        #and process it using the node-side client
-                        dictionary2.find(chunk)
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #if a(the) node finds a key
-                    if dictionary2.isFound():
-
-                        #Let the server know what the key is
-                        self.dictionary.key = dictionary2.showKey()
-                        self.state = "singleDictionaryFoundScreen"
-
+                    #### Hash File #####################
                     else:
 
-                        self.state = "singleDictionaryNotFoundScreen"
+                        doneList = []
+
+                        #While we haven't gotten all through the file or found the key...
+                        while not self.dictionary.isEof():
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
+
+                            #Serve up the next chunk
+                            chunk = self.dictionary.getNextChunk()
+
+                            #and process it using the node-side client
+                            doneList += dictionary2.find(chunk)
+
+                            dictionary2.doneList = []
+
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
+
+                        #if a(the) node finds a key
+                        if dictionary2.isFound():
+
+                            #Let the server know what the key is
+                            self.dictionary.key = dictionary2.showKey()
+                            self.dictionary.hash = dictionary2.hash
+                            self.dictionary.makeDoneFile(doneList)
+                            self.state = "singleDictionaryFoundScreen"
+
+                        else:
+
+                            self.state = "singleDictionaryNotFoundScreen"
 
                 #############################################
                 #############################################
@@ -1904,8 +1990,12 @@ class Controller():
                     print "============="
                     print "singleDictionaryFoundScreen"
 
-                    print "Key is: ", self.dictionary.showKey()
-                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+                    if self.dictionary.singleHash == True:
+                        print "Key is: ", self.dictionary.showKey()
+                        print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
+
+                    else:
+                        print "Your File, (", self.dictionary.doneFileName, ") of hash/key pairs is ready."
                     print "And it took", self.clock, "seconds."
 
                     print "(Back)"
@@ -1941,7 +2031,7 @@ class Controller():
                     print "============="
                     print "singleDictionaryNotFoundScreen"
                     print
-                    print "Sorry, we didn't find it."
+                    print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
                     print "(Back)"
