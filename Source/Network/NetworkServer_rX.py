@@ -4,14 +4,16 @@ __author__ = 'chris hamm'
 #Designed to work with NetworkClient_rX
 
 #THINGS ADDED/CHANGED WITH THIS VERSION
-    #Struture of code has been altered to make the handling of information flow better in terms of inbound info and outbound info storing and receiving
+    #(Implemented)Removed Chunk Parsing Functions (these functions are no longer needed)
+    #(Have not started implementing yet)Restructure the primary loop of the server so that the server responds to a clients message immeadiately (instead of listen to client, then listen to controller, then distribute commands)
+    #(Have not started implementing yet)Change the recv (from controller) mechanism so that server expects two messages from the controller (string, then a chunk object)
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(In progress)Send extracted information over the network to the client
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9D
-    #(In Progress) A list of what each client is currently working on
-    #(in progress) A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
+    #(Have not started implementing yet) A list of what each client is currently working on
+    #(Have not started implementing yet) A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
 
 #====================================
 #Imports
