@@ -313,7 +313,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #Else If stack empty, then send a nextChunk message to the controller and add the client to the stack of clients waiting for nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         else:
-                            print "STATUS: Sending a nextChunk request to the Controller..."
+                            print "I/O: Sending a nextChunk request to the Controller..."
+                            self.sendNextChunkCommandToController() #request the next chunk 
                             self.stackOfClientsWaitingForNextChunk.append(tempIP) #push client onto the stack
                             print "INFO: Client successfully added to the stack of clients waiting for nextChunk"
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -653,8 +654,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print " "
                 print "Printing the Contents of the dictionaryOfCurrentClientTasks"
                 print "----------------------------------------------------------------"
+                print "[key]        [value]"
                 for key, value in self.dictionaryOfCurrentClientTasks.iteritems():
-                    print key, value
+                    print str(key), str(value)
                 print "(END OF PRINTING CONTENTS OF THE DICTIONARYOFCURRENTCLIENTTASKS)"
                 print "----------------------------------------------------------------"
             except Exception as inst:
