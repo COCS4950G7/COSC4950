@@ -314,7 +314,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         else:
                             print "I/O: Sending a nextChunk request to the Controller..."
-                            self.sendNextChunkCommandToController() #request the next chunk 
+                            self.sendNextChunkCommandToController() #request the next chunk
                             self.stackOfClientsWaitingForNextChunk.append(tempIP) #push client onto the stack
                             print "INFO: Client successfully added to the stack of clients waiting for nextChunk"
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -474,7 +474,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for reply to done command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                        #THIS COMMAND IS BEING SKIPPED
+                        elif(self.checkForDone(recv)==True):
+                            print "INFO: Received DONE Command from the controller"
+                            print "WARNING: THIS FUNCTION IS NOT FINISHED"
                     #************************************************************************************
                     #(NOT SURE ABOUT THIS) Receive chunk object????
                     #************************************************************************************
@@ -952,7 +954,27 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for found command (reply to done) (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    #Skipping this unless it is really needed
+    def checkForDone(self,inboundString):
+        try:
+            print "STATUS: Checking to see if inboundString is Done..."
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0:3] == "done"):
+                print "I/O: DONE Command was received from the controller class"
+                self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Inbound checkForDone Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #/////////////////////////////////////////////////////////////////////////////
             #End of Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
