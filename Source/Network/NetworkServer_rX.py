@@ -420,11 +420,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "INFO: Copied parameters from chunk object"
                                 print "DEBUG: Size of stack of clientsWaitingForNextChunk: " + str(len(self.stackOfClientsWaitingForNextChunk))
                                 tempIP = str(self.stackOfClientsWaitingForNextChunk.pop()) #pop the stack
-                                print "DEBUG: Removing NEXT and a space from tempIP"
-                                tempIP= tempIP[5:len(tempIP)]
+                                #print "DEBUG: Removing NEXT and a space from tempIP"
+                                #tempIP= tempIP[5:len(tempIP)] #NEEDED ON THE CLIENTSIDE
                                 print "DEBUG: find first invalid char and marking it"
-                                firstInvalidCharIndex = 0
-                                for x in range(0,len(tempIP)):
+                                firstInvalidCharIndex = 5
+                                for x in range(5,len(tempIP)):
                                     if(tempIP[x].isalpha()==True):
                                         firstInvalidCharIndex= x
                                         print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
@@ -434,11 +434,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                         print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
                                         break
                                 #if still zero, keep entire string
-                                if(firstInvalidCharIndex == 0):
+                                if(firstInvalidCharIndex == 5):
                                     #keep tempIP at the same value
                                     print "DEBUG: tempIP does not need to be cropped"
                                 else:
-                                    tempIP= tempIP[0:(firstInvalidCharIndex -1)]
+                                    tempIP= tempIP[5:firstInvalidCharIndex]
                                 print "DEBUG: tempIP after popping and cropping:" + str(tempIP)
                                 #retreive socket information
                                 print "STATUS: Looking for matching IP Address in list of Clients..."
@@ -447,6 +447,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 tempSock= ""
                                 for index in range(0, len(self.listOfClients)):
                                     tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
+                                    tempPort= str(tempAddr[1]) #copy the port information
+                                    print "DEBUG: tempPort=" + str(tempPort)
                                     print "STATUS: Copying list of clients' IP Address to a new string"
                                     tempAddr2= str(tempAddr[0])
                                     print "STATUS: Comparing IP Addresses..."
@@ -468,7 +470,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
                                     print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
                                     print "STATUS: Sending nextChunk to client"
-                                    self.sendNextToClient(tempSock, tempIP, self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                    self.sendNextToClient(tempSock, tempIP, tempPort, self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     print "INFO: Successfully sent the nextChunk to the client"
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks
@@ -1058,9 +1060,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send nextChunk Command to Client (the next part of the problem)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
+    def sendNextToClient(self,recipientsSocket, recipientIPAddress, recipientPort, theNextPart): #sends the next part of problem to the client
         try:
-            recipientsSocket.sendto("NEXT " + theNextPart, recipientIPAddress)
+            recipientsSocket.sendto(theNextPart, (recipientIPAddress, recipientPort)) 
             print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
             #increment the record counter
             self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
