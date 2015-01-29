@@ -274,6 +274,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #If stack is not empty, then send the top chunk on the stack to the client that is requesting the nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         tempIP= ""
+                        print "STATUS: Extracting The Clients IP"
+                        for i in range(5, len(theInput)):
+                            tempIP+= theInput
+                        print "INFO: Successfully Extracted the Clients IP"
                         if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                             print "STATUS: Preparing to send chunk (from stack of chunks that need to be reassigned) to client..."
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -281,10 +285,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                             #position 4 is a space
                             #Extracting the clients IP
-                            print "STATUS: Extracting The Clients IP"
-                            for i in range(5, len(theInput)):
-                                tempIP+= theInput
-                            print "INFO: Successfully Extracted the Clients IP"
+                            #print "STATUS: Extracting The Clients IP"
+                            #for i in range(5, len(theInput)):
+                            #    tempIP+= theInput
+                            #print "INFO: Successfully Extracted the Clients IP"
                             self.dictionaryOfCurrentClientTasks[tempIP] = self.stackOfChunksThatNeedToBeReassigned.pop() #pop the stack
                             print "INFO: Successfully added the chunk from stack of chunks that need to be reassigned to the dictionary of current clients tasks"
                             #retreive socket information
@@ -414,7 +418,28 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "STATUS: Preparing to send nextChunk object to Client Waiting for nextChunk..."
                                 chunkParams= chunkrecv.params
                                 print "INFO: Copied parameters from chunk object"
-                                tempIP = self.stackOfClientsWaitingForNextChunk.pop() #pop the stack
+                                print "DEBUG: Size of stack of clientsWaitingForNextChunk: " + str(len(self.stackOfClientsWaitingForNextChunk))
+                                tempIP = str(self.stackOfClientsWaitingForNextChunk.pop()) #pop the stack
+                                print "DEBUG: Removing NEXT and a space from tempIP"
+                                tempIP= tempIP[5:len(tempIP)]
+                                print "DEBUG: find first invalid char and marking it"
+                                firstInvalidCharIndex = 0
+                                for x in range(0,len(tempIP)):
+                                    if(tempIP[x].isalpha()==True):
+                                        firstInvalidCharIndex= x
+                                        print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
+                                        break
+                                    elif(tempIP[x].isspace()==True):
+                                        firstInvalidCharIndex= x
+                                        print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
+                                        break
+                                #if still zero, keep entire string
+                                if(firstInvalidCharIndex == 0):
+                                    #keep tempIP at the same value
+                                    print "DEBUG: tempIP does not need to be cropped"
+                                else:
+                                    tempIP= tempIP[0:(firstInvalidCharIndex -1)]
+                                print "DEBUG: tempIP after popping and cropping:" + str(tempIP)
                                 #retreive socket information
                                 print "STATUS: Looking for matching IP Address in list of Clients..."
                                 foundMatch= False
