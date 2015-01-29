@@ -23,7 +23,7 @@ __author__ = 'chris hamm'
     #(Implemented)Send extracted information over the network to the client
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9D
-    #(In Progress) A dictionary of what each client is currently working on
+    #(Implemented) A dictionary of what each client is currently working on
         #(Implemented)Add a data structure that stores what the last chunk the server sent to each client was
     #(Implemented) A stack of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
 
