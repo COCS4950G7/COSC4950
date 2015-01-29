@@ -1012,7 +1012,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
         try:
-            recipientsSocket.sendto(theNextPart, recipientIPAddress)
+            recipientsSocket.sendto("NEXT " + theNextPart, recipientIPAddress)
             print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
             #increment the record counter
             self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)

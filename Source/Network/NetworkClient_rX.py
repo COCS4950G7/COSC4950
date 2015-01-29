@@ -7,6 +7,9 @@ __author__ = 'chris hamm'
     #(Implemented)Removed Chunk Parsing Functions (That are now no longer needed)
     #(Implemented)Removed Main Client Loop
     #(Implemented)Restructure the the Primary While Loop so that when a command is received from either server or controller, the client immeadiately responds to that command (instead of queuing up the commands and executing them one by one)
+    #(Implemented)Added a record that records the number of reply to nextchunk the client receives from server
+    #(Implemented)Revised the check for server command system
+
 #=================================
 #Imports
 #=================================
@@ -170,6 +173,7 @@ class NetworkClient():
         self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = 0
         self.recordOfInboundCommandsFromController['serverIP'] = 0
         self.recordOfInboundCommandsFromServer['DONE'] = 0
+        self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = 0
         #........................................................................
         #End of Initialize the Record Counters
         #........................................................................
@@ -241,7 +245,9 @@ class NetworkClient():
                         print "STATUS: Checking for server commands..."
                         theInput = self.clientSocket.recv(2048)
                         if(len(theInput) > 1):
-                            if theInput == "DONE":
+                            #if theInput == "DONE": #OLD METHOD
+                            if(self.checkForDoneCommand(theInput)==True):
+                                print "INFO: Received DONE Command from the server"
                                 self.sendDoneCommandToController()
                                 print " "
                                 print "INFO: Server has issued the DONE command."
@@ -251,8 +257,11 @@ class NetworkClient():
                                 break
                             #If the server wants to give us the next chunk, take it
                             #Server should be sending "NEXT" -> params -> data in seperate strings all to us
-                            elif theInput == "NEXT":
+                            #elif theInput == "NEXT":
+
+                            elif(theInput[0:3] == "NEXT"):
                                 try:
+                                    print "INFO: Received the NextChunk from the Server"
                                     #and store it locally till controller is ready for it
                                     self.chunk.params = self.clientSocket.recv(2048)
                                     self.chunk.data = self.clientSocket.recv(2048)
@@ -452,6 +461,11 @@ class NetworkClient():
                     print "# of DONE Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['DONE'])
                 else:
                     print "# of DONE Commands received from the Server: 0"
+                #print reply to nextchunk
+                if(self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] > 0):
+                    print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'])
+                else:
+                    print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: 0"
                 print "(END OF INBOUND COMMANDS FROM THE SERVER)"
                 print "------------------------------------------------"
             except Exception as inst:
@@ -554,8 +568,8 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForDoneCommand(self, inboundString):
         try:
-            if inboundString == "DONE":
-                print "INFO: Received the DONE command"
+            if inboundString[0:3] == "DONE":
+                print "INFO: Received the DONE command from the server"
                 self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
                 return True
             else:
@@ -571,6 +585,27 @@ class NetworkClient():
             print inst
             print "============================================================================================="
 
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #NEXT
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def checkForNextCommand(self,inboundString):
+        try:
+            if inboundString[0:3] == "NEXT":
+                print "INFO: Received the NEXT (chunk) command from the server"
+                self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = (self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server checkForNextCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #INVALID COMMAND HAS BEEN OMITTED
             #///////////////////////////////////////////////////////////////////////////
             #End of Inbound Communication FUnctions
