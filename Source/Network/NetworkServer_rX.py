@@ -594,7 +594,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print " "
                 print "Printing Stack Of Clients Waiting For nextChunk"
                 print "--------------------------------------------------"
-                if(len(self.listOfClientsWaitingForAReply) < 1):
+                if(len(self.stackOfClientsWaitingForNextChunk) < 1):
                     print "No Clients Are Waiting For NextChunk When The Session Ended"
                 else:
                     print "The following clients where waiting for nextChunk:"
@@ -781,79 +781,79 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send nextChunk Command to Controller
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendNextChunkCommandToController(self):
-            try:
-                self.pipe.send("nextChunk")
-                print "I/O: The NEXTCHUNK command was sent to the Controller"
-                #increment record counter
-                self.recordOfOutboundCommandsFromServerToController['nextChunk'] = (self.recordOfOutboundCommandsFromServerToController['nextChunk'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendNextChunkCommandToController(self):
+        try:
+            self.pipe.send("nextChunk")
+            print "I/O: The NEXTCHUNK command was sent to the Controller"
+            #increment record counter
+            self.recordOfOutboundCommandsFromServerToController['nextChunk'] = (self.recordOfOutboundCommandsFromServerToController['nextChunk'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Outbound sendNextChunkCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send chunkAgain Command to Controller (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendChunkAgainCommandToController(self):
-            try:
-                self.pipe.send("chunkAgain")
-                print "I/O: The CHUNKAGAIN command was sent to the Controller"
-                #increment the record counter
-                self.recordOfOutboundCommandsFromServerToController['chunkAgain'] = (self.recordOfOutboundCommandsFromServerToController['chunkAgain'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendChunkAgainCommandToController(self):
+        try:
+            self.pipe.send("chunkAgain")
+            print "I/O: The CHUNKAGAIN command was sent to the Controller"
+            #increment the record counter
+            self.recordOfOutboundCommandsFromServerToController['chunkAgain'] = (self.recordOfOutboundCommandsFromServerToController['chunkAgain'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Outbound sendChunkAgainCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send Waiting Command to Controller (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendWaitingCommandToController(self):
-            try:
-                self.pipe.send("waiting")
-                print "I/O: The WAITING command was sent to the Controller"
-                #increment the record counter
-                self.recordOfOutboundCommandsFromServerToController['waiting'] = (self.recordOfOutboundCommandsFromServerToController['waiting'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendWaitingCommandToController(self):
+        try:
+            self.pipe.send("waiting")
+            print "I/O: The WAITING command was sent to the Controller"
+            #increment the record counter
+            self.recordOfOutboundCommandsFromServerToController['waiting'] = (self.recordOfOutboundCommandsFromServerToController['waiting'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Outbound sendWaitingCommend  Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send Done Command to Controller
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendDoneCommandToController(self):
-            try:
-                self.pipe.send("done ")
-                print "I/O: The DONE command was sent to the Controller"
-                #increment the record counter
-                self.recordOfOutboundCommandsFromServerToController['done'] = (self.recordOfOutboundCommandsFromServerToController['done'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendDoneCommandToController(self):
+        try:
+            self.pipe.send("done ")
+            print "I/O: The DONE command was sent to the Controller"
+            #increment the record counter
+            self.recordOfOutboundCommandsFromServerToController['done'] = (self.recordOfOutboundCommandsFromServerToController['done'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Outbound sendDoneCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #/////////////////////////////////////////////////////////////////////////////
             #End of Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
@@ -864,53 +864,53 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for nextChunk Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
-            try:
-                print "STATUS: Checking to see if inboundString is nextChunk..."
-                if(len(inboundString) < 1):
-                    return False
-                if inboundString == "nextChunk":
-                    #position 9 will be a space
-                    print "I/O: NEXTCHUNK command was received from the controller class"
-                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] + 1)
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def checkForNextChunk(self,inboundString): #check to see if the string contains the next chunk of the problem
+        try:
+            print "STATUS: Checking to see if inboundString is nextChunk..."
+            if(len(inboundString) < 1):
+                return False
+            if inboundString == "nextChunk":
+                #position 9 will be a space
+                print "I/O: NEXTCHUNK command was received from the controller class"
+                self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Inbound checkForNextChunk Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for chunkAgain Command (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def checkForChunkAgain(self,inboundString): #check to see if the string contains that chunk that was requested
-            try:
-                print "STATUS: Checking to see if inboundString is chunkAgain..."
-                if(len(inboundString) < 1):
-                    return False
-                if(inboundString[0:9] == "CHUNKAGAIN"):
-                    #position 10 will be a space
-                    print "I/O: CHUNKAGAIN command was received from the controller class"
-                    self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] + 1)
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Controller Inbound checkForChunkAgain Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def checkForChunkAgain(self,inboundString): #check to see if the string contains that chunk that was requested
+        try:
+            print "STATUS: Checking to see if inboundString is chunkAgain..."
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0:9] == "CHUNKAGAIN"):
+                #position 10 will be a space
+                print "I/O: CHUNKAGAIN command was received from the controller class"
+                self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Controller Inbound checkForChunkAgain Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for found command (reply to done) (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -931,41 +931,41 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send Done Command to Client
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendDoneCommandToClient(self,recipientsSocket, recipientIPAddress): #sends the DONE command to a client
-            try:
-                recipientsSocket.sendto("DONE", recipientIPAddress)
-                print "I/O: The DONE command was issued to: " + str(recipientIPAddress)
-                #increment the record counter
-                self.recordOfOutboundCommandsFromServerToClient['DONE'] = (self.recordOfOutboundCommandsFromServerToClient['DONE'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendDoneCommandToClient(self,recipientsSocket, recipientIPAddress): #sends the DONE command to a client
+        try:
+            recipientsSocket.sendto("DONE", recipientIPAddress)
+            print "I/O: The DONE command was issued to: " + str(recipientIPAddress)
+            #increment the record counter
+            self.recordOfOutboundCommandsFromServerToClient['DONE'] = (self.recordOfOutboundCommandsFromServerToClient['DONE'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Outbound sendDoneCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Send nextChunk Command to Client (the next part of the problem)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
-            try:
-                recipientsSocket.sendto(theNextPart, recipientIPAddress)
-                print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
-                #increment the record counter
-                self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def sendNextToClient(self,recipientsSocket, recipientIPAddress, theNextPart): #sends the next part of problem to the client
+        try:
+            recipientsSocket.sendto(theNextPart, recipientIPAddress)
+            print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
+            #increment the record counter
+            self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #/////////////////////////////////////////////////////////////////////////////
             #End of Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
@@ -976,116 +976,114 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for Next Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def checkForNextCommand(self,inboundString): #checks for the NEXT command
-            try:
-                if(inboundString[0]=="N"):
-                    if(inboundString[1]=="E"):
-                        if(inboundString[2]=="X"):
-                            if(inboundString[3]=="T"):
-                                print "I/O: A Client has issued the NEXT command"
-                                #position 4 is a space
-                                #tempIP= ""  #THIS IS NOW DONE IN THE SERVER LOOP
-                                #for i in range(5, len(inboundString)):
-                                 #   tempIP= tempIP + inboundString[i]
-                                #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
-                                self.recordOfInboundCommandsFromClientToServer['NEXT'] = (self.recordOfInboundCommandsFromClientToServer['NEXT'] + 1)
-                                return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Inbound checkForNextCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def checkForNextCommand(self,inboundString): #checks for the NEXT command
+        try:
+            if(inboundString[0]=="N"):
+                if(inboundString[1]=="E"):
+                    if(inboundString[2]=="X"):
+                        if(inboundString[3]=="T"):
+                            print "I/O: A Client has issued the NEXT command"
+                            #position 4 is a space
+                            #tempIP= ""  #THIS IS NOW DONE IN THE SERVER LOOP
+                            #for i in range(5, len(inboundString)):
+                             #   tempIP= tempIP + inboundString[i]
+                            #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
+                            self.recordOfInboundCommandsFromClientToServer['NEXT'] = (self.recordOfInboundCommandsFromClientToServer['NEXT'] + 1)
+                            return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Inbound checkForNextCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for FoundSolution Command (MAY BE OBSOLETE ON THE SERVER SIDE)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
-            try:
-                if(inboundString[0:12] == "FOUNDSOLUTION"):
-                    print "I/O: A Client has issued the FOUNDSOLUTION command"
-                    #position 13 is a space
-                    #tempIP= ""  #THIS IS NOW DONE IN SERVER LOOP
-                    #for i in range(14, len(inboundString)):
-                    #    tempIP= tempIP + inboundString[i]
-                    #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
-                    self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Inbound checkForFoundSolutionCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+    def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
+        try:
+            if(inboundString[0:12] == "FOUNDSOLUTION"):
+                print "I/O: A Client has issued the FOUNDSOLUTION command"
+                #position 13 is a space
+                #tempIP= ""  #THIS IS NOW DONE IN SERVER LOOP
+                #for i in range(14, len(inboundString)):
+                #    tempIP= tempIP + inboundString[i]
+                #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
+                self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Inbound checkForFoundSolutionCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #Check for Crashed Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-        def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
-            try:
-                if(len(inboundString) < 1):
-                    print "INFO: Empty Crashed Message Received."
-                    return False
-                if(inboundString[0]=="C"):
-                    if(inboundString[1]=="R"):
-                        if(inboundString[2]=="A"):
-                            if(inboundString[3]=="S"):
-                                if(inboundString[4]=="H"):
-                                    if(inboundString[5]=="E"):
-                                        if(inboundString[6]=="D"):
-                                            tempCrashIP = ""   #THIS STAYS IN THE CRASH COMMAND SECTION
-                                            #position 7 is a space between the ip address and the crashed message
-                                            for i in range(8, len(inboundString)):
-                                                if(inboundString[i].isalpha()):
-                                                    print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
-                                                    break
-                                                else:
-                                                    tempCrashIP = tempCrashIP + inboundString[i]
-                                            if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
-                                                return False
-                                            print "WARNING: A Client has issued the CRASHED command"
-                                            print "The Crashed Client IP: " + tempCrashIP
-                                            self.listOfCrashedClients.append(tempCrashIP)
-                                            print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
-                                            #look through listOfConnected clients and find the matching ip address
-                                            print "STATUS: Looking for matching IP address in list of clients..."
-                                            foundMatch= False
-                                            tempAddr2= ""
-                                            for index in range(0, len(self.listOfClients)):
-                                                tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                                                print "STATUS: Copying list of clients' IP Address to a new string"
-                                                tempAddr2= str(tempAddr[0])
-                                                print "STATUS: Comparing IP Addresses..."
-                                                if(tempCrashIP == tempAddr2):
-                                                    print "INFO: Matching IP address was found in the list of clients"
-                                                    #print "DEBUG: tempAddr=" + str(tempAddr)
-                                                    del self.listOfClients[index]
-                                                    print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
-                                                    foundMatch= True
-                                                    print "STATUS: Adding this client's chunk to the stack of chunks the need to be reassigned..."
-                                                    self.stackOfChunksThatNeedToBeReassigned.append(self.dictionaryOfCurrentClientTasks[tempAddr]) #push crashed clients chunk onto the stack
-                                                    print "INFO: Successfully pushed the crashed client's chunk onto the stack"
-                                                    self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
-                                                    break
-                                                else:
-                                                    print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
-
-                                            if(foundMatch == False):
-                                                print "WARNING: No Matching IP address was found in the list of clients"
-                                                print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
-                                            return True
-                                        else:
+    def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
+        try:
+            if(len(inboundString) < 1):
+                print "INFO: Empty Crashed Message Received."
+                return False
+            if(inboundString[0]=="C"):
+                if(inboundString[1]=="R"):
+                    if(inboundString[2]=="A"):
+                        if(inboundString[3]=="S"):
+                            if(inboundString[4]=="H"):
+                                if(inboundString[5]=="E"):
+                                    if(inboundString[6]=="D"):
+                                        tempCrashIP = ""   #THIS STAYS IN THE CRASH COMMAND SECTION
+                                        #position 7 is a space between the ip address and the crashed message
+                                        for i in range(8, len(inboundString)):
+                                            if(inboundString[i].isalpha()):
+                                                print "WARNING: A Non-Numeral Value Was Detected In The Ip Address, Ignoring Remainder of String"
+                                                break
+                                            else:
+                                                tempCrashIP = tempCrashIP + inboundString[i]
+                                        if(len(tempCrashIP) < 1): #if the length is less than one, stop performing an IP check
                                             return False
+                                        print "WARNING: A Client has issued the CRASHED command"
+                                        print "The Crashed Client IP: " + tempCrashIP
+                                        self.listOfCrashedClients.append(tempCrashIP)
+                                        print "INFO: The crashed client's IP address has been added to the listOfCrashedClients"
+                                        #look through listOfConnected clients and find the matching ip address
+                                        print "STATUS: Looking for matching IP address in list of clients..."
+                                        foundMatch= False
+                                        tempAddr2= ""
+                                        for index in range(0, len(self.listOfClients)):
+                                            tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
+                                            print "STATUS: Copying list of clients' IP Address to a new string"
+                                            tempAddr2= str(tempAddr[0])
+                                            print "STATUS: Comparing IP Addresses..."
+                                            if(tempCrashIP == tempAddr2):
+                                                print "INFO: Matching IP address was found in the list of clients"
+                                                #print "DEBUG: tempAddr=" + str(tempAddr)
+                                                del self.listOfClients[index]
+                                                print "INFO: The crashed client " + str(tempAddr) + " was removed from the list of clients"
+                                                foundMatch= True
+                                                print "STATUS: Adding this client's chunk to the stack of chunks the need to be reassigned..."
+                                                self.stackOfChunksThatNeedToBeReassigned.append(self.dictionaryOfCurrentClientTasks[tempAddr]) #push crashed clients chunk onto the stack
+                                                print "INFO: Successfully pushed the crashed client's chunk onto the stack"
+                                                self.recordOfInboundCommandsFromClientToServer['CRASHED'] = (self.recordOfInboundCommandsFromClientToServer['CRASHED'] + 1)
+                                                break
+                                            else:
+                                                print "INFO: No Match found yet. " + str(tempCrashIP) + " != " + str(tempAddr2)
+
+                                        if(foundMatch == False):
+                                            print "WARNING: No Matching IP address was found in the list of clients"
+                                            print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+                                        return True
                                     else:
                                         return False
                                 else:
@@ -1097,17 +1095,19 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     else:
                         return False
                 else:
-                  return False
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
+                    return False
+            else:
+              return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Inbound checkForCrashedCommand Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #/////////////////////////////////////////////////////////////////////////////
             #End of Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
