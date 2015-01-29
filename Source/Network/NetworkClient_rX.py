@@ -483,65 +483,65 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #NEXT
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendNextCommandToServer(self):
-                #sends the NEXT command to the serve
-                try:
-                    self.clientSocket.send("NEXT " + self.myIPAddress)
-                    print "INFO: The NEXT command was sent to the server"
-                    self.recordOfOutboundCommandsFromClientToServer['NEXT'] = (self.recordOfOutboundCommandsFromClientToServer['NEXT'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendNextCommandToServer(self):
+        #sends the NEXT command to the serve
+        try:
+            self.clientSocket.send("NEXT " + self.myIPAddress)
+            print "INFO: The NEXT command was sent to the server"
+            self.recordOfOutboundCommandsFromClientToServer['NEXT'] = (self.recordOfOutboundCommandsFromClientToServer['NEXT'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendNextCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #FOUNDSOLUTION
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendFoundSolutionToServer(self):
-                #sends the FOUNDSOLUTION command to the server, and key
-                try:
-                    self.clientSocket.send("FOUNDSOLUTION " + self.myIPAddress)
-                    self.clientSocket.send(self.key)
-                    print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
-                    self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendFoundSolutionToServer(self):
+        #sends the FOUNDSOLUTION command to the server, and key
+        try:
+            self.clientSocket.send("FOUNDSOLUTION " + self.myIPAddress)
+            self.clientSocket.send(self.key)
+            print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
+            self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendFoundSolution Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #CRASHED
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendCrashedCommandToServer(self):
-                #sends the CRASHED command to the server
-                try:
-                    self.clientSocket.send("CRASHED " + self.myIPAddress)
-                    print " "
-                    print "INFO: The IP Address of the crashed client was sent to the server."
-                    print " "
-                    self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = (self.recordOfOutboundCommandsFromClientToServer['CRASHED'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendCrashedCommandToServer(self):
+        #sends the CRASHED command to the server
+        try:
+            self.clientSocket.send("CRASHED " + self.myIPAddress)
+            print " "
+            print "INFO: The IP Address of the crashed client was sent to the server."
+            print " "
+            self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = (self.recordOfOutboundCommandsFromClientToServer['CRASHED'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server sendCrashedCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #///////////////////////////////////////////////////////////////////////////
             #End of Outbound Communication Functions
             #///////////////////////////////////////////////////////////////////////////
@@ -552,24 +552,24 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #DONE
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def checkForDoneCommand(self, inboundString):
-                try:
-                    if inboundString == "DONE":
-                        print "INFO: Received the DONE command"
-                        self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
-                        return True
-                    else:
-                        return False
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def checkForDoneCommand(self, inboundString):
+        try:
+            if inboundString == "DONE":
+                print "INFO: Received the DONE command"
+                self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Server checkForDoneCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
                 #INVALID COMMAND HAS BEEN OMITTED
             #///////////////////////////////////////////////////////////////////////////
@@ -588,59 +588,59 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #DONE
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendDoneCommandToController(self):
-                try:
-                    self.pipe.send("done")
-                    print "INFO: The DONE command was sent to the Controller"
-                    self.recordOfOutboundCommandsFromClientToController['done'] = (self.recordOfOutboundCommandsFromClientToController['done'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendDoneCommandToController(self):
+        try:
+            self.pipe.send("done")
+            print "INFO: The DONE command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['done'] = (self.recordOfOutboundCommandsFromClientToController['done'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendDoneCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #CONNECTED
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendConnectedCommandToCOntroller(self):
-                try:
-                    self.pipe.send("connected")
-                    print "INFO: The CONNECTED command was sent to the Controller"
-                    self.recordOfOutboundCommandsFromClientToController['connected'] = (self.recordOfOutboundCommandsFromClientToController['connected'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendConnectedCommandToCOntroller(self):
+        try:
+            self.pipe.send("connected")
+            print "INFO: The CONNECTED command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['connected'] = (self.recordOfOutboundCommandsFromClientToController['connected'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendConnectedCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #DOINGSTUFF
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def sendDoingStuffCommandToController(self):
-                try:
-                    self.pipe.send("doingStuff")
-                    print "INFO: The DOINGSTUFF command was sent to the Controller"
-                    self.recordOfOutboundCommandsFromClientToController['doingStuff'] = (self.recordOfOutboundCommandsFromClientToController['doingStuff'] + 1)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+    def sendDoingStuffCommandToController(self):
+        try:
+            self.pipe.send("doingStuff")
+            print "INFO: The DOINGSTUFF command was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['doingStuff'] = (self.recordOfOutboundCommandsFromClientToController['doingStuff'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendDoingStuffCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #///////////////////////////////////////////////////////////////////////////
             #End of Outbound Communication Functions
             #///////////////////////////////////////////////////////////////////////////
@@ -651,23 +651,23 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #SERVER IP
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            def receiveServerIPFromController(self):
-                try:
-                    print "INFO: Waiting to receive the serverIP from Controller (function block)"
-                    self.serverIP = self.pipe.recv()
-                    print "INFO: The ServerIP was received from the Controller (function block)"
-                    self.recordOfInboundCommandsFromController['serverIP'] = (self.recordOfInboundCommandsFromController['serverIP'] + 1)
+    def receiveServerIPFromController(self):
+        try:
+            print "INFO: Waiting to receive the serverIP from Controller (function block)"
+            self.serverIP = self.pipe.recv()
+            print "INFO: The ServerIP was received from the Controller (function block)"
+            self.recordOfInboundCommandsFromController['serverIP'] = (self.recordOfInboundCommandsFromController['serverIP'] + 1)
 
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
             #///////////////////////////////////////////////////////////////////////////
             #End of Inbound Communication FUnctions
             #///////////////////////////////////////////////////////////////////////////
