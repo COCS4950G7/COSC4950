@@ -5,12 +5,16 @@ __author__ = 'chris hamm'
 
 #THINGS ADDED/CHANGED WITH THIS VERSION
     #(Implemented)Removed Chunk Parsing Functions (these functions are no longer needed)
+    #(Implemented)Marked several of the defined communication functions as potentially obsolete, may be omitted in the near future
     #(Implemented)Restructure the primary loop of the server so that the server responds to a clients message immeadiately (instead of listen to client, then listen to controller, then distribute commands)
     #(Implemented)Change the recv (from controller) mechanism so that server expects two messages from the controller (string, then a chunk object)
-    #(Have not started to implement yet)Change Communication functions to just check for what type of message
+    #(In Progress)Change Communication functions to just check for what type of message
     #(In Progress)New data containers
-        #(Have not started to implement yet)Stack containing chunks that need to be reassigned due to a client crash
-        #(In Progress)Stack of clients waiting for nextChunk
+        #(Implemented)Stack containing chunks that need to be reassigned due to a client crash
+        #(Implemented)Stack of clients waiting for nextChunk
+    #(In Progress)Modified data structures
+        #(In Progress)Changed the list of clientsCurrentTasks to a dictionary of ClientsCurrentTasks
+        #(Implemented)Changed the list of chunk objects that contain the chunks of crashed clients to a stack (known as stack containing chunks that need to be reassigned)
     #(In Progress)Remove data structures
         #(In Progress)Remove list of clients waiting for reply (to be replaced by stack of clients waiting for nextChunk)
         #(In Progress)Remove the list of controller messages (No longer needed since server reacts immediately)
@@ -19,8 +23,9 @@ __author__ = 'chris hamm'
     #(In progress)Send extracted information over the network to the client
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9D
-    #(Have not started implementing yet) A list of what each client is currently working on
-    #(Have not started implementing yet) A list of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
+    #(In Progress) A dictionary of what each client is currently working on
+        #(Implemented)Add a data structure that stores what the last chunk the server sent to each client was
+    #(Implemented) A stack of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
 
 #====================================
 #Imports
@@ -102,7 +107,26 @@ __author__ = 'chris hamm'
                 #Check for NEXT Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     #************************************************************************************
-                    #If it is the NEXT Command, send a nextChunk request to the controller
+                    #If it is the NEXT Command
+                    #************************************************************************************
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        #Check to see if stack of chunks that need to be reassigned is empty
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                            #If stack is not empty, then send the top chunk on the stack to the client that is requesting the nextChunk
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                                #Save a copy of the chunk being sent to the client in the dictionary of clientsCurrentTask
+                                #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                            #Else If stack empty, then send a nextChunk message to the controller and add the client to the stack of clients waiting for nextChunk
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        #End of Check to see if stack of chunks that need to be reassigned is empty
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    #************************************************************************************
+                    #End of If it is the Next Command
                     #************************************************************************************
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of Check for NEXT Command
@@ -122,7 +146,7 @@ __author__ = 'chris hamm'
                 #Check for CRASHED Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     #************************************************************************************
-                    #If it is the CRASHED Command, add the chunk that client was working on to the crashed client chunk stack
+                    #If it is the CRASHED Command, add the chunk that client was working on to the stack of chunks that need to be reassigned
                     #************************************************************************************
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of Check for CRASHED Command
@@ -149,7 +173,15 @@ __author__ = 'chris hamm'
                     #************************************************************************************
                     #If it is the reply to next chunk command, receive the chunk object
                     #************************************************************************************
-
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        #If stack of client waiting for nextChunk is not empty, then send chunk info to that client on top of the stack, remove client from stack
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                            #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks
+                            #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        #Else if stack of clients waiting for nextChunk is empty, then store the chunk in stack of chunks that need to be reassigned
+                        #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                     #************************************************************************************
                     #Once received chunk object, send info to the client in the waiting for nextChunk stack
                     #************************************************************************************
@@ -279,6 +311,22 @@ __author__ = 'chris hamm'
             #/////////////////////////////////////////////////////////////////////////////
             #Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send nextChunk Command to Controller
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send chunkAgain Command to Controller (MAY BE OBSOLETE ON THE SERVER SIDE)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send Waiting Command to Controller (MAY BE OBSOLETE ON THE SERVER SIDE)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send Done Command to Controller
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
             #/////////////////////////////////////////////////////////////////////////////
             #End of Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
@@ -286,6 +334,18 @@ __author__ = 'chris hamm'
             #/////////////////////////////////////////////////////////////////////////////
             #Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for nextChunk Command
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for chunkAgain Command (MAY BE OBSOLETE ON THE SERVER SIDE)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for found command (reply to done) (MAY BE OBSOLETE ON THE SERVER SIDE)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
             #/////////////////////////////////////////////////////////////////////////////
             #End of Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
@@ -299,6 +359,14 @@ __author__ = 'chris hamm'
             #/////////////////////////////////////////////////////////////////////////////
             #Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send Done Command to Client
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send nextChunk Command to Client (the next part of the problem)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
             #/////////////////////////////////////////////////////////////////////////////
             #End of Outbound Functions
             #/////////////////////////////////////////////////////////////////////////////
@@ -306,6 +374,17 @@ __author__ = 'chris hamm'
             #/////////////////////////////////////////////////////////////////////////////
             #Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for Next Command
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for FoundSolution Command (MAY BE OBSOLETE ON THE SERVER SIDE)
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Check for Crashed Command
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             #/////////////////////////////////////////////////////////////////////////////
             #End of Inbound Functions
             #/////////////////////////////////////////////////////////////////////////////
