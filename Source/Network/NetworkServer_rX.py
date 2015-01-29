@@ -267,13 +267,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #If stack is not empty, then send the top chunk on the stack to the client that is requesting the nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        tempIP= ""
                         if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                             print "STATUS: Preparing to send chunk (from stack of chunks that need to be reassigned) to client..."
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                                 #Save a copy of the chunk being sent to the client in the dictionary of clientsCurrentTask
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                             #position 4 is a space
-                            tempIP= "" #Extracting the clients IP
+                            #Extracting the clients IP
                             for i in range(5, len(theInput)):
                                 tempIP+= theInput
                             self.dictionaryOfCurrentClientTasks[tempIP] = self.stackOfChunksThatNeedToBeReassigned.pop() #pop the stack
