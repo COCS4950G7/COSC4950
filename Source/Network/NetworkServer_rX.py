@@ -20,6 +20,7 @@ __author__ = 'chris hamm'
         #(Implemented)Remove the list of controller messages (No longer needed since server reacts immediately)
     #(Implemented)Added a print condition that prints out the dictionary of currentClientTasks when the server closes
     #(Implemented)Added additional print statements, making it easier to track what is going on
+    #(Implemented)Added a record for the number of IP address the server could not find a match for and a print statement at the end for it
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -61,6 +62,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #object = stack.pop() #Is how you pop the stack
     stackOfChunksThatNeedToBeReassigned = [] #a stack
     dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
+    recordOfNumberOfIPAddressesThatHaventBeenFound = 0 #if an ip address cannot be found when server is looking for a match, this counter gets incremented
     recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
     recordOfInboundCommandsFromControllerToServer = {} #dictionary that records how many times the server received a command from the controller
     recordOfOutboundCommandsFromServerToClient = {} #dictionary that records how many times the server has issued a command to the client
@@ -304,6 +306,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             if(foundMatch == False):
                                 print "WARNING: No Matching IP address was found in the list of clients"
                                 print "INFO: Unable to Find the Client's IP: " +str(tempIP) + " "
+                                self.recordOfNumberOfIPAddressesThatHaventBeenFound+= 1
                             else:
                                 #send chunk to client
                                 print "STATUS: Sending Chunk to the Client..."
@@ -416,11 +419,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "STATUS: Looking for matching IP Address in list of Clients..."
                                 foundMatch= False
                                 tempAddr2= ""
+                                tempSock= ""
                                 for index in range(0, len(self.listOfClients)):
                                     tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
                                     print "STATUS: Copying list of clients' IP Address to a new string"
                                     tempAddr2= str(tempAddr[0])
                                     print "STATUS: Comparing IP Addresses..."
+                                    print "DEBUG: tempAddr2=" + str(tempAddr2)
+                                    print "DEBUG: tempIP=" + str(tempIP)
                                     if(tempIP == tempAddr2):
                                         print "INFO: Matching IP address was found in the list of clients"
                                         foundMatch= True
@@ -431,6 +437,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 if(foundMatch == False):
                                     print "WARNING: No Matching IP address was found in the list of clients"
                                     print "INFO: Unable to Find the Client's IP: " +str(tempIP) + " "
+                                    self.recordOfNumberOfIPAddressesThatHaventBeenFound+= 1
                                 else:
                                     print "STATUS: Copying chunk object to dictionaryOfCurrentClientTasks..."
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
@@ -670,6 +677,22 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "========================================================================================"
             #/////////////////////////////////////////////////////////////////////////////
             #End of Print contents of the dictionaryOfCurrentClientTasks
+            #/////////////////////////////////////////////////////////////////////////////
+
+            #/////////////////////////////////////////////////////////////////////////////
+            #Print Number of IP address that server was not able to find
+            #/////////////////////////////////////////////////////////////////////////////
+            print " "
+            print "Printing Number of IP Addresses that Server Could Not Find"
+            print "----------------------------------------------------------"
+            if(self.recordOfNumberOfIPAddressesThatHaventBeenFound < 1):
+                print "Server was able to find all of the IP addresses."
+            else:
+                print "Server could not find " + str(self.recordOfNumberOfIPAddressesThatHaventBeenFound) + " IP Addresses"
+            print "(END OF PRINTING NUMBER OF IP ADDRESSES SERVER COULD NOT FIND)"
+            print "----------------------------------------------------------"
+            #/////////////////////////////////////////////////////////////////////////////
+            #End of Print Number of IP Addresses that server was not able to find
             #/////////////////////////////////////////////////////////////////////////////
 
             #/////////////////////////////////////////////////////////////////////////////
@@ -1143,6 +1166,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                         if(foundMatch == False):
                                             print "WARNING: No Matching IP address was found in the list of clients"
                                             print "INFO: Unable to Find the Crashed IP: " +str(tempCrashIP) + " "
+                                            self.recordOfNumberOfIPAddressesThatHaventBeenFound+= 1
                                         return True
                                     else:
                                         return False
