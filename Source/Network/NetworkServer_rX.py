@@ -18,6 +18,8 @@ __author__ = 'chris hamm'
     #(Implemented)Remove data structures
         #(Implemented)Remove list of clients waiting for reply (to be replaced by stack of clients waiting for nextChunk)
         #(Implemented)Remove the list of controller messages (No longer needed since server reacts immediately)
+    #(Implemented)Added a print condition that prints out the dictionary of currentClientTasks when the server closes
+    #(Implemented)Added additional print statements, making it easier to track what is going on
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -182,6 +184,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #.........................................................................
         #Initialize the Record Counters
         #.........................................................................
+        print "STATUS: Initializing the Record Counters..."
         self.recordOfOutboundCommandsFromServerToController['nextChunk'] = 0
         self.recordOfOutboundCommandsFromServerToController['chunkAgain'] = 0
         self.recordOfOutboundCommandsFromServerToController['waiting'] = 0
@@ -195,6 +198,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         self.recordOfInboundCommandsFromClientToServer['NEXT'] = 0
         self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfInboundCommandsFromClientToServer['CRASHED'] = 0
+        print "INFO: Successfully initialized the Record Counters"
         #.........................................................................
         #End of Initialize the Record Counters
         #.........................................................................
@@ -203,7 +207,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #Start Listening to the Socket
         #.........................................................................
         self.serverSocket.listen(5)
-        print "Waiting for initial client to connect..."
+        print "STATUS: Waiting for initial client to connect..."
         #.........................................................................
         #End of Start Listening to the Socket
         #.........................................................................
@@ -275,9 +279,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                             #position 4 is a space
                             #Extracting the clients IP
+                            print "STATUS: Extracting The Clients IP"
                             for i in range(5, len(theInput)):
                                 tempIP+= theInput
+                            print "INFO: Successfully Extracted the Clients IP"
                             self.dictionaryOfCurrentClientTasks[tempIP] = self.stackOfChunksThatNeedToBeReassigned.pop() #pop the stack
+                            print "INFO: Successfully added the chunk from stack of chunks that need to be reassigned to the dictionary of current clients tasks"
                             #retreive socket information
                             print "STATUS: Looking for matching IP Address in list of Clients..."
                             foundMatch= False
@@ -299,7 +306,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 print "INFO: Unable to Find the Client's IP: " +str(tempIP) + " "
                             else:
                                 #send chunk to client
+                                print "STATUS: Sending Chunk to the Client..."
                                 self.sendNextToClient(tempSock,tempIP, self.dictionaryOfCurrentClientTasks[tempIP].params)
+
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Else If stack empty, then send a nextChunk message to the controller and add the client to the stack of clients waiting for nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -369,6 +378,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #/////////////////////////////////////////////////////////////////////////////
             #End of Check for input from Clients
             #/////////////////////////////////////////////////////////////////////////////
+                finally:
+                    print "INFO: There are currently " + str(len(self.stackOfClientsWaitingForNextChunk)) + " clients waiting for nextChunk"
+                    print "INFO: There are currently " + str(len(self.stackOfChunksThatNeedToBeReassigned)) + " chunks waiting to be reassigned"
+
 
             #/////////////////////////////////////////////////////////////////////////////
             #Check for input from controller class
@@ -632,6 +645,28 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #End of print list of Controller Messages
             #/////////////////////////////////////////////////////////////////////////////
             #'''GOAL: Remove the above data structure'''
+
+            #/////////////////////////////////////////////////////////////////////////////
+            #Print contents of the dictionaryOfCurrentClientTasks
+            #/////////////////////////////////////////////////////////////////////////////
+            try:
+                print " "
+                print "Printing the Contents of the dictionaryOfCurrentClientTasks"
+                print "----------------------------------------------------------------"
+                for key, value in self.dictionaryOfCurrentClientTasks.iteritems():
+                    print key, value
+                print "(END OF PRINTING CONTENTS OF THE DICTIONARYOFCURRENTCLIENTTASKS)"
+                print "----------------------------------------------------------------"
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception has been thrown in the Finally Block, in the print Dictionary of Current CLient Tasks Section"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
+            #/////////////////////////////////////////////////////////////////////////////
+            #End of Print contents of the dictionaryOfCurrentClientTasks
+            #/////////////////////////////////////////////////////////////////////////////
 
             #/////////////////////////////////////////////////////////////////////////////
             #Print Command Records
