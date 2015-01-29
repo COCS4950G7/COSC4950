@@ -21,6 +21,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added a print condition that prints out the dictionary of currentClientTasks when the server closes
     #(Implemented)Added additional print statements, making it easier to track what is going on
     #(Implemented)Added a record for the number of IP address the server could not find a match for and a print statement at the end for it
+    #(Implemented)Added a recoed for number of unknown commands from client and controller
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -197,9 +198,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = 0
         self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = 0
         self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] = 0
+        self.recordOfInboundCommandsFromControllerToServer['Unknown'] = 0
         self.recordOfInboundCommandsFromClientToServer['NEXT'] = 0
         self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfInboundCommandsFromClientToServer['CRASHED'] = 0
+        self.recordOfInboundCommandsFromClientToServer['Unknown'] = 0
         print "INFO: Successfully initialized the Record Counters"
         #.........................................................................
         #End of Initialize the Record Counters
@@ -371,6 +374,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     else:
                         print "ERROR: unknown command received"
                         print "The unknown command: '" + theInput + "'"
+                        self.recordOfInboundCommandsFromClientToServer['Unknown'] = (self.recordOfInboundCommandsFromClientToServer['Unknown'] + 1)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of If Command is Unknown, print Error
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -447,7 +451,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 tempSock= ""
                                 for index in range(0, len(self.listOfClients)):
                                     tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                                    tempPort= str(tempAddr[1]) #copy the port information
+                                    tempPort= tempAddr[1] #copy the port information
                                     print "DEBUG: tempPort=" + str(tempPort)
                                     print "STATUS: Copying list of clients' IP Address to a new string"
                                     tempAddr2= str(tempAddr[0])
@@ -524,6 +528,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         else:
                             print "ERROR: unknown command received"
                             print "The unknown command: '" + recv + "'"
+                            self.recordOfInboundCommandsFromControllerToServer['Unknown'] = (self.recordOfInboundCommandsFromControllerToServer['Unknown'] + 1)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of If Command is Unknown, print Error
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -808,6 +813,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "# of Chunk Objects received from Controller: " + str(self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'])
                 else:
                     print "# of Chunk Objects received from Controller: 0"
+                #print the Unknowns
+                if(self.recordOfInboundCommandsFromControllerToServer['Unknown'] > 0):
+                    print "# of Unknown Commands received from Controller: " + str(self.recordOfInboundCommandsFromControllerToServer['Unknown'])
+                else:
+                    print "# of Unknown Commands received from Controller: 0"
                 print "(END OF RECORD OF INBOUND COMMANDS FROM THE CONTROLLER)"
                 print "------------------------------------------------------------"
             except Exception as inst:
@@ -837,6 +847,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "# of CRASHED Commands received from Client(s): " + str(self.recordOfInboundCommandsFromClientToServer['CRASHED'])
                 else:
                     print "# of CRASHED Commands received from Client(s): 0"
+                #print the Unknowns
+                if(self.recordOfInboundCommandsFromClientToServer['Unknown'] > 0):
+                    print "# of Unknown Commands received from Client(s): " + str(self.recordOfInboundCommandsFromClientToServer['Unknown'])
+                else:
+                    print "# of Unknown Commands received from Client(s): 0"
                 print "(END OF RECORD OF INBOUND COMMANDS FROM CLIENT(S))"
                 print "------------------------------------------------------"
             except Exception as inst:
@@ -1062,7 +1077,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def sendNextToClient(self,recipientsSocket, recipientIPAddress, recipientPort, theNextPart): #sends the next part of problem to the client
         try:
-            recipientsSocket.sendto(theNextPart, (recipientIPAddress, recipientPort)) 
+            recipientsSocket.sendto(theNextPart, (recipientIPAddress, recipientPort))
             print "I/O: The nextChunk of the problem was sent to: " + str(recipientIPAddress)
             #increment the record counter
             self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunk'] + 1)

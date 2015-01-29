@@ -9,7 +9,9 @@ __author__ = 'chris hamm'
     #(Implemented)Restructure the the Primary While Loop so that when a command is received from either server or controller, the client immeadiately responds to that command (instead of queuing up the commands and executing them one by one)
     #(Implemented)Added a record that records the number of reply to nextchunk the client receives from server
     #(Implemented)Revised the check for server command system
+    #(Implemented)Added a record for the number of unknown commands the client receives from controller and from server
 
+    #COMMENT: I NOTICED THERE IS NO FUNCTION FOR THE CONTROLLER TO TELL THE CLIENT WHEN THE SOLUTION HAS BEEN FOUND
 #=================================
 #Imports
 #=================================
@@ -172,8 +174,10 @@ class NetworkClient():
         self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = 0
         self.recordOfInboundCommandsFromController['serverIP'] = 0
+        self.recordOfInboundCommandsFromController['Unknown'] = 0
         self.recordOfInboundCommandsFromServer['DONE'] = 0
         self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = 0
+        self.recordOfInboundCommandsFromServer['Unknown'] = 0
         #........................................................................
         #End of Initialize the Record Counters
         #........................................................................
@@ -283,6 +287,7 @@ class NetworkClient():
                             else:
                                 print "ERROR: Received Unknown Command From The Server"
                                 print "The unknown command: '" + theInput + "'"
+                                self.recordOfInboundCommandsFromServer['Unknown'] = (self.recordOfInboundCommandsFromServer['Unknown'] + 1)
                         else:
                             print "INFO: Received Empty String From Server."
 
@@ -326,6 +331,7 @@ class NetworkClient():
                         else:
                             print "ERROR: unknown command was received"
                             print "The unknown command: '" + recv + "'"
+                            self.recordOfInboundCommandsFromController['Unknown'] = (self.recordOfInboundCommandsFromController['Unknown'] + 1)
                     else:
                         print "INFO: No command was received from the controller class"
             #///////////////////////////////////////////////////////////////////////////
@@ -442,6 +448,11 @@ class NetworkClient():
                     print "# of serverIP Commands  received from Controller: " + str(self.recordOfInboundCommandsFromController['serverIP'])
                 else:
                     print "# of serverIP Commands received from Controller: 0"
+                #print Unknown
+                if(self.recordOfInboundCommandsFromController['Unknown'] > 0):
+                    print "# of Unknown Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['Unknown'])
+                else:
+                    print "# of Unknown Commands received from Controller: 0"
                 print "(END OF INBOUND COMMANDS FROM CONTROLLER)"
                 print "-----------------------------------------------"
             except Exception as inst:
@@ -466,6 +477,11 @@ class NetworkClient():
                     print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'])
                 else:
                     print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: 0"
+                #print Unknown
+                if(self.recordOfInboundCommandsFromServer['Unknown'] > 0):
+                    print "# of Unknown Commands received from Server: " + str(self.recordOfInboundCommandsFromServer['Unknown'])
+                else:
+                    print "# of Unknown Commands received from Server: 0"
                 print "(END OF INBOUND COMMANDS FROM THE SERVER)"
                 print "------------------------------------------------"
             except Exception as inst:
