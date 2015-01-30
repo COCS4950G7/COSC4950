@@ -605,10 +605,16 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForNextCommand(self,inboundString):
         try:
-            if inboundString[0:4] == "NEXT ":
-                print "INFO: Received the NEXT (chunk) command from the server"
-                self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = (self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] + 1)
-                return True
+            #if inboundString[0:4] == "NEXT ": #OLD METHOD
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0] == "N"):
+                if(inboundString[1] == "E"):
+                    if(inboundString[2] == "X"):
+                        if(inboundString[3] == "T"):
+                            print "INFO: Received the NEXT (chunk) command from the server"
+                            self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = (self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] + 1)
+                            return True
             else:
                 return False
         except Exception as inst:
