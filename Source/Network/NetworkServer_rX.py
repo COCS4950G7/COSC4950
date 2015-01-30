@@ -1105,6 +1105,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForNextCommand(self,inboundString): #checks for the NEXT command
         try:
+            if(len(inboundString) < 1):
+                return False
             if(inboundString[0]=="N"):
                 if(inboundString[1]=="E"):
                     if(inboundString[2]=="X"):
