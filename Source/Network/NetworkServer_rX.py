@@ -21,7 +21,8 @@ __author__ = 'chris hamm'
     #(Implemented)Added a print condition that prints out the dictionary of currentClientTasks when the server closes
     #(Implemented)Added additional print statements, making it easier to track what is going on
     #(Implemented)Added a record for the number of IP address the server could not find a match for and a print statement at the end for it
-    #(Implemented)Added a recoed for number of unknown commands from client and controller
+    #(Implemented)Added a record for number of unknown commands from client and controller
+    #(Implemented)Added an additional reocord for the new sendNextData command to the client, as well as have server send the chunk data after it sends the nextChunk message to the client
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -194,6 +195,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         self.recordOfOutboundCommandsFromServerToController['done'] = 0
         self.recordOfOutboundCommandsFromServerToClient['DONE'] = 0
         self.recordOfOutboundCommandsFromServerToClient['nextChunk'] = 0
+        self.recordOfOutboundCommandsFromServerToClient['nextChunkData'] = 0
         self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_NEXT_CHUNK'] = 0
         self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_CHUNK_AGAIN'] = 0
         self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = 0
@@ -478,6 +480,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     tempMessage= "NEXT " + str(self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
+                                    print "STATUS: Sending the corresponding data for that chunk to client..."
+                                    self.sendNextDataToClient(tempSock, tempIP, tempPort, chunkrecv.data)
+                                    print "INFO: Successfully sent the corresponding chunk data to the client"
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -781,6 +786,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     print "# of nextChunk Commands sent from Server to Client(s): " + str(self.recordOfOutboundCommandsFromServerToClient['nextChunk'])
                 else:
                     print "# of nextChunk Commands sent from Server to Client(s): 0"
+                #print the nextChunkData records
+                if(self.recordOfOutboundCommandsFromServerToClient['nextChunkData'] > 0):
+                    print "# of nextChunkData Commands sent from Server to Client(s): " + str(self.recordOfOutboundCommandsFromServerToClient['nextChunkData'])
+                else:
+                    print "# of nextChunkData Commands sent from Server to Client(s): 0"
                 print "(END OF RECORD OF OUTBOUND COMMANDS FROM SERVER TO CLIENT"
                 print "-----------------------------------------------------------"
             except Exception as inst:
@@ -1086,6 +1096,25 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Server-Client Outbound sendNext Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #Send the data for nextChunk to the client
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def sendNextDataToClient(self,recipientSocket, recipientIPAddress, recipientPort, theNextData):
+        try:
+            recipientSocket.sendto(str(theNextData),(recipientIPAddress, recipientPort))
+            print "I/O: The corresponding data has been sent to: " + str(recipientIPAddress)
+            #increment the counter
+            self.recordOfOutboundCommandsFromServerToClient['nextChunkData'] = (self.recordOfOutboundCommandsFromServerToClient['nextChunkData'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Server-Client Outbound sendNextData Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args

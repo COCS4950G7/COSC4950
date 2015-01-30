@@ -10,6 +10,8 @@ __author__ = 'chris hamm'
     #(Implemented)Added a record that records the number of reply to nextchunk the client receives from server
     #(Implemented)Revised the check for server command system
     #(Implemented)Added a record for the number of unknown commands the client receives from controller and from server
+    #(Implemented)Added a new communication command for the client to send the next chunk to the controller
+    #(Implemented)Added in function to expect a second string from the server after client receives the nextChunk command
 
     #COMMENT: I NOTICED THERE IS NO FUNCTION FOR THE CONTROLLER TO TELL THE CLIENT WHEN THE SOLUTION HAS BEEN FOUND
 #=================================
@@ -170,6 +172,7 @@ class NetworkClient():
         self.recordOfOutboundCommandsFromClientToController['done'] = 0
         self.recordOfOutboundCommandsFromClientToController['connected'] = 0
         self.recordOfOutboundCommandsFromClientToController['doingStuff'] = 0
+        self.recordOfOutboundCommandsFromClientToController['nextChunk'] = 0
         self.recordOfOutboundCommandsFromClientToServer['NEXT'] = 0
         self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = 0
@@ -240,13 +243,14 @@ class NetworkClient():
         #........................................................................
         try:
                 while self.serverSaysKeepSearching:
-                    self.clientSocket.settimeout(2.0)
+                    #self.clientSocket.settimeout(2.0) #MOVED BELOW
             #///////////////////////////////////////////////////////////////////////////
             #Check for Server Commands
             #///////////////////////////////////////////////////////////////////////////
             #'''GOAL: Want to have client respond immeadiately when it receives a command from server'''
                     try: #checking for server commands try block
                         print "STATUS: Checking for server commands..."
+                        self.clientSocket.settimeout(2.0)
                         theInput = self.clientSocket.recv(2048)
                         if(len(theInput) > 1):
                             #if theInput == "DONE": #OLD METHOD
@@ -261,17 +265,48 @@ class NetworkClient():
                                 break
                             #If the server wants to give us the next chunk, take it
                             #Server should be sending "NEXT" -> params -> data in seperate strings all to us
-                            #elif theInput == "NEXT":
                             elif(self.checkForNextCommand(theInput)==True):
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
+                                    print "STATUS: Waiting for the corresponding data from the server"
+                                    tempData= "" #declare the variable
+                                    try: #receive corresponding data from the server try block
+                                        tempData = self.clientSocket.recv(2048)
+                                        print "INFO: Received data from the server."
+                                    except Exception as inst:
+                                        print "============================================================================================="
+                                        print "ERROR: An exception was thrown in the receive corresponding data from the server Try Block"
+                                        #the exception instance
+                                        print type(inst)
+                                        #srguments stored in .args
+                                        print inst.args
+                                        #_str_ allows args tto be printed directly
+                                        print inst
+                                        print "============================================================================================="
+                                    print "STATUS: Removing the NEXT keyword from the message..."
+                                    #remove 'NEXT '
+                                    #position 4 is a space
+                                    modifiedMessage= str(theInput[5:len(theInput)])
+                                    print "INFO: Successfully removed the NEXT keyword from the message"
+                                    print "STATUS: Creating a new chunk object (to be sent to the controller)..."
+                                    #make new chunk object
+                                    tempChunk = Chunk.Chunk()
+                                    #set the params for the chunk object
+                                    tempChunk.params = modifiedMessage
+                                    #set the data for the chunk object
+                                    tempChunk.data = tempData
+                                    print "INFO: Chunk object successfully created"
+                                    print "STATUS: Sending chunk object to the controller..."
+                                    self.sendNextChunkToController(tempChunk)
+                                    print "INFO: Finished sending chunk to the controller"
+
                                     #and store it locally till controller is ready for it
-                                    self.chunk.params = self.clientSocket.recv(2048)
-                                    self.chunk.data = self.clientSocket.recv(2048)
+                                    #self.chunk.params = self.clientSocket.recv(2048)
+                                    #self.chunk.data = self.clientSocket.recv(2048)
                                     #let controller know we're ready to give it a chunk
-                                    self.sendDoingStuffCommandToController()
+                                    #self.sendDoingStuffCommandToController()
                                     #send chunk object to controller
-                                    self.pipe.send(self.chunk)
+                                    #self.pipe.send(self.chunk)
 
                                 except Exception as inst:
                                     print "============================================================================================="
@@ -399,6 +434,11 @@ class NetworkClient():
                     print "# of doingStuff Commands sent to Controller: " + str(self.recordOfOutboundCommandsFromClientToController['doingStuff'])
                 else:
                     print "# of doingStuff Commands sent to Controller: 0"
+                #print nextChunk
+                if(self.recordOfOutboundCommandsFromClientToController['nextChunk'] > 0):
+                    print "# of nextChunk Commands sent to the Controller: " + str(self.recordOfOutboundCommandsFromClientToController['nextChunk'])
+                else:
+                    print "# of nextChunk Commands sent to the Controller: 0"
                 print "(END OF OUTBOUND COMMANDS FROM CLIENT TO CONTROLLER)"
                 print "-------------------------------------------------------"
             except Exception as inst:
@@ -641,6 +681,24 @@ class NetworkClient():
             #///////////////////////////////////////////////////////////////////////////
             #Outbound Communication Functions
             #///////////////////////////////////////////////////////////////////////////
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #nextChunk
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def sendNextChunkToController(self, inboundChunk):
+        try:
+            self.pipe.send(inboundChunk)
+            print "INFO: The nextChunk was sent to the Controller"
+            self.recordOfOutboundCommandsFromClientToController['nextChunk'] = (self.recordOfOutboundCommandsFromClientToController['nextChunk'] + 1)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller sendNextChunkToController Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #DONE
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
