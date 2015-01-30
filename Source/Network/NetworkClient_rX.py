@@ -12,8 +12,9 @@ __author__ = 'chris hamm'
     #(Implemented)Added a record for the number of unknown commands the client receives from controller and from server
     #(Implemented)Added a new communication command for the client to send the next chunk to the controller
     #(Implemented)Added in function to expect a second string from the server after client receives the nextChunk command
+    #(Implemented)Added check for FOUNDSOLUTION function for inbound controller messages
+    #(Implemented)Added check for requestNextChunk function for inbound controller messages
 
-    #COMMENT: I NOTICED THERE IS NO FUNCTION FOR THE CONTROLLER TO TELL THE CLIENT WHEN THE SOLUTION HAS BEEN FOUND
 #=================================
 #Imports
 #=================================
@@ -177,6 +178,8 @@ class NetworkClient():
         self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfOutboundCommandsFromClientToServer['CRASHED'] = 0
         self.recordOfInboundCommandsFromController['serverIP'] = 0
+        self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] = 0
+        self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'] = 0
         self.recordOfInboundCommandsFromController['Unknown'] = 0
         self.recordOfInboundCommandsFromServer['DONE'] = 0
         self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = 0
@@ -303,7 +306,7 @@ class NetworkClient():
                                     self.sendNextChunkToController(tempChunk)
                                     print "INFO: Finished sending chunk to the controller"
 
-                                    #and store it locally till controller is ready for it
+                                    #and store it locally till controller is ready for it #OLD METHOD
                                     #self.chunk.params = self.clientSocket.recv(2048)
                                     #self.chunk.data = self.clientSocket.recv(2048)
                                     #let controller know we're ready to give it a chunk
@@ -353,18 +356,14 @@ class NetworkClient():
                     if(self.pipe.poll()):
                         recv = self.pipe.recv()  #Gets stuck on this line ##########
                         print "INFO: Received a controller command"
-                        #if controller says next, say "next" to server
-                        if(recv == "next"):
-                            print "INFO: Received next command from controller"
+                        if(self.checkForRequestNextChunkCommand(recv)==True):
+                            print "INFO: Received request next chunk command from controller"
                             self.sendNextCommandToServer()
-                        #if controller says "found" then send "found" and the key to the server
-                        elif(recv == "found"):
-                            print "INFO: Received found command from controller"
-                            print "STATUS: Retrieving key"
-                            if(self.pipe.poll()):
-                                self.key = self.pipe.recv()
-                                print "INFO: the key has been received"
-                                self.sendFoundSolutionToServer()
+                        elif(self.checkForFoundSolutionCommand(recv)==True):
+                            print "INFO: Received Found Solution command from controller"
+                            print "STATUS: Sending Found Solution Command to the Server..."
+                            self.sendFoundSolutionToServer()
+                            print "INFO: Sent Found Solution Command to the Server"
                         else:
                             print "ERROR: unknown command was received"
                             print "The unknown command: '" + recv + "'"
@@ -490,6 +489,16 @@ class NetworkClient():
                     print "# of serverIP Commands  received from Controller: " + str(self.recordOfInboundCommandsFromController['serverIP'])
                 else:
                     print "# of serverIP Commands received from Controller: 0"
+                #print FOUNDSOLUTION
+                if(self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] > 0):
+                    print "# of FOUNDSOLUTION Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['FOUNDSOLUTION'])
+                else:
+                    print "# of FOUNDSOLUTION Commands received from Controller: 0"
+                #print REQUESTNEXTCHUNK
+                if(self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'] > 0):
+                    print "# of REQUESTNEXTCHUNK Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'])
+                else:
+                    print "# of REQUESTNEXTCHUNK Commands received from Controller: 0"
                 #print Unknown
                 if(self.recordOfInboundCommandsFromController['Unknown'] > 0):
                     print "# of Unknown Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['Unknown'])
@@ -783,6 +792,56 @@ class NetworkClient():
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client-Controller receiveServerIP Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #FOUNDSOLUTION
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def checkForFoundSolutionCommand(self,inboundString):
+        try:
+            print "STATUS: Checking for Found Solution Command..."
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0:12] == "foundSolution"):
+                print "I/O: Received the Found Solution Command from the Controller"
+                self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller inbound checkForFoundSolutionCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #REQUESTNEXTCHUNK
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def checkForRequestNextChunkCommand(self,inboundString):
+        try:
+            print "STATUS: Checking for Request Next Chunk Command..."
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0:15] == "requestNextChunk"):
+                print "I/O: Received the Request Next Chunk Command from the Controller"
+                self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'] = (self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK']+1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller inbound checkForRequestNextChunkCommand Function Try Block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
