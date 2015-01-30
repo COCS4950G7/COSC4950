@@ -14,7 +14,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added in function to expect a second string from the server after client receives the nextChunk command
     #(Implemented)Added check for FOUNDSOLUTION function for inbound controller messages
     #(Implemented)Added check for requestNextChunk function for inbound controller messages
-
+    #TEMPORARY Added support for legacy command 'next' from the controller
 
 #=================================
 #Imports
@@ -357,6 +357,13 @@ class NetworkClient():
                     if(self.pipe.poll()):
                         recv = self.pipe.recv()  #Gets stuck on this line ##########
                         print "INFO: Received a controller command"
+                        if(recv == "next"):
+                            print " "
+                            print "WARNING: THE 'next' COMMAND IS OBSOLETE!!!! PLEASE USE 'requestNextChunk' INSTEAD"
+                            print " "
+                            self.sendNextCommandToServer()
+                            print "WARNING: The nextChunkCommand was still sent to the Server..."
+                            print " "
                         if(self.checkForRequestNextChunkCommand(recv)==True):
                             print "INFO: Received request next chunk command from controller"
                             self.sendNextCommandToServer()
