@@ -357,16 +357,16 @@ class NetworkClient():
                     if(self.pipe.poll()):
                         recv = self.pipe.recv()  #Gets stuck on this line ##########
                         print "INFO: Received a controller command"
-                        if(recv == "next"):
+                        if(self.checkForRequestNextChunkCommand(recv)==True):
+                            print "INFO: Received request next chunk command from controller"
+                            self.sendNextCommandToServer()
+                        elif(recv == "next"):
                             print " "
                             print "WARNING: THE 'next' COMMAND IS OBSOLETE!!!! PLEASE USE 'requestNextChunk' INSTEAD"
                             print " "
                             self.sendNextCommandToServer()
                             print "WARNING: The nextChunkCommand was still sent to the Server..."
                             print " "
-                        if(self.checkForRequestNextChunkCommand(recv)==True):
-                            print "INFO: Received request next chunk command from controller"
-                            self.sendNextCommandToServer()
                         elif(self.checkForFoundSolutionCommand(recv)==True):
                             print "INFO: Received Found Solution command from controller"
                             print "STATUS: Sending Found Solution Command to the Server..."
@@ -648,10 +648,14 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForDoneCommand(self, inboundString):
         try:
-            if inboundString[0:3] == "DONE":
-                print "INFO: Received the DONE command from the server"
-                self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
-                return True
+            #if inboundString[0:3] == "DONE": #OLD WAY
+            if(inboundString[0] == "D"):
+                if(inboundString[1] == "O"):
+                    if(inboundString[2] == "N"):
+                        if(inboundString[3] == "E"):
+                            print "INFO: Received the DONE command from the server"
+                            self.recordOfInboundCommandsFromServer['DONE'] = (self.recordOfInboundCommandsFromServer['DONE'] + 1)
+                            return True
             else:
                 return False
         except Exception as inst:
