@@ -1038,10 +1038,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             print "STATUS: Checking to see if inboundString is Done..."
             if(len(inboundString) < 1):
                 return False
-            if(inboundString[0:3] == "done"):
-                print "I/O: DONE Command was received from the controller class"
-                self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
-                return True
+            #if(inboundString[0:3] == "done"): #OLD METHOD
+            if(inboundString[0] == "d"):
+                if(inboundString[1] == "o"):
+                    if(inboundString[2] == "n"):
+                        if(inboundString[3] == "e"):
+                            print "I/O: DONE Command was received from the controller class"
+                            self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] = (self.recordOfInboundCommandsFromControllerToServer['REPLY_TO_DONE'] + 1)
+                            return True
             else:
                 return False
         except Exception as inst:
