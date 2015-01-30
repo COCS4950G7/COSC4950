@@ -474,7 +474,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
                                     print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
                                     print "STATUS: Sending nextChunk to client"
-                                    self.sendNextToClient(tempSock, tempIP, tempPort, self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                    #add the NEXT key word into the string so client will recognize it
+                                    tempMessage= "NEXT " + str(self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                    self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks

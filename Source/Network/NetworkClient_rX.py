@@ -262,8 +262,7 @@ class NetworkClient():
                             #If the server wants to give us the next chunk, take it
                             #Server should be sending "NEXT" -> params -> data in seperate strings all to us
                             #elif theInput == "NEXT":
-
-                            elif(theInput[0:3] == "NEXT"):
+                            elif(self.checkForNextCommand(theInput)==True):
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
                                     #and store it locally till controller is ready for it
@@ -606,7 +605,7 @@ class NetworkClient():
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForNextCommand(self,inboundString):
         try:
-            if inboundString[0:3] == "NEXT":
+            if inboundString[0:4] == "NEXT ":
                 print "INFO: Received the NEXT (chunk) command from the server"
                 self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = (self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] + 1)
                 return True
