@@ -419,6 +419,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     #************************************************************************************
                             chunkrecv = self.pipe.recv()
                             print "INFO: Received the chunk object"
+                            self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] = (self.recordOfInboundCommandsFromControllerToServer['Chunk_Objects'] + 1)
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         #If stack of client waiting for nextChunk is not empty, then send chunk info to that client on top of the stack, remove client from stack
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
