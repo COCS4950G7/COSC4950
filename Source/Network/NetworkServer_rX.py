@@ -23,6 +23,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added a record for the number of IP address the server could not find a match for and a print statement at the end for it
     #(Implemented)Added a record for number of unknown commands from client and controller
     #(Implemented)Added an additional reocord for the new sendNextData command to the client, as well as have server send the chunk data after it sends the nextChunk message to the client
+    #(Implemented)Added an additional check to check for client input, if an Empty String is received, it is ignored and an exception is thrown to skip checking for other commands because the Empty String is not a command
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -253,7 +254,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     if(len(theInput) >= 1):
                         print "INFO: Received a message from a client."
                     else:
-                        print "INFO: The Empty String has been received."
+                        print "WARNING: The Empty String has been received."
+                        raise Exception("Empty String is not a Command, ignoring input")
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of If Command is the Empty String
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -1192,7 +1194,6 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
     def checkForCrashedCommand(self,inboundString): #checks for the "CRASHED" Command
         try:
             if(len(inboundString) < 1):
-                print "INFO: Empty Crashed Message Received."
                 return False
             if(inboundString[0]=="C"):
                 if(inboundString[1]=="R"):
