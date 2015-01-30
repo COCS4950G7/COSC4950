@@ -180,6 +180,7 @@ class NetworkClient():
         self.recordOfInboundCommandsFromController['Unknown'] = 0
         self.recordOfInboundCommandsFromServer['DONE'] = 0
         self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = 0
+        self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = 0
         self.recordOfInboundCommandsFromServer['Unknown'] = 0
         #........................................................................
         #End of Initialize the Record Counters
@@ -273,6 +274,8 @@ class NetworkClient():
                                     try: #receive corresponding data from the server try block
                                         tempData = self.clientSocket.recv(2048)
                                         print "INFO: Received data from the server."
+                                        #print "DEBUG: tempData=" + str(tempData)
+                                        self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
                                     except Exception as inst:
                                         print "============================================================================================="
                                         print "ERROR: An exception was thrown in the receive corresponding data from the server Try Block"
@@ -516,6 +519,11 @@ class NetworkClient():
                     print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'])
                 else:
                     print "# of REPLY_TO_NEXTCHUNK Commands received from the Server: 0"
+                #print nextChunkData
+                if(self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] > 0):
+                    print "# of NEXTCHUNKDATA Commands received from the Server: " + str(self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'])
+                else:
+                    print "# of NEXTCHUNKDATA Commands received from the Server: 0"
                 #print Unknown
                 if(self.recordOfInboundCommandsFromServer['Unknown'] > 0):
                     print "# of Unknown Commands received from Server: " + str(self.recordOfInboundCommandsFromServer['Unknown'])
