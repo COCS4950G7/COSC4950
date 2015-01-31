@@ -294,11 +294,11 @@ class NetworkClient():
                                             closingParenthesisLocation= x
                                             break
                                         else:
-                                            dataChunkFileSize+= str(theInput[x+1])
+                                            dataChunkFileSize+= str(theInput[x])
                                     print "INFO: the dataChunkFileSize is " + str(dataChunkFileSize) + " bytes"
                                     print "STATUS: Finished extracting dataChunkFileSize"
                                     print "STATUS: Removing keywords from params..."
-                                    theInput= theInput[(closingParenthesisLocation+1):len(theInput)] #remove space after closing parenthesis as well as the keywords
+                                    theInput= theInput[(closingParenthesisLocation+2):len(theInput)] #remove space after closing parenthesis as well as the keywords
                                     print "DEBUG: theInput after removing keywords:" + str(theInput)
                                     print "INFO: Finished removing keywords"
                                     print "STATUS: Waiting for the corresponding data from the server"
