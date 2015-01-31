@@ -321,6 +321,9 @@ class NetworkClient():
                                     #set the data for the chunk object
                                     tempChunk.data = tempData
                                     print "INFO: Chunk object successfully created"
+                                    print "STATUS: Sending doingStuff Command to Controller..."
+                                    self.sendDoingStuffCommandToController()
+                                    print "INFO: doingStuff Command was sent to controller"
                                     print "STATUS: Sending chunk object to the controller..."
                                     self.sendNextChunkToController(tempChunk)
                                     print "INFO: Finished sending chunk to the controller"
