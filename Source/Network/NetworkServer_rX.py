@@ -1185,15 +1185,30 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     def checkForFoundSolutionCommand(self,inboundString): #checks for the "FOUNDSOLUTION" string
         try:
-            if(inboundString[0:12] == "FOUNDSOLUTION"):
-                print "I/O: A Client has issued the FOUNDSOLUTION command"
-                #position 13 is a space
-                #tempIP= ""  #THIS IS NOW DONE IN SERVER LOOP
-                #for i in range(14, len(inboundString)):
-                #    tempIP= tempIP + inboundString[i]
-                #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
-                self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
-                return True
+            #if(inboundString[0:12] == "FOUNDSOLUTION"): #OLD METHOD
+            if(len(inboundString) < 1):
+                return False
+            if(inboundString[0] == "F"):
+                if(inboundString[1] == "O"):
+                    if(inboundString[2] == "U"):
+                        if(inboundString[3] == "N"):
+                            if(inboundString[4] == "D"):
+                                if(inboundString[5] == "S"):
+                                    if(inboundString[6] == "O"):
+                                        if(inboundString[7] == "L"):
+                                            if(inboundString[8] == "U"):
+                                                if(inboundString[9] == "T"):
+                                                    if(inboundString[10] == "I"):
+                                                        if(inboundString[11] == "O"):
+                                                            if(inboundString[12] == "N"):
+                                                                print "I/O: A Client has issued the FOUNDSOLUTION command"
+                                                                #position 13 is a space
+                                                                #tempIP= ""  #THIS IS NOW DONE IN SERVER LOOP
+                                                                #for i in range(14, len(inboundString)):
+                                                                #    tempIP= tempIP + inboundString[i]
+                                                                #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
+                                                                self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
+                                                                return True
             else:
                 return False
         except Exception as inst:

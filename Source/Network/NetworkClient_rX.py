@@ -372,7 +372,7 @@ class NetworkClient():
             #'''GOAL: Want to have client respond immeadiately when it receives a command from the controller'''
                     print "STATUS: Checking for controller commands... "
                     if(self.pipe.poll()):
-                        recv = self.pipe.recv()  #Gets stuck on this line ##########
+                        recv = self.pipe.recv()
                         print "INFO: Received a controller command"
                         if(self.checkForRequestNextChunkCommand(recv)==True):
                             print "INFO: Received request next chunk command from controller"
