@@ -494,6 +494,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     print "STATUS: Copying chunk object to dictionaryOfCurrentClientTasks..."
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
                                     print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
+                                    print "STATUS: Measuring the file size of the params..."
+                                    import sys
+                                    paramsDataSize= sys.getsizeof(self.dictionaryOfCurrentClientTasks[tempIP])
+                                    print "INFO: The file size of the params is: " + str(paramsDataSize) + " bytes"
                                     print "STATUS: Measuring the file size of the corresponding data of the chunk..."
                                     import sys
                                     dataFileSize = sys.getsizeof(chunkrecv.data)# THIS METHOD SEEMS TO WORK
@@ -503,7 +507,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     #add in the SIZE keyword, where the size is inside the parenthesis
                                     tempMessage= "NEXT " + "SIZE(" + str(dataFileSize) + ") " +str(self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
-                                    #print "DEBUG: chunk params being sent to client=" + str(tempMessage)
+                                    print "DEBUG: chunk params being sent to client=" + str(tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
                                     print "STATUS: Sending the corresponding data for that chunk to client..."
                                     self.sendNextDataToClient(tempSock, tempIP, tempPort, chunkrecv.data)
