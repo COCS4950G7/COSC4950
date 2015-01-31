@@ -27,6 +27,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added a function to detect the size of the data in the chunk object
     #(Implemented)Added a second key to the params string that is sent to the client, after the first keyword, the size of the data will be sent
     #(Implemented)Finished Implementing the check for foundsolution function (when receiving from client), so now the DONE command is issued and the primary loop variable is set to false, which stops the server)
+    #(Implemented)Lets Controller know when the server is done
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
