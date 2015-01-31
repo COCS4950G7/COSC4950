@@ -26,6 +26,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added an additional check to check for client input, if an Empty String is received, it is ignored and an exception is thrown to skip checking for other commands because the Empty String is not a command
     #(Implemented)Added a function to detect the size of the data in the chunk object
     #(Implemented)Added a second key to the params string that is sent to the client, after the first keyword, the size of the data will be sent
+    #(Implemented)Finished Implementing the check for foundsolution function (when receiving from client), so now the DONE command is issued and the primary loop variable is set to false, which stops the server)
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -40,7 +41,6 @@ __author__ = 'chris hamm'
 #====================================
 import socket
 import platform
-import os #used for measuring file size of data in chunk object
 import Chunk
 #====================================
 #End of Imports
@@ -256,9 +256,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     if(len(theInput) >= 1):
                         print "INFO: Received a message from a client."
-                    else:
+                    else: #theInput has a length of 0
                         print "WARNING: The Empty String has been received."
-                        raise Exception("Empty String is not a Command, ignoring input")
+                        raise Exception("Empty String is not a Command, ignoring input. This is Just a Warning.")
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #End of If Command is the Empty String
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -348,13 +348,22 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #Check for FOUNDSOLUTION Command
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                     elif(self.checkForFoundSolutionCommand(theInput)==True):
-                        print "INFO: FOUNDSOLUTION Command was received"
+                        print "INFO: FOUNDSOLUTION Command was received from the Client"
+                        print "STATUS: Issuing the DONE Command to all clients..."
+                        for x in range(0, len(self.listOfClients)):
+                            (sock, addr) = self.listOfClients[x]
+                            sock.sendall("DONE")
+                            print "INFO: Issued the DONE command to client: " + str(addr)
+                        print "INFO: Finished Issuing the DONE Commands"
+                        print "STATUS: Shutting down the Server Looping Variables..."
+                        self.serverIsRunning= False
+                        print "INFO: Server Looping Variables have been shut down"
                 #position 13 is a space
                 #tempIP= ""  #THIS IS NOW DONE IN SERVER LOOP
                 #for i in range(14, len(inboundString)):
                 #    tempIP= tempIP + inboundString[i]
                 #self.stackOfClientsWaitingForNextChunk.append(tempIP) #pushing ip onto the stack
-                        print "WARNING: This Function is Incomplete"
+                        #print "WARNING: This Function is Incomplete"
                     #************************************************************************************
                     #(MAY be obsolete) I think this should only used in the client
                     #************************************************************************************
