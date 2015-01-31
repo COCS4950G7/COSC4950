@@ -281,7 +281,7 @@ class NetworkClient():
                             elif(self.checkForNextCommand(theInput)==True):
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
-                                    print "DEBUG: theInput:" + str(theInput)
+                                    #print "DEBUG: theInput:" + str(theInput)
                                     print "STATUS: Extracting chunk data file size from nextChunk Command..."
                                     #position[0:4] = 'NEXT '
                                     #position[5:9] = 'SIZE('
@@ -299,7 +299,7 @@ class NetworkClient():
                                     print "STATUS: Finished extracting dataChunkFileSize"
                                     print "STATUS: Removing keywords from params..."
                                     theInput= theInput[(closingParenthesisLocation+1):len(theInput)] #remove space after closing parenthesis as well as the keywords
-                                    print "DEBUG: theInput after removing keywords:" + str(theInput)
+                                    #print "DEBUG: theInput after removing keywords:" + str(theInput)
                                     print "INFO: Finished removing keywords"
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
@@ -647,7 +647,7 @@ class NetworkClient():
     def sendFoundSolutionToServer(self):
         #sends the FOUNDSOLUTION command to the server, and key
         try:
-            self.clientSocket.send("FOUNDSOLUTION " + self.myIPAddress)
+            self.clientSocket.send("FOUNDSOLUTION " + str(self.myIPAddress))
             self.clientSocket.send(self.key)
             print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
             self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
