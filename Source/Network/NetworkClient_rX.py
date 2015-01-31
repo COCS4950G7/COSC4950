@@ -21,6 +21,7 @@ __author__ = 'chris hamm'
     #(Implemented)Changed the check for foundSolution function so that it checks char by char instead of by the string
     #(Implemented)send the doingStuff command to controller prior to sending the chunk
     #(Implemented)Added a check for doing stuff command (for inbpund command from controller) and also added a record for the command
+    #(Implemented)Removed the keywords from the params object before sending it to the controller
 
 #=================================
 #Imports
@@ -280,19 +281,26 @@ class NetworkClient():
                             elif(self.checkForNextCommand(theInput)==True):
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
+                                    print "DEBUG: theInput:" + str(theInput)
                                     print "STATUS: Extracting chunk data file size from nextChunk Command..."
                                     #position[0:4] = 'NEXT '
                                     #position[5:9] = 'SIZE('
                                     #end of file size is marked by the closing parenthesis
                                     dataChunkFileSize = ""
+                                    closingParenthesisLocation = 0
                                     for x in range(10,len(theInput)):
                                         if(theInput[x] == ")"):
                                             #print "DEBUG: closing parenthesis for dataChunkFileSize found at pos:" + str(x)
+                                            closingParenthesisLocation= x
                                             break
                                         else:
                                             dataChunkFileSize+= str(theInput[x])
                                     print "INFO: the dataChunkFileSize is " + str(dataChunkFileSize) + " bytes"
                                     print "STATUS: Finished extracting dataChunkFileSize"
+                                    print "STATUS: Removing keywords from params..."
+                                    theInput= theInput[(closingParenthesisLocation+1),len(theInput)] #remove space after closing parenthesis as well as the keywords
+                                    print "DEBUG: theInput after removing keywords:" + str(theInput)
+                                    print "INFO: Finished removing keywords"
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
@@ -311,16 +319,16 @@ class NetworkClient():
                                         #_str_ allows args tto be printed directly
                                         print inst
                                         print "============================================================================================="
-                                    print "STATUS: Removing the NEXT keyword from the message..."
+                                    #print "STATUS: Removing the NEXT keyword from the message..." #THE FUNCTION ABOVE PERFORMS THIS TASK
                                     #remove 'NEXT '
                                     #position 4 is a space
-                                    modifiedMessage= str(theInput[5:len(theInput)])
-                                    print "INFO: Successfully removed the NEXT keyword from the message"
+                                    #modifiedMessage= str(theInput[5:len(theInput)])
+                                    #print "INFO: Successfully removed the NEXT keyword from the message"
                                     print "STATUS: Creating a new chunk object (to be sent to the controller)..."
                                     #make new chunk object
                                     tempChunk = Chunk.Chunk()
                                     #set the params for the chunk object
-                                    tempChunk.params = modifiedMessage
+                                    tempChunk.params = theInput
                                     #set the data for the chunk object
                                     tempChunk.data = tempData
                                     print "INFO: Chunk object successfully created"
