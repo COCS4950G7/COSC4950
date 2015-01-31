@@ -93,7 +93,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
         #socket.AF_INET is a socket address family represented as a pair. (hostname, port). This is the default parameter
         #socket.SOCK_STREAM is the default parameter. This defines the socket type
-        self.serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.serverSocket = socket(AF_INET, SOCK_STREAM)
         print "STATUS: Server socket created successfully"
 
         #.........................................................................

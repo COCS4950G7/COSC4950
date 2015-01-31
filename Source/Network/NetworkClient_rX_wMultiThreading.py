@@ -67,7 +67,8 @@ class NetworkClient():
         #........................................................................
         #Create Socket
         #........................................................................
-        self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #self.clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientSocket= socket(AF_INET, SOCK_STREAM)
         print "STATUS: client socket created successfully"
         #........................................................................
         #End of Create Socket

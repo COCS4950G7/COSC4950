@@ -441,7 +441,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                             if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                 print "STATUS: Preparing to send nextChunk object to Client Waiting for nextChunk..."
-                                chunkParams= chunkrecv.params
+                                #chunkParams= chunkrecv.params #NO LONGER NEEDED
                                 print "INFO: Copied parameters from chunk object"
                                 print "DEBUG: Size of stack of clientsWaitingForNextChunk: " + str(len(self.stackOfClientsWaitingForNextChunk))
                                 tempIP = str(self.stackOfClientsWaitingForNextChunk.pop()) #pop the stack
