@@ -17,6 +17,7 @@ __author__ = 'chris hamm'
     #TEMPORARY Added support for legacy command 'next' from the controller
     #TEMPORARY Added support for the legacy command "found"
     #Increased the recv buffer size for recv data from the server
+    #(Implemented)Added an extractor for the the second keyword in the nextChunk Command, which is the size of the data in the chunk object
 
 #=================================
 #Imports
@@ -275,10 +276,24 @@ class NetworkClient():
                             elif(self.checkForNextCommand(theInput)==True):
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
+                                    print "STATUS: Extracting chunk data file size from nextChunk Command..."
+                                    #position[0:4] = 'NEXT '
+                                    #position[5:9] = 'SIZE('
+                                    #end of file size is marked by the closing parenthesis
+                                    dataChunkFileSize = ""
+                                    for x in range(10,len(theInput)):
+                                        if(theInput[x] == ")"):
+                                            print "DEBUG: closing parenthesis for dataChunkFileSize found at pos:" + str(x)
+                                            break
+                                        else:
+                                            dataChunkFileSize+= str(theInput[x])
+                                    print "INFO: the dataChunkFileSize is " + str(dataChunkFileSize) + " bytes"
+                                    print "STATUS: Finished extracting dataChunkFileSize"
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
-                                        tempData = self.clientSocket.recv(16777216)
+                                        #tempData = self.clientSocket.recv(268435456) #2^28
+                                        tempData= self.clientSocket.recv(int(dataChunkFileSize)) #set recv buffer equal to the size of the data object
                                         print "INFO: Received data from the server."
                                         print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)

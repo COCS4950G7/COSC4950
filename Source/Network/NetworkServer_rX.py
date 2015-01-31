@@ -24,6 +24,8 @@ __author__ = 'chris hamm'
     #(Implemented)Added a record for number of unknown commands from client and controller
     #(Implemented)Added an additional reocord for the new sendNextData command to the client, as well as have server send the chunk data after it sends the nextChunk message to the client
     #(Implemented)Added an additional check to check for client input, if an Empty String is received, it is ignored and an exception is thrown to skip checking for other commands because the Empty String is not a command
+    #(Implemented)Added a function to detect the size of the data in the chunk object
+    #(Implemented)Added a second key to the params string that is sent to the client, after the first keyword, the size of the data will be sent
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client
@@ -38,6 +40,7 @@ __author__ = 'chris hamm'
 #====================================
 import socket
 import platform
+import os #used for measuring file size of data in chunk object
 import Chunk
 #====================================
 #End of Imports
@@ -478,15 +481,23 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     print "STATUS: Copying chunk object to dictionaryOfCurrentClientTasks..."
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
                                     print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
+                                    print "STATUS: Measuring the file size of the corresponding data of the chunk..."
+                                    #import os
+                                    #dataFileSize= os.path.getsize(chunkrecv.data) #METHOD A
+                                    #dataFileSize= os.stat(chunkrecv.data) #METHOD B
+                                    import sys
+                                    dataFileSize = sys.getsizeof(chunkrecv.data)#METHOD C THIS METHOD SEEMS TO WORK
+                                    print "INFO: The file size of the corresponding data is: " + str(dataFileSize) + " bytes"
                                     print "STATUS: Sending nextChunk to client"
                                     #add the NEXT key word into the string so client will recognize it
-                                    tempMessage= "NEXT " + str(self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                    #add in the SIZE keyword, where the size is inside the parenthesis
+                                    tempMessage= "NEXT " + "SIZE(" + str(dataFileSize) + ") " +str(self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
-                                    print "DEBUG: chunk params being sent to client=" + str(tempMessage)
+                                    #print "DEBUG: chunk params being sent to client=" + str(tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
                                     print "STATUS: Sending the corresponding data for that chunk to client..."
                                     self.sendNextDataToClient(tempSock, tempIP, tempPort, chunkrecv.data)
-                                    print "DEBUG: chunk data being sent to the client=" + str(chunkrecv.data)
+                                    #print "DEBUG: chunk data being sent to the client=" + str(chunkrecv.data)
                                     print "INFO: Successfully sent the corresponding chunk data to the client"
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks
