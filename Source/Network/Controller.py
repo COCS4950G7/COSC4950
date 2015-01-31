@@ -234,7 +234,7 @@ class Controller():
             elif state == "nodeConnectedToScreen":
 
                 #First command that requests
-                self.controllerPipe.send("next")
+                self.controllerPipe.send("requestNextChunk")
 
                 done = False
 
@@ -294,7 +294,7 @@ class Controller():
                                 key = self.dictionary.showKey()
 
                                 #send "found" over pipe to networkClient
-                                self.controllerPipe.send("found")
+                                self.controllerPipe.send("foundSolution")
 
                                 #send the key we found to networkClient
                                 self.controllerPipe.send(key)
@@ -306,7 +306,7 @@ class Controller():
 
                                 #if it didn't find anything (but is done)
                                 #get next command (which might be chunk or done or something else)
-                                self.controllerPipe.send("next")
+                                self.controllerPipe.send("requestNextChunk")
 
                         elif paramsList[0] == "rainbowmaker":
 
@@ -320,7 +320,7 @@ class Controller():
                             self.controllerPipe.send(chunkOfDone)
 
                             #Ask the server for another chunk
-                            self.controllerPipe.send("next")
+                            self.controllerPipe.send("requestNextChunk")
 
                 self.networkClient.join()
                 #self.networkClient.terminate()
