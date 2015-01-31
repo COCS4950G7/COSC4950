@@ -3,6 +3,9 @@ __author__ = 'chris hamm'
 #Created: 1/27/2015
 #Designed to work with NetworkClient_rX
 
+#IMPORTANT!!!
+    #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
+
 #THINGS ADDED/CHANGED WITH THIS VERSION
     #(Implemented)Removed Chunk Parsing Functions (these functions are no longer needed)
     #(Implemented)Marked several of the defined communication functions as potentially obsolete, may be omitted in the near future
@@ -27,6 +30,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added a function to detect the size of the data in the chunk object
     #(Implemented)Added a second key to the params string that is sent to the client, after the first keyword, the size of the data will be sent
     #(Implemented)Finished Implementing the check for foundsolution function (when receiving from client), so now the DONE command is issued and the primary loop variable is set to false, which stops the server)
+    #(Implemented)Lets Controller know when the server is done
 
 #THINGS STILL BEING INTEGRATED FROM REVISION 9E
     #(Implemented)Send extracted information over the network to the client

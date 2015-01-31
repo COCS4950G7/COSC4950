@@ -3,6 +3,9 @@ __author__ = 'chris hamm'
 #Created: 1/27/2015
 #Designed to work with NetworkClient_rX
 
+#IMPORTANT!!!
+    #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
+
 #THINGS ADDED/CHANGED WITH THIS VERSION
     #(Implemented)Removed Chunk Parsing Functions (these functions are no longer needed)
     #(Implemented)Marked several of the defined communication functions as potentially obsolete, may be omitted in the near future
