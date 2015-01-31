@@ -482,9 +482,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     #add the NEXT key word into the string so client will recognize it
                                     tempMessage= "NEXT " + str(self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
+                                    print "DEBUG: chunk params being sent to client=" + str(tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
                                     print "STATUS: Sending the corresponding data for that chunk to client..."
                                     self.sendNextDataToClient(tempSock, tempIP, tempPort, chunkrecv.data)
+                                    print "DEBUG: chunk data being sent to the client=" + str(chunkrecv.data)
                                     print "INFO: Successfully sent the corresponding chunk data to the client"
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Save a copy the chunk being sent to the client to the dictionary of clientCurrentTasks

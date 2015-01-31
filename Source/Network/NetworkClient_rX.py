@@ -279,7 +279,7 @@ class NetworkClient():
                                     try: #receive corresponding data from the server try block
                                         tempData = self.clientSocket.recv(2048)
                                         print "INFO: Received data from the server."
-                                        #print "DEBUG: tempData=" + str(tempData)
+                                        print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
                                     except Exception as inst:
                                         print "============================================================================================="
