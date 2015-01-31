@@ -16,8 +16,9 @@ __author__ = 'chris hamm'
     #(Implemented)Added check for requestNextChunk function for inbound controller messages
     #TEMPORARY Added support for legacy command 'next' from the controller
     #TEMPORARY Added support for the legacy command "found"
-    #Increased the recv buffer size for recv data from the server
+    #(Implemented)(OBSOLETE)Increased the recv buffer size for recv data from the server
     #(Implemented)Added an extractor for the the second keyword in the nextChunk Command, which is the size of the data in the chunk object
+    #(Implemented)Changed the check for foundSolution function so that it checks char by char instead of by the string
 
 #=================================
 #Imports
