@@ -844,10 +844,23 @@ class NetworkClient():
             print "STATUS: Checking for Found Solution Command..."
             if(len(inboundString) < 1):
                 return False
-            if(inboundString[0:12] == "foundSolution"):
-                print "I/O: Received the Found Solution Command from the Controller"
-                self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] + 1)
-                return True
+            #if(inboundString[0:12] == "foundSolution"): #OLD METHOD
+            if(inboundString[0] == "f"):
+                if(inboundString[1] == "o"):
+                    if(inboundString[2] == "u"):
+                        if(inboundString[3] == "n"):
+                            if(inboundString[4] == "d"):
+                                if(inboundString[5] == "S"):
+                                    if(inboundString[6] == "o"):
+                                        if(inboundString[7] == "l"):
+                                            if(inboundString[8] == "u"):
+                                                if(inboundString[9] == "t"):
+                                                    if(inboundString[10] == "i"):
+                                                        if(inboundString[11] == "o"):
+                                                            if(inboundString[12] == "n"):
+                                                                print "I/O: Received the Found Solution Command from the Controller"
+                                                                self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] = (self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] + 1)
+                                                                return True
             else:
                 return False
         except Exception as inst:
