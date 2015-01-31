@@ -434,7 +434,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 tempIP = str(self.stackOfClientsWaitingForNextChunk.pop()) #pop the stack
                                 #print "DEBUG: Removing NEXT and a space from tempIP"
                                 #tempIP= tempIP[5:len(tempIP)] #NEEDED ON THE CLIENTSIDE
-                                print "DEBUG: find first invalid char and marking it"
+                                #print "DEBUG: find first invalid char and marking it"
                                 firstInvalidCharIndex = 5
                                 for x in range(5,len(tempIP)):
                                     if(tempIP[x].isalpha()==True):
@@ -451,7 +451,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     print "INFO: tempIP does not need to be cropped"
                                 else:
                                     tempIP= tempIP[5:firstInvalidCharIndex]
-                                print "DEBUG: tempIP after popping and cropping:" + str(tempIP)
+                                #print "DEBUG: tempIP after popping and cropping:" + str(tempIP)
                                 #retreive socket information
                                 print "STATUS: Looking for matching IP Address in list of Clients..."
                                 foundMatch= False

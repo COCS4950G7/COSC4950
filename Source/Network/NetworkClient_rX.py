@@ -283,7 +283,7 @@ class NetworkClient():
                                     dataChunkFileSize = ""
                                     for x in range(10,len(theInput)):
                                         if(theInput[x] == ")"):
-                                            print "DEBUG: closing parenthesis for dataChunkFileSize found at pos:" + str(x)
+                                            #print "DEBUG: closing parenthesis for dataChunkFileSize found at pos:" + str(x)
                                             break
                                         else:
                                             dataChunkFileSize+= str(theInput[x])
@@ -292,10 +292,10 @@ class NetworkClient():
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
-                                        #tempData = self.clientSocket.recv(268435456) #2^28
+                                        #tempData = self.clientSocket.recv(268435456) #2^28 #OLD METHOD
                                         tempData= self.clientSocket.recv(int(dataChunkFileSize)) #set recv buffer equal to the size of the data object
                                         print "INFO: Received data from the server."
-                                        print "DEBUG: tempData=" + str(tempData)
+                                        #print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
                                     except Exception as inst:
                                         print "============================================================================================="
