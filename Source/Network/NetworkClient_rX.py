@@ -16,6 +16,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added check for requestNextChunk function for inbound controller messages
     #TEMPORARY Added support for legacy command 'next' from the controller
     #TEMPORARY Added support for the legacy command "found"
+    #Increased the recv buffer size for recv data from the server
 
 #=================================
 #Imports
@@ -277,7 +278,7 @@ class NetworkClient():
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
-                                        tempData = self.clientSocket.recv(2048)
+                                        tempData = self.clientSocket.recv(16777216)
                                         print "INFO: Received data from the server."
                                         print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)

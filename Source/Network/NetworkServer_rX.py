@@ -445,7 +445,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 #if still zero, keep entire string
                                 if(firstInvalidCharIndex == 5):
                                     #keep tempIP at the same value
-                                    print "DEBUG: tempIP does not need to be cropped"
+                                    print "INFO: tempIP does not need to be cropped"
                                 else:
                                     tempIP= tempIP[5:firstInvalidCharIndex]
                                 print "DEBUG: tempIP after popping and cropping:" + str(tempIP)
@@ -457,12 +457,12 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 for index in range(0, len(self.listOfClients)):
                                     tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
                                     tempPort= tempAddr[1] #copy the port information
-                                    print "DEBUG: tempPort=" + str(tempPort)
+                                    #print "DEBUG: tempPort=" + str(tempPort)
                                     print "STATUS: Copying list of clients' IP Address to a new string"
                                     tempAddr2= str(tempAddr[0])
                                     print "STATUS: Comparing IP Addresses..."
-                                    print "DEBUG: tempAddr2=" + str(tempAddr2)
-                                    print "DEBUG: tempIP=" + str(tempIP)
+                                    #print "DEBUG: tempAddr2=" + str(tempAddr2)
+                                    #print "DEBUG: tempIP=" + str(tempIP)
                                     if(tempIP == tempAddr2):
                                         print "INFO: Matching IP address was found in the list of clients"
                                         foundMatch= True
