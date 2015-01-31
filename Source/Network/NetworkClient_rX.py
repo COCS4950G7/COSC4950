@@ -19,6 +19,8 @@ __author__ = 'chris hamm'
     #(Implemented)(OBSOLETE)Increased the recv buffer size for recv data from the server
     #(Implemented)Added an extractor for the the second keyword in the nextChunk Command, which is the size of the data in the chunk object
     #(Implemented)Changed the check for foundSolution function so that it checks char by char instead of by the string
+    #(Implemented)send the doingStuff command to controller prior to sending the chunk
+    #(Implemented)Added a check for doing stuff command (for inbpund command from controller) and also added a record for the command
 
 #=================================
 #Imports
@@ -185,6 +187,7 @@ class NetworkClient():
         self.recordOfInboundCommandsFromController['serverIP'] = 0
         self.recordOfInboundCommandsFromController['FOUNDSOLUTION'] = 0
         self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'] = 0
+        self.recordOfInboundCommandsFromController['doingStuff'] = 0
         self.recordOfInboundCommandsFromController['Unknown'] = 0
         self.recordOfInboundCommandsFromServer['DONE'] = 0
         self.recordOfInboundCommandsFromServer['REPLY_TO_NEXTCHUNK'] = 0
@@ -400,6 +403,9 @@ class NetworkClient():
                             print "STATUS: Sending Found Solution Command to the Server..."
                             self.sendFoundSolutionToServer()
                             print "INFO: Sent Found Solution Command to the Server"
+                        elif(self.checkForDoingStuffCommand(recv)==True):
+                            print "INFO: Received doingStuff Command from controller"
+                            print "INFO: Controller has parroted the doingStuff Command."
                         else:
                             print "ERROR: unknown command was received"
                             print "The unknown command: '" + recv + "'"
@@ -535,6 +541,11 @@ class NetworkClient():
                     print "# of REQUESTNEXTCHUNK Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'])
                 else:
                     print "# of REQUESTNEXTCHUNK Commands received from Controller: 0"
+                #print doingStuff
+                if(self.recordOfInboundCommandsFromController['doingStuff'] > 0):
+                    print "# of doingStuff Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['doingStuff'])
+                else:
+                    print "# of doingStuff Commands received from Controller: 0"
                 #print Unknown
                 if(self.recordOfInboundCommandsFromController['Unknown'] > 0):
                     print "# of Unknown Commands received from Controller: " + str(self.recordOfInboundCommandsFromController['Unknown'])
@@ -839,7 +850,30 @@ class NetworkClient():
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
-
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                #DOINGSTUFF
+                #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    def checkForDoingStuffCommand(self,inboundString):
+        try:
+            print "STATUS: Checking for doingStuff Command..."
+            if(len(inboundString) < 1):
+                return False
+            if(self.compareString("doingStuff",inboundString,0,0,len("doingStuff"),len(inboundString))==True):
+                print "I/O: Received the doingStuff Command from the Controller"
+                self.recordOfInboundCommandsFromController['doingStuff'] = (self.recordOfInboundCommandsFromController['doingStuff'] + 1)
+                return True
+            else:
+                return False
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client-Controller inbound checkForDoingStuffCommand Function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #FOUNDSOLUTION
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
