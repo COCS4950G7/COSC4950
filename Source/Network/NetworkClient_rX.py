@@ -15,6 +15,7 @@ __author__ = 'chris hamm'
     #(Implemented)Added check for FOUNDSOLUTION function for inbound controller messages
     #(Implemented)Added check for requestNextChunk function for inbound controller messages
     #TEMPORARY Added support for legacy command 'next' from the controller
+    #TEMPORARY Added support for the legacy command "found"
 
 #=================================
 #Imports
@@ -122,7 +123,7 @@ class NetworkClient():
             print "STATUS: Getting your Network IP address"
             if(platform.system()=="Windows"):
                 self.myIPAddress = socket.gethostbyname(socket.gethostname())
-                print str(self.myIPAddress)
+                print "My IP Address: " + str(self.myIPAddress)
             elif(platform.system()=="Linux"):
                 import fcntl
                 import struct
@@ -147,16 +148,16 @@ class NetworkClient():
                     return ip
                 #end of def
                 self.myIPAddress = get_lan_ip()
-                print self.myIPAddress
+                print "My IP Address: " + str(self.myIPAddress)
             elif(platform.system()=="Darwin"):
                 self.myIPAddress= socket.gethostbyname(socket.gethostname())
-                print self.myIPAddress
+                print "My IP Address: " + str(self.myIPAddress)
             else:
                 #NOTE MAY REMOVE  THIS AND USE THE LINUX IP DETECTION METHOD FOR THIS IN THE FUTURE
                 print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
                 print "INFO: Using generic IP address retrieval method"
                 self.myIPAddress = socket.gethostbyname(socket.gethostname())
-                print self.myIPAddress
+                print "My IP Address: " + str(self.myIPAddress)
         except Exception as inst:
             print "========================================================================================"
             print "ERROR: An exception was thrown in get client IP try block"
@@ -366,6 +367,13 @@ class NetworkClient():
                             print " "
                             self.sendNextCommandToServer()
                             print "WARNING: The nextChunkCommand was still sent to the Server..."
+                            print " "
+                        elif(recv == "found"):
+                            print " "
+                            print "WARNING: THE 'found' COMMAND IS OBSOLETE!!!!!! PLEASE USE 'foundSolution' INSTEAD"
+                            print " "
+                            self.sendFoundSolutionToServer()
+                            print "WARNING: The foundSolutionCommand was still sent to the server..."
                             print " "
                         elif(self.checkForFoundSolutionCommand(recv)==True):
                             print "INFO: Received Found Solution command from controller"
