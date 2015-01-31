@@ -883,7 +883,10 @@ class NetworkClient():
             print "STATUS: Checking for Request Next Chunk Command..."
             if(len(inboundString) < 1):
                 return False
-            if(inboundString[0:15] == "requestNextChunk"):
+            #if(inboundString[0:15] == "requestNextChunk"):
+            #if(inboundString[0:15] is "requestNextChunk"):
+            #if()
+            if(self.compareString("requestNextChunk",inboundString,0,0,len("requestNextChunk"),len(inboundString))==True):
                 print "I/O: Received the Request Next Chunk Command from the Controller"
                 self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK'] = (self.recordOfInboundCommandsFromController['REQUESTNEXTCHUNK']+1)
                 return True
@@ -908,6 +911,22 @@ class NetworkClient():
     #-------------------------------------------------------------------
     #End of Defined Communication Functions
     #-------------------------------------------------------------------
+    def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
+        posA = startA
+        posB = startB
+        #add check here
+        if((endA-startA) != (endB-startB)):
+            return False
+        for x in range(startA,endA):
+            tempCharA= inboundStringA[posA]
+            tempCharB= inboundStringB[posB]
+            if(tempCharA != tempCharB):
+                return False
+            posA+= 1
+            posB+= 1
+        return True
+
+
 #================================================================
 #End of NetworkClient Class Definition
 #================================================================

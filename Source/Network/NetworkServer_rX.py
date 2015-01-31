@@ -491,11 +491,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
                                     print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
                                     print "STATUS: Measuring the file size of the corresponding data of the chunk..."
-                                    #import os
-                                    #dataFileSize= os.path.getsize(chunkrecv.data) #METHOD A
-                                    #dataFileSize= os.stat(chunkrecv.data) #METHOD B
                                     import sys
-                                    dataFileSize = sys.getsizeof(chunkrecv.data)#METHOD C THIS METHOD SEEMS TO WORK
+                                    dataFileSize = sys.getsizeof(chunkrecv.data)# THIS METHOD SEEMS TO WORK
                                     print "INFO: The file size of the corresponding data is: " + str(dataFileSize) + " bytes"
                                     print "STATUS: Sending nextChunk to client"
                                     #add the NEXT key word into the string so client will recognize it
@@ -579,7 +576,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
             #'''GOAL: To have this section (below) be removed, and have the above sections immeadiately respond to any received commands, instead of queuing the commands, then executing them'''
             #/////////////////////////////////////////////////////////////////////////////
-            #Distribute Command(s) to Client(s) if needed
+            #Distribute Command(s) to Client(s) if needed (OBSOLETE)
             #/////////////////////////////////////////////////////////////////////////////
             #/////////////////////////////////////////////////////////////////////////////
             #End of Distribute Command(s) to Client(s) if needed
