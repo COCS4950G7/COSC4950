@@ -648,7 +648,7 @@ class NetworkClient():
         #sends the FOUNDSOLUTION command to the server, and key
         try:
             self.clientSocket.send("FOUNDSOLUTION " + str(self.myIPAddress))
-            self.clientSocket.send(self.key)
+            self.clientSocket.send(str(self.key))
             print "INFO: The FOUNDSOLUTION command was sent to the server as well as the key"
             self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] = (self.recordOfOutboundCommandsFromClientToServer['FOUNDSOLUTION'] + 1)
         except Exception as inst:
