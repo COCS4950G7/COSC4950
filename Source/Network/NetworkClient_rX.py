@@ -305,8 +305,7 @@ class NetworkClient():
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
                                         #tempData = self.clientSocket.recv(268435456) #2^28 #OLD METHOD
-                                        #add32 extra bytes of memory to help prevent overflow
-                                        tempData= self.clientSocket.recv(int(dataChunkFileSize + 32)) #set recv buffer equal to the size of the data object
+                                        tempData= self.clientSocket.recv(int(dataChunkFileSize)) #set recv buffer equal to the size of the data object
                                         print "INFO: Received data from the server."
                                         #print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
