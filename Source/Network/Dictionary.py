@@ -468,7 +468,7 @@ class Dictionary():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 5000:
+            if lineCounter >= 10000:
 
                 line = ""
 
