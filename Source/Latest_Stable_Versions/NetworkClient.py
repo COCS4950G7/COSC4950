@@ -1,27 +1,11 @@
 __author__ = 'chris hamm'
-#NetworkClient_rX (revision 10)
-#Created: 1/27/2015
-#Designed to work with NetworkServer_rX
+#NetworkClient_rXA (revision 10)
+#Created: 1/31/2015
+#Designed to work with NetworkServer_rXA
 
-#THINGS ADDED/CHANGED WITH THIS REVISION
-    #(Implemented)Removed Chunk Parsing Functions (That are now no longer needed)
-    #(Implemented)Removed Main Client Loop
-    #(Implemented)Restructure the the Primary While Loop so that when a command is received from either server or controller, the client immeadiately responds to that command (instead of queuing up the commands and executing them one by one)
-    #(Implemented)Added a record that records the number of reply to nextchunk the client receives from server
-    #(Implemented)Revised the check for server command system
-    #(Implemented)Added a record for the number of unknown commands the client receives from controller and from server
-    #(Implemented)Added a new communication command for the client to send the next chunk to the controller
-    #(Implemented)Added in function to expect a second string from the server after client receives the nextChunk command
-    #(Implemented)Added check for FOUNDSOLUTION function for inbound controller messages
-    #(Implemented)Added check for requestNextChunk function for inbound controller messages
-    #TEMPORARY Added support for legacy command 'next' from the controller
-    #TEMPORARY Added support for the legacy command "found"
-    #(Implemented)(OBSOLETE)Increased the recv buffer size for recv data from the server
-    #(Implemented)Added an extractor for the the second keyword in the nextChunk Command, which is the size of the data in the chunk object
-    #(Implemented)Changed the check for foundSolution function so that it checks char by char instead of by the string
-    #(Implemented)send the doingStuff command to controller prior to sending the chunk
-    #(Implemented)Added a check for doing stuff command (for inbpund command from controller) and also added a record for the command
-    #(Implemented)Removed the keywords from the params object before sending it to the controller
+#(Implemented)Change the recv function to allow multiple pieces to be received until all of the packets are received
+#(Implemented) when more data is being received, the socket timeout is rest back to 0.25 (basically giving a time extension)
+#TEMPORARY Commented out many print statement lines to try to increase speed
 
 #=================================
 #Imports
@@ -282,7 +266,7 @@ class NetworkClient():
                                 try:
                                     print "INFO: Received the NextChunk from the Server"
                                     #print "DEBUG: theInput:" + str(theInput)
-                                    print "STATUS: Extracting chunk data file size from nextChunk Command..."
+                                    #print "STATUS: Extracting chunk data file size from nextChunk Command..."
                                     #position[0:4] = 'NEXT '
                                     #position[5:9] = 'SIZE('
                                     #end of file size is marked by the closing parenthesis
@@ -295,20 +279,32 @@ class NetworkClient():
                                             break
                                         else:
                                             dataChunkFileSize+= str(theInput[x])
-                                    print "INFO: the dataChunkFileSize is " + str(dataChunkFileSize) + " bytes"
-                                    print "STATUS: Finished extracting dataChunkFileSize"
-                                    print "STATUS: Removing keywords from params..."
+                                    #print "INFO: the dataChunkFileSize is " + str(dataChunkFileSize) + " bytes"
+                                    #print "STATUS: Finished extracting dataChunkFileSize"
+                                    #print "STATUS: Removing keywords from params..."
                                     theInput= theInput[(closingParenthesisLocation+2):len(theInput)] #remove space after closing parenthesis as well as the keywords
-                                    print "DEBUG: theInput after removing keywords:" + str(theInput)
-                                    print "INFO: Finished removing keywords"
+                                    #print "DEBUG: theInput after removing keywords:" + str(theInput)
+                                    #print "INFO: Finished removing keywords"
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
                                         #tempData = self.clientSocket.recv(268435456) #2^28 #OLD METHOD
-                                        tempData= self.clientSocket.recv((int(dataChunkFileSize)+ 268435456)) #set recv buffer equal to the size of the data object
+                                        #tempData= self.clientSocket.recv((int(dataChunkFileSize)+ 268435456)) #set recv buffer equal to the size of the data object
+                                        import sys
+                                        while(sys.getsizeof(tempData) < dataChunkFileSize):
+                                            inputData= self.clientSocket.recv(4096)
+                                            if inputData:
+                                                tempData+= inputData
+                                                self.clientSocket.settimeout(0.25) #reset the socket timeout
+                                            else:
+                                                break
+
                                         print "INFO: Received data from the server."
+
                                         #print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
+                                    except socket.timeout as inst:
+                                        print "NOTICE: The socket has timed out"
                                     except Exception as inst:
                                         print "============================================================================================="
                                         print "ERROR: An exception was thrown in the receive corresponding data from the server Try Block"
@@ -319,6 +315,7 @@ class NetworkClient():
                                         #_str_ allows args tto be printed directly
                                         print inst
                                         print "============================================================================================="
+
                                     #print "STATUS: Removing the NEXT keyword from the message..." #THE FUNCTION ABOVE PERFORMS THIS TASK
                                     #remove 'NEXT '
                                     #position 4 is a space
@@ -331,10 +328,10 @@ class NetworkClient():
                                     tempChunk.params = theInput
                                     #set the data for the chunk object
                                     tempChunk.data = tempData
-                                    print "INFO: Chunk object successfully created"
+                                    #print "INFO: Chunk object successfully created"
                                     print "STATUS: Sending doingStuff Command to Controller..."
                                     self.sendDoingStuffCommandToController()
-                                    print "INFO: doingStuff Command was sent to controller"
+                                    #print "INFO: doingStuff Command was sent to controller"
                                     print "STATUS: Sending chunk object to the controller..."
                                     self.sendNextChunkToController(tempChunk)
                                     print "INFO: Finished sending chunk to the controller"
@@ -392,20 +389,20 @@ class NetworkClient():
                         if(self.checkForRequestNextChunkCommand(recv)==True):
                             print "INFO: Received request next chunk command from controller"
                             self.sendNextCommandToServer()
-                        elif(recv == "next"):
-                            print " "
-                            print "WARNING: THE 'next' COMMAND IS OBSOLETE!!!! PLEASE USE 'requestNextChunk' INSTEAD"
-                            print " "
-                            self.sendNextCommandToServer()
-                            print "WARNING: The nextChunkCommand was still sent to the Server..."
-                            print " "
-                        elif(recv == "found"):
-                            print " "
-                            print "WARNING: THE 'found' COMMAND IS OBSOLETE!!!!!! PLEASE USE 'foundSolution' INSTEAD"
-                            print " "
-                            self.sendFoundSolutionToServer()
-                            print "WARNING: The foundSolutionCommand was still sent to the server..."
-                            print " "
+                        #elif(recv == "next"):
+                         #   print " "
+                          #  print "WARNING: THE 'next' COMMAND IS OBSOLETE!!!! PLEASE USE 'requestNextChunk' INSTEAD"
+                           # print " "
+                            #self.sendNextCommandToServer()
+                            #print "WARNING: The nextChunkCommand was still sent to the Server..."
+                            #print " "
+                        #elif(recv == "found"):
+                         #   print " "
+                          #  print "WARNING: THE 'found' COMMAND IS OBSOLETE!!!!!! PLEASE USE 'foundSolution' INSTEAD"
+                          #  print " "
+                           # self.sendFoundSolutionToServer()
+                           # print "WARNING: The foundSolutionCommand was still sent to the server..."
+                           # print " "
                         elif(self.checkForFoundSolutionCommand(recv)==True):
                             print "INFO: Received Found Solution command from controller"
                             print "STATUS: Sending Found Solution Command to the Server..."
@@ -413,7 +410,7 @@ class NetworkClient():
                             print "INFO: Sent Found Solution Command to the Server"
                         elif(self.checkForDoingStuffCommand(recv)==True):
                             print "INFO: Received doingStuff Command from controller"
-                            print "INFO: Controller has parroted the doingStuff Command."
+                            #print "INFO: Controller has parroted the doingStuff Command."
                         else:
                             print "ERROR: unknown command was received"
                             print "The unknown command: '" + recv + "'"
