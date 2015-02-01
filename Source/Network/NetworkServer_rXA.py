@@ -1,44 +1,10 @@
 __author__ = 'chris hamm'
-#NetworkServer_rX (revision 10)
-#Created: 1/27/2015
-#Designed to work with NetworkClient_rX
+#NetworkServer_rXA (revision 10)
+#Created: 1/31/2015
+#Designed to work with NetworkClient_rXA
 
 #IMPORTANT!!!
     #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
-
-#THINGS ADDED/CHANGED WITH THIS VERSION
-    #(Implemented)Removed Chunk Parsing Functions (these functions are no longer needed)
-    #(Implemented)Marked several of the defined communication functions as potentially obsolete, may be omitted in the near future
-    #(Implemented)Restructure the primary loop of the server so that the server responds to a clients message immeadiately (instead of listen to client, then listen to controller, then distribute commands)
-    #(Implemented)Change the recv (from controller) mechanism so that server expects two messages from the controller (string, then a chunk object)
-    #(Implemented)Change Communication functions to just check for what type of message
-    #(Implemented)New data containers
-        #(Implemented)Stack containing chunks that need to be reassigned due to a client crash
-        #(Implemented)Stack of clients waiting for nextChunk
-    #(Implemented)Modified data structures
-        #(Implemented)Changed the list of clientsCurrentTasks to a dictionary of ClientsCurrentTasks
-        #(Implemented)Changed the list of chunk objects that contain the chunks of crashed clients to a stack (known as stack containing chunks that need to be reassigned)
-    #(Implemented)Remove data structures
-        #(Implemented)Remove list of clients waiting for reply (to be replaced by stack of clients waiting for nextChunk)
-        #(Implemented)Remove the list of controller messages (No longer needed since server reacts immediately)
-    #(Implemented)Added a print condition that prints out the dictionary of currentClientTasks when the server closes
-    #(Implemented)Added additional print statements, making it easier to track what is going on
-    #(Implemented)Added a record for the number of IP address the server could not find a match for and a print statement at the end for it
-    #(Implemented)Added a record for number of unknown commands from client and controller
-    #(Implemented)Added an additional reocord for the new sendNextData command to the client, as well as have server send the chunk data after it sends the nextChunk message to the client
-    #(Implemented)Added an additional check to check for client input, if an Empty String is received, it is ignored and an exception is thrown to skip checking for other commands because the Empty String is not a command
-    #(Implemented)Added a function to detect the size of the data in the chunk object
-    #(Implemented)Added a second key to the params string that is sent to the client, after the first keyword, the size of the data will be sent
-    #(Implemented)Finished Implementing the check for foundsolution function (when receiving from client), so now the DONE command is issued and the primary loop variable is set to false, which stops the server)
-    #(Implemented)Lets Controller know when the server is done
-
-#THINGS STILL BEING INTEGRATED FROM REVISION 9E
-    #(Implemented)Send extracted information over the network to the client
-
-#THINGS STILL BEING INTEGRATED FROM REVISION 9D
-    #(Implemented) A dictionary of what each client is currently working on
-        #(Implemented)Add a data structure that stores what the last chunk the server sent to each client was
-    #(Implemented) A stack of chunk objects that contains the chunk of a crashed client (chunk added when client crashes, and chunk is removed when a new client is given the chunk)
 
 #====================================
 #Imports

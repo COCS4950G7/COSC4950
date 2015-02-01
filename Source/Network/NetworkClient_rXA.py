@@ -1,27 +1,7 @@
 __author__ = 'chris hamm'
-#NetworkClient_rX (revision 10)
-#Created: 1/27/2015
-#Designed to work with NetworkServer_rX
-
-#THINGS ADDED/CHANGED WITH THIS REVISION
-    #(Implemented)Removed Chunk Parsing Functions (That are now no longer needed)
-    #(Implemented)Removed Main Client Loop
-    #(Implemented)Restructure the the Primary While Loop so that when a command is received from either server or controller, the client immeadiately responds to that command (instead of queuing up the commands and executing them one by one)
-    #(Implemented)Added a record that records the number of reply to nextchunk the client receives from server
-    #(Implemented)Revised the check for server command system
-    #(Implemented)Added a record for the number of unknown commands the client receives from controller and from server
-    #(Implemented)Added a new communication command for the client to send the next chunk to the controller
-    #(Implemented)Added in function to expect a second string from the server after client receives the nextChunk command
-    #(Implemented)Added check for FOUNDSOLUTION function for inbound controller messages
-    #(Implemented)Added check for requestNextChunk function for inbound controller messages
-    #TEMPORARY Added support for legacy command 'next' from the controller
-    #TEMPORARY Added support for the legacy command "found"
-    #(Implemented)(OBSOLETE)Increased the recv buffer size for recv data from the server
-    #(Implemented)Added an extractor for the the second keyword in the nextChunk Command, which is the size of the data in the chunk object
-    #(Implemented)Changed the check for foundSolution function so that it checks char by char instead of by the string
-    #(Implemented)send the doingStuff command to controller prior to sending the chunk
-    #(Implemented)Added a check for doing stuff command (for inbpund command from controller) and also added a record for the command
-    #(Implemented)Removed the keywords from the params object before sending it to the controller
+#NetworkClient_rXA (revision 10)
+#Created: 1/31/2015
+#Designed to work with NetworkServer_rXA
 
 #=================================
 #Imports

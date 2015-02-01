@@ -263,7 +263,7 @@ class NetworkClient():
             #'''GOAL: Want to have client respond immeadiately when it receives a command from server'''
                     try: #checking for server commands try block
                         print "STATUS: Checking for server commands..."
-                        self.clientSocket.settimeout(2.0)
+                        self.clientSocket.settimeout(0.25)
                         theInput = self.clientSocket.recv(2048)
                         if(len(theInput) > 1):
                             #if theInput == "DONE": #OLD METHOD
@@ -305,7 +305,7 @@ class NetworkClient():
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
                                         #tempData = self.clientSocket.recv(268435456) #2^28 #OLD METHOD
-                                        tempData= self.clientSocket.recv(int(dataChunkFileSize)) #set recv buffer equal to the size of the data object
+                                        tempData= self.clientSocket.recv((int(dataChunkFileSize)*10)) #set recv buffer equal to the size of the data object
                                         print "INFO: Received data from the server."
                                         #print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
