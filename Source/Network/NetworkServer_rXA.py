@@ -7,7 +7,7 @@ __author__ = 'chris hamm'
     #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
 
 #(Not implemented yet)Tell controller when the server is done
-
+#TEMPORARY commented out many print statements to try to improve speed
 
 #====================================
 #Imports
@@ -182,7 +182,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         self.recordOfInboundCommandsFromClientToServer['FOUNDSOLUTION'] = 0
         self.recordOfInboundCommandsFromClientToServer['CRASHED'] = 0
         self.recordOfInboundCommandsFromClientToServer['Unknown'] = 0
-        print "INFO: Successfully initialized the Record Counters"
+        #print "INFO: Successfully initialized the Record Counters"
         #.........................................................................
         #End of Initialize the Record Counters
         #.........................................................................
@@ -200,13 +200,13 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #Wait for initial client to connect
         #.........................................................................
         sock, addr= self.serverSocket.accept()
-        print "INFO: First client has connected"
+        #print "INFO: First client has connected"
         print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
         self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
-        print "STATUS: Client successfully added to the list of clients"
+        #print "STATUS: Client successfully added to the list of clients"
         #When a client is added, they are also added to the dictionaryOfCurrentClientTasks
         self.dictionaryOfCurrentClientTasks[addr] = "" #Not working on anything, so value is the empty string
-        print "STATUS: Client successfully added to the Dictionary of Current Client Tasks"
+        #print "STATUS: Client successfully added to the Dictionary of Current Client Tasks"
         #.........................................................................
         #End of Wait for initial client to connect
         #.........................................................................
@@ -252,10 +252,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #If stack is not empty, then send the top chunk on the stack to the client that is requesting the nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         tempIP= ""
-                        print "STATUS: Extracting The Clients IP"
+                        #print "STATUS: Extracting The Clients IP"
                         for i in range(5, len(theInput)):
                             tempIP+= theInput
-                        print "INFO: Successfully Extracted the Clients IP"
+                        #print "INFO: Successfully Extracted the Clients IP"
                         if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                             print "STATUS: Preparing to send chunk (from stack of chunks that need to be reassigned) to client..."
                                 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -268,16 +268,16 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             #    tempIP+= theInput
                             #print "INFO: Successfully Extracted the Clients IP"
                             self.dictionaryOfCurrentClientTasks[tempIP] = self.stackOfChunksThatNeedToBeReassigned.pop() #pop the stack
-                            print "INFO: Successfully added the chunk from stack of chunks that need to be reassigned to the dictionary of current clients tasks"
+                            #print "INFO: Successfully added the chunk from stack of chunks that need to be reassigned to the dictionary of current clients tasks"
                             #retreive socket information
                             print "STATUS: Looking for matching IP Address in list of Clients..."
                             foundMatch= False
                             tempAddr2= ""
                             for index in range(0, len(self.listOfClients)):
                                 tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
-                                print "STATUS: Copying list of clients' IP Address to a new string"
+                                #print "STATUS: Copying list of clients' IP Address to a new string"
                                 tempAddr2= str(tempAddr[0])
-                                print "STATUS: Comparing IP Addresses..."
+                                #print "STATUS: Comparing IP Addresses..."
                                 if(tempIP == tempAddr2):
                                     print "INFO: Matching IP address was found in the list of clients"
                                     foundMatch= True
@@ -301,7 +301,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             print "I/O: Sending a nextChunk request to the Controller..."
                             self.sendNextChunkCommandToController() #request the next chunk
                             self.stackOfClientsWaitingForNextChunk.append(tempIP) #push client onto the stack
-                            print "INFO: Client successfully added to the stack of clients waiting for nextChunk"
+                            #print "INFO: Client successfully added to the stack of clients waiting for nextChunk"
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                         #End of Check to see if stack of chunks that need to be reassigned is empty
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -399,8 +399,8 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                 print "STATUS: Preparing to send nextChunk object to Client Waiting for nextChunk..."
                                 #chunkParams= chunkrecv.params #NO LONGER NEEDED
-                                print "INFO: Copied parameters from chunk object"
-                                print "DEBUG: Size of stack of clientsWaitingForNextChunk: " + str(len(self.stackOfClientsWaitingForNextChunk))
+                                #print "INFO: Copied parameters from chunk object"
+                                #print "DEBUG: Size of stack of clientsWaitingForNextChunk: " + str(len(self.stackOfClientsWaitingForNextChunk))
                                 tempIP = str(self.stackOfClientsWaitingForNextChunk.pop()) #pop the stack
                                 #print "DEBUG: Removing NEXT and a space from tempIP"
                                 #tempIP= tempIP[5:len(tempIP)] #NEEDED ON THE CLIENTSIDE
@@ -409,11 +409,11 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                 for x in range(5,len(tempIP)):
                                     if(tempIP[x].isalpha()==True):
                                         firstInvalidCharIndex= x
-                                        print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
+                                        #print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
                                         break
                                     elif(tempIP[x].isspace()==True):
                                         firstInvalidCharIndex= x
-                                        print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
+                                        #print "DEBUG: firstInvalidChar=" + str(firstInvalidCharIndex)
                                         break
                                 #if still zero, keep entire string
                                 if(firstInvalidCharIndex == 5):
@@ -431,9 +431,9 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     tempSock, tempAddr= self.listOfClients[index] #get socket and ip address of client
                                     tempPort= tempAddr[1] #copy the port information
                                     #print "DEBUG: tempPort=" + str(tempPort)
-                                    print "STATUS: Copying list of clients' IP Address to a new string"
+                                    #print "STATUS: Copying list of clients' IP Address to a new string"
                                     tempAddr2= str(tempAddr[0])
-                                    print "STATUS: Comparing IP Addresses..."
+                                    #print "STATUS: Comparing IP Addresses..."
                                     #print "DEBUG: tempAddr2=" + str(tempAddr2)
                                     #print "DEBUG: tempIP=" + str(tempIP)
                                     if(tempIP == tempAddr2):
@@ -448,23 +448,23 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                                     print "INFO: Unable to Find the Client's IP: " +str(tempIP) + " "
                                     self.recordOfNumberOfIPAddressesThatHaventBeenFound+= 1
                                 else:
-                                    print "STATUS: Copying chunk object to dictionaryOfCurrentClientTasks..."
+                                    #print "STATUS: Copying chunk object to dictionaryOfCurrentClientTasks..."
                                     self.dictionaryOfCurrentClientTasks[tempIP] = chunkrecv
-                                    print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
+                                    #print "INFO: Successfully saved chunk object to dictionaryOfCurrentClientTasks"
                                     print "STATUS: Measuring the file size of the params..."
                                     import sys
                                     paramsDataSize= sys.getsizeof(self.dictionaryOfCurrentClientTasks[tempIP])
-                                    print "INFO: The file size of the params is: " + str(paramsDataSize) + " bytes"
+                                    #print "INFO: The file size of the params is: " + str(paramsDataSize) + " bytes"
                                     print "STATUS: Measuring the file size of the corresponding data of the chunk..."
                                     import sys
                                     dataFileSize = sys.getsizeof(chunkrecv.data)# THIS METHOD SEEMS TO WORK
-                                    print "INFO: The file size of the corresponding data is: " + str(dataFileSize) + " bytes"
+                                    #print "INFO: The file size of the corresponding data is: " + str(dataFileSize) + " bytes"
                                     print "STATUS: Sending nextChunk to client"
                                     #add the NEXT key word into the string so client will recognize it
                                     #add in the SIZE keyword, where the size is inside the parenthesis
                                     tempMessage= "NEXT " + "SIZE(" + str((dataFileSize)) + ") " +str(self.dictionaryOfCurrentClientTasks[tempIP].params)
                                     self.sendNextToClient(tempSock, tempIP, tempPort, tempMessage)
-                                    print "DEBUG: chunk params being sent to client=" + str(tempMessage)
+                                    #print "DEBUG: chunk params being sent to client=" + str(tempMessage)
                                     print "INFO: Successfully sent the nextChunk to the client"
                                     print "STATUS: Sending the corresponding data for that chunk to client..."
                                     self.sendNextDataToClient(tempSock, tempIP, tempPort, chunkrecv.data)
@@ -479,7 +479,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             else:
                                 print "STATUS: No Clients are waiting for nextChunk. Chunk is being added to stack of chunks that need to be reassigned."
                                 self.stackOfChunksThatNeedToBeReassigned.append(chunkrecv) #push chunk on to the stack
-                                print "INFO: Successfully pushed chunk on to the stack."
+                                #print "INFO: Successfully pushed chunk on to the stack."
                     #************************************************************************************
                     #Once received chunk object, send info to the client in the waiting for nextChunk stack (DONE ABOVE)
                     #************************************************************************************
@@ -556,10 +556,10 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                     sock, addr =self.serverSocket.accept()
                     print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
                     self.listOfClients.append((sock, addr))
-                    print "INFO: Client successfully added to the list of clients"
+                    #print "INFO: Client successfully added to the list of clients"
                     print str(len(self.listOfClients)) + " Client(s) are currently Connected."
                     self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
-                    print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
+                    #print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
                 except socket.timeout as inst:
                     print "STATUS: Socket timed out. No client is trying to connect."
                 except Exception as inst:
