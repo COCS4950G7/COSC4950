@@ -3,6 +3,9 @@ __author__ = 'chris hamm'
 #Created: 1/31/2015
 #Designed to work with NetworkServer_rXA
 
+#(Implemented)Change the recv function to allow multiple pieces to be received until all of the packets are received
+#(Implemented) when more data is being received, the socket timeout is rest back to 0.25 (basically giving a time extension)
+
 #=================================
 #Imports
 #=================================
@@ -279,16 +282,28 @@ class NetworkClient():
                                     print "STATUS: Finished extracting dataChunkFileSize"
                                     print "STATUS: Removing keywords from params..."
                                     theInput= theInput[(closingParenthesisLocation+2):len(theInput)] #remove space after closing parenthesis as well as the keywords
-                                    print "DEBUG: theInput after removing keywords:" + str(theInput)
+                                    #print "DEBUG: theInput after removing keywords:" + str(theInput)
                                     print "INFO: Finished removing keywords"
                                     print "STATUS: Waiting for the corresponding data from the server"
                                     tempData= "" #declare the variable
                                     try: #receive corresponding data from the server try block
                                         #tempData = self.clientSocket.recv(268435456) #2^28 #OLD METHOD
-                                        tempData= self.clientSocket.recv((int(dataChunkFileSize)+ 268435456)) #set recv buffer equal to the size of the data object
+                                        #tempData= self.clientSocket.recv((int(dataChunkFileSize)+ 268435456)) #set recv buffer equal to the size of the data object
+                                        import sys
+                                        while(sys.getsizeof(tempData) < dataChunkFileSize):
+                                            inputData= self.clientSocket.recv(4096)
+                                            if inputData:
+                                                tempData+= inputData
+                                                self.clientSocket.settimeout(0.25) #reset the socket timeout
+                                            else:
+                                                break
+
                                         print "INFO: Received data from the server."
+
                                         #print "DEBUG: tempData=" + str(tempData)
                                         self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] = (self.recordOfInboundCommandsFromServer['NEXTCHUNKDATA'] + 1)
+                                    except socket.timeout as inst:
+                                        print "NOTICE: The socket has timed out"
                                     except Exception as inst:
                                         print "============================================================================================="
                                         print "ERROR: An exception was thrown in the receive corresponding data from the server Try Block"
@@ -299,6 +314,7 @@ class NetworkClient():
                                         #_str_ allows args tto be printed directly
                                         print inst
                                         print "============================================================================================="
+
                                     #print "STATUS: Removing the NEXT keyword from the message..." #THE FUNCTION ABOVE PERFORMS THIS TASK
                                     #remove 'NEXT '
                                     #position 4 is a space

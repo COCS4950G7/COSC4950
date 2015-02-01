@@ -6,6 +6,9 @@ __author__ = 'chris hamm'
 #IMPORTANT!!!
     #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
 
+#(Not implemented yet)Tell controller when the server is done
+
+
 #====================================
 #Imports
 #====================================
