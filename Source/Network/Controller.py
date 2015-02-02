@@ -968,8 +968,10 @@ class Controller():
 
                 isFound = False
 
+                isEof = False
+
                 #While we haven't gotten all through the file or found the key...
-                while not (self.dictionary.isEof() or isFound):
+                while not (isEof or isFound):
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -990,12 +992,18 @@ class Controller():
                     #If the server needs a chunk, give one. (this should be the first thing server says)
                     if rec == "nextChunk":
 
-                        #chunk is a Chunk object
-                        chunk = self.dictionary.getNextChunk()
+                        if not self.dictionary.isEof():
 
-                        self.controllerPipe.send("nextChunk")
+                                #chunk is a Chunk object
+                                chunk = self.dictionary.getNextChunk()
 
-                        self.controllerPipe.send(chunk)
+                                self.controllerPipe.send("nextChunk")
+
+                                self.controllerPipe.send(chunk)
+
+                        else:
+
+                            isEof = True
 
                     #If the server needs a chunk again
                     elif rec == "chunkAgain":
