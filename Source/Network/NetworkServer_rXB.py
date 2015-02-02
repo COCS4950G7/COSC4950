@@ -7,7 +7,7 @@ __author__ = 'chris hamm'
     #A glitch has been detected in the server. The server will only communication with the last client it talked too. (THIS INCLUDES THE DONE COMMAND!)
 
 #CHANGES MADE IN THIS REVISION
-
+    #(In progress) Integrate multithreading
 #CHANGES FROM LAST REVISION
     #(Not implemented yet)Tell controller when the server is done
     #TEMPORARY commented out many print statements to try to improve speed
@@ -16,8 +16,10 @@ __author__ = 'chris hamm'
 #Imports
 #====================================
 import socket
+from socket import *
 import platform
 import Chunk
+from thread import *
 #====================================
 #End of Imports
 #====================================
@@ -43,6 +45,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #stackOfClientsWaitingForNextChunk.append(Object) #Is how to push onto the stack
         #object = stack.pop() #Is how you pop the stack
     stackOfChunksThatNeedToBeReassigned = [] #a stack
+    numOfThreads = 0
     dictionaryOfCurrentClientTasks = {} #dictionary that holds the ip of each client as the key and the chunk it is working on as the value
     recordOfNumberOfIPAddressesThatHaventBeenFound = 0 #if an ip address cannot be found when server is looking for a match, this counter gets incremented
     recordOfOutboundCommandsFromServerToController = {} #dictionary that records how many times the server has issued a command to the controller
@@ -61,6 +64,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
 
         #socket.AF_INET is a socket address family represented as a pair. (hostname, port). This is the default parameter
         #socket.SOCK_STREAM is the default parameter. This defines the socket type
+        import socket
         self.serverSocket= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print "STATUS: Server socket created successfully"
 
@@ -202,9 +206,23 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #.........................................................................
         #Wait for initial client to connect
         #.........................................................................
+        '''
         sock, addr= self.serverSocket.accept()
         #print "INFO: First client has connected"
         print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
+        try:
+            #creating a new thread. calling clientthread function
+            start_new_thread((clientthread(sock), (sock,)))
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the wait for initial client to connect multithread Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
         self.listOfClients.append((sock, addr)) #add the tuple to the list of clients
         #print "STATUS: Client successfully added to the list of clients"
         #When a client is added, they are also added to the dictionaryOfCurrentClientTasks
@@ -213,20 +231,73 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         #.........................................................................
         #End of Wait for initial client to connect
         #.........................................................................
-
+        '''
         #.........................................................................
         #Start of Primary Server While Loop
         #.........................................................................
         try: #server primary while loop try block
             while(self.serverIsRunning==True): #server primary while loop
             #/////////////////////////////////////////////////////////////////////////////
+            #Check to see if another client is trying to connect
+            #/////////////////////////////////////////////////////////////////////////////
+                try: #check to see if another client is trying to connect try block
+                    print "STATUS: Checking to see if another client is trying to connect..."
+                    self.serverSocket.settimeout(0.25)
+                    sock, addr =self.serverSocket.accept()
+                    print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
+                    self.listOfClients.append((sock, addr))
+                    try:
+                        start_new_thread(self.clientthread, (sock,))
+                    except Exception as inst:
+                        print "========================================================================================"
+                        print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
+                        print type(inst) #the exception instance
+                        print inst.args #srguments stored in .args
+                        print inst #_str_ allows args tto be printed directly
+                        print "========================================================================================"
+
+                    #print "INFO: Client successfully added to the list of clients"
+                    print str(len(self.listOfClients)) + " Client(s) are currently Connected."
+                    self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
+                    #print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
+                except socket.timeout as inst:
+                    print "STATUS: Socket timed out. No client is trying to connect."
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                finally:
+                    print "INFO: Currently, there are " + str(len(self.listOfClients)) + " clients currently connected"
+            #/////////////////////////////////////////////////////////////////////////////
+            #End of Check to see if another client is trying to connect
+            #/////////////////////////////////////////////////////////////////////////////
+            #/////////////////////////////////////////////////////////////////////////////
             #Check for input from clients
             #/////////////////////////////////////////////////////////////////////////////
             #'''GOAL: Want server to respond immeadiately when it receives a command from a client'''
                 print "STATUS: Checking for input from client(s)..."
                 try: #check for client input try block
-                    sock.settimeout(0.25)
-                    theInput = sock.recv(2048) #listening for input
+                    #sock.settimeout(0.25)
+
+                    self.serverSocket.settimeout(0.25)
+                    #theInput = sock.recv(2048) #listening for input
+                    theInput =""
+
+                    #try:
+                    theInput = self.serverSocket.recv(2048)
+                    #except socket.error as inst:
+                        #if(str(inst) == "[Errno 35] Resource  temporarily unavailable"):
+                     #   import time
+                      #  time.sleep(0)
+                      #  print "WARNING: 2nd attempt to recv"
+                      #  self.serverSocket.settimeout(0.25) #reset timeout
+                      #  theInput = self.serverSocket.recv(2048)
+                      #  continue
+                        #raise inst
+
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #If Command is the Empty String (do not expect a chunk object)
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -295,14 +366,31 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                             else:
                                 #send chunk to client
                                 print "STATUS: Sending Chunk to the Client..."
-                                self.sendNextToClient(tempSock,tempIP, self.dictionaryOfCurrentClientTasks[tempIP].params)
-
+                                try:
+                                    self.sendNextToClient(tempSock,tempIP, self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                except socket.error as inst:
+                                    i#f(str(inst) == "[Errno 35] Resource temporarily unavailable"):
+                                    import time
+                                    time.sleep(0)
+                                    print "WARNING: 2nd attempt to sendNextToClient"
+                                    self.serverSocket.settimeout(0.25) #reset timeout
+                                    self.sendNextToClient(tempSock, tempIP, self.dictionaryOfCurrentClientTasks[tempIP].params)
+                                    continue
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             #Else If stack empty, then send a nextChunk message to the controller and add the client to the stack of clients waiting for nextChunk
                             #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         else:
                             print "I/O: Sending a nextChunk request to the Controller..."
-                            self.sendNextChunkCommandToController() #request the next chunk
+                            try:
+                                self.sendNextChunkCommandToController() #request the next chunk
+                            except socket.error as inst:
+                                #if(str(inst) == "[Errno 35] Resource temporarily unavailable"):
+                                import time
+                                time.sleep(0)
+                                print "WARNING: 2nd attempt to sendNextChunkToController"
+                                self.serverSocket.settimeout(0.25) #reset the timeout
+                                self.sendNextChunkCommandToController()
+                                continue
                             self.stackOfClientsWaitingForNextChunk.append(tempIP) #push client onto the stack
                             #print "INFO: Client successfully added to the stack of clients waiting for nextChunk"
                         #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -550,33 +638,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
             #/////////////////////////////////////////////////////////////////////////////
             #'''GOAL: Remove the section above'''
 
-            #/////////////////////////////////////////////////////////////////////////////
-            #Check to see if another client is trying to connect
-            #/////////////////////////////////////////////////////////////////////////////
-                try: #check to see if another client is trying to connect try block
-                    print "STATUS: Checking to see if another client is trying to connect..."
-                    self.serverSocket.settimeout(0.25)
-                    sock, addr =self.serverSocket.accept()
-                    print "INFO: Connected with " + addr[0] + ":" + str(addr[1])
-                    self.listOfClients.append((sock, addr))
-                    #print "INFO: Client successfully added to the list of clients"
-                    print str(len(self.listOfClients)) + " Client(s) are currently Connected."
-                    self.dictionaryOfCurrentClientTasks[addr] = "" #Client has no task currently, so value is the empty string
-                    #print "STATUS: Client was successfully added to the Dictionary of Current Client Tasks"
-                except socket.timeout as inst:
-                    print "STATUS: Socket timed out. No client is trying to connect."
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception has been thrown in the Check to see if another client is trying to connect Try Block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
-                finally:
-                    print "INFO: Currently, there are " + str(len(self.listOfClients)) + " clients currently connected"
-            #/////////////////////////////////////////////////////////////////////////////
-            #End of Check to see if another client is trying to connect
-            #/////////////////////////////////////////////////////////////////////////////
+
         #.........................................................................
         #End of Primary Server While Loop
         #.........................................................................
@@ -1283,6 +1345,68 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
     #-------------------------------------------------------------------
     #End of Defined Communication Functions
     #-------------------------------------------------------------------
+    #-------------------------------------------------------------------
+    #Client Thread function
+    #-------------------------------------------------------------------
+    def clientthread(self,inputSocket):
+        try:
+            #infinite loop so that the function does not terminate and tread does not end
+            self.numOfThreads+= 1
+            while True:
+                #sending message to connected client
+                import time
+                time.sleep(1)
+                try:
+                    inputSocket.send('You have spawned a new thread!') #send the string
+                except socket.error as inst:
+                    #if(str(inst) == "[Errno 35] Resource temporarily unavailable"):
+                    time.sleep(0)
+                    print "WARNING: 2nd attempt at sending test message"
+                    self.serverSocket.settimeout(0.25) #reset timeout
+                    inputSocket.send('You have spawned a new thread!')
+                    continue
+                    #raise inst
+                #receiving from the client
+                data = ""
+                try:
+                    data = inputSocket.recv(2048)
+                except Exception as inst:
+                    time.sleep(0)
+                    print "WARNING: 2nd attempt at recv"
+                    self.serverSocket.settimeout(0.25) #reset timeout
+                    data = inputSocket.recv(2048)
+                    continue
+                if(data[0] == "N"):
+                    if(data[1] == "E"):
+                        if(data[2] == "X"):
+                            if(data[3] == "T"):
+                                print "INFO: receive next command from " + str(data[4:len(data)]) +", sending next to controller"
+                                try:
+                                    self.sendNextChunkCommandToController()
+                                except socket.error as inst:
+                                    time.sleep(0)
+                                    print "WARNING: 2nd attempt at sending nextChunkCommandToController"
+                                    self.serverSocket.settimeout(0.25) #reset timeout
+                                    self.sendNextChunkCommandToController()
+                                    continue
+                else:
+                    print "Other command received: " + str(data)
+                print "# of threads:" + str(self.numOfThreads)
+                #print str(data) + ",# of threads: " + str(self.numOfThreads)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in the Client Thread function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+    #-------------------------------------------------------------------
+    #End of client thread function
+    #-------------------------------------------------------------------
+
 #==============================================================
 #End of NetworkServer Class Definition
 #==============================================================

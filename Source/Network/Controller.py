@@ -32,8 +32,8 @@ import string
 from Chunk import Chunk
 from Dictionary import Dictionary
 #from Brute_Force import Brute_Force
-from NetworkClient_rXA import NetworkClient
-from NetworkServer_rXA import NetworkServer
+from NetworkClient_rXB import NetworkClient
+from NetworkServer_rXB import NetworkServer
 from RainbowMaker import RainbowMaker
 from RainbowUser import RainbowUser
 

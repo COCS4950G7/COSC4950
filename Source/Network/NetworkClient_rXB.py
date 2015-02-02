@@ -214,6 +214,7 @@ class NetworkClient():
             self.clientSocket.connect((self.serverIP, self.port))
             print "STATUS: Successfully connected to server"
 
+
         except socket.timeout as msg:
             print "========================================================================================"
             print "ERROR: the connection has timed out. Check to see if you entered the correct IP Address."
@@ -244,6 +245,12 @@ class NetworkClient():
         try:
                 while self.serverSaysKeepSearching:
                     #self.clientSocket.settimeout(2.0) #MOVED BELOW
+                    #for multithreading piece
+                    import time
+                    time.sleep(1)
+                    #data = self.clientSocket.recv(2048)
+                    #print str(data)
+                    #self.clientSocket.send('Hi! I am a client')
             #///////////////////////////////////////////////////////////////////////////
             #Check for Server Commands
             #///////////////////////////////////////////////////////////////////////////
