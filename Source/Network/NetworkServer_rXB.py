@@ -1369,12 +1369,14 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 #receiving from the client
                 data = ""
                 try:
-                    data = inputSocket.recv(2048)
+                    #data = inputSocket.recv(2048)
+                    data = self.serverSocket.recv(2048)
                 except Exception as inst:
                     time.sleep(0)
                     print "WARNING: 2nd attempt at recv"
                     self.serverSocket.settimeout(0.25) #reset timeout
-                    data = inputSocket.recv(2048)
+                    #data = inputSocket.recv(2048)
+                    data = self.serverSocket.recv(2048)
                     continue
                 if(data[0] == "N"):
                     if(data[1] == "E"):
