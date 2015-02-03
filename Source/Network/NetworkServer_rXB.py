@@ -190,6 +190,7 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
         self.recordOfInboundCommandsFromClientToServer['CRASHED'] = 0
         self.recordOfInboundCommandsFromClientToServer['Unknown'] = 0
         #print "INFO: Successfully initialized the Record Counters"
+
         #.........................................................................
         #End of Initialize the Record Counters
         #.........................................................................
@@ -281,22 +282,21 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
                 print "STATUS: Checking for input from client(s)..."
                 try: #check for client input try block
                     #sock.settimeout(0.25)
-
                     self.serverSocket.settimeout(0.25)
                     #theInput = sock.recv(2048) #listening for input
                     theInput =""
-
-                    #try:
-                    theInput = self.serverSocket.recv(2048)
-                    #except socket.error as inst:
-                        #if(str(inst) == "[Errno 35] Resource  temporarily unavailable"):
-                     #   import time
-                      #  time.sleep(0)
-                      #  print "WARNING: 2nd attempt to recv"
-                      #  self.serverSocket.settimeout(0.25) #reset timeout
-                      #  theInput = self.serverSocket.recv(2048)
-                      #  continue
-                        #raise inst
+                    checkingForClientInput= True
+                    while checkingForClientInput==True:
+                        try:
+                            theInput = self.serverSocket.recv(2048)
+                            if not theInput:
+                                checkingForClientInput= False
+                                break
+                        except socket.timeout as inst:
+                            checkingForClientInput= False
+                            break
+                        except Exception as inst:
+                            checkingForClientInput= True
 
                 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 #If Command is the Empty String (do not expect a chunk object)
@@ -1350,51 +1350,90 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
     #-------------------------------------------------------------------
     def clientthread(self,inputSocket):
         try:
+            data = ""
             #infinite loop so that the function does not terminate and tread does not end
-            self.numOfThreads+= 1
+            #self.numOfThreads+= 1
+            '''
             while True:
                 #sending message to connected client
                 import time
-                time.sleep(1)
-                try:
-                    inputSocket.send('You have spawned a new thread!') #send the string
-                except socket.error as inst:
-                    #if(str(inst) == "[Errno 35] Resource temporarily unavailable"):
-                    time.sleep(0)
-                    print "WARNING: 2nd attempt at sending test message"
-                    self.serverSocket.settimeout(0.25) #reset timeout
-                    inputSocket.send('You have spawned a new thread!')
-                    continue
-                    #raise inst
+                time.sleep(0.25)
+                messageSent= False
+                while messageSent == False:
+                    try:
+                        inputSocket.send('You have spawned a new thread!') #send the string
+                        messageSent= True
+                    except socket.error as inst:
+                        messageSent= False
+                        #if(str(inst) == "[Errno 35] Resource temporarily unavailable"):
+                        #time.sleep(0)
+                        #print "WARNING: 2nd attempt at sending test message"
+                        #self.serverSocket.settimeout(0.25) #reset timeout
+                        #inputSocket.send('You have spawned a new thread!')
+                        #continue
+                        #raise inst
                 #receiving from the client
-                data = ""
-                try:
-                    #data = inputSocket.recv(2048)
-                    data = self.serverSocket.recv(2048)
-                except Exception as inst:
-                    time.sleep(0)
-                    print "WARNING: 2nd attempt at recv"
-                    self.serverSocket.settimeout(0.25) #reset timeout
-                    #data = inputSocket.recv(2048)
-                    data = self.serverSocket.recv(2048)
-                    continue
-                if(data[0] == "N"):
-                    if(data[1] == "E"):
-                        if(data[2] == "X"):
-                            if(data[3] == "T"):
-                                print "INFO: receive next command from " + str(data[4:len(data)]) +", sending next to controller"
-                                try:
-                                    self.sendNextChunkCommandToController()
-                                except socket.error as inst:
-                                    time.sleep(0)
-                                    print "WARNING: 2nd attempt at sending nextChunkCommandToController"
-                                    self.serverSocket.settimeout(0.25) #reset timeout
-                                    self.sendNextChunkCommandToController()
-                                    continue
-                else:
-                    print "Other command received: " + str(data)
-                print "# of threads:" + str(self.numOfThreads)
-                #print str(data) + ",# of threads: " + str(self.numOfThreads)
+                '''
+            while True:
+                #check for client input
+                messageReceived= False
+                while messageReceived == False:
+                    try:
+                        data = inputSocket.recv(2048)
+                        if not data:
+                            messageReceived= True
+                    except Exception as inst:
+                        messageReceived= False
+                    if(len(data) < 1):
+                        unusedVar=True
+                    elif(self.compareString(str(data),"NEXT",0,0,len("NEXT"),len("NEXT"))):
+                        try:
+                            print "Received the NEXT Command from client"
+                            self.sendNextChunkCommandToController()
+                        except socket.error as inst:
+                            import time
+                            time.sleep(0)
+                            print "WARNING: 2nd attempt at sending nextChunkCommandToController"
+                            self.serverSocket.settimeout(0.25) #reset timeout
+                            self.sendNextChunkCommandToController()
+                    else:
+                        print "Other command received: " + str(data)
+                #check for controller input
+                if(self.pipe.poll()):
+                    inputString= ""
+                    receivedString= False
+                    while receivedString==False:
+                        try:
+                            inputString= self.pipe.recv()
+                            receivedString= True
+                            print "received something on the pipe^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                        except Exception as inst:
+                            receivedString=False
+                    if(self.compareString(inputString,"nextChunk",0,0,len("nextChunk"),len("nextChunk"))):
+                        receivedData= False
+                        inputData= ""
+                        while receivedData==False:
+                            try:
+                                inputData= self.pipe.recv()
+                                receivedData= True
+                            except Exception as inst:
+                                receivedData= False
+                        print "I FOUND IT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                        #if(len(self.stackOfClientsWaitingForNextChunk) > 0):
+
+
+        except IndexError as inst:
+            print "============================================================================================="
+            print "ERROR: An IndexError was thrown in the Client Thread function Try Block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print " "
+            print "string: '" +str(data) +"'"
+            print "============================================================================================="
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in the Client Thread function Try Block"
@@ -1408,7 +1447,20 @@ class NetworkServer(): #CLASS NAME WILL NOT CHANGE BETWEEN VERSIONS
     #-------------------------------------------------------------------
     #End of client thread function
     #-------------------------------------------------------------------
-
+    def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
+        posA = startA
+        posB = startB
+        #add check here
+        if((endA-startA) != (endB-startB)):
+            return False
+        for x in range(startA,endA):
+            tempCharA= inboundStringA[posA]
+            tempCharB= inboundStringB[posB]
+            if(tempCharA != tempCharB):
+                return False
+            posA+= 1
+            posB+= 1
+        return True
 #==============================================================
 #End of NetworkServer Class Definition
 #==============================================================
