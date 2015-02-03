@@ -33,9 +33,11 @@ class NetworkClient:
 
         clientsocket.connect(addr)
         print "Connected to server"
+        from random import *
+        myNumber= randint(0,10) #temporary to show that it is a different thread running
         while 1:
             #data = raw_input(">> ") #part of the original example
-            data = "me 2 \n"
+            data = "me " +str(myNumber) + "\n"
             if not data:
                 break
             else:
