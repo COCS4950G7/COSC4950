@@ -34,6 +34,8 @@ def receiveData(networkSocket, socketLock):
                     break
                 else:
                     print "received data: " + str(data) +"\n"
+            #except networkSocket.timeout as inst:
+             #   print "Socket has timed out in receiveData.\n"
             except Exception as inst:
                 print "Exception in receive data: " + str(inst) +"\n"
                 break
@@ -49,6 +51,8 @@ def sendData(networkSocket, clientIP, outboundMessage, socketLock):
             networkSocket.sendto(outboundMessage, clientIP)
             print "sent data: " +str(outboundMessage) + " to client: " +str(clientIP) +"\n"
             break
+        #except networkSocket.timeout as inst:
+         #   print "Socket has timed out in sendData. Attempting to send again.\n"
         except Exception as inst:
             print "Exception in send data: " +str(inst) +"\n"
     socketLock.release()
@@ -62,14 +66,31 @@ def sendDoneCommandToClient(networkSocket, clientIP, socketLock):
             networkSocket.sendto("done",clientIP)
             print "sent Done command to client: " +str(clientIP) +"\n"
             break
+        #except networkSocket.error as inst:
+         #   print "Socket has timed out in sendDoneCommandToClient. Attempting to send again.\n"
         except Exception as inst:
             print "Exception in send Done command: " +str(inst) +"\n"
     socketLock.release()
 
 
-class NetworkServer:
 
-    def handler(clientsocket, clientaddr, socketLock):
+def checkForNextCommandFromClient(inboundData):
+    print "Checking for the Next command from the client\n"
+    if(compareString(inboundData,"NEXT",0,0,len("NEXT"),len("NEXT"))):
+        print "NEXT command was received from the client\n"
+        return True
+    else:
+        return False
+
+def incrementNextCommandFromClientCounter(self):
+    self.nextCommandFromClientCounter+= 1
+
+
+
+class NetworkServer:
+    nextCommandFromClientCounter = 0
+
+    def handler(clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock):
         print "Accepted connection from: "+ str(clientaddr) +"\n"
 
         while 1:
@@ -85,9 +106,14 @@ class NetworkServer:
             data = receiveData(clientsocket,socketLock)
             if(data != ""):
                 msg = "You sent me: %s" % data + "\n"
+                if(checkForNextCommandFromClient(data)==True):
+                    nextCommandFromClientCounterLock.acquire()
+                    incrementNextCommandFromClientCounter()
+                    nextCommandFromClientCounterLock.release()
                 sendData(clientsocket, clientaddr,msg,socketLock)
                 #clientsocket.send(msg) #OLD SEND METHOD
         clientsocket.close()
+
 
 
 
@@ -96,6 +122,7 @@ class NetworkServer:
         host = 'localhost'
         port = 55567
         buf = 1024
+
         listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
         addr = (host, port)
 
@@ -105,23 +132,27 @@ class NetworkServer:
 
         serversocket.listen(2)
         socketLock = thread.allocate_lock()
+        nextCommandFromClientCounterLock = thread.allocate_lock()
         try: #Main try block
             while 1:
                 print "Server is listening for connections\n"
 
                 clientsocket, clientaddr = serversocket.accept()
                 listOfClients.append((clientsocket, clientaddr))
-                thread.start_new_thread(handler, (clientsocket, clientaddr, socketLock)) #create a new thread
+                thread.start_new_thread(handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
                 print " A New thread was made\n"
         except Exception as inst:
             print "ERROR IN MAIN THREAD: " +str(inst) +"\n"
         finally:
-            serversocket.close()
-            print "Socket has been closed.\n"
+            #serversocket.close() #MOVED BELOW
+            #print "Socket has been closed.\n"
             print "# of clients connected: " + str(len(listOfClients)) +"\n"
-            print "Issuing Done Commands to clients..."
+            print "Issuing Done Commands to clients...\n"
             for i in range(0,len(listOfClients)):
                 doneSock, doneAddr = listOfClients[i]
                 sendDoneCommandToClient(doneSock,doneAddr,socketLock)
-
+            serversocket.close()
+            print "Socket has been closed\n"
+            nextCommandFromClientCounterLock.acquire()
+            print "# of Next Commands received from the client: " + str(nextCommandFromClientCounter)+"\n"
 

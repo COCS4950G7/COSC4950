@@ -4,6 +4,7 @@ __author__ = 'chris hamm'
 
 from socket import *
 from random import *
+import sys
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #This function is now global
         posA = startA
@@ -31,21 +32,37 @@ def receiveData(networkSocket):
                     break
                 else:
                     print "received data: " + str(data) +"\n"
+                    if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command
+                        print "DONE COMMAND RECEIVED!!!!\n"
+                        break
+           # except networkSocket.timeout as inst:
+            #    print "Socket has timed out in receiveData\n"
+             #   break
             except Exception as inst:
                 print "Exception in receive data: " + str(inst) +"\n"
                 break
         return data #if data is empty string, nothing was received
 
-def sendData(networkSocket, serverIP, outboundMessage):
+def sendData(networkSocket, serverIP, outboundMessage): #return true if you need to break out of main client loop, else false
     print "Sending message to Server: " +str(serverIP) +"\n"
     networkSocket.settimeout(0.5)
     while True:
         try:
             networkSocket.sendto(outboundMessage, serverIP)
             print "sent data: " +str(outboundMessage) + " to server: " +str(serverIP) +"\n"
-            break
+            return False
+            #break
         except Exception as inst:
-            print "Exception in send data: " +str(inst) +"\n"
+            if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
+                print "Broken pipe error detected in sendData\n"
+                #networkSocket.close()
+                #sys.exit(1)
+                #print "Socket has been closed and program exitted.\n"
+                #break
+                return True
+            else:
+                print "Exception in send data: " +str(inst) +"\n"
+                return False
 
 def checkForDoneCommandFromServer(networkSocket):
     print "Checking for server issued done command\n"
@@ -58,8 +75,12 @@ def checkForDoneCommandFromServer(networkSocket):
             else:
                 print "Received Done Command From Server\n"
                 return True
+                break
+        #except networkSocket.timeout as inst:
+         #   print "Socket has timed out in checkForDoneCommandFromServer."
+          #  break
         except Exception as inst:
-            print "Exception in checkForDoneCommandFromServer: " +str(inst)
+            print "Exception in checkForDoneCommandFromServer: " +str(inst) +"\n"
             break
     return False
 
@@ -84,7 +105,10 @@ class NetworkClient:
                 break
             else:
                 #clientsocket.send(data) #OLD SNED METHOD
-                sendData(clientsocket,addr,data)
+                exitMainLoop= sendData(clientsocket,addr,data)
+                if(exitMainLoop == True):
+                    print "Breaking out of Main Loop\n"
+                    break
                 if(checkForDoneCommandFromServer(clientsocket)==True):
                     break
                 data = receiveData(clientsocket)
