@@ -28,6 +28,16 @@
 #   Nick Baum
 
 
+#   2/3/2015
+#   Made some fixes, some oddities still for very short key lengths. For example, starting with one character key
+#   lengths works for all keys except those of length 2. There are other similar oddities and I am actively tracking
+#   down the cause(s).
+#   Added isFound() and getKey() methods to integrate with controller. Getting and running chunks seems to work and I
+#   believe this version, while somewhat buggy in certain circumstances, is ready to attempt integration with
+#   controller. To that end, I have removed the automatic calls to the command line interface.
+
+#   Nick Baum
+
 import hashlib
 import os
 import itertools
@@ -46,7 +56,7 @@ class WorkUnit(object):
 
 
 class Brute_Force():
-    minKeyLength = 6
+    minKeyLength = 1
     maxKeyLength = 16
     alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
     num_processes = cpu_count()
@@ -69,11 +79,9 @@ class Brute_Force():
                 return
 
         #print num_processes, " processes"
-        self.commandline()
-        #self.test_chunking("aaa999")
+        #self.commandline()
+        #self.test_chunking()
 
-    def command_line_demo(self):
-        self.commandline()
 
     def from_controller(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
         self.alphabet = alphabet
@@ -84,14 +92,20 @@ class Brute_Force():
         self.set_chars_to_check()
         self.run()
 
+#Get a chunk for networked cracking
     def get_chunk(self):
 
         #"method algorithm hash alphabetChoice minCharacters maxCharacters prefix fileLocation width height"
         #"bruteforce sha1 7cacb75c4cc31d62a6c2a0774cf3c41a70f01bc0 d 1 12 1234 0 0 0"
         for prefix in self.get_prefix():
-            if len(prefix) == 0:
+            if prefix == '':
+                #sentinel value to indicate zero length prefixx.
+                prefix = "-99999999999999999999999999999999999"
                 min_length = self.minKeyLength
-                max_length = self.charactersToCheck
+                if self.charactersToCheck > self.maxKeyLength:
+                    max_length = self.maxKeyLength
+                else:
+                    max_length = self.charactersToCheck
             else:
                 min_length = len(prefix) + self.charactersToCheck
                 max_length = min_length
@@ -116,21 +130,28 @@ class Brute_Force():
         for j in range(0, self.num_processes):
             children.append(Process(target=self.check_keys, args=(self.queue, self.countey, self.done)))
             children[j].start()
-        for letter in self.alphabet:
-            if self.done.value:
-                    while not self.queue.empty():
-                        self.queue.get()
-                    self.queue.close()
-                    self.terminate_processes(children)
-                    return
-            self.queue.put(WorkUnit(prefix+letter, len(prefix)-1, self.alphabet))
-            with self.done.get_lock():
+        if prefix == "-99999999999999999999999999999999999":
+            for i in range(self.minKeyLength, self.charactersToCheck):
+                prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i-1, self.charactersToCheck+1))
+                for aPrefix in prefixes:
+                    self.queue.put(WorkUnit(aPrefix, i, self.alphabet))
+        else:
+            for letter in self.alphabet:
                 if self.done.value:
-                    while not self.queue.empty():
-                        self.queue.get()
-                    self.queue.close()
-                    self.terminate_processes(children)
-                    return
+                        while not self.queue.empty():
+                            self.queue.get()
+                        self.queue.close()
+                        self.terminate_processes(children)
+                        return
+
+                self.queue.put(WorkUnit(prefix+letter, self.charactersToCheck, self.alphabet))
+                with self.done.get_lock():
+                    if self.done.value:
+                        while not self.queue.empty():
+                            self.queue.get()
+                        self.queue.close()
+                        self.terminate_processes(children)
+                        return
 
         #wait while we burn through the remaining queue
         while self.queue:
@@ -145,9 +166,13 @@ class Brute_Force():
         else:
             return "fail"
 
+    def isFound(self):
+        return self.done.value
 
+    def getKey(self):
+        return self.key
 
-    def test_chunking(self, testkey):
+    def test_chunking(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         self.what_we_got()
         self.get_hash()
@@ -156,26 +181,28 @@ class Brute_Force():
         self.what_we_got()
 
         self.set_chars_to_check()
+        self.done.value = False
+        while not self.done.value:
 
-        chunk = self.get_chunk().next()
-        print "\n\nData from chunk:"
-        settings = chunk.params
-        settings_list = settings.split()
-        self.algorithm = settings_list[1]
-        print "Algorithm: " + self.algorithm
-        self.origHash = settings_list[2]
-        print "Hash: " + self.origHash
-        self.alphabet = settings_list[3]
-        print "Alphabet: " + self.alphabet
-        self.minKeyLength = int(settings_list[4])
-        self.maxKeyLength = int(settings_list[5])
-        print "Checking keys from " + str(self.minKeyLength) + " to " + str(self.maxKeyLength) + " characters."
-        prefix = settings_list[6]
-        print "Prefix: " + prefix
-        self.run_chunk(chunk)
+            chunk = self.get_chunk().next()
+            print "\n\nData from chunk:"
+            settings = chunk.params
+            settings_list = settings.split()
+            self.algorithm = settings_list[1]
+            print "Algorithm: " + self.algorithm
+            self.origHash = settings_list[2]
+            print "Hash: " + self.origHash
+            self.alphabet = settings_list[3]
+            print "Alphabet: " + self.alphabet
+            self.minKeyLength = int(settings_list[4])
+            self.maxKeyLength = int(settings_list[5])
+            print "Checking keys from " + str(self.minKeyLength) + " to " + str(self.maxKeyLength) + " characters."
+            prefix = settings_list[6]
+            print "Prefix: " + prefix
+            self.run_chunk(chunk)
 
         print "That took: ", self.elapsed, " seconds."
-        self.speed = (self.countey.value * self.chunk_size)/self.elapsed
+        #self.speed = (self.countey.value * self.chunk_size)/self.elapsed
         print "At about: ", self.speed, " hashes per second."
 
         if self.done.value:
@@ -186,11 +213,9 @@ class Brute_Force():
         exit()
 
     def get_prefix(self):
-        if self.minKeyLength - self.charactersToCheck < 0:
-            starting_length = self.charactersToCheck
-        else:
-            starting_length = self.minKeyLength - self.charactersToCheck
-        for i in range(starting_length, (self.maxKeyLength - self.charactersToCheck + 1)):
+        if self.minKeyLength < self.charactersToCheck:
+            yield ''
+        for i in range(self.minKeyLength-self.charactersToCheck, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             for prefix in prefixes:
                 yield ''.join(prefix)
@@ -217,7 +242,6 @@ class Brute_Force():
             children.append(Process(target=self.check_keys, args=(self.queue, self.countey, self.done)))
             children[j].start()
 
-        #this may disappear, why even implement passwords that short?
         if self.minKeyLength < self.charactersToCheck:
             for i in range(self.minKeyLength, self.charactersToCheck+1):
                 self.queue.put(WorkUnit('', i, self.alphabet))
