@@ -2,6 +2,8 @@ __author__ = 'chris hamm'
 #NetworkClient_r11
 #Created: 2/2/2015
 
+#DEAD REVISION
+
 from socket import *
 from random import *
 import sys
@@ -88,7 +90,7 @@ class NetworkClient:
     if __name__ == '__main__':
 
         host = 'localhost'
-        port = 55567
+        port = 55568
         buf = 1024
 
         addr = (host, port)
@@ -100,7 +102,8 @@ class NetworkClient:
         myNumber= randint(0,10) #temporary to show that it is a different thread running
         while 1:
             #data = raw_input(">> ") #part of the original example
-            data = "me " +str(myNumber) + "\n"
+            #data = "me " +str(myNumber) + "\n"
+            data = "NEXT"
             if not data:
                 break
             else:

@@ -4,6 +4,9 @@ __author__ = 'chris hamm'
 
 #NOTE,WHEN ISSUING THE DONE COMMAND,ONLY THE FIRST CLIENT RECV THE MESSAGE, SERVER DOES NOT SEEM TO SEND THE DONE COMMAND TO THE SECOND CLIENT
 
+#CRITICAL ERROR, CANT PASS SELF TO THE HANDLER
+
+#DEAD REVISION
 from socket import *
 import thread
 
@@ -82,15 +85,19 @@ def checkForNextCommandFromClient(inboundData):
     else:
         return False
 
-def incrementNextCommandFromClientCounter(self):
-    self.nextCommandFromClientCounter+= 1
 
 
 
-class NetworkServer:
+
+class NetworkServer():
     nextCommandFromClientCounter = 0
 
-    def handler(clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock):
+
+
+    def incrementNextCommandFromClientCounter(self):
+        self.nextCommandFromClientCounter+= 1
+
+    def handler(self,clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock):
         print "Accepted connection from: "+ str(clientaddr) +"\n"
 
         while 1:
@@ -108,19 +115,17 @@ class NetworkServer:
                 msg = "You sent me: %s" % data + "\n"
                 if(checkForNextCommandFromClient(data)==True):
                     nextCommandFromClientCounterLock.acquire()
-                    incrementNextCommandFromClientCounter()
+                    self.incrementNextCommandFromClientCounter()
                     nextCommandFromClientCounterLock.release()
                 sendData(clientsocket, clientaddr,msg,socketLock)
                 #clientsocket.send(msg) #OLD SEND METHOD
         clientsocket.close()
 
 
-
-
     if __name__ == "__main__":
 
         host = 'localhost'
-        port = 55567
+        port = 55568
         buf = 1024
 
         listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
@@ -139,7 +144,7 @@ class NetworkServer:
 
                 clientsocket, clientaddr = serversocket.accept()
                 listOfClients.append((clientsocket, clientaddr))
-                thread.start_new_thread(handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
+                thread.start_new_thread(handler, (self,clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
                 print " A New thread was made\n"
         except Exception as inst:
             print "ERROR IN MAIN THREAD: " +str(inst) +"\n"
@@ -155,4 +160,4 @@ class NetworkServer:
             print "Socket has been closed\n"
             nextCommandFromClientCounterLock.acquire()
             print "# of Next Commands received from the client: " + str(nextCommandFromClientCounter)+"\n"
-
+            nextCommandFromClientCounterLock.release()
