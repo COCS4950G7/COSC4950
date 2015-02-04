@@ -90,15 +90,14 @@ def checkForNextCommandFromClient(inboundData):
 
 
 class NetworkServer():
+
     nextCommandFromClientCounter = 0
 
-
-
     def incrementNextCommandFromClientCounter(self):
-        self.nextCommandFromClientCounter+= 1
+        self.nextCommandFromClientCounter += 1
 
-    def handler(self,clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock):
-        print "Accepted connection from: "+ str(clientaddr) +"\n"
+    def handler(self, clientsocket, clientaddr, socketLock, nextCommandFromClientCounterLock):
+        print "Accepted connection from: " + str(clientaddr) + "\n"
 
         while 1:
             #data = clientsocket.recv(1024) #OLD RECV METHOD
@@ -109,11 +108,11 @@ class NetworkServer():
             #        print "Received the me 2 command form server\n"
             #    else:
             #        print "Did not receive the me2 command." + str(data)
-            print "Checking for input from : " +str(clientaddr) +"\n"
-            data = receiveData(clientsocket,socketLock)
+            print "Checking for input from : " + str(clientaddr) + "\n"
+            data = receiveData(clientsocket , socketLock)
             if(data != ""):
                 msg = "You sent me: %s" % data + "\n"
-                if(checkForNextCommandFromClient(data)==True):
+                if(checkForNextCommandFromClient(data) == True):
                     nextCommandFromClientCounterLock.acquire()
                     self.incrementNextCommandFromClientCounter()
                     nextCommandFromClientCounterLock.release()
@@ -121,44 +120,47 @@ class NetworkServer():
                 #clientsocket.send(msg) #OLD SEND METHOD
         clientsocket.close()
 
+    def __init__(self):
 
-    if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
-                                #move the vars below into a inititialization function
+        if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
+                                   #move the vars below into a inititialization function
 
-        host = 'localhost'
-        port = 55568
-        buf = 1024
+            host = 'localhost'
+            port = 55568
+            buf = 1024
 
-        listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
-        addr = (host, port)
+            listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
+            addr = (host, port)
 
-        serversocket = socket(AF_INET, SOCK_STREAM)
+            serversocket = socket(AF_INET, SOCK_STREAM)
 
-        serversocket.bind(addr)
+            serversocket.bind(addr)
 
-        serversocket.listen(2)
-        socketLock = thread.allocate_lock()
-        nextCommandFromClientCounterLock = thread.allocate_lock()
-        try: #Main try block
-            while 1:
-                print "Server is listening for connections\n"
+            serversocket.listen(2)
+            socketLock = thread.allocate_lock()
+            nextCommandFromClientCounterLock = thread.allocate_lock()
+            try: #Main try block
+                while 1:
+                    print "Server is listening for connections\n"
 
-                clientsocket, clientaddr = serversocket.accept()
-                listOfClients.append((clientsocket, clientaddr))
-                thread.start_new_thread(handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
-                print " A New thread was made\n"
-        except Exception as inst:
-            print "ERROR IN MAIN THREAD: " +str(inst) +"\n"
-        finally:
-            #serversocket.close() #MOVED BELOW
-            #print "Socket has been closed.\n"
-            print "# of clients connected: " + str(len(listOfClients)) +"\n"
-            print "Issuing Done Commands to clients...\n"
-            for i in range(0,len(listOfClients)):
-                doneSock, doneAddr = listOfClients[i]
-                sendDoneCommandToClient(doneSock,doneAddr,socketLock)
-            serversocket.close()
-            print "Socket has been closed\n"
-            nextCommandFromClientCounterLock.acquire()
-            print "# of Next Commands received from the client: " + str(nextCommandFromClientCounter)+"\n"
-            nextCommandFromClientCounterLock.release()
+                    clientsocket, clientaddr = serversocket.accept()
+                    listOfClients.append((clientsocket, clientaddr))
+                    thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock,)) #create a new thread
+                    print " A New thread was made\n"
+            except Exception as inst:
+                print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
+            finally:
+                #serversocket.close() #MOVED BELOW
+                #print "Socket has been closed.\n"
+                print "# of clients connected: " + str(len(listOfClients)) + "\n"
+                print "Issuing Done Commands to clients...\n"
+                for i in range(0, len(listOfClients)):
+                    doneSock, doneAddr = listOfClients[i]
+                    sendDoneCommandToClient(doneSock, doneAddr, socketLock)
+                serversocket.close()
+                print "Socket has been closed\n"
+                nextCommandFromClientCounterLock.acquire()
+                print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
+                nextCommandFromClientCounterLock.release()
+
+NetworkServer()
