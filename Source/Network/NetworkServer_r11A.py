@@ -73,7 +73,6 @@ def sendDoneCommandToClient(networkSocket, clientIP, socketLock):
     socketLock.release()
 
 
-
 def checkForNextCommandFromClient(inboundData):
     print "Checking for the Next command from the client\n"
     if(compareString(inboundData,"NEXT",0,0,len("NEXT"),len("NEXT"))):

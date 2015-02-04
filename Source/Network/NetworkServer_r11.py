@@ -6,7 +6,7 @@ __author__ = 'chris hamm'
 
 #CRITICAL ERROR, CANT PASS SELF TO THE HANDLER
 
-#DEAD REVISION
+
 from socket import *
 import thread
 
