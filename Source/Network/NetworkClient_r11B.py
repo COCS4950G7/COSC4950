@@ -6,6 +6,6 @@ __author__ = 'chris hamm'
 
 #NetworkClient class
 class NetworkClient():
-
+    temp=True
 
 #end of NetworkClient class
