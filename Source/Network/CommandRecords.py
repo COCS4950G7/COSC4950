@@ -1,4 +1,5 @@
 __author__ = 'chris hamm'
+#This is supposed to run with NetworkServer_r11A
 class CommandRecords():
     numberOfNextCommandsFromClients = 0
     numberOfDoneCommandsSentToClients = 0

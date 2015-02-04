@@ -122,7 +122,8 @@ class NetworkServer():
         clientsocket.close()
 
 
-    if __name__ == "__main__":
+    if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
+                                #move the vars below into a inititialization function
 
         host = 'localhost'
         port = 55568
@@ -144,7 +145,7 @@ class NetworkServer():
 
                 clientsocket, clientaddr = serversocket.accept()
                 listOfClients.append((clientsocket, clientaddr))
-                thread.start_new_thread(handler, (self,clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
+                thread.start_new_thread(handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock)) #create a new thread
                 print " A New thread was made\n"
         except Exception as inst:
             print "ERROR IN MAIN THREAD: " +str(inst) +"\n"
