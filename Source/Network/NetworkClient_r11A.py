@@ -6,7 +6,7 @@ __author__ = 'chris hamm'
 #NetworkClient_r11
 #Created: 2/2/2015
 
-#DEAD REVISION
+#DEAD REVISION, USING ORIGINAL REVISION 11
 
 from socket import *
 from random import *

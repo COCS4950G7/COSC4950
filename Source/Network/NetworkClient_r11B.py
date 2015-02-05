@@ -4,6 +4,8 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkServer_r11B
 
+#USING ORIGINAL REVISION 11
+
 #NetworkClient class
 class NetworkClient():
     temp=True

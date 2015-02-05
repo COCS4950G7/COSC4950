@@ -4,7 +4,7 @@ __author__ = 'chris hamm'
 
 #NOTE,WHEN ISSUING THE DONE COMMAND,ONLY THE FIRST CLIENT RECV THE MESSAGE, SERVER DOES NOT SEEM TO SEND THE DONE COMMAND TO THE SECOND CLIENT
 
-#CRITICAL ERROR, CANT PASS SELF TO THE HANDLER
+
 
 
 from socket import *
@@ -93,6 +93,7 @@ class NetworkServer():
 
     nextCommandFromClientCounter = 0
 
+
     def incrementNextCommandFromClientCounter(self):
         self.nextCommandFromClientCounter += 1
 
@@ -150,8 +151,6 @@ class NetworkServer():
             except Exception as inst:
                 print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
             finally:
-                #serversocket.close() #MOVED BELOW
-                #print "Socket has been closed.\n"
                 print "# of clients connected: " + str(len(listOfClients)) + "\n"
                 print "Issuing Done Commands to clients...\n"
                 for i in range(0, len(listOfClients)):
