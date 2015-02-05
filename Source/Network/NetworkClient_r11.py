@@ -25,7 +25,7 @@ def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #
             posB+= 1
         return True
 
-def receiveData(networkSocket):
+def receiveData(self,networkSocket):
         print "Checking for inbound network data\n"
         networkSocket.settimeout(0.5)
         data = ""
@@ -35,9 +35,13 @@ def receiveData(networkSocket):
                 if not data:
                     break
                 else:
-                    print "received data: " + str(data) +"\n"
+                    print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
                     if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command
                         print "DONE COMMAND RECEIVED!!!!\n"
+                        break
+                    else: #then it is an unknown command
+                        print "Unknown command received from the server: " + str(data) +"\n"
+                        self.incrementUnknownCommandFromServerCounter()
                         break
            # except networkSocket.timeout as inst: #NO LONGER USED
             #    print "Socket has timed out in receiveData\n"
@@ -74,7 +78,7 @@ def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you
                 print "Exception in send data: " +str(inst) +"\n"
                 return False
 
-def checkForDoneCommandFromServer(self,networkSocket):
+def checkForDoneCommandFromServer(self,networkSocket): #Something is wrong with this check
     print "Checking for server issued done command\n"
     networkSocket.settimeout(0.5)
     while True:
@@ -104,7 +108,10 @@ class NetworkClient:
     crashedCommandToServerCounter = 0
 
     #inbound commands from server
-    doneCommandFromServerCounter = 0
+    doneCommandFromServerCounter = 0 #This check (above) needs to be revised
+    nextChunkParamsFromServerCounter = 0 #not implemented yet, only incrementor is implemented
+    nextChunkDataFromServerCounter = 0 #not implemented yet, only incrementor is implemented
+    unknownCommandFromServerCounter = 0
 
     def incrementNextCommandToServerCounter(self):
         self.nextCommandToServerCounter += 1
@@ -117,6 +124,15 @@ class NetworkClient:
 
     def incrementDoneCommandFromServerCounter(self):
         self.doneCommandFromServerCounter+= 1
+
+    def incrementNextChunkParamsFromServerCounter(self):
+        self.nextChunkParamsFromServerCounter+= 1
+
+    def incrementNextChunkDataFromServerCounter(self):
+        self.nextChunkDataFromServerCounter+= 1
+
+    def incrementUnknownCommandFromServerCounter(self):
+        self.unknownCommandFromServerCounter+= 1
 
     def __init__(self):
         if __name__ == '__main__':
@@ -154,7 +170,7 @@ class NetworkClient:
                             break
                         if(checkForDoneCommandFromServer(self,clientsocket)==True):
                             break
-                        data = receiveData(clientsocket)
+                        data = receiveData(self,clientsocket)
                         if(data != ""):
                             print "Received message from server: " + str(data) +"\n"
                         #data = clientsocket.recv(buf) #OLD RECV METHOD
@@ -176,5 +192,6 @@ class NetworkClient:
                 print "# of Crashed  Commands Sent To Server: " + str(self.crashedCommandToServerCounter) +"\n"
                 print "----------------------Inbound Commands From Server----------------\n"
                 print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
+                print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
 
 NetworkClient()

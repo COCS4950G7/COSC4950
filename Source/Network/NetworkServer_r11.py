@@ -118,9 +118,11 @@ def checkForCrashedCommandFromClient(inboundData):
 
 class NetworkServer():
 
+    #Server command records
     #records of outbound commands to clients
     doneCommandToClientCounter = 0
     nextCommandToClientCounter = 0
+    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor is implemented
 
     #records of inbound commands from clients
     nextCommandFromClientCounter = 0
@@ -136,6 +138,9 @@ class NetworkServer():
 
     def incrementNextCommandToClientCounter(self):
         self.nextCommandToClientCounter += 1
+
+    def incrementNextDataCommandToClientCounter(self):
+        self.nextDataCommandToClientCounter+= 1
 
     def incrementNextCommandFromClientCounter(self):
         self.nextCommandFromClientCounter += 1
