@@ -4,26 +4,32 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkServer_r11
 
+#I THINK I FIXED THIS(below)
 #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
+    #Suspect that it is because the check for done command is not implemented properly
 
 from socket import *
 from random import *
 import sys
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #This function is now global
-        posA = startA
-        posB = startB
-        #add check here (optional)
-        if((endA-startA) != (endB-startB)):
-            return False
-        for x in range(startA,endA):
-            tempCharA= inboundStringA[posA]
-            tempCharB= inboundStringB[posB]
-            if(tempCharA != tempCharB):
+        try:
+            posA = startA
+            posB = startB
+            #add check here (optional)
+            if((endA-startA) != (endB-startB)):
                 return False
-            posA+= 1
-            posB+= 1
-        return True
+            for x in range(startA,endA):
+                tempCharA= inboundStringA[posA]
+                tempCharB= inboundStringB[posB]
+                if(tempCharA != tempCharB):
+                    return False
+                posA+= 1
+                posB+= 1
+            return True
+        except Exception as inst:
+            print "ERROR in compareString: " + str(inst) +"\n"
+            return False
 
 def receiveData(self,networkSocket):
         print "Checking for inbound network data\n"
@@ -36,8 +42,11 @@ def receiveData(self,networkSocket):
                     break
                 else:
                     print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
-                    if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command
-                        print "DONE COMMAND RECEIVED!!!!\n"
+                    #if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command #OLD METHOD
+                     #   print "DONE COMMAND RECEIVED!!!!\n"
+                     #  break
+                    if(checkForDoneCommandFromServer(self,str(data))==True):
+                        print "Server has issued the done command\n"
                         break
                     else: #then it is an unknown command
                         print "Unknown command received from the server: " + str(data) +"\n"
@@ -69,35 +78,37 @@ def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you
         except Exception as inst:
             if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
                 print "Broken pipe error detected in sendData\n"
-                #networkSocket.close() #Network socket does not need to be closed because client is single threaded!
-                #sys.exit(1)
-                #print "Socket has been closed and program exitted.\n"
-                #break
                 return True
             else:
                 print "Exception in send data: " +str(inst) +"\n"
                 return False
 
-def checkForDoneCommandFromServer(self,networkSocket): #Something is wrong with this check
-    print "Checking for server issued done command\n"
-    networkSocket.settimeout(0.5)
-    while True:
-        try:
-            data = networkSocket.recv(1024)
-            if not data:
-                break
-            else:
-                print "Received Done Command From Server\n"
-                self.incrementDoneCommandFromServerCounter()
-                return True
-                break
-        #except networkSocket.timeout as inst: #NO LONGER USED
-         #   print "Socket has timed out in checkForDoneCommandFromServer."
-          #  break
-        except Exception as inst:
-            print "Exception in checkForDoneCommandFromServer: " +str(inst) +"\n"
-            break
-    return False
+def checkForDoneCommandFromServer(self,inboundString):
+    try:
+        print "Checking for done command from server\n"
+        if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
+            print "Done command was received from the server\n"
+            self.incrementNextChunkDataFromServerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForDoneCommandFromServer: " + str(inst) +"\n"
+        return False
+
+def checkForNextChunkParamsFromServer(self, inboundString):
+    try:
+        print "Checking for next chunk params from the server\n"
+        if(compareString(inboundString,"nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
+            print "Received the Next Chunk Params from Server\n"
+            self.incrementNextChunkParamsFromServerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForNextChunkParamsFromServer: " +str(inst) +"\n"
+        return False
+
 
 class NetworkClient:
 
@@ -108,10 +119,12 @@ class NetworkClient:
     crashedCommandToServerCounter = 0
 
     #inbound commands from server
-    doneCommandFromServerCounter = 0 #This check (above) needs to be revised
-    nextChunkParamsFromServerCounter = 0 #not implemented yet, only incrementor is implemented
+    doneCommandFromServerCounter = 0
+    nextChunkParamsFromServerCounter = 0
     nextChunkDataFromServerCounter = 0 #not implemented yet, only incrementor is implemented
     unknownCommandFromServerCounter = 0
+
+    #considering putting in a counter for number of exceptions thrown (for each exception type)
 
     def incrementNextCommandToServerCounter(self):
         self.nextCommandToServerCounter += 1
@@ -145,14 +158,17 @@ class NetworkClient:
 
                 clientsocket = socket(AF_INET, SOCK_STREAM)
 
-                clientsocket.connect(addr)
-                print "Connected to server\n"
+                try:
+                    clientsocket.connect(addr)
+                    print "Connected to server\n"
+                except Exception as inst:
+                    print "ERROR in connect to server: " + str(inst) +"\n"
                 myNumber= randint(0,3) #temporary to show that it is a different thread running
                 #data = "NEXT" #start by sending NEXT to server
                 while 1:
                     #data = raw_input(">> ") #part of the original example
                     #data = "me " +str(myNumber) + "\n"
-                    if(myNumber == 0):
+                    if(myNumber == 0): #TEMPORARY, used for testing command records
                         data = "NEXT"
                     elif(myNumber == 1):
                         data = "FOUNDSOLUTION"
@@ -168,9 +184,11 @@ class NetworkClient:
                         if(exitMainLoop == True):
                             print "Breaking out of Main Loop\n"
                             break
-                        if(checkForDoneCommandFromServer(self,clientsocket)==True):
-                            break
+                       # if(checkForDoneCommandFromServer(self,data)==True): #MOVED BELOW
+                        #    break
                         data = receiveData(self,clientsocket)
+                        #if(checkForDoneCommandFromServer(self,data)==True): #RECEIVEDATA TAKES CARE OF THIS FUNCTION
+                         #   break
                         if(data != ""):
                             print "Received message from server: " + str(data) +"\n"
                         #data = clientsocket.recv(buf) #OLD RECV METHOD
@@ -182,7 +200,7 @@ class NetworkClient:
                          #   else:
                          #       print "did not receive the me 2 command." + str(data)
             except Exception as inst:
-                print "ERROR: " + str(inst) +"\n"
+                print "ERROR in main try block: " + str(inst) +"\n"
             finally:
                 clientsocket.close()
                 print "Socket has been closed\n"
@@ -192,6 +210,7 @@ class NetworkClient:
                 print "# of Crashed  Commands Sent To Server: " + str(self.crashedCommandToServerCounter) +"\n"
                 print "----------------------Inbound Commands From Server----------------\n"
                 print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
+                print "# of next Chunk Params Received From Server: " + str(self.nextChunkParamsFromServerCounter) +"\n"
                 print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
 
 NetworkClient()
