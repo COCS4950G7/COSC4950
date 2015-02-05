@@ -2,7 +2,9 @@ __author__ = 'chris hamm'
 #NetworkClient_r11
 #Created: 2/2/2015
 
-#DEAD REVISION
+#Designed to work with NetworkServer_r11
+
+#WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
 
 from socket import *
 from random import *
@@ -11,7 +13,7 @@ import sys
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #This function is now global
         posA = startA
         posB = startB
-        #add check here
+        #add check here (optional)
         if((endA-startA) != (endB-startB)):
             return False
         for x in range(startA,endA):
@@ -37,7 +39,7 @@ def receiveData(networkSocket):
                     if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command
                         print "DONE COMMAND RECEIVED!!!!\n"
                         break
-           # except networkSocket.timeout as inst:
+           # except networkSocket.timeout as inst: #NO LONGER USED
             #    print "Socket has timed out in receiveData\n"
              #   break
             except Exception as inst:
@@ -63,7 +65,7 @@ def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you
         except Exception as inst:
             if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
                 print "Broken pipe error detected in sendData\n"
-                #networkSocket.close()
+                #networkSocket.close() #Network socket does not need to be closed because client is single threaded!
                 #sys.exit(1)
                 #print "Socket has been closed and program exitted.\n"
                 #break
@@ -72,7 +74,7 @@ def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you
                 print "Exception in send data: " +str(inst) +"\n"
                 return False
 
-def checkForDoneCommandFromServer(networkSocket):
+def checkForDoneCommandFromServer(self,networkSocket):
     print "Checking for server issued done command\n"
     networkSocket.settimeout(0.5)
     while True:
@@ -82,9 +84,10 @@ def checkForDoneCommandFromServer(networkSocket):
                 break
             else:
                 print "Received Done Command From Server\n"
+                self.incrementDoneCommandFromServerCounter()
                 return True
                 break
-        #except networkSocket.timeout as inst:
+        #except networkSocket.timeout as inst: #NO LONGER USED
          #   print "Socket has timed out in checkForDoneCommandFromServer."
           #  break
         except Exception as inst:
@@ -100,6 +103,9 @@ class NetworkClient:
     foundSolutionCommandToServerCounter = 0
     crashedCommandToServerCounter = 0
 
+    #inbound commands from server
+    doneCommandFromServerCounter = 0
+
     def incrementNextCommandToServerCounter(self):
         self.nextCommandToServerCounter += 1
 
@@ -108,6 +114,9 @@ class NetworkClient:
 
     def incrementCrashedCommandToServerCounter(self):
         self.crashedCommandToServerCounter+= 1
+
+    def incrementDoneCommandFromServerCounter(self):
+        self.doneCommandFromServerCounter+= 1
 
     def __init__(self):
         if __name__ == '__main__':
@@ -143,7 +152,7 @@ class NetworkClient:
                         if(exitMainLoop == True):
                             print "Breaking out of Main Loop\n"
                             break
-                        if(checkForDoneCommandFromServer(clientsocket)==True):
+                        if(checkForDoneCommandFromServer(self,clientsocket)==True):
                             break
                         data = receiveData(clientsocket)
                         if(data != ""):
@@ -165,5 +174,7 @@ class NetworkClient:
                 print "# of Next Commands Sent To Server: " + str(self.nextCommandToServerCounter) +"\n"
                 print "# of Found Solution Commands Sent To Server: " +str(self.foundSolutionCommandToServerCounter) +"\n"
                 print "# of Crashed  Commands Sent To Server: " + str(self.crashedCommandToServerCounter) +"\n"
+                print "----------------------Inbound Commands From Server----------------\n"
+                print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
 
 NetworkClient()

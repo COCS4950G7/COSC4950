@@ -2,9 +2,9 @@ __author__ = 'chris hamm'
 #NetworkServer_r11
 #Created: 2/2/2015
 
-#NOTE,WHEN ISSUING THE DONE COMMAND,ONLY THE FIRST CLIENT RECV THE MESSAGE, SERVER DOES NOT SEEM TO SEND THE DONE COMMAND TO THE SECOND CLIENT
 
 
+#Designed to work with NetworkClient_r11
 
 
 from socket import *
@@ -128,6 +128,9 @@ class NetworkServer():
     crashedCommandFromClientCounter = 0
     unknownCommandFromClientCounter = 0
 
+    #record of number of threads
+    numberOfThreadsCreatedCounter = 0
+
     def incrementDoneCommandToClientCounter(self):
         self.doneCommandToClientCounter += 1
 
@@ -145,6 +148,9 @@ class NetworkServer():
 
     def incrementCrashedCommandFromClientCounter(self):
         self.crashedCommandFromClientCounter += 1
+
+    def incrementNumberOfThreadsCreatedCounter(self):
+        self.numberOfThreadsCreatedCounter+= 1
 
     def handler(self, clientsocket, clientaddr, socketLock, nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock):
         print "Accepted connection from: " + str(clientaddr) + "\n"
@@ -198,6 +204,7 @@ class NetworkServer():
             serversocket.bind(addr)
 
             serversocket.listen(2)
+            #the thread locks
             socketLock = thread.allocate_lock()
             nextCommandFromClientCounterLock = thread.allocate_lock()
             foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
@@ -211,6 +218,7 @@ class NetworkServer():
                     listOfClients.append((clientsocket, clientaddr))
                     thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock)) #create a new thread
                     print " A New thread was made\n"
+                    self.incrementNumberOfThreadsCreatedCounter()
             except Exception as inst:
                 print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
             finally:
@@ -222,6 +230,8 @@ class NetworkServer():
                 serversocket.close()
                 print "Socket has been closed\n"
                 #printing out all of the records
+                print "---------------Number of Threads Created-----------------------\n"
+                print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
                 print "---------------Outbound Commands To Client(s)------------------\n"
                 print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
                 print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
