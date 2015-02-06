@@ -8,6 +8,8 @@ __author__ = 'chris hamm'
 #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
     #Suspect that it is because the check for done command is not implemented properly
 
+#Has connection issues when trying to connect to the server
+
 from socket import *
 from random import *
 import sys
@@ -176,13 +178,13 @@ class NetworkClient:
                 addr = (host, port)
 
                 clientsocket = socket(AF_INET, SOCK_STREAM)
+                #try:
+                 #   serverIP= raw_input('What is the Servers IP Address?')
+                #except Exception as inst:
+                 #   print "ERROR in get serverIP try block: " + str(inst) + "\n"
                 try:
-                    serverIP= raw_input('What is the Servers IP Address?')
-                except Exception as inst:
-                    print "ERROR in get serverIP try block: " + str(inst) + "\n"
-                try:
-                    #clientsocket.connect(addr)
-                    clientsocket.connect((serverIP,port))
+                    clientsocket.connect(addr)
+                    #clientsocket.connect((serverIP,port))
                     print "Connected to server\n"
                 except Exception as inst:
                     print "ERROR in connect to server: " + str(inst) +"\n"
