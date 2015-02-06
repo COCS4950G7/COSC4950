@@ -182,7 +182,7 @@ class NetworkClient:
                     print "ERROR in get serverIP try block: " + str(inst) + "\n"
                 try:
                     #clientsocket.connect(addr)
-                    clientsocket.connect(serverIP)
+                    clientsocket.connect((serverIP,port))
                     print "Connected to server\n"
                 except Exception as inst:
                     print "ERROR in connect to server: " + str(inst) +"\n"
