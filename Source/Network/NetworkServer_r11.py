@@ -8,6 +8,7 @@ __author__ = 'chris hamm'
 
 
 from socket import *
+import socket
 import thread
 import platform
 
@@ -198,7 +199,8 @@ class NetworkServer():
         if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
                                    #move the vars below into a inititialization function
 
-            host = 'localhost'
+            #host = 'localhost' #old connection method
+            host = '' #New Connection method
             port = 55568
             buf = 1024
 
@@ -289,7 +291,10 @@ class NetworkServer():
 
             addr = (host, port)
 
-            serversocket = socket(AF_INET, SOCK_STREAM)
+            #serversocket = socket(AF_INET, SOCK_STREAM) #old create socket method
+            serversocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
+
+
 
             serversocket.bind(addr)
 

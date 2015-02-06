@@ -12,6 +12,7 @@ __author__ = 'chris hamm'
 #ALTERNATE ERROR FAILS TO CONNECT WITH ERRNO 61, 'connection refused'
 
 from socket import *
+import socket
 from random import *
 import platform
 import sys
@@ -173,7 +174,8 @@ class NetworkClient:
     def __init__(self):
         if __name__ == '__main__':
             try: #Main try block
-                host = 'localhost'
+                #host = 'localhost' #old connection method
+                host = '' #new connection method
                 port = 55568
                 buf = 1024
 
@@ -262,7 +264,8 @@ class NetworkClient:
 
                 addr = (host, port)
 
-                clientsocket = socket(AF_INET, SOCK_STREAM)
+                #clientsocket = socket(AF_INET, SOCK_STREAM) #old create socket method
+                clientsocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
                 try:
                     serverIP= raw_input('What is the Servers IP Address?')
                 except Exception as inst:
