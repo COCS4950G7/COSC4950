@@ -8,10 +8,12 @@ __author__ = 'chris hamm'
 #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
     #Suspect that it is because the check for done command is not implemented properly
 
-#Has connection issues when trying to connect to the server
+#Has connection issues when trying to connect to the server, Errno 111 'connection refused' but only server and client are on different machines
+#ALTERNATE ERROR FAILS TO CONNECT WITH ERRNO 61, 'connection refused'
 
 from socket import *
 from random import *
+import platform
 import sys
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #This function is now global
@@ -175,16 +177,99 @@ class NetworkClient:
                 port = 55568
                 buf = 1024
 
+                #.........................................................................
+                #Detect the Operating System
+                #.........................................................................
+                try: #getOS try block
+                    print "*************************************"
+                    print "    Network Client"
+                    print "*************************************"
+                    print "OS DETECTION:"
+                    if(platform.system()=="Windows"): #Detecting Windows
+                        print platform.system()
+                        print platform.win32_ver()
+                    elif(platform.system()=="Linux"): #Detecting Linux
+                        print platform.system()
+                        print platform.dist()
+                    elif(platform.system()=="Darwin"): #Detecting OSX
+                        print platform.system()
+                        print platform.mac_ver()
+                    else:                           #Detecting an OS that is not listed
+                        print platform.system()
+                        print platform.version()
+                        print platform.release()
+                    print "*************************************"
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception was thrown in getOS try block"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                #......................................
+                #End of detect OS
+                #......................................
+
+                #.........................................................................
+                #Retrieve the local network IP Address
+                #.........................................................................
+                try: #getIP tryblock
+                    print "STATUS: Getting your network IP adddress"
+                    if(platform.system()=="Windows"):
+                        print socket.gethostbyname(socket.gethostname())
+                    elif(platform.system()=="Linux"):
+                        #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
+                        #Claims that this works on linux and windows machines
+                        import fcntl
+                        import struct
+                        import os
+
+                        def get_interface_ip(ifname):
+                            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                            return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
+                        #end of def
+                        def get_lan_ip():
+                            ip = socket.gethostbyname(socket.gethostname())
+                            if ip.startswith("127.") and os.name != "nt":
+                                interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
+                                for ifname in interfaces:
+                                    try:
+                                        ip = get_interface_ip(ifname)
+                                        print "IP address was retrieved from the " + str(ifname) + " interface."
+                                        break
+                                    except IOError:
+                                        pass
+                            return ip
+                        #end of def
+                        print get_lan_ip()
+                    elif(platform.system()=="Darwin"):
+                        print socket.gethostbyname(socket.gethostname())
+                    else:
+                        #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
+                        print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                        print "INFO: System is using a generic IP detection method"
+                        print socket.gethostbyname(socket.gethostname())
+                except Exception as inst:
+                    print "========================================================================================"
+                    print "ERROR: An exception was thrown in getIP try block"
+                    print type(inst) #the exception instance
+                    print inst.args #srguments stored in .args
+                    print inst #_str_ allows args tto be printed directly
+                    print "========================================================================================"
+                #.........................................................................
+                #End of Retrieve the local network IP Address
+                #.........................................................................
+
                 addr = (host, port)
 
                 clientsocket = socket(AF_INET, SOCK_STREAM)
-                #try:
-                 #   serverIP= raw_input('What is the Servers IP Address?')
-                #except Exception as inst:
-                 #   print "ERROR in get serverIP try block: " + str(inst) + "\n"
                 try:
-                    clientsocket.connect(addr)
-                    #clientsocket.connect((serverIP,port))
+                    serverIP= raw_input('What is the Servers IP Address?')
+                except Exception as inst:
+                    print "ERROR in get serverIP try block: " + str(inst) + "\n"
+                try:
+                    #clientsocket.connect(addr)
+                    clientsocket.connect((serverIP,port))
                     print "Connected to server\n"
                 except Exception as inst:
                     print "ERROR in connect to server: " + str(inst) +"\n"
