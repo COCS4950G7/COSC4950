@@ -48,6 +48,12 @@ def receiveData(self,networkSocket):
                     if(checkForDoneCommandFromServer(self,str(data))==True):
                         print "Server has issued the done command\n"
                         break
+                    elif(checkForNextChunkParamsFromServer(str(data))==True):
+                        print "Received Next Chunk Params From Server\n"
+                        break
+                    elif(checkForNextChunkDataFromServer(str(data))==True):
+                        print "Received Next Chunk Data From Server\n"
+                        break
                     else: #then it is an unknown command
                         print "Unknown command received from the server: " + str(data) +"\n"
                         self.incrementUnknownCommandFromServerCounter()
@@ -99,7 +105,7 @@ def checkForDoneCommandFromServer(self,inboundString):
 def checkForNextChunkParamsFromServer(self, inboundString):
     try:
         print "Checking for next chunk params from the server\n"
-        if(compareString(inboundString,"nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
+        if(compareString(inboundString,"nextChunkParams",0,0,len("nextChunkParams"),len("nextChunkParams"))==True):
             print "Received the Next Chunk Params from Server\n"
             self.incrementNextChunkParamsFromServerCounter()
             return True
@@ -107,6 +113,19 @@ def checkForNextChunkParamsFromServer(self, inboundString):
             return False
     except Exception as inst:
         print "ERROR in checkForNextChunkParamsFromServer: " +str(inst) +"\n"
+        return False
+
+def checkForNextChunkDataFromServer(self, inboundString):
+    try:
+        print "Checking for next chunk data from the server\n"
+        if(compareString(inboundString,"nextChunkData",0,0,len("nextChunkData"),len("nextChunkData"))==True):
+            print "Received the Next Chunk Data from Server\n"
+            self.incrementNextChunkDataFromServerCounter()
+            return  True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForNextChunkDataFromServer: " + str(inst) +"\n"
         return False
 
 
@@ -121,7 +140,7 @@ class NetworkClient:
     #inbound commands from server
     doneCommandFromServerCounter = 0
     nextChunkParamsFromServerCounter = 0
-    nextChunkDataFromServerCounter = 0 #not implemented yet, only incrementor is implemented
+    nextChunkDataFromServerCounter = 0
     unknownCommandFromServerCounter = 0
 
     #considering putting in a counter for number of exceptions thrown (for each exception type)
@@ -193,7 +212,7 @@ class NetworkClient:
                             print "Received message from server: " + str(data) +"\n"
                         #data = clientsocket.recv(buf) #OLD RECV METHOD
                         #if not data:
-                        #    break
+                        #    break    
                         #else:
                          #   if(compareString(data,"You sent me: me 2",0,0,len("You sent me: me 2"),len("You sent me: me 2"))):
                          #       print "received the me 2 command from the server\n"
@@ -211,6 +230,7 @@ class NetworkClient:
                 print "----------------------Inbound Commands From Server----------------\n"
                 print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
                 print "# of next Chunk Params Received From Server: " + str(self.nextChunkParamsFromServerCounter) +"\n"
+                print "# of next Chunk Data Received From Server: " + str(self.nextChunkDataFromServerCounter) + "\n"
                 print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
 
 NetworkClient()
