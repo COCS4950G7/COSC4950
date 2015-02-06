@@ -176,9 +176,13 @@ class NetworkClient:
                 addr = (host, port)
 
                 clientsocket = socket(AF_INET, SOCK_STREAM)
-
                 try:
-                    clientsocket.connect(addr)
+                    serverIP= raw_input('What is the Servers IP Address?')
+                except Exception as inst:
+                    print "ERROR in get serverIP try block: " + str(inst) + "\n"
+                try:
+                    #clientsocket.connect(addr)
+                    clientsocket.connect(serverIP)
                     print "Connected to server\n"
                 except Exception as inst:
                     print "ERROR in connect to server: " + str(inst) +"\n"
