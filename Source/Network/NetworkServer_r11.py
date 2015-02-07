@@ -204,7 +204,7 @@ class NetworkServer():
     #records of outbound commands to clients
     doneCommandToClientCounter = 0
     nextCommandToClientCounter = 0
-    nextDataCommandToClientCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    nextDataCommandToClientCounter = 0 #needs the details of the chunk parsing to be added
 
     #records of inbound commands from clients
     nextCommandFromClientCounter = 0
@@ -213,15 +213,15 @@ class NetworkServer():
     unknownCommandFromClientCounter = 0
 
     #records of outbound commands to controller
-    nextChunkCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    nextChunkCommandToControllerCounter = 0
     #ChunkAgain command is obsolete
-    waitingCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
-    doneCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    waitingCommandToControllerCounter = 0
+    doneCommandToControllerCounter = 0
 
     #records of inbound commands from controller
-    nextChunkCommandFromControllerCounter = 0 #implemented, only incrementor and thread lock and print record implemented
+    nextChunkCommandFromControllerCounter = 0
     #chunkAgain command is obsolete
-    doneCommandFromControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    doneCommandFromControllerCounter = 0
     unknownCommandFromControllerCounter = 0
 
     #record of number of threads
@@ -324,194 +324,197 @@ class NetworkServer():
 
     def __init__(self, pipeendconnectedtocontroller):
         self.pipe= pipeendconnectedtocontroller
-
-        if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
+        #print "Debugging line 1, before the if main\n"
+        #if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
                                    #move the vars below into a inititialization function
+        #INDENT EVERYTHING AFTER THIS POINT IF YOU ARE GOING TO UNCOMMENT 'IF name == main
+        #host = 'localhost' #old connection method
+        host = '' #New Connection method
+        port = 55568
+        buf = 1024
 
-            #host = 'localhost' #old connection method
-            host = '' #New Connection method
-            port = 55568
-            buf = 1024
+        listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
 
-            listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
+        #.........................................................................
+        #Detect the Operating System
+        #.........................................................................
+        try: #getOS try block
+            print "*************************************"
+            print "    Network Server"
+            print "*************************************"
+            print "OS DETECTION:"
+            if(platform.system()=="Windows"): #Detecting Windows
+                print platform.system()
+                print platform.win32_ver()
+            elif(platform.system()=="Linux"): #Detecting Linux
+                print platform.system()
+                print platform.dist()
+            elif(platform.system()=="Darwin"): #Detecting OSX
+                print platform.system()
+                print platform.mac_ver()
+            else:                           #Detecting an OS that is not listed
+                print platform.system()
+                print platform.version()
+                print platform.release()
+            print "*************************************"
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in getOS try block"
+            print type(inst) #the exception instance
+            print inst.args #srguments stored in .args
+            print inst #_str_ allows args tto be printed directly
+            print "========================================================================================"
+        #.........................................................................
+        #End of Detect the Operating System
+        #.........................................................................
 
-            #.........................................................................
-            #Detect the Operating System
-            #.........................................................................
-            try: #getOS try block
-                print "*************************************"
-                print "    Network Server"
-                print "*************************************"
-                print "OS DETECTION:"
-                if(platform.system()=="Windows"): #Detecting Windows
-                    print platform.system()
-                    print platform.win32_ver()
-                elif(platform.system()=="Linux"): #Detecting Linux
-                    print platform.system()
-                    print platform.dist()
-                elif(platform.system()=="Darwin"): #Detecting OSX
-                    print platform.system()
-                    print platform.mac_ver()
-                else:                           #Detecting an OS that is not listed
-                    print platform.system()
-                    print platform.version()
-                    print platform.release()
-                print "*************************************"
-            except Exception as inst:
-                print "========================================================================================"
-                print "ERROR: An exception was thrown in getOS try block"
-                print type(inst) #the exception instance
-                print inst.args #srguments stored in .args
-                print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
-            #.........................................................................
-            #End of Detect the Operating System
-            #.........................................................................
+        #.........................................................................
+        #Retrieve the local network IP Address
+        #.........................................................................
+        try: #getIP tryblock
+            print "STATUS: Getting your network IP adddress"
+            if(platform.system()=="Windows"):
+                print socket.gethostbyname(socket.gethostname())
+            elif(platform.system()=="Linux"):
+                #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
+                #Claims that this works on linux and windows machines
+                import fcntl
+                import struct
+                import os
 
-            #.........................................................................
-            #Retrieve the local network IP Address
-            #.........................................................................
-            try: #getIP tryblock
-                print "STATUS: Getting your network IP adddress"
-                if(platform.system()=="Windows"):
-                    print socket.gethostbyname(socket.gethostname())
-                elif(platform.system()=="Linux"):
-                    #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
-                    #Claims that this works on linux and windows machines
-                    import fcntl
-                    import struct
-                    import os
+                def get_interface_ip(ifname):
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
+                #end of def
+                def get_lan_ip():
+                    ip = socket.gethostbyname(socket.gethostname())
+                    if ip.startswith("127.") and os.name != "nt":
+                        interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
+                        for ifname in interfaces:
+                            try:
+                                ip = get_interface_ip(ifname)
+                                print "IP address was retrieved from the " + str(ifname) + " interface."
+                                break
+                            except IOError:
+                                pass
+                    return ip
+                #end of def
+                print get_lan_ip()
+            elif(platform.system()=="Darwin"):
+                print socket.gethostbyname(socket.gethostname())
+            else:
+                #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
+                print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                print "INFO: System is using a generic IP detection method"
+                print socket.gethostbyname(socket.gethostname())
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in getIP try block"
+            print type(inst) #the exception instance
+            print inst.args #srguments stored in .args
+            print inst #_str_ allows args tto be printed directly
+            print "========================================================================================"
+        #.........................................................................
+        #End of Retrieve the local network IP Address
+        #.........................................................................
 
-                    def get_interface_ip(ifname):
-                        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
-                    #end of def
-                    def get_lan_ip():
-                        ip = socket.gethostbyname(socket.gethostname())
-                        if ip.startswith("127.") and os.name != "nt":
-                            interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
-                            for ifname in interfaces:
-                                try:
-                                    ip = get_interface_ip(ifname)
-                                    print "IP address was retrieved from the " + str(ifname) + " interface."
-                                    break
-                                except IOError:
-                                    pass
-                        return ip
-                    #end of def
-                    print get_lan_ip()
-                elif(platform.system()=="Darwin"):
-                    print socket.gethostbyname(socket.gethostname())
-                else:
-                    #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
-                    print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
-                    print "INFO: System is using a generic IP detection method"
-                    print socket.gethostbyname(socket.gethostname())
-            except Exception as inst:
-                print "========================================================================================"
-                print "ERROR: An exception was thrown in getIP try block"
-                print type(inst) #the exception instance
-                print inst.args #srguments stored in .args
-                print inst #_str_ allows args tto be printed directly
-                print "========================================================================================"
-            #.........................................................................
-            #End of Retrieve the local network IP Address
-            #.........................................................................
+        addr = (host, port)
 
-            addr = (host, port)
+        #serversocket = socket(AF_INET, SOCK_STREAM) #old create socket method
+        #print "Creating the socket...\n"
+        serversocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
+        #print "Successfully created the socket\n"
 
-            #serversocket = socket(AF_INET, SOCK_STREAM) #old create socket method
-            serversocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
+        #print "Binding the socket...\n"
+        serversocket.bind(addr)
+        #print "Successfully bound to the socket\n"
 
-
-
-            serversocket.bind(addr)
-
-            serversocket.listen(2)
-            #the thread locks
-            socketLock = thread.allocate_lock()
-            #outbound to client command locks
-            doneCommandToClientCounterLock = thread.allocate_lock()
-            nextCommandToClientCounterLock = thread.allocate_lock()
-            nextDataCommandToClientCounterLock = thread.allocate_lock()
-            #inbound from client client command locks
-            nextCommandFromClientCounterLock = thread.allocate_lock()
-            foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
-            unknownCommandFromClientCounterLock = thread.allocate_lock()
-            crashedCommandFromClientCounterLock = thread.allocate_lock()
-            #outbound to controller command locks
-            nextChunkCommandToControllerCounterLock = thread.allocate_lock()
-            waitingCommandToControllerCounterLock = thread.allocate_lock()
-            doneCommandToControllerCounterLock = thread.allocate_lock()
-            #inbound from controller command locks
-            nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
-            doneCommandFromControllerCounterLock = thread.allocate_lock()
-            unknownCommandFromControllerCounterLock = thread.allocate_lock()
-            try: #Main try block
-                while 1:
-                    print "Server is listening for connections\n"
-
-                    clientsocket, clientaddr = serversocket.accept()
-                    listOfClients.append((clientsocket, clientaddr))
-                    thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock)) #create a new thread
-                    print " A New thread was made\n"
-                    self.incrementNumberOfThreadsCreatedCounter()
-            except Exception as inst:
-                print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
-            finally:
-                print "# of clients connected: " + str(len(listOfClients)) + "\n"
-                print "Issuing Done Commands to clients...\n"
-                for i in range(0, len(listOfClients)):
-                    doneSock, doneAddr = listOfClients[i]
-                    sendDoneCommandToClient(self,doneSock, doneAddr, socketLock)
-                serversocket.close()
-                print "Socket has been closed\n"
-                #printing out all of the records
-                print "---------------Number of Threads Created-----------------------\n"
-                print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
-                print "---------------Outbound Commands To Client(s)------------------\n"
-                doneCommandToClientCounterLock.acquire()
-                print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
-                doneCommandToClientCounterLock.release()
-                nextCommandToClientCounterLock.acquire()
-                print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
-                nextCommandToClientCounterLock.release()
-                nextDataCommandToClientCounterLock.acquire()
-                print "# of Next Data Commands sent to the clients: " +str(self.nextDataCommandToClientCounter) + "\n"
-                nextDataCommandToClientCounterLock.release()
-                print "---------------Inbound Commands From Client(s)-----------------\n"
-                nextCommandFromClientCounterLock.acquire()
-                print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
-                nextCommandFromClientCounterLock.release()
-                foundSolutionCommandFromClientCounterLock.acquire()
-                print "# of FOUNDSOLUTION Commands received from the client: " +str(self.foundSolutionCommandFromClientCounter) +"\n"
-                foundSolutionCommandFromClientCounterLock.release()
-                unknownCommandFromClientCounterLock.acquire()
-                print "# of Unknown Commands received from Client: " + str(self.unknownCommandFromClientCounter) +"\n"
-                unknownCommandFromClientCounterLock.release()
-                crashedCommandFromClientCounterLock.acquire()
-                print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
-                crashedCommandFromClientCounterLock.release()
-                print "--------------Outbound Commands To Controller----------------\n"
-                nextChunkCommandToControllerCounterLock.acquire()
-                print "# of nextChunk Commands sent to the Controller: " +str(self.nextChunkCommandToControllerCounter)+"\n"
-                nextChunkCommandToControllerCounterLock.release()
-                waitingCommandToControllerCounterLock.acquire()
-                print "# of waiting Commands sent to the Controller: " + str(self.waitingCommandToControllerCounter)+"\n"
-                waitingCommandToControllerCounterLock.release()
-                doneCommandToControllerCounterLock.acquire()
-                print "# of done Commands sent to the Controller: " + str(self.doneCommandToControllerCounter)+"\n"
-                doneCommandToControllerCounterLock.release()
-                print "-------------Inbound Commands From Controller---------------\n"
-                nextChunkCommandFromControllerCounterLock.acquire()
-                print "# of nextChunk Commands received from the Controller: "+ str(self.nextChunkCommandFromControllerCounter)+"\n"
-                nextChunkCommandFromControllerCounterLock.release()
-                doneCommandFromControllerCounterLock.acquire()
-                print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
-                doneCommandFromControllerCounterLock.release()
-                unknownCommandFromControllerCounterLock.acquire()
-                print "# of unknown Commands received from the Controller: "+str(self.unknownCommandFromControllerCounter)+"\n"
-                unknownCommandFromControllerCounterLock.release()
+        serversocket.listen(2)
+        #print "Initializing thread locks...\n"
+        #the thread locks
+        socketLock = thread.allocate_lock()
+        #outbound to client command locks
+        doneCommandToClientCounterLock = thread.allocate_lock()
+        nextCommandToClientCounterLock = thread.allocate_lock()
+        nextDataCommandToClientCounterLock = thread.allocate_lock()
+        #inbound from client client command locks
+        nextCommandFromClientCounterLock = thread.allocate_lock()
+        foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
+        unknownCommandFromClientCounterLock = thread.allocate_lock()
+        crashedCommandFromClientCounterLock = thread.allocate_lock()
+        #outbound to controller command locks
+        nextChunkCommandToControllerCounterLock = thread.allocate_lock()
+        waitingCommandToControllerCounterLock = thread.allocate_lock()
+        doneCommandToControllerCounterLock = thread.allocate_lock()
+        #inbound from controller command locks
+        nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
+        doneCommandFromControllerCounterLock = thread.allocate_lock()
+        unknownCommandFromControllerCounterLock = thread.allocate_lock()
+        #print "Successfully initialized the thread locks\n"
+        try: #Main try block
+            while 1:
+                print "Server is listening for connections\n"
+                clientsocket, clientaddr = serversocket.accept()
+                listOfClients.append((clientsocket, clientaddr))
+                thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock)) #create a new thread
+                print " A New thread was made\n"
+                self.incrementNumberOfThreadsCreatedCounter()
+        except Exception as inst:
+            print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
+        finally:
+            print "# of clients connected: " + str(len(listOfClients)) + "\n"
+            print "Issuing Done Commands to clients...\n"
+            for i in range(0, len(listOfClients)):
+                doneSock, doneAddr = listOfClients[i]
+                sendDoneCommandToClient(self,doneSock, doneAddr, socketLock)
+            serversocket.close()
+            print "Socket has been closed\n"
+            #printing out all of the records
+            print "---------------Number of Threads Created-----------------------\n"
+            print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
+            print "---------------Outbound Commands To Client(s)------------------\n"
+            doneCommandToClientCounterLock.acquire()
+            print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
+            doneCommandToClientCounterLock.release()
+            nextCommandToClientCounterLock.acquire()
+            print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
+            nextCommandToClientCounterLock.release()
+            nextDataCommandToClientCounterLock.acquire()
+            print "# of Next Data Commands sent to the clients: " +str(self.nextDataCommandToClientCounter) + "\n"
+            nextDataCommandToClientCounterLock.release()
+            print "---------------Inbound Commands From Client(s)-----------------\n"
+            nextCommandFromClientCounterLock.acquire()
+            print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
+            nextCommandFromClientCounterLock.release()
+            foundSolutionCommandFromClientCounterLock.acquire()
+            print "# of FOUNDSOLUTION Commands received from the client: " +str(self.foundSolutionCommandFromClientCounter) +"\n"
+            foundSolutionCommandFromClientCounterLock.release()
+            unknownCommandFromClientCounterLock.acquire()
+            print "# of Unknown Commands received from Client: " + str(self.unknownCommandFromClientCounter) +"\n"
+            unknownCommandFromClientCounterLock.release()
+            crashedCommandFromClientCounterLock.acquire()
+            print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
+            crashedCommandFromClientCounterLock.release()
+            print "--------------Outbound Commands To Controller----------------\n"
+            nextChunkCommandToControllerCounterLock.acquire()
+            print "# of nextChunk Commands sent to the Controller: " +str(self.nextChunkCommandToControllerCounter)+"\n"
+            nextChunkCommandToControllerCounterLock.release()
+            waitingCommandToControllerCounterLock.acquire()
+            print "# of waiting Commands sent to the Controller: " + str(self.waitingCommandToControllerCounter)+"\n"
+            waitingCommandToControllerCounterLock.release()
+            doneCommandToControllerCounterLock.acquire()
+            print "# of done Commands sent to the Controller: " + str(self.doneCommandToControllerCounter)+"\n"
+            doneCommandToControllerCounterLock.release()
+            print "-------------Inbound Commands From Controller---------------\n"
+            nextChunkCommandFromControllerCounterLock.acquire()
+            print "# of nextChunk Commands received from the Controller: "+ str(self.nextChunkCommandFromControllerCounter)+"\n"
+            nextChunkCommandFromControllerCounterLock.release()
+            doneCommandFromControllerCounterLock.acquire()
+            print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
+            doneCommandFromControllerCounterLock.release()
+            unknownCommandFromControllerCounterLock.acquire()
+            print "# of unknown Commands received from the Controller: "+str(self.unknownCommandFromControllerCounter)+"\n"
+            unknownCommandFromControllerCounterLock.release()
 
 
 #NetworkServer() #No longer needed, controller calls NetworkServer now

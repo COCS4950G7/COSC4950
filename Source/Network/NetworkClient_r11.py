@@ -294,178 +294,181 @@ class NetworkClient():
 
     def __init__(self, pipeendconnectedtocontroller):
         self.pipe = pipeendconnectedtocontroller #pipe to the controller
-        if __name__ == '__main__':
-            try: #Main try block
-                #host = 'localhost' #old connection method
-                host = '' #new connection method
-                port = 55568
-                buf = 1024
-                serverIP = '127.0.1.1'
+        #if __name__ == '__main__':
+        #INDENT EVERYTHING BELOW HERE IF YOU ARE TO UNCOMMENT if name==main
+        try: #Main try block
+            #host = 'localhost' #old connection method
+            self.host = '' #new connection method
+            self.port = 55568
+            buf = 1024
+            self.serverIP = '127.0.1.1'
 
-                #.........................................................................
-                #Detect the Operating System
-                #.........................................................................
-                try: #getOS try block
-                    print "*************************************"
-                    print "    Network Client"
-                    print "*************************************"
-                    print "OS DETECTION:"
-                    if(platform.system()=="Windows"): #Detecting Windows
-                        print platform.system()
-                        print platform.win32_ver()
-                    elif(platform.system()=="Linux"): #Detecting Linux
-                        print platform.system()
-                        print platform.dist()
-                    elif(platform.system()=="Darwin"): #Detecting OSX
-                        print platform.system()
-                        print platform.mac_ver()
-                    else:                           #Detecting an OS that is not listed
-                        print platform.system()
-                        print platform.version()
-                        print platform.release()
-                    print "*************************************"
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception was thrown in getOS try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
-                #......................................
-                #End of detect OS
-                #......................................
-
-                #.........................................................................
-                #Retrieve the local network IP Address
-                #.........................................................................
-                try: #getIP tryblock
-                    print "STATUS: Getting your network IP adddress"
-                    if(platform.system()=="Windows"):
-                        print socket.gethostbyname(socket.gethostname())
-                    elif(platform.system()=="Linux"):
-                        #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
-                        #Claims that this works on linux and windows machines
-                        import fcntl
-                        import struct
-                        import os
-
-                        def get_interface_ip(ifname):
-                            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                            return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
-                        #end of def
-                        def get_lan_ip():
-                            ip = socket.gethostbyname(socket.gethostname())
-                            if ip.startswith("127.") and os.name != "nt":
-                                interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
-                                for ifname in interfaces:
-                                    try:
-                                        ip = get_interface_ip(ifname)
-                                        print "IP address was retrieved from the " + str(ifname) + " interface."
-                                        break
-                                    except IOError:
-                                        pass
-                            return ip
-                        #end of def
-                        print get_lan_ip()
-                    elif(platform.system()=="Darwin"):
-                        print socket.gethostbyname(socket.gethostname())
-                    else:
-                        #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
-                        print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
-                        print "INFO: System is using a generic IP detection method"
-                        print socket.gethostbyname(socket.gethostname())
-                except Exception as inst:
-                    print "========================================================================================"
-                    print "ERROR: An exception was thrown in getIP try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
-                    print "========================================================================================"
-                #.........................................................................
-                #End of Retrieve the local network IP Address
-                #.........................................................................
-
-                addr = (host, port)
-
-                #clientsocket = socket(AF_INET, SOCK_STREAM) #old create socket method
-                clientsocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
-                #try:
-                    #serverIP= raw_input('What is the Servers IP Address?') #OLD MANUAL METHOD
-                self.receiveServerIPFromController() #NEW AUTOMATED METHOD
-                #except Exception as inst:
-                 #   print "ERROR in get serverIP try block: " + str(inst) + "\n"
-                try:
-                    #clientsocket.connect(addr)
-                    clientsocket.connect((serverIP,port))
-                    print "Connected to server\n"
-                    self.sendConnectedCommandToController()
-                except Exception as inst:
-                    print "ERROR in connect to server: " + str(inst) +"\n"
-                #myNumber= randint(0,3) #temporary to show that it is a different thread running
-                #data = "NEXT" #start by sending NEXT to server
-                while 1:
-                    #Communication with Network Server
-                    #if(myNumber == 0): #TEMPORARY, used for testing command records
-                     #   data = "NEXT"
-                   # elif(myNumber == 1):
-                    #    data = "FOUNDSOLUTION"
-                    #elif(myNumber == 2):
-                    #    data = "CRASHED"
-                    #else:
-                    #    data = "Unknown"
-                    if not data:
-                        break
-                    else:
-                        exitMainLoop= sendData(self,clientsocket,addr,data)
-                        if(exitMainLoop == True):
-                            print "Breaking out of Main Loop\n"
-                            break
-                        data = receiveData(self,clientsocket)
-                        if(data != ""):
-                            print "Received message from server: " + str(data) +"\n"
-                    #end communication with Network Server
-                    #communication with Controller
-                    print "Checking for controller commands...\n"
-                    if(self.pipe.poll()):
-                        inboundControllerCommand= self.pipe.recv()
-                        print "Received a Command from the Controller\n"
-                        if(self.checkForFoundSolutionCommandFromController(inboundControllerCommand)==True):
-                            print "foundSolution Command has been received from Controller\n"
-                            self.sendFoundSolutionCommandToServer()
-                        elif(self.checkForRequestNextChunkCommandFromController(inboundControllerCommand)==True):
-                            print "requestNextChunk Command has been received from Controller\n"
-                            self.sendNextChunkCommandToServer()
-                        elif(self.checkForDoingStuffCommandFromController(inboundControllerCommand)==True):
-                            print "doingStuff Command has been received from Controller\n"
-                            #controller has parroted the command back, dont do anything
-                        else:
-                            print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
-                            self.incrementUnknownCommandFromControllerCounter()
-                    #end communication with controller
+            #.........................................................................
+            #Detect the Operating System
+            #.........................................................................
+            try: #getOS try block
+                print "*************************************"
+                print "    Network Client"
+                print "*************************************"
+                print "OS DETECTION:"
+                if(platform.system()=="Windows"): #Detecting Windows
+                    print platform.system()
+                    print platform.win32_ver()
+                elif(platform.system()=="Linux"): #Detecting Linux
+                    print platform.system()
+                    print platform.dist()
+                elif(platform.system()=="Darwin"): #Detecting OSX
+                    print platform.system()
+                    print platform.mac_ver()
+                else:                           #Detecting an OS that is not listed
+                    print platform.system()
+                    print platform.version()
+                    print platform.release()
+                print "*************************************"
             except Exception as inst:
-                print "ERROR in main try block: " + str(inst) +"\n"
-            finally:
-                clientsocket.close()
-                print "Socket has been closed\n"
-                print "----------------------Outbound Commands To Server-----------------\n"
-                print "# of Next Commands Sent To Server: " + str(self.nextCommandToServerCounter) +"\n"
-                print "# of Found Solution Commands Sent To Server: " +str(self.foundSolutionCommandToServerCounter) +"\n"
-                print "# of Crashed  Commands Sent To Server: " + str(self.crashedCommandToServerCounter) +"\n"
-                print "----------------------Inbound Commands From Server----------------\n"
-                print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
-                print "# of next Chunk Params Received From Server: " + str(self.nextChunkParamsFromServerCounter) +"\n"
-                print "# of next Chunk Data Received From Server: " + str(self.nextChunkDataFromServerCounter) + "\n"
-                print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
-                print "----------------------Outbound Commands To Controller---------------------\n"
-                print "# of next Chunk Commands Sent to Controller: " + str(self.nextChunkCommandToControllerCounter) + "\n"
-                print "# of Done Commands Sent To Controller: " + str(self.doneCommandToControllerCounter) + "\n"
-                print "# of Connected Commands Sent to Controller: " + str(self.connectedCommandToControllerCounter) +"\n"
-                print "# of doingStuff Commands Sent to Controller: " + str(self.doingStuffCommandToControllerCounter) +"\n"
-                print "----------------------Inbound Commands From Controller-----------------------\n"
-                print "# of Receive Server IP From Controller Commands: " + str(self.receiveServerIPFromControllerCounter) +"\n"
-                print "# of doingStuff Commands Received From Controller: " + str(self.doingStuffCommandFromControllerCounter) +"\n"
-                print "# of foundSolution Commands Received From Controller: " + str(self.foundSolutionCommandFromControllerCounter)+"\n"
-                print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
-                print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in getOS try block"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
+            #......................................
+            #End of detect OS
+            #......................................
+
+            #.........................................................................
+            #Retrieve the local network IP Address
+            #.........................................................................
+            try: #getIP tryblock
+                print "STATUS: Getting your network IP adddress"
+                if(platform.system()=="Windows"):
+                    print socket.gethostbyname(socket.gethostname())
+                elif(platform.system()=="Linux"):
+                    #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
+                    #Claims that this works on linux and windows machines
+                    import fcntl
+                    import struct
+                    import os
+
+                    def get_interface_ip(ifname):
+                        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                        return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
+                    #end of def
+                    def get_lan_ip():
+                        ip = socket.gethostbyname(socket.gethostname())
+                        if ip.startswith("127.") and os.name != "nt":
+                            interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
+                            for ifname in interfaces:
+                                try:
+                                    ip = get_interface_ip(ifname)
+                                    print "IP address was retrieved from the " + str(ifname) + " interface."
+                                    break
+                                except IOError:
+                                    pass
+                        return ip
+                    #end of def
+                    print get_lan_ip()
+                elif(platform.system()=="Darwin"):
+                    print socket.gethostbyname(socket.gethostname())
+                else:
+                    #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
+                    print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
+                    print "INFO: System is using a generic IP detection method"
+                    print socket.gethostbyname(socket.gethostname())
+            except Exception as inst:
+                print "========================================================================================"
+                print "ERROR: An exception was thrown in getIP try block"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                print "========================================================================================"
+            #.........................................................................
+            #End of Retrieve the local network IP Address
+            #.........................................................................
+
+            #addr = (host, port) #part of old connection system
+
+            #clientsocket = socket(AF_INET, SOCK_STREAM) #old create socket method
+            clientsocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
+            try:
+                #serverIP= raw_input('What is the Servers IP Address?') #OLD MANUAL METHOD
+                receiveServerIPFromController(self) #NEW AUTOMATED METHOD
+                print "Received IP Address from the Controller: '"+ str(self.serverIP)+"'\n"
+            except Exception as inst:
+                print "ERROR in get serverIP try block: " + str(inst) + "\n"
+            try:
+                #clientsocket.connect(addr) #old connection system
+                clientsocket.connect((self.serverIP, self.port))
+                print "Connected to server\n"
+                sendConnectedCommandToController(self)
+            except Exception as inst:
+                print "ERROR in connect to server: " + str(inst) +"\n"
+            #myNumber= randint(0,3) #temporary to show that it is a different thread running
+            #data = "NEXT" #start by sending NEXT to server
+            data = "" #initialize data
+            while 1:
+                #Communication with Network Server
+                #if(myNumber == 0): #TEMPORARY, used for testing command records
+                 #   data = "NEXT"
+               # elif(myNumber == 1):
+                #    data = "FOUNDSOLUTION"
+                #elif(myNumber == 2):
+                #    data = "CRASHED"
+                #else:
+                #    data = "Unknown"
+                if not data:
+                    break
+                else:
+                    exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data)
+                    if(exitMainLoop == True):
+                        print "Breaking out of Main Loop\n"
+                        break
+                    data = receiveData(self,clientsocket)
+                    if(data != ""):
+                        print "Received message from server: " + str(data) +"\n"
+                #end communication with Network Server
+                #communication with Controller
+                print "Checking for controller commands...\n"
+                if(self.pipe.poll()):
+                    inboundControllerCommand= self.pipe.recv()
+                    print "Received a Command from the Controller\n"
+                    if(self.checkForFoundSolutionCommandFromController(inboundControllerCommand)==True):
+                        print "foundSolution Command has been received from Controller\n"
+                        self.sendFoundSolutionCommandToServer()
+                    elif(self.checkForRequestNextChunkCommandFromController(inboundControllerCommand)==True):
+                        print "requestNextChunk Command has been received from Controller\n"
+                        self.sendNextChunkCommandToServer()
+                    elif(self.checkForDoingStuffCommandFromController(inboundControllerCommand)==True):
+                        print "doingStuff Command has been received from Controller\n"
+                        #controller has parroted the command back, dont do anything
+                    else:
+                        print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
+                        self.incrementUnknownCommandFromControllerCounter()
+                #end communication with controller
+        except Exception as inst:
+            print "ERROR in main try block: " + str(inst) +"\n"
+        finally:
+            clientsocket.close()
+            print "Socket has been closed\n"
+            print "----------------------Outbound Commands To Server-----------------\n"
+            print "# of Next Commands Sent To Server: " + str(self.nextCommandToServerCounter) +"\n"
+            print "# of Found Solution Commands Sent To Server: " +str(self.foundSolutionCommandToServerCounter) +"\n"
+            print "# of Crashed  Commands Sent To Server: " + str(self.crashedCommandToServerCounter) +"\n"
+            print "----------------------Inbound Commands From Server----------------\n"
+            print "# of Done Commands Received From Server: " + str(self.doneCommandFromServerCounter) +"\n"
+            print "# of next Chunk Params Received From Server: " + str(self.nextChunkParamsFromServerCounter) +"\n"
+            print "# of next Chunk Data Received From Server: " + str(self.nextChunkDataFromServerCounter) + "\n"
+            print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
+            print "----------------------Outbound Commands To Controller---------------------\n"
+            print "# of next Chunk Commands Sent to Controller: " + str(self.nextChunkCommandToControllerCounter) + "\n"
+            print "# of Done Commands Sent To Controller: " + str(self.doneCommandToControllerCounter) + "\n"
+            print "# of Connected Commands Sent to Controller: " + str(self.connectedCommandToControllerCounter) +"\n"
+            print "# of doingStuff Commands Sent to Controller: " + str(self.doingStuffCommandToControllerCounter) +"\n"
+            print "----------------------Inbound Commands From Controller-----------------------\n"
+            print "# of Receive Server IP From Controller Commands: " + str(self.receiveServerIPFromControllerCounter) +"\n"
+            print "# of doingStuff Commands Received From Controller: " + str(self.doingStuffCommandFromControllerCounter) +"\n"
+            print "# of foundSolution Commands Received From Controller: " + str(self.foundSolutionCommandFromControllerCounter)+"\n"
+            print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
+            print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
 
 #NetworkClient() #no longer needed, controller calls NetworkClient now
