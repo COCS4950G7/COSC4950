@@ -5,11 +5,12 @@ __author__ = 'chris hamm'
 #Designed to work with NetworkServer_r11
 
 #I THINK I FIXED THIS(below)
-#WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
+    #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
     #Suspect that it is because the check for done command is not implemented properly
 
-#Has connection issues when trying to connect to the server, Errno 111 'connection refused' but only server and client are on different machines
-#ALTERNATE ERROR FAILS TO CONNECT WITH ERRNO 61, 'connection refused'
+#Fixed issue (below) by changing how the socket objects are created
+    #Has connection issues when trying to connect to the server, Errno 111 'connection refused' but only server and client are on different machines
+    #ALTERNATE ERROR FAILS TO CONNECT WITH ERRNO 61, 'connection refused'
 
 from socket import *
 import socket
@@ -136,7 +137,7 @@ def checkForNextChunkDataFromServer(self, inboundString):
 
 class NetworkClient:
 
-    #client records
+    #client records-------
     #outbound commands sent to server
     nextCommandToServerCounter = 0
     foundSolutionCommandToServerCounter = 0
@@ -148,8 +149,22 @@ class NetworkClient:
     nextChunkDataFromServerCounter = 0
     unknownCommandFromServerCounter = 0
 
-    #considering putting in a counter for number of exceptions thrown (for each exception type)
+    #outbound commands sent to controller
+    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    connectedCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    doingStuffCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
 
+    #inbound commands from controller
+    receiveServerIPFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    doingStuffCommandFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    foundSolutionCommandFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    requestNextChunkCommandFromControllerCounter = 0 #not yet implemented yet, only incrementor and print record statement
+
+    #considering putting in a counter for number of exceptions thrown (for each exception type)
+        #counter for how many times you have broken out of the main loop and not received the done command
+
+    #increment counter functions
     def incrementNextCommandToServerCounter(self):
         self.nextCommandToServerCounter += 1
 
@@ -170,6 +185,31 @@ class NetworkClient:
 
     def incrementUnknownCommandFromServerCounter(self):
         self.unknownCommandFromServerCounter+= 1
+
+    def incrementNextChunkCommandToControllerCounter(self):
+        self.nextChunkCommandToControllerCounter+= 1
+
+    def incrementDoneCommandToControllerCounter(self):
+        self.doneCommandToControllerCounter+= 1
+
+    def incrementConnectedCommandToControllerCounter(self):
+        self.connectedCommandToControllerCounter+= 1
+
+    def incrementDoingStuffCommandToControllerCounter(self):
+        self.doingStuffCommandToControllerCounter+= 1
+
+    def incrementReceiveServerIPFromControllerCounter(self):
+        self.receiveServerIPFromControllerCounter+= 1
+
+    def incrementDoingStuffCommandFromControllerCounter(self):
+        self.doingStuffCommandFromControllerCounter+= 1
+
+    def incrementFoundSolutionCommandFromControllerCounter(self):
+        self.foundSolutionCommandFromControllerCounter+= 1
+
+    def incrementRequestNextChunkCommandFromControllerCounter(self):
+        self.requestNextChunkCommandFromControllerCounter+= 1
+    #end of increment counter functions
 
     def __init__(self):
         if __name__ == '__main__':
@@ -326,5 +366,16 @@ class NetworkClient:
                 print "# of next Chunk Params Received From Server: " + str(self.nextChunkParamsFromServerCounter) +"\n"
                 print "# of next Chunk Data Received From Server: " + str(self.nextChunkDataFromServerCounter) + "\n"
                 print "# of Unknown Commands Received From Server: " + str(self.unknownCommandFromServerCounter) +"\n"
+                print "----------------------Outbound Commands To Controller---------------------\n"
+                print "# of next Chunk Commands Sent to Controller: " + str(self.nextChunkCommandToControllerCounter) + "\n"
+                print "# of Done Commands Sent To Controller: " + str(self.doneCommandToControllerCounter) + "\n"
+                print "# of Connected Commands Sent to Controller: " + str(self.connectedCommandToControllerCounter) +"\n"
+                print "# of doingStuff Commands Sent to Controller: " + str(self.doingStuffCommandToControllerCounter) +"\n"
+                print "----------------------Inbound Commands From Controller-----------------------\n"
+                print "# of Receive Server IP From Controller Commands: " + str(self.receiveServerIPFromControllerCounter) +"\n"
+                print "# of doingStuff Commands Received From Controller: " + str(self.doingStuffCommandFromControllerCounter) +"\n"
+                print "# of foundSolution Commands Received From Controller: " + str(self.foundSolutionCommandFromControllerCounter)+"\n"
+                print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
+
 
 NetworkClient()
