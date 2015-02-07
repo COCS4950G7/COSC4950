@@ -285,7 +285,7 @@ class NetworkServer():
             print "Checking for input from : " + str(clientaddr) + "\n"
             data = receiveData(clientsocket , socketLock)
             if(data != ""):
-                msg = "You sent me: %s" % data + "\n"
+                #msg = "You sent me: %s" % data + "\n" #OLD SYSTEM
                 if(checkForNextCommandFromClient(data) == True):
                     nextCommandFromClientCounterLock.acquire()
                     self.incrementNextCommandFromClientCounter()
@@ -302,7 +302,8 @@ class NetworkServer():
                     unknownCommandFromClientCounterLock.acquire()
                     self.incrementUnknownCommandFromClientCounter()
                     unknownCommandFromClientCounterLock.release()
-                sendData(clientsocket, clientaddr,msg,socketLock)
+                #sendData(clientsocket, clientaddr,msg,socketLock) #OLD SYSTEM
+                sendData(clientsocket, clientaddr, data, socketLock)
             #CHECKING FOR CONTROLLER INPUT
             print "Checking for input from the Controller\n"
             if(self.pipe.poll()):

@@ -37,6 +37,10 @@ def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #
             return True
         except Exception as inst:
             print "ERROR in compareString: " + str(inst) +"\n"
+            print "---- inboundStringA: '" + inboundStringA + "'\n"
+            print "-------- startA: " + str(startA) + " endA: " + str(endA) +"\n"
+            print "---- inboundStringB: '" + inboundStringB + "'\n"
+            print "-------- startB: " + str(startB) + " endB: " + str(endB) +"\n"
             return False
 
 def receiveData(self,networkSocket):
@@ -47,6 +51,8 @@ def receiveData(self,networkSocket):
             try:
                 data = networkSocket.recv(1024)
                 if not data:
+                    break
+                elif(len(data) < 1):
                     break
                 else:
                     print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
@@ -96,6 +102,30 @@ def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you
             else:
                 print "Exception in send data: " +str(inst) +"\n"
                 return False
+
+def sendNextChunkCommandToServer(self, networkSocket):
+    try:
+        print "Sending nextChunk Command to Server\n"
+        networkSocket.send("NEXT " + str(self.myIPAddress))
+        self.incrementNextCommandToServerCounter()
+    except Exception as inst:
+        print "Exception thrown in sendNextChunkCommandToServer: " + str(inst)+"\n"
+
+def sendFoundSolutionCommandToServer(self, networkSocket):
+    try:
+        print "Sending foundSolution Command to Server\n"
+        networkSocket.send("FOUNDSOLUTION")
+        self.incrementFoundSolutionCommandToServerCounter()
+    except Exception as inst:
+        print "Exception thrown in sendFoundSolutionCommandToServer: "+ str(inst)+"\n"
+
+def sendCrashedCommandToServer(self, networkSocket):
+    try:
+        print "Sending Crashed Command to Server\n"
+        networkSocket.send("CRASHED " + self.myIPAddress)
+        self.incrementCrashedCommandToServerCounter()
+    except Exception as inst:
+        print "Exception thrown in the sendCrashedCommandToServer: "+str(inst)+"\n"
 
 def checkForDoneCommandFromServer(self,inboundString):
     try:
@@ -302,6 +332,7 @@ class NetworkClient():
             self.port = 55568
             buf = 1024
             self.serverIP = '127.0.1.1'
+            self.myIPAddress = ""
 
             #.........................................................................
             #Detect the Operating System
@@ -342,7 +373,8 @@ class NetworkClient():
             try: #getIP tryblock
                 print "STATUS: Getting your network IP adddress"
                 if(platform.system()=="Windows"):
-                    print socket.gethostbyname(socket.gethostname())
+                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
+                    print self.myIPAddress
                 elif(platform.system()=="Linux"):
                     #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
                     #Claims that this works on linux and windows machines
@@ -367,9 +399,11 @@ class NetworkClient():
                                     pass
                         return ip
                     #end of def
-                    print get_lan_ip()
+                    self.myIPAddress= get_lan_ip()
+                    print self.myIPAddress
                 elif(platform.system()=="Darwin"):
-                    print socket.gethostbyname(socket.gethostname())
+                    self.myIPAddress = socket.gethostbyname(socket.gethostname())
+                    print self.myIPAddress
                 else:
                     #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
                     print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
@@ -406,45 +440,39 @@ class NetworkClient():
             #myNumber= randint(0,3) #temporary to show that it is a different thread running
             #data = "NEXT" #start by sending NEXT to server
             data = "" #initialize data
-            while 1:
-                #Communication with Network Server
-                #if(myNumber == 0): #TEMPORARY, used for testing command records
-                 #   data = "NEXT"
-               # elif(myNumber == 1):
-                #    data = "FOUNDSOLUTION"
-                #elif(myNumber == 2):
-                #    data = "CRASHED"
+            while True:
+                #if not data:
+                 #   break
                 #else:
-                #    data = "Unknown"
-                if not data:
+                exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data)
+                if(exitMainLoop == True):
+                    print "Breaking out of Main Loop\n"
                     break
-                else:
-                    exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data)
-                    if(exitMainLoop == True):
-                        print "Breaking out of Main Loop\n"
-                        break
-                    data = receiveData(self,clientsocket)
-                    if(data != ""):
-                        print "Received message from server: " + str(data) +"\n"
-                #end communication with Network Server
-                #communication with Controller
+                data = receiveData(self,clientsocket)
+                if(data != ""):
+                    print "Received message from server: " + str(data) +"\n"
+            #end communication with Network Server
+            #communication with Controller
                 print "Checking for controller commands...\n"
                 if(self.pipe.poll()):
                     inboundControllerCommand= self.pipe.recv()
-                    print "Received a Command from the Controller\n"
-                    if(self.checkForFoundSolutionCommandFromController(inboundControllerCommand)==True):
-                        print "foundSolution Command has been received from Controller\n"
-                        self.sendFoundSolutionCommandToServer()
-                    elif(self.checkForRequestNextChunkCommandFromController(inboundControllerCommand)==True):
-                        print "requestNextChunk Command has been received from Controller\n"
-                        self.sendNextChunkCommandToServer()
-                    elif(self.checkForDoingStuffCommandFromController(inboundControllerCommand)==True):
-                        print "doingStuff Command has been received from Controller\n"
-                        #controller has parroted the command back, dont do anything
+                    if(len(inboundControllerCommand) < 1):
+                        print "received empty string, ignoring it\n"
                     else:
-                        print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
-                        self.incrementUnknownCommandFromControllerCounter()
-                #end communication with controller
+                        print "Received a Command from the Controller\n"
+                        if(checkForFoundSolutionCommandFromController(self, inboundControllerCommand)==True):
+                            print "foundSolution Command has been received from Controller\n"
+                            sendFoundSolutionCommandToServer(self, clientsocket)
+                        elif(checkForRequestNextChunkCommandFromController(self,inboundControllerCommand)==True):
+                            print "requestNextChunk Command has been received from Controller\n"
+                            sendNextChunkCommandToServer(self, clientsocket)
+                        elif(checkForDoingStuffCommandFromController(self,inboundControllerCommand)==True):
+                            print "doingStuff Command has been received from Controller\n"
+                            #controller has parroted the command back, dont do anything
+                        else:
+                            print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
+                            self.incrementUnknownCommandFromControllerCounter()
+            #end communication with controller
         except Exception as inst:
             print "ERROR in main try block: " + str(inst) +"\n"
         finally:
