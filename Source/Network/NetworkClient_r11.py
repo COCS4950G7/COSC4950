@@ -61,13 +61,13 @@ def receiveData(self,networkSocket):
                      #  break
                     if(checkForDoneCommandFromServer(self,str(data))==True):
                         print "Server has issued the done command\n"
-                        self.sendDoneCommandToController()
+                        sendDoneCommandToController(self)
                         break
-                    elif(checkForNextChunkParamsFromServer(str(data))==True):
+                    elif(checkForNextChunkParamsFromServer(self, str(data))==True):
                         print "Received Next Chunk Params From Server\n"
                         #insert chunk assembling process here
                         break
-                    elif(checkForNextChunkDataFromServer(str(data))==True):
+                    elif(checkForNextChunkDataFromServer(self, str(data))==True):
                         print "Received Next Chunk Data From Server\n"
                         #insert chunk assembling process here
                         break
@@ -143,7 +143,7 @@ def checkForDoneCommandFromServer(self,inboundString):
 def checkForNextChunkParamsFromServer(self, inboundString):
     try:
         print "Checking for next chunk params from the server\n"
-        if(compareString(inboundString,"nextChunkParams",0,0,len("nextChunkParams"),len("nextChunkParams"))==True):
+        if(compareString(inboundString,"NEXT",0,0,len("NEXT"),len("NEXT"))==True):
             print "Received the Next Chunk Params from Server\n"
             self.incrementNextChunkParamsFromServerCounter()
             return True
@@ -156,7 +156,7 @@ def checkForNextChunkParamsFromServer(self, inboundString):
 def checkForNextChunkDataFromServer(self, inboundString):
     try:
         print "Checking for next chunk data from the server\n"
-        if(compareString(inboundString,"nextChunkData",0,0,len("nextChunkData"),len("nextChunkData"))==True):
+        if(compareString(inboundString,"nextChunkData",0,0,len("nextChunkData"),len("nextChunkData"))==True): #might omit this check
             print "Received the Next Chunk Data from Server\n"
             self.incrementNextChunkDataFromServerCounter()
             return  True
@@ -441,16 +441,14 @@ class NetworkClient():
             #data = "NEXT" #start by sending NEXT to server
             data = "" #initialize data
             while True:
-                #if not data:
+                receiveData(self, clientsocket)
+                #exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data) #Designed to stop client if the is a break in the pipe
+                #if(exitMainLoop == True):
+                 #   print "Breaking out of Main Loop\n"
                  #   break
-                #else:
-                exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data)
-                if(exitMainLoop == True):
-                    print "Breaking out of Main Loop\n"
-                    break
-                data = receiveData(self,clientsocket)
-                if(data != ""):
-                    print "Received message from server: " + str(data) +"\n"
+                #data = receiveData(self,clientsocket) #MOVED ABOVE
+                #if(data != ""):
+                 #   print "Received message from server: " + str(data) +"\n"
             #end communication with Network Server
             #communication with Controller
                 print "Checking for controller commands...\n"
