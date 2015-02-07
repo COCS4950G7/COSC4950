@@ -345,4 +345,4 @@ class NetworkServer():
                 print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
                 crashedCommandFromClientCounterLock.release()
 
-NetworkServer()
+#NetworkServer() #commented out because a pipe object needs to be passed into the parameters here
