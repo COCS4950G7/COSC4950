@@ -4,6 +4,8 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkServer_r11
 
+#Must now be called by controller
+
 #I THINK I FIXED THIS(below)
     #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
     #Suspect that it is because the check for done command is not implemented properly
@@ -53,20 +55,20 @@ def receiveData(self,networkSocket):
                      #  break
                     if(checkForDoneCommandFromServer(self,str(data))==True):
                         print "Server has issued the done command\n"
+                        self.sendDoneCommandToController()
                         break
                     elif(checkForNextChunkParamsFromServer(str(data))==True):
                         print "Received Next Chunk Params From Server\n"
+                        #insert chunk assembling process here
                         break
                     elif(checkForNextChunkDataFromServer(str(data))==True):
                         print "Received Next Chunk Data From Server\n"
+                        #insert chunk assembling process here
                         break
                     else: #then it is an unknown command
                         print "Unknown command received from the server: " + str(data) +"\n"
                         self.incrementUnknownCommandFromServerCounter()
                         break
-           # except networkSocket.timeout as inst: #NO LONGER USED
-            #    print "Socket has timed out in receiveData\n"
-             #   break
             except Exception as inst:
                 print "Exception in receive data: " + str(inst) +"\n"
                 break
@@ -235,6 +237,7 @@ class NetworkClient:
     doingStuffCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
     foundSolutionCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
     requestNextChunkCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
+    unknownCommandFromControllerCounter = 0
 
     #considering putting in a counter for number of exceptions thrown (for each exception type)
         #counter for how many times you have broken out of the main loop and not received the done command
@@ -284,6 +287,9 @@ class NetworkClient:
 
     def incrementRequestNextChunkCommandFromControllerCounter(self):
         self.requestNextChunkCommandFromControllerCounter+= 1
+
+    def incrementUnknownCommandFromControllerCounter(self):
+        self.unknownCommandFromControllerCounter+= 1
     #end of increment counter functions
 
     def __init__(self, pipeendconnectedtocontroller):
@@ -383,52 +389,59 @@ class NetworkClient:
 
                 #clientsocket = socket(AF_INET, SOCK_STREAM) #old create socket method
                 clientsocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
-                try:
-                    serverIP= raw_input('What is the Servers IP Address?')
-                except Exception as inst:
-                    print "ERROR in get serverIP try block: " + str(inst) + "\n"
+                #try:
+                    #serverIP= raw_input('What is the Servers IP Address?') #OLD MANUAL METHOD
+                self.receiveServerIPFromController() #NEW AUTOMATED METHOD
+                #except Exception as inst:
+                 #   print "ERROR in get serverIP try block: " + str(inst) + "\n"
                 try:
                     #clientsocket.connect(addr)
                     clientsocket.connect((serverIP,port))
                     print "Connected to server\n"
+                    self.sendConnectedCommandToController()
                 except Exception as inst:
                     print "ERROR in connect to server: " + str(inst) +"\n"
-                myNumber= randint(0,3) #temporary to show that it is a different thread running
+                #myNumber= randint(0,3) #temporary to show that it is a different thread running
                 #data = "NEXT" #start by sending NEXT to server
                 while 1:
-                    #data = raw_input(">> ") #part of the original example
-                    #data = "me " +str(myNumber) + "\n"
-                    if(myNumber == 0): #TEMPORARY, used for testing command records
-                        data = "NEXT"
-                    elif(myNumber == 1):
-                        data = "FOUNDSOLUTION"
-                    elif(myNumber == 2):
-                        data = "CRASHED"
-                    else:
-                        data = "Unknown"
+                    #Communication with Network Server
+                    #if(myNumber == 0): #TEMPORARY, used for testing command records
+                     #   data = "NEXT"
+                   # elif(myNumber == 1):
+                    #    data = "FOUNDSOLUTION"
+                    #elif(myNumber == 2):
+                    #    data = "CRASHED"
+                    #else:
+                    #    data = "Unknown"
                     if not data:
                         break
                     else:
-                        #clientsocket.send(data) #OLD SNED METHOD
                         exitMainLoop= sendData(self,clientsocket,addr,data)
                         if(exitMainLoop == True):
                             print "Breaking out of Main Loop\n"
                             break
-                       # if(checkForDoneCommandFromServer(self,data)==True): #MOVED BELOW
-                        #    break
                         data = receiveData(self,clientsocket)
-                        #if(checkForDoneCommandFromServer(self,data)==True): #RECEIVEDATA TAKES CARE OF THIS FUNCTION
-                         #   break
                         if(data != ""):
                             print "Received message from server: " + str(data) +"\n"
-                        #data = clientsocket.recv(buf) #OLD RECV METHOD
-                        #if not data:
-                        #    break    
-                        #else:
-                         #   if(compareString(data,"You sent me: me 2",0,0,len("You sent me: me 2"),len("You sent me: me 2"))):
-                         #       print "received the me 2 command from the server\n"
-                         #   else:
-                         #       print "did not receive the me 2 command." + str(data)
+                    #end communication with Network Server
+                    #communication with Controller
+                    print "Checking for controller commands...\n"
+                    if(self.pipe.poll()):
+                        inboundControllerCommand= self.pipe.recv()
+                        print "Received a Command from the Controller\n"
+                        if(self.checkForFoundSolutionCommandFromController(inboundControllerCommand)==True):
+                            print "foundSolution Command has been received from Controller\n"
+                            self.sendFoundSolutionCommandToServer()
+                        elif(self.checkForRequestNextChunkCommandFromController(inboundControllerCommand)==True):
+                            print "requestNextChunk Command has been received from Controller\n"
+                            self.sendNextChunkCommandToServer()
+                        elif(self.checkForDoingStuffCommandFromController(inboundControllerCommand)==True):
+                            print "doingStuff Command has been received from Controller\n"
+                            #controller has parroted the command back, dont do anything
+                        else:
+                            print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
+                            self.incrementUnknownCommandFromControllerCounter()
+                    #end communication with controller
             except Exception as inst:
                 print "ERROR in main try block: " + str(inst) +"\n"
             finally:
@@ -453,6 +466,6 @@ class NetworkClient:
                 print "# of doingStuff Commands Received From Controller: " + str(self.doingStuffCommandFromControllerCounter) +"\n"
                 print "# of foundSolution Commands Received From Controller: " + str(self.foundSolutionCommandFromControllerCounter)+"\n"
                 print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
-
+                print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
 
 NetworkClient()

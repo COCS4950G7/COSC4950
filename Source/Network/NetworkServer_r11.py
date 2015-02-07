@@ -2,7 +2,7 @@ __author__ = 'chris hamm'
 #NetworkServer_r11
 #Created: 2/2/2015
 
-
+#Now needs to be run through controller
 
 #Designed to work with NetworkClient_r11
 
@@ -194,7 +194,8 @@ class NetworkServer():
                 sendData(clientsocket, clientaddr,msg,socketLock)
         clientsocket.close()
 
-    def __init__(self):
+    def __init__(self, pipeendconnectedtocontroller):
+        self.pipe= pipeendconnectedtocontroller
 
         if __name__ == "__main__": #Nick's thoughts, this is designed to access from outside the class ddefinition
                                    #move the vars below into a inititialization function
