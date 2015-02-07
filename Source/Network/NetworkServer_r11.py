@@ -309,30 +309,30 @@ class NetworkServer():
     def incrementNumberOfIPAddressesNotFound(self):
         self.numberOfIPAddressesNotFound+= 1
 
-    def handler(self, clientsocket, clientaddr, socketLock, nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock):
+    def handler(self, clientsocket, clientaddr, socketLock):
         print "Accepted connection from: " + str(clientaddr) + "\n"
-
-        while 1:
+        clientIsConnected= True
+        while True:
             #CHECKING FOR CLIENT INPUT
             print "Checking for input from : " + str(clientaddr) + "\n"
             data = receiveData(clientsocket , socketLock)
             if(data != ""):
                 if(checkForNextCommandFromClient(data) == True):
-                    nextCommandFromClientCounterLock.acquire()
+                    self.nextCommandFromClientCounterLock.acquire()
                     self.incrementNextCommandFromClientCounter()
-                    nextCommandFromClientCounterLock.release()
+                    self.nextCommandFromClientCounterLock.release()
                 elif(checkForFoundSolutionCommandFromClient(data) == True):
-                    foundSolutionCommandFromClientCounterLock.acquire()
+                    self.foundSolutionCommandFromClientCounterLock.acquire()
                     self.incrementFoundSolutionCommandFromClientCounter()
-                    foundSolutionCommandFromClientCounterLock.release()
+                    self.foundSolutionCommandFromClientCounterLock.release()
                 elif(checkForCrashedCommandFromClient(self, data)==True):
-                    crashedCommandFromClientCounterLock.acquire()
+                    self.crashedCommandFromClientCounterLock.acquire()
                     self.incrementCrashedCommandFromClientCounter()
-                    crashedCommandFromClientCounterLock.release()
+                    self.crashedCommandFromClientCounterLock.release()
                 else:
-                    unknownCommandFromClientCounterLock.acquire()
+                    self.unknownCommandFromClientCounterLock.acquire()
                     self.incrementUnknownCommandFromClientCounter()
-                    unknownCommandFromClientCounterLock.release()
+                    self.unknownCommandFromClientCounterLock.release()
                 sendData(clientsocket, clientaddr, data, socketLock)
             #CHECKING FOR CONTROLLER INPUT
             print "Checking for input from the Controller\n"
@@ -467,126 +467,126 @@ class NetworkServer():
         serversocket.listen(2)
         #print "Initializing thread locks...\n"
         #server variable locks
-        listOfClientsLock = thread.allocate_lock()
-        listOfCrashedClientsLock = thread.allocate_lock()
-        stackOfClientsWaitingForNextChunkLock = thread.allocate_lock()
-        stackOfChunksThatNeedToBeReassignedLock = thread.allocate_lock()
-        dictionaryOfCurrentClientTasksLock = thread.allocate_lock()
+        self.listOfClientsLock = thread.allocate_lock()
+        self.listOfCrashedClientsLock = thread.allocate_lock()
+        self.stackOfClientsWaitingForNextChunkLock = thread.allocate_lock()
+        self.stackOfChunksThatNeedToBeReassignedLock = thread.allocate_lock()
+        self.dictionaryOfCurrentClientTasksLock = thread.allocate_lock()
         #the thread locks
         socketLock = thread.allocate_lock()
         #outbound to client command locks
-        doneCommandToClientCounterLock = thread.allocate_lock()
-        nextCommandToClientCounterLock = thread.allocate_lock()
-        nextDataCommandToClientCounterLock = thread.allocate_lock()
+        self.doneCommandToClientCounterLock = thread.allocate_lock()
+        self.nextCommandToClientCounterLock = thread.allocate_lock()
+        self.nextDataCommandToClientCounterLock = thread.allocate_lock()
         #inbound from client client command locks
-        nextCommandFromClientCounterLock = thread.allocate_lock()
-        foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
-        unknownCommandFromClientCounterLock = thread.allocate_lock()
-        crashedCommandFromClientCounterLock = thread.allocate_lock()
+        self.nextCommandFromClientCounterLock = thread.allocate_lock()
+        self.foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
+        self.unknownCommandFromClientCounterLock = thread.allocate_lock()
+        self.crashedCommandFromClientCounterLock = thread.allocate_lock()
         #outbound to controller command locks
-        nextChunkCommandToControllerCounterLock = thread.allocate_lock()
-        waitingCommandToControllerCounterLock = thread.allocate_lock()
-        doneCommandToControllerCounterLock = thread.allocate_lock()
+        self.nextChunkCommandToControllerCounterLock = thread.allocate_lock()
+        self.waitingCommandToControllerCounterLock = thread.allocate_lock()
+        self.doneCommandToControllerCounterLock = thread.allocate_lock()
         #inbound from controller command locks
-        nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
-        doneCommandFromControllerCounterLock = thread.allocate_lock()
-        unknownCommandFromControllerCounterLock = thread.allocate_lock()
+        self.nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
+        self.doneCommandFromControllerCounterLock = thread.allocate_lock()
+        self.unknownCommandFromControllerCounterLock = thread.allocate_lock()
 
         #print "Successfully initialized the thread locks\n"
         try: #Main try block
             while 1:
                 print "Server is listening for connections\n"
                 clientsocket, clientaddr = serversocket.accept()
-                listOfClientsLock.acquire()
+                self.listOfClientsLock.acquire()
                 self.listOfClients.append((clientsocket, clientaddr))
-                listOfClientsLock.release()
-                thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock)) #create a new thread
+                self.listOfClientsLock.release()
+                thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock)) #create a new thread
                 print " A New thread was made\n"
                 self.incrementNumberOfThreadsCreatedCounter()
         except Exception as inst:
             print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
         finally:
-            listOfClientsLock.acquire()
+            self.listOfClientsLock.acquire()
             print "# of clients connected: " + str(len(self.listOfClients)) + "\n"
-            listOfClientsLock.release()
+            self.listOfClientsLock.release()
             print "Issuing Done Commands to clients...\n"
-            listOfClientsLock.acquire()
+            self.listOfClientsLock.acquire()
             for i in range(0, len(self.listOfClients)):
                 doneSock, doneAddr = self.listOfClients[i]
                 sendDoneCommandToClient(self,doneSock, doneAddr, socketLock)
-            listOfClientsLock.release()
+            self.listOfClientsLock.release()
             serversocket.close()
             print "Socket has been closed\n"
             #printing out all of the records
             print "---------------Number of Threads Created-----------------------\n"
             print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
             print "---------------List of Crashed Clients-------------------------\n"
-            listOfCrashedClientsLock.acquire()
+            self.listOfCrashedClientsLock.acquire()
             print "# of Crashed Clients: " + str(len(self.listOfCrashedClients)) +"\n"
             if(len(self.listOfCrashedClients) > 0):
                 for x in range(0, len(self.listOfCrashedClients)):
                     print str(x) + ")" + str(self.listOfCrashedClients[x]) +"\n"
-            listOfCrashedClientsLock.release()
+            self.listOfCrashedClientsLock.release()
             print "--------------Stack of Clients Waiting For Next Chunk---------------\n"
-            stackOfClientsWaitingForNextChunkLock.acquire()
+            self.stackOfClientsWaitingForNextChunkLock.acquire()
             print "# of Clients Waiting For Next Chunk: " +str(len(self.stackOfClientsWaitingForNextChunk)) +"\n"
             if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                 while(len(self.stackOfClientsWaitingForNextChunk) > 0):
                     print str(self.stackOfClientsWaitingForNextChunk.pop()) + "\n"
-            stackOfClientsWaitingForNextChunkLock.release()
+            self.stackOfClientsWaitingForNextChunkLock.release()
             print "--------------Stack of Chunks That Need To Be Reassigned----------------\n"
-            stackOfChunksThatNeedToBeReassignedLock.acquire()
+            self.stackOfChunksThatNeedToBeReassignedLock.acquire()
             print "# of Chunks That Need To Be Reassigned: " + str(len(self.stackOfChunksThatNeedToBeReassigned)) +"\n"
-            stackOfChunksThatNeedToBeReassignedLock.release()
+            self.stackOfChunksThatNeedToBeReassignedLock.release()
             print "--------------Dictionary of Current Client Tasks---------------------\n"
-            dictionaryOfCurrentClientTasksLock.acquire()
+            self.dictionaryOfCurrentClientTasksLock.acquire()
             print "[key]         [value]"  +"\n"
             for key, value in self.dictionaryOfCurrentClientTasks.iteritems():
                 print str(key), str(value)
-            dictionaryOfCurrentClientTasksLock.release()
+            self.dictionaryOfCurrentClientTasksLock.release()
             print "---------------Outbound Commands To Client(s)------------------\n"
-            doneCommandToClientCounterLock.acquire()
+            self.doneCommandToClientCounterLock.acquire()
             print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
-            doneCommandToClientCounterLock.release()
-            nextCommandToClientCounterLock.acquire()
+            self.doneCommandToClientCounterLock.release()
+            self.nextCommandToClientCounterLock.acquire()
             print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
-            nextCommandToClientCounterLock.release()
-            nextDataCommandToClientCounterLock.acquire()
+            self.nextCommandToClientCounterLock.release()
+            self.nextDataCommandToClientCounterLock.acquire()
             print "# of Next Data Commands sent to the clients: " +str(self.nextDataCommandToClientCounter) + "\n"
-            nextDataCommandToClientCounterLock.release()
+            self.nextDataCommandToClientCounterLock.release()
             print "---------------Inbound Commands From Client(s)-----------------\n"
-            nextCommandFromClientCounterLock.acquire()
+            self.nextCommandFromClientCounterLock.acquire()
             print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
-            nextCommandFromClientCounterLock.release()
-            foundSolutionCommandFromClientCounterLock.acquire()
+            self.nextCommandFromClientCounterLock.release()
+            self.foundSolutionCommandFromClientCounterLock.acquire()
             print "# of FOUNDSOLUTION Commands received from the client: " +str(self.foundSolutionCommandFromClientCounter) +"\n"
-            foundSolutionCommandFromClientCounterLock.release()
-            unknownCommandFromClientCounterLock.acquire()
+            self.foundSolutionCommandFromClientCounterLock.release()
+            self.unknownCommandFromClientCounterLock.acquire()
             print "# of Unknown Commands received from Client: " + str(self.unknownCommandFromClientCounter) +"\n"
-            unknownCommandFromClientCounterLock.release()
-            crashedCommandFromClientCounterLock.acquire()
+            self.unknownCommandFromClientCounterLock.release()
+            self.crashedCommandFromClientCounterLock.acquire()
             print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
-            crashedCommandFromClientCounterLock.release()
+            self.crashedCommandFromClientCounterLock.release()
             print "--------------Outbound Commands To Controller----------------\n"
-            nextChunkCommandToControllerCounterLock.acquire()
+            self.nextChunkCommandToControllerCounterLock.acquire()
             print "# of nextChunk Commands sent to the Controller: " +str(self.nextChunkCommandToControllerCounter)+"\n"
-            nextChunkCommandToControllerCounterLock.release()
-            waitingCommandToControllerCounterLock.acquire()
+            self.nextChunkCommandToControllerCounterLock.release()
+            self.waitingCommandToControllerCounterLock.acquire()
             print "# of waiting Commands sent to the Controller: " + str(self.waitingCommandToControllerCounter)+"\n"
-            waitingCommandToControllerCounterLock.release()
-            doneCommandToControllerCounterLock.acquire()
+            self.waitingCommandToControllerCounterLock.release()
+            self.doneCommandToControllerCounterLock.acquire()
             print "# of done Commands sent to the Controller: " + str(self.doneCommandToControllerCounter)+"\n"
-            doneCommandToControllerCounterLock.release()
+            self.doneCommandToControllerCounterLock.release()
             print "-------------Inbound Commands From Controller---------------\n"
-            nextChunkCommandFromControllerCounterLock.acquire()
+            self.nextChunkCommandFromControllerCounterLock.acquire()
             print "# of nextChunk Commands received from the Controller: "+ str(self.nextChunkCommandFromControllerCounter)+"\n"
-            nextChunkCommandFromControllerCounterLock.release()
-            doneCommandFromControllerCounterLock.acquire()
+            self.nextChunkCommandFromControllerCounterLock.release()
+            self.doneCommandFromControllerCounterLock.acquire()
             print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
-            doneCommandFromControllerCounterLock.release()
-            unknownCommandFromControllerCounterLock.acquire()
+            self.doneCommandFromControllerCounterLock.release()
+            self.unknownCommandFromControllerCounterLock.acquire()
             print "# of unknown Commands received from the Controller: "+str(self.unknownCommandFromControllerCounter)+"\n"
-            unknownCommandFromControllerCounterLock.release()
+            self.unknownCommandFromControllerCounterLock.release()
 
 
 #NetworkServer() #No longer needed, controller calls NetworkServer now
