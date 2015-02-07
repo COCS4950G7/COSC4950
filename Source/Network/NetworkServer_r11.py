@@ -78,7 +78,10 @@ def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
         #except networkSocket.error as inst:
          #   print "Socket has timed out in sendDoneCommandToClient. Attempting to send again.\n"
         except Exception as inst:
-            print "Exception in send Done command: " +str(inst) +"\n"
+            if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
+                print "Broken pipe error detected in sendData\n"
+            else:
+                print "Exception in send Done command: " +str(inst) +"\n"
     socketLock.release()
 
 def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
@@ -273,19 +276,10 @@ class NetworkServer():
         print "Accepted connection from: " + str(clientaddr) + "\n"
 
         while 1:
-            #data = clientsocket.recv(1024) #OLD RECV METHOD
-            #if not data:
-            #    break
-            #else:
-            #    if(compareString(data,"me 2",0,0,len("me 2"),len("me 2"))):
-            #        print "Received the me 2 command form server\n"
-            #    else:
-            #        print "Did not receive the me2 command." + str(data)
             #CHECKING FOR CLIENT INPUT
             print "Checking for input from : " + str(clientaddr) + "\n"
             data = receiveData(clientsocket , socketLock)
             if(data != ""):
-                #msg = "You sent me: %s" % data + "\n" #OLD SYSTEM
                 if(checkForNextCommandFromClient(data) == True):
                     nextCommandFromClientCounterLock.acquire()
                     self.incrementNextCommandFromClientCounter()
@@ -302,7 +296,6 @@ class NetworkServer():
                     unknownCommandFromClientCounterLock.acquire()
                     self.incrementUnknownCommandFromClientCounter()
                     unknownCommandFromClientCounterLock.release()
-                #sendData(clientsocket, clientaddr,msg,socketLock) #OLD SYSTEM
                 sendData(clientsocket, clientaddr, data, socketLock)
             #CHECKING FOR CONTROLLER INPUT
             print "Checking for input from the Controller\n"
