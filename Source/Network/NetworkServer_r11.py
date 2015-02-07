@@ -321,10 +321,48 @@ class NetworkServer():
                     self.nextCommandFromClientCounterLock.acquire()
                     self.incrementNextCommandFromClientCounter()
                     self.nextCommandFromClientCounterLock.release()
+                    #extract the clients IP from message
+                    clientsIP = ""
+                    for index in range(5, len(data)):
+                        clientsIP+= data[index]
+                    #determine if a chunk from stackofChunksThatMustBeReassigned can be used
+                    self.stackOfChunksThatNeedToBeReassignedLock.acquire()
+                    if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
+                        self.dictionaryOfCurrentClientTasksLock.acquire()
+                        #assign a chunk to the client from the stack
+                        self.dictionaryOfCurrentClientTasks[clientsIP]= self.stackOfChunksThatNeedToBeReassigned.pop()
+                        #send chhunk params to client
+                        socketLock.acquire()
+                        try:
+                            sendNextCommandToClient(self,clientsocket,clientsIP, self.dictionaryOfCurrentClientTasks[clientsIP].params)
+                        except Exception as inst:
+                            print "ERROR in sending NextParams to the client: " +str(inst)+"\n"
+                        #send the chunk data to the client
+                        try:
+                            sendNextDataCommandToClient(self,clientsocket,clientsIP, self.dictionaryOfCurrentClientTasks[clientsIP].data)
+                        except Exception as inst:
+                            print "ERROR in sending NextData to the client: " +str(inst)+"\n"
+                        socketLock.release()
+                        self.dictionaryOfCurrentClientTasksLock.release()
+                    else: #send a nextChunk request to the controller
+                        socketLock.acquire()
+                        sendNextChunkCommandToController(self)
+                        socketLock.release()
+                        self.stackOfClientsWaitingForNextChunkLock.acquire()
+                        self.stackOfClientsWaitingForNextChunk.append(clientsIP)
+                        self.stackOfClientsWaitingForNextChunkLock.release()
+                    self.stackOfChunksThatNeedToBeReassignedLock.release()
                 elif(checkForFoundSolutionCommandFromClient(data) == True):
                     self.foundSolutionCommandFromClientCounterLock.acquire()
                     self.incrementFoundSolutionCommandFromClientCounter()
                     self.foundSolutionCommandFromClientCounterLock.release()
+                    self.listOfClientsLock.acquire()
+                    socketLock.acquire()
+                    for i in range(0, len(self.listOfClients)): #issueing done commands to all clients
+                        (sock, addr) = self.listOfClients[i]
+                        sock.sendall("done")
+                    socketLock.release()
+                    self.listOfClientsLock.release()
                 elif(checkForCrashedCommandFromClient(self, data)==True):
                     self.crashedCommandFromClientCounterLock.acquire()
                     self.incrementCrashedCommandFromClientCounter()
@@ -333,7 +371,7 @@ class NetworkServer():
                     self.unknownCommandFromClientCounterLock.acquire()
                     self.incrementUnknownCommandFromClientCounter()
                     self.unknownCommandFromClientCounterLock.release()
-                sendData(clientsocket, clientaddr, data, socketLock)
+                #sendData(clientsocket, clientaddr, data, socketLock) #potentially obsolete
             #CHECKING FOR CONTROLLER INPUT
             print "Checking for input from the Controller\n"
             if(self.pipe.poll()):
