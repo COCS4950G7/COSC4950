@@ -468,4 +468,4 @@ class NetworkClient():
                 print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
                 print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
 
-#NetworkClient() #pipe object needs to be passed into the parameters here
+#NetworkClient() #no longer needed, controller calls NetworkClient now

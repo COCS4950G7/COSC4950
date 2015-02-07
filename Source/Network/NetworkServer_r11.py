@@ -70,7 +70,9 @@ def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
         try:
             networkSocket.sendto("done",clientIP)
             print "sent Done command to client: " +str(clientIP) +"\n"
+            self.doneCommandToClientCounterLock.acquire()
             self.incrementDoneCommandToClientCounter()
+            self.doneCommandToClientCounterLock.release()
             break
         #except networkSocket.error as inst:
          #   print "Socket has timed out in sendDoneCommandToClient. Attempting to send again.\n"
@@ -86,7 +88,9 @@ def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, sock
         try:
             networkSocket.sendto(outboundMessage, clientIP)
             print "sent Next command to client "+str(clientIP)+"\n"
+            self.nextCommandToClientCounterLock.acquire()
             self.incrementNextCommandToClientCounter()
+            self.nextCommandToClientCounterLock.release()
             break
         except Exception as inst:
             print "Exception in send Next command: " +str(inst) +"\n"
@@ -122,9 +126,9 @@ class NetworkServer():
 
     #Server command records
     #records of outbound commands to clients
-    doneCommandToClientCounter = 0 #thread lock implemented
-    nextCommandToClientCounter = 0 #thread lock implemented
-    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
+    doneCommandToClientCounter = 0
+    nextCommandToClientCounter = 0
+    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
 
     #records of inbound commands from clients
     nextCommandFromClientCounter = 0
@@ -133,15 +137,15 @@ class NetworkServer():
     unknownCommandFromClientCounter = 0
 
     #records of outbound commands to controller
-    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
+    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
     #ChunkAgain command is obsolete
-    waitingCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
-    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock implemented
+    waitingCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
+    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
 
     #records of inbound commands from controller
-    nextChunkCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock implemented
+    nextChunkCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record implemented
     #chunkAgain command is obsolete
-    doneCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
+    doneCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
 
     #record of number of threads
     numberOfThreadsCreatedCounter = 0
@@ -367,8 +371,15 @@ class NetworkServer():
                 print "---------------Number of Threads Created-----------------------\n"
                 print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
                 print "---------------Outbound Commands To Client(s)------------------\n"
+                doneCommandToClientCounterLock.acquire()
                 print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
+                doneCommandToClientCounterLock.release()
+                nextCommandToClientCounterLock.acquire()
                 print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
+                nextCommandToClientCounterLock.release()
+                nextDataCommandToClientCounterLock.acquire()
+                print "# of Next Data Commands sent to the clients: " +str(self.nextDataCommandToClientCounter) + "\n"
+                nextDataCommandToClientCounterLock.release()
                 print "---------------Inbound Commands From Client(s)-----------------\n"
                 nextCommandFromClientCounterLock.acquire()
                 print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
@@ -382,5 +393,23 @@ class NetworkServer():
                 crashedCommandFromClientCounterLock.acquire()
                 print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
                 crashedCommandFromClientCounterLock.release()
+                print "--------------Outbound Commands To Controller----------------\n"
+                nextChunkCommandToControllerCounterLock.acquire()
+                print "# of nextChunk Commands sent to the Controller: " +str(self.nextChunkCommandToControllerCounter)+"\n"
+                nextChunkCommandToControllerCounterLock.release()
+                waitingCommandToControllerCounterLock.acquire()
+                print "# of waiting Commands sent to the Controller: " + str(self.waitingCommandToControllerCounter)+"\n"
+                waitingCommandToControllerCounterLock.release()
+                doneCommandToControllerCounterLock.acquire()
+                print "# of done Commands sent to the Controller: " + str(self.doneCommandToControllerCounter)+"\n"
+                doneCommandToControllerCounterLock.release()
+                print "-------------Inbound Commands From Controller---------------\n"
+                nextChunkCommandFromControllerCounterLock.acquire()
+                print "# of nextChunk Commands received from the Controller: "+ str(self.nextChunkCommandFromControllerCounter)+"\n"
+                nextChunkCommandFromControllerCounterLock.release()
+                doneCommandFromControllerCounterLock.acquire()
+                print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
+                doneCommandFromControllerCounterLock.release()
 
-#NetworkServer() #pipe object needs to be passed into the parameters here
+
+#NetworkServer() #No longer needed, controller calls NetworkServer now
