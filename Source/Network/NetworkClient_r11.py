@@ -134,6 +134,81 @@ def checkForNextChunkDataFromServer(self, inboundString):
         print "ERROR in checkForNextChunkDataFromServer: " + str(inst) +"\n"
         return False
 
+def sendNextChunkCommandToController(self, inboundChunk):
+    try:
+        print "Sending nextChunk Command to the Controller\n"
+        self.pipe.send(inboundChunk)
+        self.incrementNextChunkCommandToControllerCounter()
+    except Exception as inst:
+        print "ERROR in sendNextChunkCommandToController: " + str(inst)+"\n"
+
+def sendDoneCommandToController(self):
+    try:
+        print "Sending done Command to the Controller\n"
+        self.pipe.send("done")
+        self.incrementDoneCommandToControllerCounter()
+    except Exception as inst:
+        print "ERROR in sendDoneCommandToController: " + str(inst)+"\n"
+
+def sendConnectedCommandToController(self):
+    try:
+        print "Sending connected Command to the Controller\n"
+        self.pipe.send("connected")
+        self.incrementConnectedCommandToControllerCounter()
+    except Exception as inst:
+        print "ERROR in sendConnectedCommandToController: " + str(inst)+"\n"
+
+def sendDoingStuffCommandToController(self):
+    try:
+        print "Sending doingStuff Command to the Controller\n"
+        self.pipe.send("doingStuff")
+        self.incrementDoingStuffCommandToControllerCounter()
+    except Exception as inst:
+        print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
+
+def receiveServerIPFromController(self):
+    try:
+        print "Receiving the server IP from the Controller\n"
+        self.serverIP= self.pipe.recv()
+        self.incrementReceiveServerIPFromControllerCounter()
+    except Exception as inst:
+        print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
+
+def checkForDoingStuffCommandFromController(self, inboundString):
+    try:
+        print "Checking for doingStuff Command from the Controller\n"
+        if(compareString(inboundString,"doingStuff",0,0,len("doingStuff"),len("doingStuff"))==True):
+            self.incrementDoingStuffCommandFromControllerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForDoingStuff Command from the Controller: " + str(inst) +"\n"
+        return False
+
+def checkForFoundSolutionCommandFromController(self, inboundString):
+    try:
+        print "Checking for foundSolution Command from the Controller\n"
+        if(compareString(inboundString,"foundSolution",0,0,len("foundSolution"),len("foundSolution"))==True):
+            self.incrementFoundSolutionCommandFromControllerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForFoundSolutionCommandFromController: " + str(inst) +"\n"
+        return False
+
+def checkForRequestNextChunkCommandFromController(self, inboundString):
+    try:
+        print "Checking for requestNextChunk Command from the Controller\n"
+        if(compareString(inboundString,"requestNextChunk",0,0,len("requestNextChunk"),len("requestNextChunk"))==True):
+            self.incrementRequestNextChunkCommandFromControllerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkForRequestNextChunk Command from Controller: " + str(inst) +"\n"
+        return False
 
 class NetworkClient:
 
@@ -150,16 +225,16 @@ class NetworkClient:
     unknownCommandFromServerCounter = 0
 
     #outbound commands sent to controller
-    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    connectedCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    doingStuffCommandToControllerCounter = 0 #not yet implemented, only incrementor and print record statement
+    nextChunkCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
+    doneCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
+    connectedCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
+    doingStuffCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
 
     #inbound commands from controller
-    receiveServerIPFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    doingStuffCommandFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    foundSolutionCommandFromControllerCounter = 0 #not yet implemented, only incrementor and print record statement
-    requestNextChunkCommandFromControllerCounter = 0 #not yet implemented yet, only incrementor and print record statement
+    receiveServerIPFromControllerCounter = 0 #receive function is defined, only incrementor and print record statement
+    doingStuffCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
+    foundSolutionCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
+    requestNextChunkCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
 
     #considering putting in a counter for number of exceptions thrown (for each exception type)
         #counter for how many times you have broken out of the main loop and not received the done command
@@ -211,13 +286,15 @@ class NetworkClient:
         self.requestNextChunkCommandFromControllerCounter+= 1
     #end of increment counter functions
 
-    def __init__(self):
+    def __init__(self, pipeendconnectedtocontroller):
+        self.pipe = pipeendconnectedtocontroller #pipe to the controller
         if __name__ == '__main__':
             try: #Main try block
                 #host = 'localhost' #old connection method
                 host = '' #new connection method
                 port = 55568
                 buf = 1024
+                serverIP = '127.0.1.1'
 
                 #.........................................................................
                 #Detect the Operating System
