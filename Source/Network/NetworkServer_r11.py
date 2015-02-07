@@ -6,6 +6,7 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkClient_r11
 
+#NOTE FOR OPTIMIZATION, CALL THE THREAD LOCKS THROUGH SELF INSTEAD OF THROUGH AN ADDITIONAL PARAMETER
 
 from socket import *
 import socket
@@ -87,13 +88,29 @@ def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, sock
     while True:
         try:
             networkSocket.sendto(outboundMessage, clientIP)
-            print "sent Next command to client "+str(clientIP)+"\n"
+            print "sent Next command to client: "+str(clientIP)+"\n"
             self.nextCommandToClientCounterLock.acquire()
             self.incrementNextCommandToClientCounter()
             self.nextCommandToClientCounterLock.release()
             break
         except Exception as inst:
             print "Exception in send Next command: " +str(inst) +"\n"
+    socketLock.release()
+
+def sendNextDataCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
+    print "Sending Next Data Command to Client\n"
+    networkSocket.settimeout(0.5)
+    socketLock.acquire()
+    while True:
+        try:
+            networkSocket.sendto(outboundMessage,clientIP)
+            print "sent next data command to client: "+str(clientIP)+"\n"
+            self.nextDataCommandToClientCounter.acquire()
+            self.incrementNextDataCommandToClientCounter()
+            self.nextDataCommandToClientCounter.release()
+            break
+        except Exception as inst:
+            print "Exception in send next Data Command to Client: " +str(inst)+"\n"
     socketLock.release()
 
 
@@ -121,6 +138,65 @@ def checkForCrashedCommandFromClient(inboundData):
     else:
         return False
 
+def sendNextChunkCommandToController(self):
+    try:
+        print "Sending nextChunk Command to the Controller\n"
+        self.pipe.send("nextChunk")
+        self.nextChunkCommandToControllerCounterLock.acquire()
+        self.incrementNextChunkCommandToControllerCounter()
+        self.nextChunkCommandToControllerCounterLock.release()
+    except Exception as inst:
+        print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
+
+def sendWaitingCommandToController(self):
+    try:
+        print "Sending waiting Command to the Controller\n"
+        self.pipe.send("waiting")
+        self.waitingCommandToControllerCounterLock.acquire()
+        self.incrementWaitingCommandToControllerCounter()
+        self.waitingCommandToControllerCounterLock.release()
+    except Exception as inst:
+        print "Exception was thrown in sendWaitingCommandToController: " +str(inst)+"\n"
+
+def sendDoneCommandToController(self):
+    try:
+        print "Sending done Command to the Controller\n"
+        self.pipe.send("done ")
+        self.doneCommandToControllerCounterLock.acquire()
+        self.incrementDoneCommandToControllerCounter()
+        self.doneCommandToControllerCounterLock.release()
+    except Exception as inst:
+        print "Exception was thrown in sendDoneCommandToController: "+str(inst)+"\n"
+
+def checkForNextChunkCommandFromController(self, inboundString):
+    try:
+        print "Checking for nextChunk Command from the Controller\n"
+        if(compareString(inboundString, "nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
+            print "nextChunk Command was received from the Controller\n"
+            self.nextChunkCommandFromControllerCounterLock.acquire()
+            self.incrementNextChunkCommandFromControllerCounter()
+            self.nextChunkCommandFromControllerCounterLock.release()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "Exception thrown in checkForNextChunkCommandFromController: " +str(inst)+"\n"
+        return False
+
+def checkForDoneCommandFromController(self, inboundString):
+    try:
+        print "Checking for done Command from the Controller\n"
+        if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
+            print "done Command was received from the Controller\n"
+            self.doneCommandFromControllerCounterLock.acquire()
+            self.incrementDoneCommandFromControllerCounter()
+            self.doneCommandFromControllerCounterLock.release()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
+        return False
 
 class NetworkServer():
 
@@ -128,7 +204,7 @@ class NetworkServer():
     #records of outbound commands to clients
     doneCommandToClientCounter = 0
     nextCommandToClientCounter = 0
-    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
+    nextDataCommandToClientCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
 
     #records of inbound commands from clients
     nextCommandFromClientCounter = 0
@@ -137,15 +213,16 @@ class NetworkServer():
     unknownCommandFromClientCounter = 0
 
     #records of outbound commands to controller
-    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
+    nextChunkCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
     #ChunkAgain command is obsolete
-    waitingCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
-    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
+    waitingCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    doneCommandToControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
 
     #records of inbound commands from controller
-    nextChunkCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record implemented
+    nextChunkCommandFromControllerCounter = 0 #implemented, only incrementor and thread lock and print record implemented
     #chunkAgain command is obsolete
-    doneCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock and print record is implemented
+    doneCommandFromControllerCounter = 0 #implemented, only incrementor and thread lock and print record is implemented
+    unknownCommandFromControllerCounter = 0
 
     #record of number of threads
     numberOfThreadsCreatedCounter = 0
@@ -186,6 +263,9 @@ class NetworkServer():
     def incrementDoneCommandFromControllerCounter(self):
         self.doneCommandFromControllerCounter+= 1
 
+    def incrementUnknownCommandFromControllerCounter(self):
+        self.unknownCommandFromControllerCounter+= 1
+
     def incrementNumberOfThreadsCreatedCounter(self):
         self.numberOfThreadsCreatedCounter+= 1
 
@@ -201,6 +281,7 @@ class NetworkServer():
             #        print "Received the me 2 command form server\n"
             #    else:
             #        print "Did not receive the me2 command." + str(data)
+            #CHECKING FOR CLIENT INPUT
             print "Checking for input from : " + str(clientaddr) + "\n"
             data = receiveData(clientsocket , socketLock)
             if(data != ""):
@@ -222,6 +303,23 @@ class NetworkServer():
                     self.incrementUnknownCommandFromClientCounter()
                     unknownCommandFromClientCounterLock.release()
                 sendData(clientsocket, clientaddr,msg,socketLock)
+            #CHECKING FOR CONTROLLER INPUT
+            print "Checking for input from the Controller\n"
+            if(self.pipe.poll()):
+                inboundControllerCommand= self.pipe.recv()
+                print "Received a message from the Controller\n"
+                if(checkForNextChunkCommandFromController(inboundControllerCommand)==True):
+                    print "Waiting for corresponding chunk object...\n"
+                    inboundControllerChunkObject = self.pipe.recv()
+                    print "Received the chunk object\n"
+                    #Insert chunk handling here
+                elif(checkForDoneCommandFromController(inboundControllerCommand)==True):
+                    print "check for done command from controller Function is Incomplete\n"
+                else:
+                    print "ERROR: Received unknown command from the Controller: '" +str(inboundControllerCommand)+"'\n"
+                    self.unknownCommandFromControllerCounterLock.acquire()
+                    self.incrementUnknownCommandFromControllerCounter()
+                    self.unknownCommandFromControllerCounterLock.release()
         clientsocket.close()
 
     def __init__(self, pipeendconnectedtocontroller):
@@ -348,6 +446,7 @@ class NetworkServer():
             #inbound from controller command locks
             nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
             doneCommandFromControllerCounterLock = thread.allocate_lock()
+            unknownCommandFromControllerCounterLock = thread.allocate_lock()
             try: #Main try block
                 while 1:
                     print "Server is listening for connections\n"
@@ -410,6 +509,9 @@ class NetworkServer():
                 doneCommandFromControllerCounterLock.acquire()
                 print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
                 doneCommandFromControllerCounterLock.release()
+                unknownCommandFromControllerCounterLock.acquire()
+                print "# of unknown Commands received from the Controller: "+str(self.unknownCommandFromControllerCounter)+"\n"
+                unknownCommandFromControllerCounterLock.release()
 
 
 #NetworkServer() #No longer needed, controller calls NetworkServer now
