@@ -122,15 +122,26 @@ class NetworkServer():
 
     #Server command records
     #records of outbound commands to clients
-    doneCommandToClientCounter = 0
-    nextCommandToClientCounter = 0
-    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor is implemented
+    doneCommandToClientCounter = 0 #thread lock implemented
+    nextCommandToClientCounter = 0 #thread lock implemented
+    nextDataCommandToClientCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
 
     #records of inbound commands from clients
     nextCommandFromClientCounter = 0
     foundSolutionCommandFromClientCounter = 0
     crashedCommandFromClientCounter = 0
     unknownCommandFromClientCounter = 0
+
+    #records of outbound commands to controller
+    nextChunkCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
+    #ChunkAgain command is obsolete
+    waitingCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
+    doneCommandToControllerCounter = 0 #not yet implemented, only incrementor and thread lock implemented
+
+    #records of inbound commands from controller
+    nextChunkCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock implemented
+    #chunkAgain command is obsolete
+    doneCommandFromControllerCounter = 0 #not yet implemented, only incrementor and thread lock is implemented
 
     #record of number of threads
     numberOfThreadsCreatedCounter = 0
@@ -155,6 +166,21 @@ class NetworkServer():
 
     def incrementCrashedCommandFromClientCounter(self):
         self.crashedCommandFromClientCounter += 1
+
+    def incrementNextChunkCommandToControllerCounter(self):
+        self.nextChunkCommandToControllerCounter+= 1
+
+    def incrementWaitingCommandToControllerCounter(self):
+        self.waitingCommandToControllerCounter+= 1
+
+    def incrementDoneCommandToControllerCounter(self):
+        self.doneCommandToControllerCounter+= 1
+
+    def incrementNextChunkCommandFromControllerCounter(self):
+        self.nextChunkCommandFromControllerCounter+= 1
+
+    def incrementDoneCommandFromControllerCounter(self):
+        self.doneCommandFromControllerCounter+= 1
 
     def incrementNumberOfThreadsCreatedCounter(self):
         self.numberOfThreadsCreatedCounter+= 1
@@ -302,10 +328,22 @@ class NetworkServer():
             serversocket.listen(2)
             #the thread locks
             socketLock = thread.allocate_lock()
+            #outbound to client command locks
+            doneCommandToClientCounterLock = thread.allocate_lock()
+            nextCommandToClientCounterLock = thread.allocate_lock()
+            nextDataCommandToClientCounterLock = thread.allocate_lock()
+            #inbound from client client command locks
             nextCommandFromClientCounterLock = thread.allocate_lock()
             foundSolutionCommandFromClientCounterLock = thread.allocate_lock()
             unknownCommandFromClientCounterLock = thread.allocate_lock()
             crashedCommandFromClientCounterLock = thread.allocate_lock()
+            #outbound to controller command locks
+            nextChunkCommandToControllerCounterLock = thread.allocate_lock()
+            waitingCommandToControllerCounterLock = thread.allocate_lock()
+            doneCommandToControllerCounterLock = thread.allocate_lock()
+            #inbound from controller command locks
+            nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
+            doneCommandFromControllerCounterLock = thread.allocate_lock()
             try: #Main try block
                 while 1:
                     print "Server is listening for connections\n"
@@ -345,4 +383,4 @@ class NetworkServer():
                 print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
                 crashedCommandFromClientCounterLock.release()
 
-NetworkServer() #pipe object needs to be passed into the parameters here
+#NetworkServer() #pipe object needs to be passed into the parameters here

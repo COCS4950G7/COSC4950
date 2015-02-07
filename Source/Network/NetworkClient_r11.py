@@ -212,7 +212,7 @@ def checkForRequestNextChunkCommandFromController(self, inboundString):
         print "ERROR in checkForRequestNextChunk Command from Controller: " + str(inst) +"\n"
         return False
 
-class NetworkClient:
+class NetworkClient():
 
     #client records-------
     #outbound commands sent to server
@@ -227,16 +227,16 @@ class NetworkClient:
     unknownCommandFromServerCounter = 0
 
     #outbound commands sent to controller
-    nextChunkCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
-    doneCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
-    connectedCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
-    doingStuffCommandToControllerCounter = 0 #send function is defined, only incrementor and print record statement
+    nextChunkCommandToControllerCounter = 0
+    doneCommandToControllerCounter = 0
+    connectedCommandToControllerCounter = 0
+    doingStuffCommandToControllerCounter = 0
 
     #inbound commands from controller
-    receiveServerIPFromControllerCounter = 0 #receive function is defined, only incrementor and print record statement
-    doingStuffCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
-    foundSolutionCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
-    requestNextChunkCommandFromControllerCounter = 0 #checking function is defined, only incrementor and print record statement
+    receiveServerIPFromControllerCounter = 0
+    doingStuffCommandFromControllerCounter = 0
+    foundSolutionCommandFromControllerCounter = 0
+    requestNextChunkCommandFromControllerCounter = 0
     unknownCommandFromControllerCounter = 0
 
     #considering putting in a counter for number of exceptions thrown (for each exception type)
@@ -468,4 +468,4 @@ class NetworkClient:
                 print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
                 print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
 
-NetworkClient() #pipe object needs to be passed into the parameters here
+#NetworkClient() #pipe object needs to be passed into the parameters here
