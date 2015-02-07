@@ -80,6 +80,7 @@ def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
         except Exception as inst:
             if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
                 print "Broken pipe error detected in sendData\n"
+                break
             else:
                 print "Exception in send Done command: " +str(inst) +"\n"
     socketLock.release()
