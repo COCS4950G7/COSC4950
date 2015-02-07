@@ -134,10 +134,40 @@ def checkForFoundSolutionCommandFromClient(inboundData):
     else:
         return False
 
-def checkForCrashedCommandFromClient(inboundData):
+def checkForCrashedCommandFromClient(self,inboundData):
     print "Checking for the Crashed Command from the Client\n"
     if(compareString(inboundData,"CRASHED",0,0,len("CRASHED"),len("CRASHED"))):
         print "CRASHED Command was received from the client\n"
+        crashedClientIP= ""
+        for x in range(8, len(inboundData)):
+            crashedClientIP += inboundData[x]
+        print "Crashed Client IP: " + str(crashedClientIP) + "\n"
+        self.listOfCrashedClientsLock.acquire()
+        self.listOfCrashedClients.append(crashedClientIP)
+        self.listOfCrashedClientsLock.release()
+        print "Looking for a matching IP in the list of clients\n"
+        foundMatch= False
+        tempAddr2 = ""
+        self.listOfClientsLock.acquire()
+        for index in range(0, len(self.listOfClients)):
+            tempSock, tempAddr= self.listOfClients[index]
+            tempAddr2= str(tempAddr[0])
+            if(crashedClientIP == tempAddr2):
+                print "Matching IP Address was found\n"
+                del self.listOfClients[index] #remove crashed client from listOfClients
+                foundMatch= True
+                self.stackOfChunksThatNeedToBeReassignedLock.acquire()
+                self.dictionaryOfCurrentClientTasksLock.acquire()
+                self.stackOfChunksThatNeedToBeReassigned.append(self.dictionaryOfCurrentClientTasks[tempAddr])
+                self.dictionaryOfCurrentClientTasksLock.release()
+                self.stackOfChunksThatNeedToBeReassignedLock.release()
+                break
+            else:
+                print "No Matching IP found yet\n"
+        self.listOfClientsLock.release()
+        if(foundMatch==False):
+            print "WARNING: No matching IP Address was found in the list of clients\n"
+            self.incrementNumberOfIPAddressesNotFound()
         return True
     else:
         return False
@@ -231,6 +261,9 @@ class NetworkServer():
     #record of number of threads
     numberOfThreadsCreatedCounter = 0
 
+    #record of number IP addresses that where not able to be found
+    numberOfIPAddressesNotFound = 0
+
     def incrementDoneCommandToClientCounter(self):
         self.doneCommandToClientCounter += 1
 
@@ -273,6 +306,9 @@ class NetworkServer():
     def incrementNumberOfThreadsCreatedCounter(self):
         self.numberOfThreadsCreatedCounter+= 1
 
+    def incrementNumberOfIPAddressesNotFound(self):
+        self.numberOfIPAddressesNotFound+= 1
+
     def handler(self, clientsocket, clientaddr, socketLock, nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock):
         print "Accepted connection from: " + str(clientaddr) + "\n"
 
@@ -289,7 +325,7 @@ class NetworkServer():
                     foundSolutionCommandFromClientCounterLock.acquire()
                     self.incrementFoundSolutionCommandFromClientCounter()
                     foundSolutionCommandFromClientCounterLock.release()
-                elif(checkForCrashedCommandFromClient(data)==True):
+                elif(checkForCrashedCommandFromClient(self, data)==True):
                     crashedCommandFromClientCounterLock.acquire()
                     self.incrementCrashedCommandFromClientCounter()
                     crashedCommandFromClientCounterLock.release()
@@ -328,7 +364,11 @@ class NetworkServer():
         port = 55568
         buf = 1024
 
-        listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
+        self.listOfClients = [] #list that holds the IPs of all the clients (in a tuple of socket, then ip)
+        self.listOfCrashedClients = [] #list that holds the IP addresses of all crashed clients
+        self.stackOfClientsWaitingForNextChunk = []
+        self.stackOfChunksThatNeedToBeReassigned = []
+        self.dictionaryOfCurrentClientTasks = {}
 
         #.........................................................................
         #Detect the Operating System
@@ -426,6 +466,12 @@ class NetworkServer():
 
         serversocket.listen(2)
         #print "Initializing thread locks...\n"
+        #server variable locks
+        listOfClientsLock = thread.allocate_lock()
+        listOfCrashedClientsLock = thread.allocate_lock()
+        stackOfClientsWaitingForNextChunkLock = thread.allocate_lock()
+        stackOfChunksThatNeedToBeReassignedLock = thread.allocate_lock()
+        dictionaryOfCurrentClientTasksLock = thread.allocate_lock()
         #the thread locks
         socketLock = thread.allocate_lock()
         #outbound to client command locks
@@ -445,28 +491,59 @@ class NetworkServer():
         nextChunkCommandFromControllerCounterLock = thread.allocate_lock()
         doneCommandFromControllerCounterLock = thread.allocate_lock()
         unknownCommandFromControllerCounterLock = thread.allocate_lock()
+
         #print "Successfully initialized the thread locks\n"
         try: #Main try block
             while 1:
                 print "Server is listening for connections\n"
                 clientsocket, clientaddr = serversocket.accept()
-                listOfClients.append((clientsocket, clientaddr))
+                listOfClientsLock.acquire()
+                self.listOfClients.append((clientsocket, clientaddr))
+                listOfClientsLock.release()
                 thread.start_new_thread(self.handler, (clientsocket, clientaddr, socketLock,nextCommandFromClientCounterLock, foundSolutionCommandFromClientCounterLock, unknownCommandFromClientCounterLock, crashedCommandFromClientCounterLock)) #create a new thread
                 print " A New thread was made\n"
                 self.incrementNumberOfThreadsCreatedCounter()
         except Exception as inst:
             print "ERROR IN MAIN THREAD: " +str(inst) + "\n"
         finally:
-            print "# of clients connected: " + str(len(listOfClients)) + "\n"
+            listOfClientsLock.acquire()
+            print "# of clients connected: " + str(len(self.listOfClients)) + "\n"
+            listOfClientsLock.release()
             print "Issuing Done Commands to clients...\n"
-            for i in range(0, len(listOfClients)):
-                doneSock, doneAddr = listOfClients[i]
+            listOfClientsLock.acquire()
+            for i in range(0, len(self.listOfClients)):
+                doneSock, doneAddr = self.listOfClients[i]
                 sendDoneCommandToClient(self,doneSock, doneAddr, socketLock)
+            listOfClientsLock.release()
             serversocket.close()
             print "Socket has been closed\n"
             #printing out all of the records
             print "---------------Number of Threads Created-----------------------\n"
             print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
+            print "---------------List of Crashed Clients-------------------------\n"
+            listOfCrashedClientsLock.acquire()
+            print "# of Crashed Clients: " + str(len(self.listOfCrashedClients)) +"\n"
+            if(len(self.listOfCrashedClients) > 0):
+                for x in range(0, len(self.listOfCrashedClients)):
+                    print str(x) + ")" + str(self.listOfCrashedClients[x]) +"\n"
+            listOfCrashedClientsLock.release()
+            print "--------------Stack of Clients Waiting For Next Chunk---------------\n"
+            stackOfClientsWaitingForNextChunkLock.acquire()
+            print "# of Clients Waiting For Next Chunk: " +str(len(self.stackOfClientsWaitingForNextChunk)) +"\n"
+            if(len(self.stackOfClientsWaitingForNextChunk) > 0):
+                while(len(self.stackOfClientsWaitingForNextChunk) > 0):
+                    print str(self.stackOfClientsWaitingForNextChunk.pop()) + "\n"
+            stackOfClientsWaitingForNextChunkLock.release()
+            print "--------------Stack of Chunks That Need To Be Reassigned----------------\n"
+            stackOfChunksThatNeedToBeReassignedLock.acquire()
+            print "# of Chunks That Need To Be Reassigned: " + str(len(self.stackOfChunksThatNeedToBeReassigned)) +"\n"
+            stackOfChunksThatNeedToBeReassignedLock.release()
+            print "--------------Dictionary of Current Client Tasks---------------------\n"
+            dictionaryOfCurrentClientTasksLock.acquire()
+            print "[key]         [value]"  +"\n"
+            for key, value in self.dictionaryOfCurrentClientTasks.iteritems():
+                print str(key), str(value)
+            dictionaryOfCurrentClientTasksLock.release()
             print "---------------Outbound Commands To Client(s)------------------\n"
             doneCommandToClientCounterLock.acquire()
             print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
