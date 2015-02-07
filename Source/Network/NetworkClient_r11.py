@@ -133,6 +133,7 @@ def checkForDoneCommandFromServer(self,inboundString):
         if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
             print "Done command was received from the server\n"
             self.incrementNextChunkDataFromServerCounter()
+            self.serverIssuedDoneCommand = True
             return True
         else:
             return False
@@ -333,6 +334,7 @@ class NetworkClient():
             buf = 1024
             self.serverIP = '127.0.1.1'
             self.myIPAddress = ""
+            self.serverIssuedDoneCommand= False
 
             #.........................................................................
             #Detect the Operating System
@@ -430,7 +432,7 @@ class NetworkClient():
                 print "Received IP Address from the Controller: '"+ str(self.serverIP)+"'\n"
             except Exception as inst:
                 print "ERROR in get serverIP try block: " + str(inst) + "\n"
-            try:
+            try: #main try block?
                 #clientsocket.connect(addr) #old connection system
                 clientsocket.connect((self.serverIP, self.port))
                 print "Connected to server\n"
@@ -440,7 +442,7 @@ class NetworkClient():
             #myNumber= randint(0,3) #temporary to show that it is a different thread running
             #data = "NEXT" #start by sending NEXT to server
             data = "" #initialize data
-            while True:
+            while True: #client main loop
                 receiveData(self, clientsocket)
                 #exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data) #Designed to stop client if the is a break in the pipe
                 #if(exitMainLoop == True):
@@ -474,6 +476,9 @@ class NetworkClient():
         except Exception as inst:
             print "ERROR in main try block: " + str(inst) +"\n"
         finally:
+            if(self.serverIssuedDoneCommand==False):
+                print "WARNING: Quitting before server has issued the Done Command! Sending Crash message to server\n"
+                sendCrashedCommandToServer(self, clientsocket)
             clientsocket.close()
             print "Socket has been closed\n"
             print "----------------------Outbound Commands To Server-----------------\n"
