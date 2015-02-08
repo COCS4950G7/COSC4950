@@ -72,11 +72,11 @@ class Dictionary():
     #Sets the dictionary file's name
     def setFileName(self, fileName):
 
-        self.fileName = fileName
+        self.fileName = str(fileName) + ".txt"
 
         #Checks for filenotfound and returns code to caller class
         try:
-            file = open(fileName, "r")
+            file = open(fileName + ".txt", "r")
             file.close()
 
         except (OSError, IOError):
