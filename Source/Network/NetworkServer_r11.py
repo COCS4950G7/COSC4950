@@ -331,10 +331,14 @@ class NetworkServer():
                         self.dictionaryOfCurrentClientTasksLock.acquire()
                         #assign a chunk to the client from the stack
                         self.dictionaryOfCurrentClientTasks[clientsIP]= self.stackOfChunksThatNeedToBeReassigned.pop()
+                        #add the appropriate keywords NEXT and SIZE to the params
+                        import sys
+                        dataFileSize = sys.getsizeof(self.dictionaryOfCurrentClientTasks[clientsIP].data)
+                        tempKeywords= "NEXT " +"SIZE(" + str(dataFileSize) +") " + str(self.dictionaryOfCurrentClientTasks[clientsIP].params)
                         #send chhunk params to client
                         socketLock.acquire()
                         try:
-                            sendNextCommandToClient(self,clientsocket,clientsIP, self.dictionaryOfCurrentClientTasks[clientsIP].params)
+                            sendNextCommandToClient(self,clientsocket,clientsIP, tempKeywords)
                         except Exception as inst:
                             print "ERROR in sending NextParams to the client: " +str(inst)+"\n"
                         #send the chunk data to the client
