@@ -108,11 +108,11 @@ class Controller():
                     print "============="
                     print "Start"
                     print
-                    print "(Node)"
-                    print "(Server)"
-                    print "(Single)"
+                    print "Become A Node (n)"
+                    print "Run in Server Mode (ser)"
+                    print "Run in Single-User Mode (sin)"
                     print
-                    print "(About)"
+                    print "About Page (about)"
                     print
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
@@ -198,7 +198,7 @@ class Controller():
                     print
                     print "Done?"
 
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -237,21 +237,22 @@ class Controller():
                     #Get the server's IP:
                     self.serverIP = raw_input("What's the server's IP: ")
 
-                    print "Ready?"
-                    print "(Node)"
-                    print "(Back)"
+                    print "Ready to Become a Node?"
+                    print
+                    print "Node (n)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "node", "back", "Back", "b", "Exit", "exit"}
+                    goodNames = {"Node", "node", "n", "back", "Back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Node", "node"):
+                    if userInput in ("Node", "node", "n"):
 
                         self.state = "nodeConnectingScreen"
 
@@ -428,12 +429,12 @@ class Controller():
                     print "============="
                     print "Start -> Server"
                     print
-                    print "(bruteForce)"
-                    print "(rainbowMake)"
-                    print "(rainbowUser)"
-                    print "(dictionary)"
+                    print "Brute Force Attack (b)"
+                    print "Rainbow Table Maker (make)"
+                    print "Rainbow Table Attack (use)"
+                    print "Dictionary Attack (d)"
                     print
-                    print "(back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -967,11 +968,11 @@ class Controller():
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the file name: ")
+                    fileName = raw_input("What's the file name (___.txt): ")
                     while not self.dictionary.setFileName(fileName) == "Good":
 
                         print "File not found..."
-                        fileName = raw_input("What's the file name: ")
+                        fileName = raw_input("What's the file name (___.txt): ")
 
                     #Get the hash
                     print
@@ -983,9 +984,9 @@ class Controller():
                     print
                     print "Ready to go?"
                     print
-                    print "(Crack)"
+                    print "Crack That Hash! (c)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -1144,7 +1145,7 @@ class Controller():
                     print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
                     print "And it took", self.clock, "seconds."
 
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.dictionary.reset()
                     userInput = raw_input("Choice: ")
@@ -1184,7 +1185,7 @@ class Controller():
                     print "Sorry, we didn't find it."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.dictionary.reset()
                     userInput = raw_input("Choice: ")
@@ -1219,12 +1220,12 @@ class Controller():
                     print "============="
                     print "Start -> Single-User Mode"
                     print
-                    print "(BruteForce)"
-                    print "(RainbowMake)"
-                    print "(RainbowUse)"
-                    print "(Dictionary)"
+                    print "Brute Force Attack (b)"
+                    print "Rainbow Table Maker (make)"
+                    print "Rainbow Table Attack (use)"
+                    print "Dictionary Attack (d)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -1349,9 +1350,9 @@ class Controller():
                     print
                     print "Ready to go?"
                     print
-                    print "(Crack)"
+                    print "Crack That Hash! (c)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -1447,7 +1448,7 @@ class Controller():
                     print "Wish a", self.brute_force.algorithm, "hash of: ", self.brute_force.origHash
                     print "And it took", self.clock, "seconds."
 
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
 
                     userInput = raw_input("Choice: ")
@@ -1485,7 +1486,7 @@ class Controller():
                     print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
 
                     userInput = raw_input("Choice: ")
@@ -1540,9 +1541,9 @@ class Controller():
                     print
                     print "Ready to go?"
                     print
-                    print "(Crack)"
+                    print "Crack That Hash! (c)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -1645,7 +1646,7 @@ class Controller():
                     print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
                     print "And it took", self.clock, "seconds."
 
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.rainbowUser.reset()
                     userInput = raw_input("Choice: ")
@@ -1682,7 +1683,7 @@ class Controller():
                     print "Sorry, we didn't find it."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.dictionary.reset()
                     userInput = raw_input("Choice: ")
@@ -1797,9 +1798,9 @@ class Controller():
                     print
                     print "Ready to go?"
                     print
-                    print "(Create)"
+                    print "Create the Table! (c)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -1977,7 +1978,7 @@ class Controller():
                     print "And ", self.colidingClock2, " seconds for Collision Repair"
 
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.rainbowMaker.reset()
                     userInput = raw_input("Choice: ")
@@ -2044,8 +2045,8 @@ class Controller():
                     print
                     print "Are we searching for a single hash, or from a file of hashes?"
                     print
-                    print "(single)"
-                    print "(file)"
+                    print "Single Hash (s)"
+                    print "From a File (f)"
                     print
                     userInput = raw_input("Choice: ")
 
@@ -2087,9 +2088,9 @@ class Controller():
                     print
                     print "Ready to go?"
                     print
-                    print "(Crack)"
+                    print "Crack That Hash! (c)"
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
@@ -2241,7 +2242,7 @@ class Controller():
                         print "Your File, (", self.dictionary.doneFileName, ") of hash/key pairs is ready."
                     print "And it took", self.clock, "seconds."
 
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.dictionary.reset()
                     userInput = raw_input("Choice: ")
@@ -2277,7 +2278,7 @@ class Controller():
                     print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
                     print
-                    print "(Back)"
+                    print "Go Back (back)"
                     print "(Exit)"
                     self.dictionary.reset()
                     userInput = raw_input("Choice: ")
