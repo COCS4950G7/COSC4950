@@ -31,7 +31,7 @@ import string
 
 from Chunk import Chunk
 from Dictionary import Dictionary
-#from Brute_Force import Brute_Force
+from Brute_Force import Brute_Force
 from NetworkClient import NetworkClient
 from NetworkServer import NetworkServer
 from RainbowMaker import RainbowMaker
@@ -45,7 +45,7 @@ class Controller():
     rainbowMaker = RainbowMaker()
     rainbowUser = RainbowUser()
     dictionary = Dictionary()
-    #brute_force = Brute_Force()
+    brute_force = Brute_Force()
 
     controllerPipe, networkPipe = Pipe()
 
@@ -1197,16 +1197,105 @@ class Controller():
                 #if we're at the  singleBruteForceScreen state (Screen)
                 elif state == "singleBruteForceScreen":
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "singleBruteForceScreen"
+                    print
 
-                    if userInput == "crackIt":
 
-                        self.state = "singlerRainMakerScreen"
+                    #Get the algorithm
 
-                        #get info from GUI and pass to Brute_Force class
+                    print "What's the algorithm: "
+                    print "(md5)"
+                    print "(sha1)"
+                    print "(sha256)"
+                    print "(sha512)"
+                    print
+                    algo = raw_input("Choice: ")
 
-                    elif userInput == "back":
+                    #Sterolize inputs
+                    goodNames = {"md5", "sha1", "sha256", "sha512"}
+                    while not algo in goodNames:
+
+                        print "Input Error!"
+
+                        algo = raw_input("Try Again: ")
+                    #Set algorithm of dictionary to user input of 'algo'
+                    #self.brute_force.setAlgorithm(algo)
+
+
+                    #Get the alphabet to be used
+
+                    print
+                    print "What's the alphabet: "
+                    print "0-9(d)"
+                    print "a-z(a)"
+                    print "A-Z(A)"
+                    print "a-z&A-Z(m)"
+                    print "a-z&A-Z&0-9(M)"
+                    print
+                    alphabet = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"d", "a", "A", "m", "M"}
+                    while not alphabet in goodNames:
+
+                        print "Input Error!"
+
+                        alphabet = raw_input("Try Again: ")
+                    #self.brute_force.setAlphabet(alphabet)
+
+
+                    #Get the min and max Number of chars of key
+
+                    print
+                    minKeyLength = raw_input("What's the minimum key length? ")
+                    while not self.isInt(minKeyLength):
+
+                        print "Input Error, Not an Integer!"
+
+                        minKeyLength = raw_input("Try Again: ")
+                    print
+                    maxKeyLength = raw_input("What's the maximum key length? ")
+                    while not self.isInt(maxKeyLength):
+
+                        print "Input Error, Not an Integer!"
+
+                        maxKeyLength = raw_input("Try Again: ")
+                    #self.brute_force.setNumChars(numChars)
+
+
+                    #Get the hash
+
+                    hash = raw_input("What's the hash we're searching for: ")
+                    #self.brute_force.setHash(hash)
+
+                    #Sets variables in Brute Force class?
+                    self.brute_force.from_controller(alphabet, algo, hash, minKeyLength, maxKeyLength)
+
+                    #Get the go-ahead
+
+                    print
+                    print "Ready to go?"
+                    print
+                    print "(Crack)"
+                    print
+                    print "(Back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Crack", "crack"):
+
+                        self.state = "singleBruteSearchingScreen"
+
+                    elif userInput in ("Back", "back"):
 
                         self.state = "singleStartScreen"
 
@@ -1220,20 +1309,57 @@ class Controller():
                 #if we're at the singleBruteSearchingScreen state (Screen)
                 elif state == "singleBruteSearchingScreen":
 
-                    #display results and wait for user interaction
+                    print "============="
+                    print "singleBruteSearchingScreen"
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    self.clock = time()
 
-                    if userInput == "back":
+                    #Splitting the work up to simulate network functionality.
+                    #self.brute_force will be our server instance and
+                    #brute_force2 will be our node (client) instance
+                    brute_force2 = Brute_Force()
 
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
+                    #Stuff for those pretty status pictures stuff
+                    starCounter = 0
+                    whiteL = ""
+                    whiteR = "            "
+
+                    #While we haven't exhausted our search space or found an answer:
+                    while not(self.brute_force.isDone() or brute_force2.isFound()):
+
+                        #Clear the screen and re-draw
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        #Ohhh, pretty status pictures
+                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                        if starCounter > 11:
+                            starCounter = 0
+                            whiteL = ""
+                            whiteR = "            "
+                        else:
+                            starCounter += 1
+                            whiteL = whiteL + " "
+                            whiteR = whiteR[:-1]
+
+
+                         #Serve up the next chunk
+                        chunk = self.brute_force.get_chunk()
+
+                        #and process it using the node-side instance
+                        brute_force2.run_chunk(chunk)
+
+                    elapsed = (time() - self.clock)
+                    self.clock = elapsed
+
+                    #if a(the) node finds a key
+                    if brute_force2.isFound():
+
+                        #Let the server know what the key is
+                        self.brute_force.key = brute_force2.getKey()
+                        self.state = "singleBruteFoundScreen"
 
                     else:
 
-                        #We're done
-                        self.done = True
+                        self.state = "singleBruteNotFoundScreen"
 
                 #############################################
                 #############################################
@@ -1242,13 +1368,31 @@ class Controller():
 
                     #display results and wait for user interaction
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "singleDictionaryFoundScreen"
+                    print "Key is: ", self.brute_force.getKey()
+                    print "Wish a", self.brute_force.algorithm, "hash of: ", self.brute_force.origHash
+                    print "And it took", self.clock, "seconds."
 
-                    if userInput == "back":
+                    print "(Back)"
+                    print "(Exit)"
 
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    #Reset the variables
+                    self.brute_force.reset()
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "singleStartScreen"
 
                     else:
 
@@ -1262,13 +1406,31 @@ class Controller():
 
                     #display results and wait for user interaction
 
-                    #What did the user pick? (Crack it!, Back, Exit)
-                    #userInput = GUI.getInput()
+                    print "============="
+                    print "singleDictionaryFoundScreen"
+                    print
+                    print "Sorry, we didn't find anything."
+                    print "Just FYI though, that took", self.clock, "seconds."
+                    print
+                    print "(Back)"
+                    print "(Exit)"
 
-                    if userInput == "back":
+                    userInput = raw_input("Choice: ")
 
-                        #GUI.setState("singleBruteForceScreen")
-                        self.state = "singlerRainMakerScreen"
+                    #Sterolize inputs
+                    goodNames = {"Back", "back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    #Reset the variables
+                    self.brute_force.reset()
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "singleStartScreen"
 
                     else:
 
