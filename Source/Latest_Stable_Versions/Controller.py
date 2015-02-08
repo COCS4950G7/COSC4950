@@ -97,19 +97,28 @@ class Controller():
                 #if we're at the start state
                 if state == "startScreen":
 
+                    print "###################################################"
+                    print "#################  MIGHTY CRACKER #################"
+                    print "###################################################"
+                    print "         Brought to you by: *************"
+
+                    print "A general-purpose, hash cracking utility."
+
                     #What did the user pick? (Node, Server, Single, Exit)
                     print "============="
-                    print "startScreen"
+                    print "Start"
                     print
                     print "(Node)"
                     print "(Server)"
                     print "(Single)"
                     print
+                    print "(About)"
+                    print
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "node", "Server", "server", "Single", "single", "Exit", "exit"}
+                    goodNames = {"Node", "node", "n", "Server", "server", "ser", "Single", "single", "sin", "About", "about", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -117,22 +126,99 @@ class Controller():
                         userInput = raw_input("Try Again: ")
 
                     #If user picks Node, tell GUI to go to Node start screen
-                    if userInput in ("Node", "node"):
+                    if userInput in ("Node", "node", "n"):
 
                         self.state = "nodeStartScreen"
 
-                    elif userInput in ("Server", "server"):
+                    elif userInput in ("Server", "server", "ser"):
 
                         self.state = "serverStartScreen"
 
-                    elif userInput in ("single", "Single"):
+                    elif userInput in ("single", "Single", "sin"):
 
                         self.state = "singleStartScreen"
+
+                    elif userInput in ("About", "about"):
+
+                        self.state = "aboutScreen"
 
                     else:
 
                         #We're done
                         self.done = True
+
+                #############################################
+                #############################################
+                #if we're at the node start state (Screen)
+                elif state == "aboutScreen":
+
+                    #What did the user pick? (Be a node, Back, Exit)
+                    print "============="
+                    print "Start -> About"
+
+                    print
+                    print "Authors: Chris Hamm, John Wright, Nick Baum, Chris Bugg"
+                    print
+                    print "Description:"
+                    print "Our project, Mighty Cracker, is a program designed to crack hashed "
+                    print "passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,"
+                    print "and Windows 7+. It uses the power of multiprocessing to fully utilize"
+                    print "every computer available, and can utilize a LAN to distribute the"
+                    print "workload over up to 90 computers (nodes). For now, the algorithms"
+                    print "that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,"
+                    print "which cover a fair amount of the common hashing algorithms used."
+                    print
+                    print "We've implemented three common attack methods to find an original password."
+                    print " Dictionary takes a list of passwords, hashes them, and compares the "
+                    print "     hashes to the original (user inputted) hash to find a match."
+                    print " Brute Force will iterate through any combination (up to 16 "
+                    print "     characters) of letters, numbers, and symbols to brute-force"
+                    print "     the password, returning an original if found."
+                    print " Rainbow Tables are pre-computed arrays of hashes, organized to to"
+                    print "     provide a time-cost trade-off. The creator creates tables to"
+                    print "     be used at a later time, and the user uses created tables."
+                    print "     This gives one a huge advantage if you know what the password"
+                    print "     will consist of ahead of time."
+                    print
+                    print "These three methods can all be used on either a single computer"
+                    print "(single-user mode) or on a network of computers (similar to"
+                    print "a Beowulf cluster). When using on headless systems, the program"
+                    print "can run in terminal (text-only) mode with a -c command."
+                    print
+                    print "of the distributed, multi-process, simple GUI approach this program"
+                    print "takes, it is potentially more powerful and more user-friendly than"
+                    print "most other hash cracking software out there today, making it more"
+                    print "accessible for more people. Simply open the executable and crack "
+                    print "passwords."
+                    print
+                    print "In the future we'd like to add on the ability to crack the LMT-family"
+                    print "of hashes (Windows) as well as add in GPU support for additional power."
+                    print
+
+                    print
+                    print "Done?"
+
+                    print "(Back)"
+                    print "(Exit)"
+                    userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"back", "Back", "Exit", "exit"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("Back", "back"):
+
+                        self.state = "startScreen"
+
+                    else:
+
+                        #We're done
+                        self.done = True
+
 
                 ##################################################################################
                 ###################################### NODE ######################################
@@ -145,7 +231,7 @@ class Controller():
 
                     #What did the user pick? (Be a node, Back, Exit)
                     print "============="
-                    print "nodeStartScreen"
+                    print "Start -> Node"
                     print
 
                     #Get the server's IP:
@@ -158,7 +244,7 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "node", "back", "Back", "Exit", "exit"}
+                    goodNames = {"Node", "node", "back", "Back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -169,7 +255,7 @@ class Controller():
 
                         self.state = "nodeConnectingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "startScreen"
 
@@ -190,7 +276,7 @@ class Controller():
                     #What did the user pick? (Be a Node, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "nodeConnectingScreen"
+                    print "Start -> Node -> Connecting..."
                     print
 
                     #userInput = raw_input("Choice: ")
@@ -260,7 +346,7 @@ class Controller():
                             #Clear the screen and re-draw
                             os.system('cls' if os.name == 'nt' else 'clear')
                             print "============="
-                            print "nodeConnectedToScreen"
+                            print "Start -> Node -> Connected..."
 
                         #If the server says we're doing stuff
                         elif rec == "doingStuff":
@@ -270,7 +356,7 @@ class Controller():
                             #Clear the screen and re-draw
                             os.system('cls' if os.name == 'nt' else 'clear')
                             print "============="
-                            print "nodeDoingStuffScreen"
+                            print "Start -> Node -> Working..."
 
                             #'chunk' is an object that has attributes 'params' and 'data' (both are strings for network passing)
 
@@ -309,7 +395,7 @@ class Controller():
                                     self.controllerPipe.send("requestNextChunk")
 
                             elif paramsList[0] == "rainbowmaker":
-
+                                print "BROKE"
                                 #This line will be unreponsive during creation
                                 chunkOfDone = self.rainbowMaker.create(chunk)
 
@@ -328,32 +414,6 @@ class Controller():
                     #Go back to the nodeStart screen since we're done here
                     self.state = "nodeStartScreen"
 
-                #############################################
-                #############################################
-                #Ignore for now, implemented in nodeConnectedScreen
-                #if we're at the node doing stuff state (Screen)
-                elif state == "nodeDoingStuffScreen":
-
-                    #What did the user pick? (Be a Node, Back, Exit)
-                    ###userInput = GUI.getInput()
-                    print "============="
-                    print "nodeDoingStuffScreen"
-                    print "(back)"
-                    print "(Exit)"
-                    userInput = raw_input("Choice: ")
-
-                    #wait to get done with our stuff
-                    #then switch to nodeConnectedToScreen or nodeConnectingScreen depending
-
-                    if userInput == "back":
-
-                        ###GUI.setState("nodeStartScreen")
-                        self.state = "nodeStartScreen"
-
-                    else:
-
-                        #We're done
-                        self.done = True
 
                 ####################################################################################
                 ###################################### SERVER ######################################
@@ -366,7 +426,7 @@ class Controller():
 
                     #What did the user pick? (Brute-Force, Rainbow, Back, Exit)
                     print "============="
-                    print "serverStartScreen"
+                    print "Start -> Server"
                     print
                     print "(bruteForce)"
                     print "(rainbowMake)"
@@ -378,14 +438,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"bruteForce", "brute", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "back", "Back", "Exit", "exit"}
+                    goodNames = {"bruteForce", "brute", "bf", "b", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "d", "back", "Back", "b" "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("bruteForce", "brute"):
+                    if userInput in ("bruteForce", "brute", "bf", "b"):
 
                         self.state = "serverBruteForceScreen"
 
@@ -397,11 +457,11 @@ class Controller():
 
                         self.state = "serverRainUserScreen"
 
-                    elif userInput in ("dictionary", "dic"):
+                    elif userInput in ("dictionary", "dic", "d"):
 
                         self.state = "serverDictionaryScreen"
 
-                    elif userInput in ("back", "Back"):
+                    elif userInput in ("back", "Back", "b"):
 
                         self.state = "startScreen"
 
@@ -415,7 +475,8 @@ class Controller():
                 #############################################
                 #############################################
                 #if we're at the serverBruteForceScreen state (Screen)
-                elif state == "serverBruteForceScreen":
+                elif state == "Start -> Server -> Brute Force":
+                    print "BROKE"
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     #userInput = GUI.getInput()
@@ -438,7 +499,8 @@ class Controller():
                 #############################################
                 #############################################
                 #if we're at the serverBruteSearchingScreen state (Screen)
-                elif state == "serverBruteSearchingScreen":
+                elif state == "Start -> Server -> Brute Force -> Searching...":
+                    print "BROKE"
 
                     #display results and wait for user interaction
 
@@ -457,7 +519,8 @@ class Controller():
                 #############################################
                 #############################################
                 #if we're at the serverBruteFoundScreen state (Screen)
-                elif state == "serverBruteFoundScreen":
+                elif state == "Start -> Server -> Brute Force -> Found":
+                    print "BROKE"
 
                     #display results and wait for user interaction
 
@@ -476,7 +539,8 @@ class Controller():
                 #############################################
                 #############################################
                 #if we're at the serverBruteNotFoundScreen state (Screen)
-                elif state == "serverBruteNotFoundScreen":
+                elif state == "Start -> Server -> Brute Force -> Not Found":
+                    print "BROKE"
 
                     #display results and wait for user interaction
 
@@ -498,11 +562,12 @@ class Controller():
                 #############################################
                 #if we're at the serverRainUserScreen state (Screen)
                 elif state == "serverRainUserScreen":
-
+                    print "BROKE"
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainUserScreen"
+                    print "Start -> Server -> Rainbow User"
+                    print
                     print "(crackIt)"
                     print "(back)"
                     print "(Exit)"
@@ -529,13 +594,14 @@ class Controller():
                 #############################################
                 #if we're at the serverRainUserSearchingScreen state (Screen)
                 elif state == "serverRainUserSearchingScreen":
-
+                    print "BROKE"
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainUserSearchingScreen"
+                    print "Start -> Server -> Rainbow User -> Searching..."
+                    print
                     print "(back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
@@ -554,13 +620,14 @@ class Controller():
                 #############################################
                 #if we're at the serverRainUserFoundScreen state (Screen)
                 elif state == "serverRainUserFoundScreen":
-
+                    print "BROKE"
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainUserFoundScreen"
+                    print "Start -> Server -> Rainbow User -> Found!"
+                    print
                     print "(back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
@@ -579,13 +646,14 @@ class Controller():
                 #############################################
                 #if we're at the serverRainUserNotFoundScreen state (Screen)
                 elif state == "serverRainUserNotFoundScreen":
-
+                    print "BROKE"
                     #display results and wait for user interaction
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "serverRainUserNotFoundScreen"
+                    print "Start -> Server -> Rainbow User -> Not Found"
+                    print
                     print "(back)"
                     print "(Exit)"
                     userInput = raw_input("Choice: ")
@@ -606,9 +674,9 @@ class Controller():
                 #############################################
                 #if we're at the serverRainMakerScreen state (Screen)
                 elif state == "serverRainMakerScreen":
-
+                    print "BROKE"
                     print "============="
-                    print "serverRainMakerScreen"
+                    print "Start -> Server -> Rainbow Maker"
                     print
 
                     #Get the algorithm
@@ -721,10 +789,11 @@ class Controller():
                 #############################################
                 #if we're at the serverRainMakerSearchingScreen state (Screen)
                 elif state == "serverRainMakerSearchingScreen":
-
+                    print "BROKE"
                     #display results and wait for user interaction
                     print "============="
-                    print "serverRainMakerSearchingScreen"
+                    print "Start -> Server -> Rainbow Maker -> Searching..."
+                    print
 
                     #Start up the networkServer class (as sub-process in the background)
                     self.networkServer.start()
@@ -826,10 +895,11 @@ class Controller():
                 #############################################
                 #if we're at the serverRainMakerDoneScreen state (Screen)
                 elif state == "serverRainMakerDoneScreen":
-
+                    print "BROKE"
                     #display results and wait for user interaction
                     print "============="
-                    print "singleRainMakerDoneScreen"
+                    print "Start -> Server -> Rainbow Maker -> Done!"
+                    print
 
                     print "We just made ", self.rainbowMaker.getFileName()
                     print "With chain length of ", self.rainbowMaker.getLength()
@@ -870,7 +940,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "serverDictionaryScreen"
+                    print "Start -> Server -> Dictionary"
                     print
 
                     #Get the algorithm
@@ -920,18 +990,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Crack", "crack"):
+                    if userInput in ("Crack", "crack", "c"):
 
                         self.state = "serverDictionarySearchingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "serverStartScreen"
 
@@ -947,7 +1017,8 @@ class Controller():
 
                     #display results and wait for user interaction
                     print "============="
-                    print "serverDictionarySearchingScreen"
+                    print "Start -> Server -> Dictionary -> Searching..."
+                    print
 
                     #Start up the networkServer class (as sub-process in the background)
                     self.networkServer.start()
@@ -1067,7 +1138,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "serverDictionaryFoundScreen"
+                    print "Start -> Server -> Dictionary -> Found!"
 
                     print "Key is: ", self.dictionary.showKey()
                     print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
@@ -1079,14 +1150,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "serverDictionaryScreen"
 
@@ -1108,7 +1179,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "serverDictionaryNotFoundScreen"
+                    print "Start -> Server -> Dictionary -> Not Found"
                     print
                     print "Sorry, we didn't find it."
                     print "Just FYI though, that took", self.clock, "seconds."
@@ -1119,14 +1190,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "serverDictionaryScreen"
 
@@ -1146,7 +1217,7 @@ class Controller():
 
                     #What did the user pick? (Brute-Force, Rainbow, Dictionary, Back, Exit)
                     print "============="
-                    print "Single-User Mode StartScreen"
+                    print "Start -> Single-User Mode"
                     print
                     print "(BruteForce)"
                     print "(RainbowMake)"
@@ -1158,14 +1229,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "Back", "back", "Exit", "exit"}
+                    goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "bf", "b", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "d", "Back", "back", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("BruteForce", "bruteforce", "Brute", "brute"):
+                    if userInput in ("BruteForce", "bruteforce", "Brute", "brute", "bf", "b"):
 
                         self.state = "singleBruteForceScreen"
 
@@ -1177,7 +1248,7 @@ class Controller():
 
                         self.state = "singleRainUserScreen"
 
-                    elif userInput in ("Dictionary", "dictionary", "dic"):
+                    elif userInput in ("Dictionary", "dictionary", "dic", "d"):
 
                         self.state = "singleDictionaryScreen"
 
@@ -1198,7 +1269,7 @@ class Controller():
                 elif state == "singleBruteForceScreen":
 
                     print "============="
-                    print "singleBruteForceScreen"
+                    print "Start -> Single-User Mode -> Brute Force"
                     print
 
 
@@ -1266,6 +1337,7 @@ class Controller():
 
                     #Get the hash
 
+                    print
                     hash = raw_input("What's the hash we're searching for: ")
                     #self.brute_force.setHash(hash)
 
@@ -1284,18 +1356,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Crack", "crack"):
+                    if userInput in ("Crack", "crack", "c"):
 
                         self.state = "singleBruteSearchingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1310,7 +1382,7 @@ class Controller():
                 elif state == "singleBruteSearchingScreen":
 
                     print "============="
-                    print "singleBruteSearchingScreen"
+                    print "Start -> Single-User Mode -> Brute Force -> Searching..."
 
                     self.clock = time()
 
@@ -1369,7 +1441,8 @@ class Controller():
                     #display results and wait for user interaction
 
                     print "============="
-                    print "singleDictionaryFoundScreen"
+                    print "Start -> Single-User Mode -> Brute Force -> Found!"
+                    print
                     print "Key is: ", self.brute_force.getKey()
                     print "Wish a", self.brute_force.algorithm, "hash of: ", self.brute_force.origHash
                     print "And it took", self.clock, "seconds."
@@ -1380,7 +1453,7 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -1390,7 +1463,7 @@ class Controller():
                     #Reset the variables
                     self.brute_force.reset()
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1407,7 +1480,7 @@ class Controller():
                     #display results and wait for user interaction
 
                     print "============="
-                    print "singleDictionaryFoundScreen"
+                    print "Start -> Single-User Mode -> Brute Force -> Not Found"
                     print
                     print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
@@ -1418,7 +1491,7 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -1428,7 +1501,7 @@ class Controller():
                     #Reset the variables
                     self.brute_force.reset()
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1446,7 +1519,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "singleRainUserScreen"
+                    print "Start -> Single-User Mode -> Rainbow User"
                     print
 
                     #Get the file name
@@ -1474,18 +1547,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Crack", "crack"):
+                    if userInput in ("Crack", "crack", "c"):
 
                         self.state = "singleRainUserSearchingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1501,7 +1574,7 @@ class Controller():
 
                     #display results and wait for user interaction
                     print "============="
-                    print "singleRainUserSearchingScreen"
+                    print "Start -> Single-User Mode -> Rainbow User -> Searching..."
 
                     self.clock = time()
 
@@ -1566,8 +1639,8 @@ class Controller():
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "singleRainUserFoundScreen"
-
+                    print "Start -> Single-User Mode -> Rainbow User -> Found!"
+                    print
                     print "Key is: ", self.rainbowUser.getKey()
                     print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
                     print "And it took", self.clock, "seconds."
@@ -1578,14 +1651,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1604,7 +1677,7 @@ class Controller():
                     #What did the user pick? (Crack it!, Back, Exit)
                     ###userInput = GUI.getInput()
                     print "============="
-                    print "singleRainUserNotFoundScreen"
+                    print "Start -> Single-User Mode -> Rainbow User -> Not Found"
                     print
                     print "Sorry, we didn't find it."
                     print "Just FYI though, that took", self.clock, "seconds."
@@ -1615,14 +1688,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1639,7 +1712,7 @@ class Controller():
                 elif state == "singleRainMakerScreen":
 
                     print "============="
-                    print "singleRainMakerScreen"
+                    print "Start -> Single-User Mode -> Rainbow Maker"
                     print
 
                     #Get the algorithm
@@ -1731,18 +1804,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
+                    goodNames = {"Create", "create", "c", "Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Create", "create"):
+                    if userInput in ("Create", "create", "c"):
 
                         self.state = "singleRainMakerDoingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1758,7 +1831,7 @@ class Controller():
 
                     #display results and wait for user interaction
                     print "============="
-                    print "singleRainMakerDoingScreen"
+                    print "Start -> Single-User Mode -> Rainbow Maker -> Working..."
 
                     self.clock = time()
 
@@ -1891,7 +1964,7 @@ class Controller():
 
                     #display results and wait for user interaction
                     print "============="
-                    print "single RainMaker Done Screen"
+                    print "Start -> Single-User Mode -> Rainbow Maker -> Done!"
                     print
 
                     print "We just made ", self.rainbowMaker.getFileName()
@@ -1910,14 +1983,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -1935,7 +2008,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "singleDictionaryScreen"
+                    print "Start -> Single-User Mode -> Dictionary"
                     print
 
                     #Get the algorithm
@@ -2021,18 +2094,18 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Crack", "crack", "Back", "back", "Exit", "exit"}
+                    goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Crack", "crack"):
+                    if userInput in ("Crack", "crack", "c"):
 
                         self.state = "singleDictionarySearchingScreen"
 
-                    elif userInput in ("Back", "back"):
+                    elif userInput in ("Back", "back", "b"):
 
                         self.state = "singleStartScreen"
 
@@ -2048,7 +2121,7 @@ class Controller():
 
                     #display results and wait for user interaction
                     print "============="
-                    print "singleDictionarySearchingScreen"
+                    print "Start -> Single-User Mode -> Dictionary -> Searching..."
 
                     self.clock = time()
 
@@ -2158,7 +2231,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "singleDictionaryFoundScreen"
+                    print "Start -> Single-User Mode -> Dictionary -> Found!"
 
                     if self.dictionary.singleHash == True:
                         print "Key is: ", self.dictionary.showKey()
@@ -2174,14 +2247,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleDictionaryScreen"
 
@@ -2199,7 +2272,7 @@ class Controller():
 
                     #What did the user pick? (Crack it!, Back, Exit)
                     print "============="
-                    print "singleDictionaryNotFoundScreen"
+                    print "Start -> Single-User Mode -> Dictionary -> Not Found"
                     print
                     print "Sorry, we didn't find anything."
                     print "Just FYI though, that took", self.clock, "seconds."
@@ -2210,14 +2283,14 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Back", "back", "Exit", "exit"}
+                    goodNames = {"Back", "back", "b", "Exit", "exit"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
 
                         userInput = raw_input("Try Again: ")
 
-                    if userInput in ("Back", "back"):
+                    if userInput in ("Back", "back", "b"):
 
                         self.state = "singleDictionaryScreen"
 
