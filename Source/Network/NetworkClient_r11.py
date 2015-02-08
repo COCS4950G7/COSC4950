@@ -19,6 +19,7 @@ import socket
 from random import *
 import platform
 import sys
+import Chunk
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB): #This function is now global
         try:
@@ -66,11 +67,50 @@ def receiveData(self,networkSocket):
                     elif(checkForNextChunkParamsFromServer(self, str(data))==True):
                         print "Received Next Chunk Params From Server\n"
                         #insert chunk assembling process here
-                        break
-                    elif(checkForNextChunkDataFromServer(self, str(data))==True):
-                        print "Received Next Chunk Data From Server\n"
+                        dataChunkFileSize = ""
+                        closingParenthesisLocation = 0
+                        #end of file size is marked by a closing parenthesis
+                        #position [0:4] = 'NEXT'
+                        #position [5:9] = 'SIZE('
+                        for index in range(10,len(data)):
+                            if(data[index] == ")"):
+                                closingParenthesisLocation = index
+                                break
+                            else:
+                                dataChunkFileSize+= str(data[index])
+                        #removing keywords from the params
+                        data= data[(closingParenthesisLocation+2):len(data)]
+                        inputData  = ""
+                        #receive the chunk data from the server
+                        try:
+                            import sys
+                            while(sys.getsizeof(inputData) < dataChunkFileSize):
+                                recvData = networkSocket.recv(4096)
+                                if recvData:
+                                    inputData+= recvData
+                                    networkSocket.settimeout(0.25) #reset the socket timeout
+                                else:
+                                    break
+                                self.nextChunkDataFromServerCounterLock.acquire()
+                                self.incrementNextChunkDataFromServerCounter()
+                                self.nextChunkDataFromServerCounterLock.release()
+                        except Exception as inst:
+                            print "Error in receiving chunk data from server: " +str(inst)+"\n"
+                        #make a chunk object to send to the controller
+                        tempChunk= Chunk.Chunk()
+                        #set params
+                        tempChunk.params = data
+                        #set data
+                        tempChunk.data = inputData
+                        #send doignSTuff command to controller
+                        sendDoingStuffCommandToController(self)
+                        #send the chunk to the controller
+                        sendNextChunkCommandToController(tempChunk)
+                        break #keep, this is part of the new code, NOT part of the old code moved from prev revision
+                    #elif(checkForNextChunkDataFromServer(self, str(data))==True): #THIS FUNCTION IS INCLUDED IN THE CHECKFOR NEXTPARAMS FUNCTION ABOVE
+                     #   print "Received Next Chunk Data From Server\n"
                         #insert chunk assembling process here
-                        break
+                     #   break
                     else: #then it is an unknown command
                         print "Unknown command received from the server: " + str(data) +"\n"
                         self.incrementUnknownCommandFromServerCounter()
