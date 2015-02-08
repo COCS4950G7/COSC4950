@@ -116,8 +116,13 @@ def receiveData(self,networkSocket):
                         self.incrementUnknownCommandFromServerCounter()
                         break
             except Exception as inst:
-                print "Exception in receive data: " + str(inst) +"\n"
-                break
+                if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
+                    #dont display the timed out message
+                    fakeVar=True
+                    break
+                else:
+                    print "Exception in receive data: " + str(inst) +"\n"
+                    break
         return data #if data is empty string, nothing was received
 
 def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you need to break out of main client loop, else false
@@ -172,7 +177,7 @@ def checkForDoneCommandFromServer(self,inboundString):
         print "Checking for done command from server\n"
         if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
             print "Done command was received from the server\n"
-            self.incrementNextChunkDataFromServerCounter()
+            self.incrementDoneCommandFromServerCounter()
             self.serverIssuedDoneCommand = True
             return True
         else:
@@ -247,6 +252,18 @@ def receiveServerIPFromController(self):
     except Exception as inst:
         print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
 
+def checkForDoneCommandFromController(self, inboundString):
+    try:
+        print "Checking for done command from the Controller\n"
+        if(compareString(inboundString, "done",0,0,len("done"), len("done"))==True):
+            self.incrementDoneCommandFromControllerCounter()
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "ERROR in checkingForDoneCommandFromController: " +str(inst)+"\n"
+        return False
+
 def checkForDoingStuffCommandFromController(self, inboundString):
     try:
         print "Checking for doingStuff Command from the Controller\n"
@@ -305,6 +322,7 @@ class NetworkClient():
 
     #inbound commands from controller
     receiveServerIPFromControllerCounter = 0
+    doneCommandFromControllerCounter = 0
     doingStuffCommandFromControllerCounter = 0
     foundSolutionCommandFromControllerCounter = 0
     requestNextChunkCommandFromControllerCounter = 0
@@ -350,6 +368,9 @@ class NetworkClient():
     def incrementReceiveServerIPFromControllerCounter(self):
         self.receiveServerIPFromControllerCounter+= 1
 
+    def incrementDoneCommandFromControllerCounter(self):
+        self.doneCommandFromControllerCounter+= 1
+
     def incrementDoingStuffCommandFromControllerCounter(self):
         self.doingStuffCommandFromControllerCounter+= 1
 
@@ -374,6 +395,7 @@ class NetworkClient():
             buf = 1024
             self.serverIP = '127.0.1.1'
             self.myIPAddress = ""
+            self.listOfUnknownCommandsFromController = []
             self.serverIssuedDoneCommand= False
 
             #.........................................................................
@@ -509,9 +531,13 @@ class NetworkClient():
                         elif(checkForDoingStuffCommandFromController(self,inboundControllerCommand)==True):
                             print "doingStuff Command has been received from Controller\n"
                             #controller has parroted the command back, dont do anything
+                        elif(checkForDoneCommandFromController(self, inboundControllerCommand)==True):
+                            print "done command has been received from the Controller\n"
+                            #just a confirmation message
                         else:
                             print "ERROR: unknown command received from Controller: " +str(inboundControllerCommand) +"\n"
                             self.incrementUnknownCommandFromControllerCounter()
+                            self.listOfUnknownCommandsFromController.append(inboundControllerCommand)
             #end communication with controller
         except Exception as inst:
             print "ERROR in main try block: " + str(inst) +"\n"
@@ -537,9 +563,13 @@ class NetworkClient():
             print "# of doingStuff Commands Sent to Controller: " + str(self.doingStuffCommandToControllerCounter) +"\n"
             print "----------------------Inbound Commands From Controller-----------------------\n"
             print "# of Receive Server IP From Controller Commands: " + str(self.receiveServerIPFromControllerCounter) +"\n"
+            print "# of done Commands Received from Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
             print "# of doingStuff Commands Received From Controller: " + str(self.doingStuffCommandFromControllerCounter) +"\n"
             print "# of foundSolution Commands Received From Controller: " + str(self.foundSolutionCommandFromControllerCounter)+"\n"
             print "# of requestNextChunk Commands Received From Controller: " + str(self.requestNextChunkCommandFromControllerCounter)+"\n"
             print "# of unknown Commands Received From Controller: " + str(self.unknownCommandFromControllerCounter)+"\n"
+            if(len(self.listOfUnknownCommandsFromController) > 0):
+                for index in range(0, len(self.listOfUnknownCommandsFromController)):
+                    print "     " + str(index) + ") " + str(self.listOfUnknownCommandsFromController[index]) +"\n"
 
 #NetworkClient() #no longer needed, controller calls NetworkClient now
