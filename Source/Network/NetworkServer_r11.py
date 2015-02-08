@@ -8,6 +8,11 @@ __author__ = 'chris hamm'
 
 #BUG, if two client have the same ip address , then dictionary of current client tasks will override the first one
 
+#DEAD REVISION, attempting a brand new revision
+
+#use RLock to simplify some of the locking mecanisms
+#use 'with' and it will release the lock when finished
+
 from socket import *
 import socket
 import thread
@@ -86,6 +91,7 @@ def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
     print "socket lock acquired\n"
     while True:
         try:
+            print "preparing to send done command to client\n"
             networkSocket.sendto("done",clientIP)
             #self.serversocket.sendto("done",clientIP)
             print "sent Done command to client: " +str(clientIP) +"\n"
@@ -120,7 +126,9 @@ def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, sock
     #self.serversocket.settimeout(0.5)
     while True:
         try:
+            print "preparing to send next command to client\n"
             networkSocket.sendto(outboundMessage, clientIP)
+            #networkSocket.sendall(outboundMessage)
             #self.serversocket.sendto(outboundMessage, clientIP)
             print "sent Next command to client: "+str(clientIP)+"\n"
             self.nextCommandToClientCounterLock.acquire()
@@ -129,10 +137,13 @@ def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, sock
             break
         except Exception as inst:
             if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
-                #dont display the timeout message
+                print "ERROR: timed out"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
                 fakeVar= True
-                networkSocket.settimeout(0.5) #reset the socket timeout
-                break
+               # networkSocket.settimeout(5.0) #reset the socket timeout
+                #dont break
             else:
                 print "Exception in send Next command: " +str(inst) +"\n"
                 break
@@ -149,6 +160,7 @@ def sendNextDataCommandToClient(self, networkSocket, clientIP, outboundMessage, 
     #self.serversocket.settimeout(0.5)
     while True:
         try:
+            print "preparing to send next data to client\n"
             networkSocket.sendto(outboundMessage,clientIP)
             #self.serversocket.sendto(outboundMessage,clientIP)
             print "sent next data command to client: "+str(clientIP)+"\n"
@@ -167,7 +179,7 @@ def sendNextDataCommandToClient(self, networkSocket, clientIP, outboundMessage, 
                 break
     #self.socketLock.release()
     socketLock.release()
-
+#23-15-4
 
 def checkForNextCommandFromClient(inboundData):
     print "Checking for the Next command from the client\n"
@@ -363,6 +375,7 @@ class NetworkServer():
     def handler(self, clientsocket, clientaddr, socketLock):
         print "Accepted connection from: " + str(clientaddr) + "\n"
         clientIsConnected= True
+        clientHost, clientPort = clientaddr
         while True:
             #CHECKING FOR CLIENT INPUT
             print "Checking for input from : " + str(clientaddr) + "\n"
@@ -390,12 +403,13 @@ class NetworkServer():
                         #send chhunk params to client
                         #socketLock.acquire() #functions already lock the socket
                         try:
+                            print "clientIP: "+str(clientsIP)+"\n"
                             sendNextCommandToClient(self,clientsocket,clientsIP, tempKeywords, socketLock)
                         except Exception as inst:
                             print "ERROR in sending NextParams to the client: " +str(inst)+"\n"
                         #send the chunk data to the client
                         try:
-                            sendNextDataCommandToClient(self,clientsocket,clientsIP, self.dictionaryOfCurrentClientTasks[clientsIP].data, socketLock)
+                            sendNextDataCommandToClient(self,clientsocket,clientsIP, str(self.dictionaryOfCurrentClientTasks[clientsIP].data), socketLock)
                         except Exception as inst:
                             print "ERROR in sending NextData to the client: " +str(inst)+"\n"
                         #socketLock.release() #functions already lock the socket
@@ -464,8 +478,10 @@ class NetworkServer():
                         self.dictionaryOfCurrentClientTasksLock.acquire()
                         tempKeywords2= "NEXT " + "SIZE(" + str(chunkFileSize) +") " +str(self.dictionaryOfCurrentClientTasks[storedClientIP].params)
                         self.dictionaryOfCurrentClientTasksLock.release()
-                        sendNextCommandToClient(self,self.serversocket,(storedClientIP, self.port), tempKeywords2, socketLock)
-                        sendNextDataCommandToClient(self,self.serversocket, (storedClientIP, self.port), inboundControllerChunkObject.data, socketLock)
+                        #print "storedClientIP: " +str(storedClientIP)+"\n"
+                        #print "clientPort: "+str(clientPort)+"\n"
+                        sendNextCommandToClient(self,self.serversocket,(storedClientIP, clientPort), tempKeywords2, socketLock)
+                        sendNextDataCommandToClient(self,self.serversocket, (storedClientIP, clientPort), str(inboundControllerChunkObject.data), socketLock)
                     else:
                         self.stackOfChunksThatNeedToBeReassignedLock.acquire()
                         self.stackOfChunksThatNeedToBeReassigned.append(inboundControllerChunkObject)

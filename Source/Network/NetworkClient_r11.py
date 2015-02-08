@@ -6,6 +6,8 @@ __author__ = 'chris hamm'
 
 #Must now be called by controller
 
+#DEAD REVISION, attempting a brand new revision
+
 #I THINK I FIXED THIS(below)
     #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
     #Suspect that it is because the check for done command is not implemented properly
