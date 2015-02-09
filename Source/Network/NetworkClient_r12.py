@@ -83,6 +83,7 @@ def receiveData(self,networkSocket):
                         #removing keywords from the params
                         data= data[(closingParenthesisLocation+2):len(data)]
                         inputData  = ""
+                        recvData = ""
                         #receive the chunk data from the server
                         try:
                             import sys
@@ -90,14 +91,17 @@ def receiveData(self,networkSocket):
                                 recvData = networkSocket.recv(4096)
                                 if recvData:
                                     inputData+= recvData
-                                    networkSocket.settimeout(0.25) #reset the socket timeout
-                                else:
-                                    break
-                                self.nextChunkDataFromServerCounterLock.acquire()
-                                self.incrementNextChunkDataFromServerCounter()
-                                self.nextChunkDataFromServerCounterLock.release()
+                                    networkSocket.settimeout(0.5) #reset the socket timeout
+                                #else:
+                                    #break #TMPORARY COMMENT
                         except Exception as inst:
+                            if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                                print "ERROR in receiving chunk data from the server: timed out\n"
+                                print "dataChunkFileSize: "+ str(dataChunkFileSize)+"\n"
+                                print "Size of inputData: " + str(sys.getsizeof(inputData)) +"\n"
+                                print "Size of recvData: " + str(sys.getsizeof(recvData))+"\n"
                             print "Error in receiving chunk data from server: " +str(inst)+"\n"
+                        self.incrementNextChunkDataFromServerCounter()
                         #make a chunk object to send to the controller
                         tempChunk= Chunk.Chunk()
                         #set params
@@ -107,7 +111,7 @@ def receiveData(self,networkSocket):
                         #send doignSTuff command to controller
                         sendDoingStuffCommandToController(self)
                         #send the chunk to the controller
-                        sendNextChunkCommandToController(tempChunk)
+                        sendNextChunkCommandToController(self,tempChunk)
                         break #keep, this is part of the new code, NOT part of the old code moved from prev revision
                     #elif(checkForNextChunkDataFromServer(self, str(data))==True): #THIS FUNCTION IS INCLUDED IN THE CHECKFOR NEXTPARAMS FUNCTION ABOVE
                      #   print "Received Next Chunk Data From Server\n"
