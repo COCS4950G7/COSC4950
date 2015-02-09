@@ -14,9 +14,32 @@ __author__ = 'chris hamm'
     #   lock.acquire()
     #   lock.acquire() #This wont block (this is nested)
 
+#Latest error:
+'''
+Sending Next Command to Client
+
+TERM environment variable not set.
+Searching--> [ *           ]
+Acquired socket lock
+
+ERROR: timed out
+<class 'socket.timeout'>
+('timed out',)
+timed out
+Sending Next Data Command to Client
+
+Acquired socket lock
+
+preparing to send next data to client
+
+Unhandled exception in thread started by <bound method NetworkServer.handler of <NetworkServer_r12.NetworkServer instance at 0x1022e17e8>>
+Checking for the Next command from the client
+'''
+
 import socket
 from socket import *
 import threading
+from threading import RLock
 import thread
 import platform
 import sys
@@ -123,105 +146,11 @@ def checkForDoneCommandFromController(self, inboundString):
         print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
         return False
 
-def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
-    print "Issuing Done Command to Client: " + str(clientIP) +"\n"
-    #networkSocket.settimeout(0.5)
-    print "Acquiring socket lock\n"
-    #self.socketLock.acquire()
-    socketLock.acquire()
-    networkSocket.settimeout(0.5)
-    #self.serversocket.settimeout(0.5)
-    print "socket lock acquired\n"
-    while True:
-        try:
-            print "preparing to send done command to client\n"
-            networkSocket.sendto("done",clientIP)
-            #self.serversocket.sendto("done",clientIP)
-            print "sent Done command to client: " +str(clientIP) +"\n"
-            self.doneCommandToClientCounterLock.acquire()
-            self.incrementDoneCommandToClientCounter()
-            self.doneCommandToClientCounterLock.release()
-            break
-        #except networkSocket.error as inst:
-         #   print "Socket has timed out in sendDoneCommandToClient. Attempting to send again.\n"
-        except Exception as inst:
-            if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
-                print "Broken pipe error detected in sendData\n"
-                break
-            elif(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
-                #do not display the timeout error, but keep trying to send the done command
-                fakeVar=True
-                networkSocket.settimeout(0.5)#reset the socket timeout
-                #DO NOT break
-            else:
-                print "Exception in send Done command: " +str(inst) +"\n"
-                break
-    #self.socketLock.release()
-    socketLock.release()
 
-def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
-    print "Sending Next Command to Client\n"
-    #networkSocket.settimeout(0.5)
-    #self.socketLock.acquire()
-    socketLock.acquire()
-    networkSocket.settimeout(0.5)
-    print "Acquired socket lock\n"
-    #self.serversocket.settimeout(0.5)
-    while True:
-        try:
-            print "preparing to send next command to client\n"
-            networkSocket.sendto(outboundMessage, clientIP)
-            #networkSocket.sendall(outboundMessage)
-            #self.serversocket.sendto(outboundMessage, clientIP)
-            print "sent Next command to client: "+str(clientIP)+"\n"
-            self.nextCommandToClientCounterLock.acquire()
-            self.incrementNextCommandToClientCounter()
-            self.nextCommandToClientCounterLock.release()
-            break
-        except Exception as inst:
-            if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
-                print "ERROR: timed out"
-                print type(inst) #the exception instance
-                print inst.args #srguments stored in .args
-                print inst #_str_ allows args tto be printed directly
-                fakeVar= True
-               # networkSocket.settimeout(5.0) #reset the socket timeout
-                #dont break
-            else:
-                print "Exception in send Next command: " +str(inst) +"\n"
-                break
-    #self.socketLock.release()
-    socketLock.release()
 
-def sendNextDataCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
-    print "Sending Next Data Command to Client\n"
-    #networkSocket.settimeout(0.5)
-    #self.socketLock.acquire()
-    socketLock.acquire()
-    networkSocket.settimeout(0.5)
-    print "Acquired socket lock\n"
-    #self.serversocket.settimeout(0.5)
-    while True:
-        try:
-            print "preparing to send next data to client\n"
-            networkSocket.sendto(outboundMessage,clientIP)
-            #self.serversocket.sendto(outboundMessage,clientIP)
-            print "sent next data command to client: "+str(clientIP)+"\n"
-            self.nextDataCommandToClientCounter.acquire()
-            self.incrementNextDataCommandToClientCounter()
-            self.nextDataCommandToClientCounter.release()
-            break
-        except Exception as inst:
-            if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
-                #dont display the timeout message
-                fakeVar= True
-                networkSocket.settimeout(0.5) #reset the socket timeout
-                #dont break
-            else:
-                print "Exception in send next Data Command to Client: " +str(inst)+"\n"
-                break
-    #self.socketLock.release()
-    socketLock.release()
+
+
+
 
 class NetworkServer():
     #Declare class vars here
@@ -331,7 +260,7 @@ class NetworkServer():
                 socketLock.acquire()
                 inboundClientCommand = clientSocket.recv(2048)
                 socketLock.release()
-                if(checkForNextCommandFromClient(inboundClientCommand)==True):
+                if(checkForNextCommandFromClient(self,inboundClientCommand)==True):
                     #extract the clients IP from message
                     clientsIP = ""
                     for index in range(5, len(inboundClientCommand)):
@@ -346,24 +275,32 @@ class NetworkServer():
                         dataFileSize = sys.getsizeof(self.dictionaryOfCurrentClientTasks[clientsIP].data)
                         tempKeywords= "NEXT " +"SIZE(" + str(dataFileSize) +") " + str(self.dictionaryOfCurrentClientTasks[clientsIP].params)
                         #send chhunk params to client
-                        #socketLock.acquire() #functions already lock the socket
+                        socketLock.acquire() #functions already lock the socket
                         try:
                             print "clientIP: "+str(clientsIP)+"\n"
-                            sendNextCommandToClient(self,clientSocket,clientsIP, tempKeywords, socketLock)
+                            self.sendNextCommandToClient(clientSocket,clientsIP, tempKeywords, socketLock)
                         except Exception as inst:
                             print "ERROR in sending NextParams to the client: " +str(inst)+"\n"
+                        finally:
+                            socketLock.release()
                         #send the chunk data to the client
                         try:
-                            sendNextDataCommandToClient(self,clientSocket,clientsIP, str(self.dictionaryOfCurrentClientTasks[clientsIP].data), socketLock)
+                            self.sendNextDataCommandToClient(clientSocket,clientsIP, str(self.dictionaryOfCurrentClientTasks[clientsIP].data), socketLock)
                         except Exception as inst:
                             print "ERROR in sending NextData to the client: " +str(inst)+"\n"
+                        #finally:
+                         #   if(self.dictionaryOfCurrentClientTasksLock.locked()):
+                          #      self.dictionaryOfCurrentClientTasksLock.release()
+                           # if(socketLock.locked()):
+                            #    socketLock.release()
                     else:
                         socketLock.acquire()
-                        self.sendNextChunkCommandToController(self)
+                        self.sendNextChunkCommandToController()
                         socketLock.release()
                         self.stackOfClientsWaitingForNextChunkLock.acquire()
                         self.stackOfClientsWaitingForNextChunk.append(clientsIP)
                         self.stackOfClientsWaitingForNextChunkLock.release()
+                        print "Added client to the stack of clients waiting for next chunk\n"
                     self.stackOfChunksThatNeedToBeReassignedLock.release()
                 elif(checkForFoundSolutionCommandFromClient(inboundClientCommand) == True):
                     self.foundSolutionCommandFromClientCounterLock.acquire()
@@ -385,7 +322,28 @@ class NetworkServer():
                     self.incrementUnknownCommandFromClientCounter()
                     self.unknownCommandFromClientCounterLock.release()
             except Exception as inst:
-                print "Error in handler main try block: "+str(inst)+"\n"
+                if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                    #dont display error message
+                    fakeVar= True
+                    socketLock.release()
+                else:
+                    print "Error in handler main try block: "+str(inst)+"\n"
+                    socketLock.release()
+            #finally:
+                #if(self.dictionaryOfCurrentClientTasksLock.locked()):
+                 #   self.dictionaryOfCurrentClientTasksLock.release()
+                #if(self.stackOfChunksThatNeedToBeReassignedLock.locked()):
+                #    self.stackOfChunksThatNeedToBeReassignedLock.release()
+                #if(self.foundSolutionCommandFromClientCounterLock.locked()):
+                #    self.foundSolutionCommandFromClientCounterLock.release()
+                #if(self.listOfClientsLock.locked()):
+             #       self.listOfClientsLock.release()
+              #  if(self.crashedCommandFromClientCounterLock.locked()):
+               #     self.crashedCommandFromClientCounterLock.release()
+               # if(self.unknownCommandFromClientCounterLock.locked()):
+               #     self.unknownCommandFromClientCounterLock.release()
+               # if(socketLock.locked()):
+                #    socketLock.release()
         clientSocket.close()
 
     #Define the class constructor here
@@ -393,10 +351,11 @@ class NetworkServer():
         self.pipe= inboundpipefromcontroller
 
         #Create the serversocket
+        import socket
         serversocket= socket.socket(AF_INET, SOCK_STREAM)
 
         #bind the socket
-        serversocket.bind(self.host, self.port)
+        serversocket.bind((self.host, self.port))
 
         #detect the OS
         try: #getOS try block
@@ -480,7 +439,9 @@ class NetworkServer():
             while True:
                 #check to see if a client is trying to connect
                 try: #check for a client that wants to connect try block
+                    self.socketLock.acquire()
                     clientSocket, clientAddr = serversocket.accept()
+                    self.socketLock.release()
                     self.listOfClientsLock.acquire()
                     self.listOfClients.append((clientSocket, clientAddr))
                     self.listOfClientsLock.release()
@@ -488,7 +449,18 @@ class NetworkServer():
                     print "A new thread has been made\n"
                     self.incrementNumberOfThreadsCreatedCounter()
                 except Exception as inst:
-                    print "Error in check for clients trying to connect try block: " +str(inst)+"\n"
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #dont print out the error
+                        fakeVar= True
+                        self.socketLock.release()
+                    else:
+                        print "Error in check for clients trying to connect try block: " +str(inst)+"\n"
+                        self.socketLock.release()
+                #finally:
+                 #   if(self.listOfClientsLock.locked()):
+                  #      self.listOfClientsLock.release()
+                   # if(self.socketLock.locked()):
+                    #    self.socketLock.release()
                 #check for input from the controller
                 try: #check for controller input try block
                     if(self.pipe.poll()):
@@ -522,7 +494,7 @@ class NetworkServer():
                                 self.dictionaryOfCurrentClientTasksLock.acquire()
                                 self.dictionaryOfCurrentClientTasks[storedClientIP] = inboundControllerObject
                                 self.dictionaryOfCurrentClientTasksLock.release()
-                                self.stackOfClientsWaitingForNextChunkLock.release()
+                                #self.stackOfClientsWaitingForNextChunkLock.release()
                                 chunkFileSize = sys.getsizeof(inboundControllerObject.data)
                                 #adding keywords to the params
                                 self.dictionaryOfCurrentClientTasksLock.acquire()
@@ -538,9 +510,10 @@ class NetworkServer():
                                         break
                                 self.listOfClientsLock.release()
                                 if(clientPort == ""):
+                                    print "ERROR unable to find a matching ip address\n"
                                     raise Exception("ERROR: client IP did not find a match in the listOfClients")
-                                sendNextCommandToClient(self,self.serversocket,(storedClientIP, clientPort), tempKeywords2, self.socketLock)
-                                sendNextDataCommandToClient(self,self.serversocket, (storedClientIP, clientPort), str(inboundControllerObject.data), self.socketLock)
+                                self.sendNextCommandToClient(serversocket,(storedClientIP, clientPort), tempKeywords2, self.socketLock)
+                                self.sendNextDataCommandToClient(serversocket, (storedClientIP, clientPort), str(inboundControllerObject.data), self.socketLock)
                             #otherwise no clients are waiting for nextChunk
                             else:
                                 #store the chunk in the stack of chunksThatNeedToBeReassigned
@@ -552,14 +525,204 @@ class NetworkServer():
                         elif(checkForDoneCommandFromController(self, inboundControllerCommand)==True):
                             print "Received the done command from the controller\n"
                         #else print the unknown command
-                        print "ERROR unknown command received from controller: " + str(inboundControllerCommand)
-                        self.unknownCommandFromControllerCounterLock.acquire()
-                        self.incrementUnknownCommandFromControllerCounter()
-                        self.unknownCommandFromControllerCounterLock.release()
+                        else:
+                            print "ERROR unknown command received from controller: " + str(inboundControllerCommand)
+                            self.unknownCommandFromControllerCounterLock.acquire()
+                            self.incrementUnknownCommandFromControllerCounter()
+                            self.unknownCommandFromControllerCounterLock.release()
                 except Exception as inst:
                     print "Error in check for controller input try block: " +str(inst)+"\n"
+                #finally:
+                 #   if(self.stackOfClientsWaitingForNextChunkLock.locked()):
+                  #      self.stackOfClientsWaitingForNextChunkLock.release()
+                   # if(self.dictionaryOfCurrentClientTasksLock.locked()):
+                  #      self.dictionaryOfCurrentClientTasksLock.release()
+                  #  if(self.listOfClientsLock.locked()):
+                  #     self.listOfClientsLock.release()
+                  #  if(self.stackOfChunksThatNeedToBeReassignedLock.locked()):
+                  #      self.stackOfChunksThatNeedToBeReassignedLock.release()
+                   # if(self.unknownCommandFromControllerCounterLock.locked()):
+                   #     self.unknownCommandFromControllerCounterLock.release()
+                   # if(self.socketLock.locked()):
+                   #     self.socketLock.release()
         except Exception as inst:
             print "Error in the MAIN THREAD: " + str(inst)+"\n"
         #End of Main thread server loop
 
         #Finally block goes here
+        finally:
+            print "Acquiring lock for print command records\n"
+            self.listOfClientsLock.acquire()
+            print "# of clients connected: " + str(len(self.listOfClients)) + "\n"
+            self.listOfClientsLock.release()
+            print "Issuing Done Commands to clients...\n"
+            self.listOfClientsLock.acquire()
+            for i in range(0, len(self.listOfClients)):
+                doneSock, doneAddr = self.listOfClients[i]
+                self.sendDoneCommandToClient(doneSock, doneAddr, self.socketLock)
+            self.listOfClientsLock.release()
+            serversocket.close()
+            print "Socket has been closed\n"
+            #printing out all of the records
+            print "---------------Number of Threads Created-----------------------\n"
+            print "# of Threads Created: " + str(self.numberOfThreadsCreatedCounter) +"\n"
+            print "---------------List of Crashed Clients-------------------------\n"
+            self.listOfCrashedClientsLock.acquire()
+            print "# of Crashed Clients: " + str(len(self.listOfCrashedClients)) +"\n"
+            if(len(self.listOfCrashedClients) > 0):
+                for x in range(0, len(self.listOfCrashedClients)):
+                    print str(x) + ")" + str(self.listOfCrashedClients[x]) +"\n"
+            self.listOfCrashedClientsLock.release()
+            print "--------------Stack of Clients Waiting For Next Chunk---------------\n"
+            self.stackOfClientsWaitingForNextChunkLock.acquire()
+            print "# of Clients Waiting For Next Chunk: " +str(len(self.stackOfClientsWaitingForNextChunk)) +"\n"
+            if(len(self.stackOfClientsWaitingForNextChunk) > 0):
+                while(len(self.stackOfClientsWaitingForNextChunk) > 0):
+                    print str(self.stackOfClientsWaitingForNextChunk.pop()) + "\n"
+            self.stackOfClientsWaitingForNextChunkLock.release()
+            print "--------------Stack of Chunks That Need To Be Reassigned----------------\n"
+            self.stackOfChunksThatNeedToBeReassignedLock.acquire()
+            print "# of Chunks That Need To Be Reassigned: " + str(len(self.stackOfChunksThatNeedToBeReassigned)) +"\n"
+            self.stackOfChunksThatNeedToBeReassignedLock.release()
+            print "--------------Dictionary of Current Client Tasks---------------------\n"
+            self.dictionaryOfCurrentClientTasksLock.acquire()
+            print "[key]         [value]"  +"\n"
+            for key, value in self.dictionaryOfCurrentClientTasks.iteritems():
+                print str(key), str(value)
+            self.dictionaryOfCurrentClientTasksLock.release()
+            print "---------------Outbound Commands To Client(s)------------------\n"
+            self.doneCommandToClientCounterLock.acquire()
+            print "# of Done Commands sent to the clients: " + str(self.doneCommandToClientCounter) +"\n"
+            self.doneCommandToClientCounterLock.release()
+            self.nextCommandToClientCounterLock.acquire()
+            print "# of Next Commands sent to the clients: " +str(self.nextCommandToClientCounter) +"\n"
+            self.nextCommandToClientCounterLock.release()
+            self.nextDataCommandToClientCounterLock.acquire()
+            print "# of Next Data Commands sent to the clients: " +str(self.nextDataCommandToClientCounter) + "\n"
+            self.nextDataCommandToClientCounterLock.release()
+            print "---------------Inbound Commands From Client(s)-----------------\n"
+            self.nextCommandFromClientCounterLock.acquire()
+            print "# of Next Commands received from the client: " + str(self.nextCommandFromClientCounter) + "\n"
+            self.nextCommandFromClientCounterLock.release()
+            self.foundSolutionCommandFromClientCounterLock.acquire()
+            print "# of FOUNDSOLUTION Commands received from the client: " +str(self.foundSolutionCommandFromClientCounter) +"\n"
+            self.foundSolutionCommandFromClientCounterLock.release()
+            self.unknownCommandFromClientCounterLock.acquire()
+            print "# of Unknown Commands received from Client: " + str(self.unknownCommandFromClientCounter) +"\n"
+            self.unknownCommandFromClientCounterLock.release()
+            self.crashedCommandFromClientCounterLock.acquire()
+            print "# of Crashed Commands received from client: " + str(self.crashedCommandFromClientCounter) + "\n"
+            self.crashedCommandFromClientCounterLock.release()
+            print "--------------Outbound Commands To Controller----------------\n"
+            self.nextChunkCommandToControllerCounterLock.acquire()
+            print "# of nextChunk Commands sent to the Controller: " +str(self.nextChunkCommandToControllerCounter)+"\n"
+            self.nextChunkCommandToControllerCounterLock.release()
+            self.waitingCommandToControllerCounterLock.acquire()
+            print "# of waiting Commands sent to the Controller: " + str(self.waitingCommandToControllerCounter)+"\n"
+            self.waitingCommandToControllerCounterLock.release()
+            self.doneCommandToControllerCounterLock.acquire()
+            print "# of done Commands sent to the Controller: " + str(self.doneCommandToControllerCounter)+"\n"
+            self.doneCommandToControllerCounterLock.release()
+            print "-------------Inbound Commands From Controller---------------\n"
+            self.nextChunkCommandFromControllerCounterLock.acquire()
+            print "# of nextChunk Commands received from the Controller: "+ str(self.nextChunkCommandFromControllerCounter)+"\n"
+            self.nextChunkCommandFromControllerCounterLock.release()
+            self.doneCommandFromControllerCounterLock.acquire()
+            print "# of done Commands received from the Controller: " +str(self.doneCommandFromControllerCounter)+"\n"
+            self.doneCommandFromControllerCounterLock.release()
+            self.unknownCommandFromControllerCounterLock.acquire()
+            print "# of unknown Commands received from the Controller: "+str(self.unknownCommandFromControllerCounter)+"\n"
+            self.unknownCommandFromControllerCounterLock.release()
+
+    def sendNextChunkCommandToController(self):
+        try:
+            print "Sending nextChunk Command to the Controller\n"
+            self.pipe.send("nextChunk")
+            print "Sent the nextChunk Command to the Controller\n"
+            self.nextChunkCommandToControllerCounterLock.acquire()
+            self.incrementNextChunkCommandToControllerCounter()
+            self.nextChunkCommandToControllerCounterLock.release()
+            print "Incremented the nextChunkToCOntrollerCounter\n"
+        except Exception as inst:
+            print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
+        #finally:
+         #   self.nextChunkCommandToControllerCounterLock.release()
+
+    def sendDoneCommandToClient(self,networkSocket, clientIP, socketLock):
+        print "Issuing Done Command to Client: " + str(clientIP) +"\n"
+        #networkSocket.settimeout(0.5)
+        print "Acquiring socket lock\n"
+        socketLock.acquire()
+        networkSocket.settimeout(0.5)
+        #self.serversocket.settimeout(0.5)
+        print "socket lock acquired\n"
+        try:
+            print "preparing to send done command to client\n"
+            networkSocket.sendto("done",clientIP)
+            print "sent Done command to client: " +str(clientIP) +"\n"
+            self.doneCommandToClientCounterLock.acquire()
+            self.incrementDoneCommandToClientCounter()
+            self.doneCommandToClientCounterLock.release()
+        #except networkSocket.error as inst:
+         #   print "Socket has timed out in sendDoneCommandToClient. Attempting to send again.\n"
+        except Exception as inst:
+            if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
+                print "Broken pipe error detected in sendData\n"
+                self.doneCommandToClientCounterLock.release()
+            elif(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                #do not display the timeout error, but keep trying to send the done command
+                fakeVar=True
+                self.doneCommandToClientCounterLock.release()
+            else:
+                print "Exception in send Done command: " +str(inst) +"\n"
+                self.doneCommandToClientCounterLock.release()
+        socketLock.release()
+
+    def sendNextCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
+        print "Sending Next Command to Client\n"
+        socketLock.acquire()
+        networkSocket.settimeout(0.5)
+        print "Acquired socket lock\n"
+        try:
+            networkSocket.sendto(outboundMessage, clientIP)
+            print "sent Next command to client: "+str(clientIP)+"\n"
+            self.nextCommandToClientCounterLock.acquire()
+            self.incrementNextCommandToClientCounter()
+            self.nextCommandToClientCounterLock.release()
+        except Exception as inst:
+            if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
+                print "ERROR: timed out"
+                print type(inst) #the exception instance
+                print inst.args #srguments stored in .args
+                print inst #_str_ allows args tto be printed directly
+                fakeVar= True
+                #self.nextCommandToClientCounterLock.release()
+            else:
+                print "Exception in send Next command: " +str(inst) +"\n"
+                #self.nextCommandToClientCounterLock.release()
+        socketLock.release()
+
+    def sendNextDataCommandToClient(self, networkSocket, clientIP, outboundMessage, socketLock):
+        print "Sending Next Data Command to Client\n"
+        socketLock.acquire()
+        #networkSocket.settimeout(0.5)
+        print "Acquired socket lock\n"
+        try:
+            print "preparing to send next data to client\n"
+            networkSocket.sendto(outboundMessage,clientIP)
+            print "sent next data command to client: "+str(clientIP)+"\n"
+            self.nextDataCommandToClientCounterLock.acquire()
+            self.incrementNextDataCommandToClientCounter()
+            self.nextDataCommandToClientCounterLock.release()
+        except Exception as inst:
+            if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
+                #dont display the timeout message
+                fakeVar= True
+                #networkSocket.settimeout(0.5) #reset the socket timeout
+                #dont break
+                #self.nextDataCommandToClientCounterLock()
+            else:
+                print "Exception in send next Data Command to Client: " +str(inst)+"\n"
+                #self.nextDataCommandToClientCounterLock()
+        socketLock.release()
+
