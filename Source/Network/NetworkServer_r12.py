@@ -253,6 +253,7 @@ class NetworkServer():
     #Define the thread handler here
     def handler(self, clientSocket, clientAddr, socketLock):
         clientSocket.settimeout(0.5)
+        inboundClientCommand= ""
         while True:
             try: #handler main try block
                 socketLock.acquire()
@@ -260,7 +261,10 @@ class NetworkServer():
                 try: #recv inbound messages try block
                     inboundClientCommand = clientSocket.recv(2048)
                 except Exception as inst:
-                    print "Error in recv command from the client: "+str(inst)+"\n"
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        print "No input from the client detected\n"
+                    else:
+                        print "Error in recv command from the client: "+str(inst)+"\n"
                 finally:
                     socketLock.release()
                     print "Handler Released socketLock\n"
@@ -284,6 +288,7 @@ class NetworkServer():
                         print "Released dictionaryOfCurrentClientTasks Lock\n"
                         dataFileSize = sys.getsizeof(self.dictionaryOfCurrentClientTasks[clientsIP].data)
                         tempKeywords= "NEXT " +"SIZE(" + str(dataFileSize) +") " + str(self.dictionaryOfCurrentClientTasks[clientsIP].params)
+                        print "chunk params with keywords: " +str(tempKeywords) + "\n"
                         #send chhunk params to client
                         #socketLock.acquire() #functions already lock the socket
                         try:
@@ -294,6 +299,7 @@ class NetworkServer():
                         #finally:
                             #socketLock.release()
                         #send the chunk data to the client
+
                         try:
                             self.sendNextDataCommandToClient(clientSocket,clientsIP, str(self.dictionaryOfCurrentClientTasks[clientsIP].data), socketLock)
                         except Exception as inst:
@@ -499,7 +505,10 @@ class NetworkServer():
                         if(checkForNextChunkCommandFromController(self, inboundControllerCommand)==True):
                             #wait for the chunk object from the controller
                             print "Waiting for the corresponding chunk object from controller\n"
-                            inboundControllerObject= self.pipe.recv()
+                            try:
+                                inboundControllerObject= self.pipe.recv()
+                            except Exception as inst:
+                                print "Error in trying to receive corresponding chunk object: " +str(inst)+"\n"
                             print "Received the chunk object from controller\n"
                             #check if clients are waiting for nextChunk
                             self.stackOfClientsWaitingForNextChunkLock.acquire()
@@ -534,6 +543,8 @@ class NetworkServer():
                                 tempKeywords2= "NEXT " + "SIZE(" + str(chunkFileSize) +") " +str(self.dictionaryOfCurrentClientTasks[storedClientIP].params)
                                 self.dictionaryOfCurrentClientTasksLock.release()
                                 print "Released dictionaryOfCurrentClientTasks Lock\n"
+                                print "chunk params with keywords: " + str(tempKeywords2)+"\n"
+                                print "chunk data: " +str(inboundControllerObject.data)+"\n"
                                 #retreiving client's port
                                 clientPort= ""
                                 tempSock= ""
