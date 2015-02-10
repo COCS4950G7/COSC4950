@@ -87,13 +87,16 @@ def receiveData(self,networkSocket):
                     inputData  = ""
                     recvData = ""
                     #receive the chunk data from the server
+                    networkSocket.settimeout(0.5)
                     try:
                         import sys
                         while(sys.getsizeof(inputData) < dataChunkFileSize):
-                            recvData = networkSocket.recv(4096)
+                            recvData = networkSocket.recv(1024)
+                            if(inputData >= dataChunkFileSize):
+                                break
                             if recvData:
                                 inputData+= recvData
-                                #networkSocket.settimeout(0.5) #reset the socket timeout
+                                networkSocket.settimeout(0.5) #reset the socket timeout
                             else:
                                 break #TMPORARY COMMENT
                     except Exception as inst:
@@ -102,7 +105,8 @@ def receiveData(self,networkSocket):
                             print "dataChunkFileSize: "+ str(dataChunkFileSize)+"\n"
                             print "Size of inputData: " + str(sys.getsizeof(inputData)) +"\n"
                             print "Size of recvData: " + str(sys.getsizeof(recvData))+"\n"
-                        print "Error in receiving chunk data from server: " +str(inst)+"\n"
+                        else:
+                            print "Error in receiving chunk data from server: " +str(inst)+"\n"
                     self.incrementNextChunkDataFromServerCounter()
                     #make a chunk object to send to the controller
                     tempChunk= Chunk.Chunk()
