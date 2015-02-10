@@ -8,14 +8,6 @@ __author__ = 'chris hamm'
 
 
 
-#I THINK I FIXED THIS(below)
-    #WARNING BUG!!!!!! Sometimes a client disconnects from server because it claims that it received the 'done' command
-    #Suspect that it is because the check for done command is not implemented properly
-
-#Fixed issue (below) by changing how the socket objects are created
-    #Has connection issues when trying to connect to the server, Errno 111 'connection refused' but only server and client are on different machines
-    #ALTERNATE ERROR FAILS TO CONNECT WITH ERRNO 61, 'connection refused'
-
 from socket import *
 import socket
 from random import *
@@ -50,25 +42,24 @@ def receiveData(self,networkSocket):
         print "Checking for inbound network data\n"
         networkSocket.settimeout(0.5)
         data = ""
-        #while True:
-        try:
-            data = networkSocket.recv(1024)
-            if not data:
-                fakeVar= True
-               # break
-            elif(len(data) < 1):
+        completeData = ""
+        try: #receive data try block
+            #while True:
+            completeData = networkSocket.recv(2048)
+                #if data:
+                 #   completeData+= data
+                  #  networkSocket.settimeout(0.5)
+               # else:
+                #    break
+            if(len(completeData) < 1):
                 print "received empty string\n"
-                #break
-            else:
-                print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
-                #if(checkForDoneCommandFromServer(networkSocket)==True): #check to see if received data is the done command #OLD METHOD
-                 #   print "DONE COMMAND RECEIVED!!!!\n"
-                 #  break
-                if(checkForDoneCommandFromServer(self,str(data))==True):
+            else: #not empty string
+                #print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
+                if(checkForDoneCommandFromServer(self,str(completeData))==True):
                     print "Server has issued the done command\n"
                     sendDoneCommandToController(self)
                     #break
-                elif(checkForNextChunkParamsFromServer(self, str(data))==True):
+                elif(checkForNextChunkParamsFromServer(self, str(completeData))==True):
                     print "Received Next Chunk Params From Server\n"
                     #insert chunk assembling process here
                     dataChunkFileSize = ""
@@ -76,29 +67,32 @@ def receiveData(self,networkSocket):
                     #end of file size is marked by a closing parenthesis
                     #position [0:4] = 'NEXT'
                     #position [5:9] = 'SIZE('
-                    for index in range(10,len(data)):
-                        if(data[index] == ")"):
+                    for index in range(10,len(completeData)):
+                        if(completeData[index] == ")"):
                             closingParenthesisLocation = index
                             break
                         else:
-                            dataChunkFileSize+= str(data[index])
+                            dataChunkFileSize+= str(completeData[index])
                     #removing keywords from the params
-                    data= data[(closingParenthesisLocation+2):len(data)]
+                    completeData= completeData[(closingParenthesisLocation+2):len(completeData)]
+                    print "data after keywords where removed: "+str(completeData)+"\n"
                     inputData  = ""
                     recvData = ""
                     #receive the chunk data from the server
                     networkSocket.settimeout(0.5)
                     try:
                         import sys
+                        print "dataChunkFileSize: " +str(dataChunkFileSize)+"\n"
                         while(sys.getsizeof(inputData) < dataChunkFileSize):
-                            recvData = networkSocket.recv(1024)
-                            if(inputData >= dataChunkFileSize):
-                                break
+                            recvData = networkSocket.recv(4096)
+                            #if(inputData >= dataChunkFileSize):
+                             #   break
                             if recvData:
                                 inputData+= recvData
                                 networkSocket.settimeout(0.5) #reset the socket timeout
                             else:
-                                break #TMPORARY COMMENT
+                                break
+                        self.incrementNextChunkDataFromServerCounter()
                     except Exception as inst:
                         if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                             print "ERROR in receiving chunk data from the server: timed out\n"
@@ -107,11 +101,11 @@ def receiveData(self,networkSocket):
                             print "Size of recvData: " + str(sys.getsizeof(recvData))+"\n"
                         else:
                             print "Error in receiving chunk data from server: " +str(inst)+"\n"
-                    self.incrementNextChunkDataFromServerCounter()
+                    #self.incrementNextChunkDataFromServerCounter() #Moved to above the except statement
                     #make a chunk object to send to the controller
                     tempChunk= Chunk.Chunk()
                     #set params
-                    tempChunk.params = data
+                    tempChunk.params = completeData
                     #set data
                     tempChunk.data = inputData
                     #send doignSTuff command to controller
@@ -119,23 +113,18 @@ def receiveData(self,networkSocket):
                     #send the chunk to the controller
                     sendNextChunkCommandToController(self,tempChunk)
                     #break #keep, this is part of the new code, NOT part of the old code moved from prev revision
-                #elif(checkForNextChunkDataFromServer(self, str(data))==True): #THIS FUNCTION IS INCLUDED IN THE CHECKFOR NEXTPARAMS FUNCTION ABOVE
-                 #   print "Received Next Chunk Data From Server\n"
-                    #insert chunk assembling process here
-                 #   break
                 else: #then it is an unknown command
-                    print "Unknown command received from the server: " + str(data) +"\n"
+                    print "Unknown command received from the server: " + str(completeData) +"\n"
                     self.incrementUnknownCommandFromServerCounter()
                     #break
         except Exception as inst:
             if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
                 #dont display the timed out message
                 fakeVar=True
-                #break
             else:
                 print "Exception in receive data: " + str(inst) +"\n"
                 #break
-        return data #if data is empty string, nothing was received
+        return completeData #if data is empty string, nothing was received
 
 def sendData(self,networkSocket, serverIP, outboundMessage): #return true if you need to break out of main client loop, else false
     print "Sending message to Server: " +str(serverIP) +"\n"
@@ -314,6 +303,8 @@ def checkForRequestNextChunkCommandFromController(self, inboundString):
 
 class NetworkClient():
 
+    numOfParamsWithExtraData = 0
+
     #client records-------
     #outbound commands sent to server
     nextCommandToServerCounter = 0
@@ -398,10 +389,7 @@ class NetworkClient():
 
     def __init__(self, pipeendconnectedtocontroller):
         self.pipe = pipeendconnectedtocontroller #pipe to the controller
-        #if __name__ == '__main__':
-        #INDENT EVERYTHING BELOW HERE IF YOU ARE TO UNCOMMENT if name==main
         try: #Main try block
-            #host = 'localhost' #old connection method
             self.host = '' #new connection method
             self.port = 55568
             buf = 1024
@@ -496,35 +484,151 @@ class NetworkClient():
             #End of Retrieve the local network IP Address
             #.........................................................................
 
-            #addr = (host, port) #part of old connection system
-
-            #clientsocket = socket(AF_INET, SOCK_STREAM) #old create socket method
             clientsocket = socket.socket(AF_INET, SOCK_STREAM) #new create socket method
             try:
-                #serverIP= raw_input('What is the Servers IP Address?') #OLD MANUAL METHOD
                 receiveServerIPFromController(self) #NEW AUTOMATED METHOD
                 print "Received IP Address from the Controller: '"+ str(self.serverIP)+"'\n"
             except Exception as inst:
                 print "ERROR in get serverIP try block: " + str(inst) + "\n"
-            try: #main try block?
-                #clientsocket.connect(addr) #old connection system
+            try:
                 clientsocket.connect((self.serverIP, self.port))
                 print "Connected to server\n"
                 sendConnectedCommandToController(self)
             except Exception as inst:
                 print "ERROR in connect to server: " + str(inst) +"\n"
-            #myNumber= randint(0,3) #temporary to show that it is a different thread running
-            #data = "NEXT" #start by sending NEXT to server
             data = "" #initialize data
             while True: #client main loop
-                receiveData(self, clientsocket)
-                #exitMainLoop= sendData(self,clientsocket,(self.serverIP, self.port),data) #Designed to stop client if the is a break in the pipe
-                #if(exitMainLoop == True):
-                 #   print "Breaking out of Main Loop\n"
-                 #   break
-                #data = receiveData(self,clientsocket) #MOVED ABOVE
-                #if(data != ""):
-                 #   print "Received message from server: " + str(data) +"\n"
+                #receiveData(self, clientsocket) #old method of checking for server commands
+                print "Checking for inbound network data\n"
+                clientsocket.settimeout(0.5)
+                data = ""
+                completeData = ""
+                try: #receive data try block
+                    #while True:
+                    try: #recv try block
+                        while True:
+                            data = clientsocket.recv(2048)
+                            if data:
+                                completeData+= data
+                                clientsocket.settimeout(0.5)
+                            else:
+                                break
+                    except Exception as inst:
+                        print "Error in recv from clientsocket: " +str(inst)+"\n"
+                        #if data:
+                         #   completeData+= data
+                          #  networkSocket.settimeout(0.5)
+                       # else:
+                        #    break
+                    if(len(completeData) < 1):
+                        print "received empty string\n"
+                    else: #not empty string
+                        #print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
+                        if(checkForDoneCommandFromServer(self,str(completeData))==True):
+                            print "Server has issued the done command\n"
+                            sendDoneCommandToController(self)
+                            #break
+                        elif(checkForNextChunkParamsFromServer(self, str(completeData))==True):
+                            print "Received Next Chunk Params From Server\n"
+                            #insert chunk assembling process here
+                            dataChunkFileSize = ""
+                            closingParenthesisLocation = 0
+                            #end of file size is marked by a closing parenthesis
+                            #position [0:4] = 'NEXT'
+                            #position [5:9] = 'SIZE('
+                            for index in range(10,len(completeData)):
+                                if(completeData[index] == ")"):
+                                    closingParenthesisLocation = index
+                                    break
+                                else:
+                                    dataChunkFileSize+= str(completeData[index])
+                            #removing keywords from the params
+                            completeData= completeData[(closingParenthesisLocation+2):len(completeData)]
+                            #print "data after keywords where removed from front: "+str(completeData)+"\n"
+                            #remove extra code from after the params message and store it. So we can add it to the inbound data
+                            #there are 9 legal spaces in the params
+                            numOfSpaces = 0
+                            overFlowParams = "" #stores the extra data at the end of the params that shouldnt be there
+                            firstInvalidCharPosition = 0
+                            print "checking for extra data in the params\n"
+                            for x in range(0,len(completeData)):
+                                if(numOfSpaces < 10):
+                                    if(completeData[x].isspace()):
+                                        numOfSpaces+= 1
+                                    elif(x == len(completeData)):
+                                        break
+                                    else:
+                                        firstInvalidCharPosition = x
+                                        break
+                            #copy the rest into overflowParams
+                            if(firstInvalidCharPosition > 0):
+                                self.numOfParamsWithExtraData+= 1
+                                print "checking first char is a space\n"
+                                if(completeData[x].isspace()):
+                                    print"adding 1 to var to compensate for detected space\n"
+                                    firstInvalidCharPosition+= 1
+                                print "copying excess data from params into overflow\n"
+                                overFlowParams= completeData[firstInvalidCharPosition:len(completeData)]
+                                print "removing extra data from params\n"
+                                completeData = completeData[0, firstInvalidCharPosition]
+                                print "complete data after params cleanup: "+str(completeData)+"\n"
+                            else:
+                                print "no extra data was detected in the params\n"
+                            inputData  = ""
+                            recvData = ""
+                            #receive the chunk data from the server
+                            #clientsocket.settimeout(0.5)
+                            try:
+                                import sys
+                                print "dataChunkFileSize: " +str(dataChunkFileSize)+"\n"
+                                while(sys.getsizeof(inputData) < dataChunkFileSize):
+                                    if(sys.getsizeof(inputData >= dataChunkFileSize)):
+                                        break
+                                    else:
+                                        recvData = clientsocket.recv(4096)
+                                        #if(inputData >= dataChunkFileSize):
+                                         #   break
+                                        if recvData:
+                                            inputData+= recvData
+                                            clientsocket.settimeout(0.5) #reset the socket timeout
+                                        else:
+                                            break
+                                self.incrementNextChunkDataFromServerCounter()
+                            except Exception as inst:
+                                if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                                    print "ERROR in receiving chunk data from the server: timed out\n"
+                                    print "dataChunkFileSize: "+ str(dataChunkFileSize)+"\n"
+                                    print "Size of inputData: " + str(sys.getsizeof(inputData)) +"\n"
+                                    print "Size of recvData: " + str(sys.getsizeof(recvData))+"\n"
+                                else:
+                                    print "Error in receiving chunk data from server: " +str(inst)+"\n"
+                            if(len(overFlowParams) > 0):
+                                print "adding overflow params to from of dataChunk\n"
+                                inputData= str(overFlowParams) + str(inputData)
+                                #print "inputData after adding overflowparams: "+str(inputData)+"\n"
+                            #self.incrementNextChunkDataFromServerCounter() #Moved to above the except statement
+                            #make a chunk object to send to the controller
+                            tempChunk= Chunk.Chunk()
+                            #set params
+                            tempChunk.params = completeData
+                            #set data
+                            tempChunk.data = inputData
+                            #send doignSTuff command to controller
+                            sendDoingStuffCommandToController(self)
+                            #send the chunk to the controller
+                            sendNextChunkCommandToController(self,tempChunk)
+                            #break #keep, this is part of the new code, NOT part of the old code moved from prev revision
+                        else: #then it is an unknown command
+                            print "Unknown command received from the server: " + str(completeData) +"\n"
+                            self.incrementUnknownCommandFromServerCounter()
+                            #break
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
+                        #dont display the timed out message
+                        fakeVar=True
+                    else:
+                        print "Exception in receive data: " + str(inst) +"\n"
+                        #break
             #end communication with Network Server
             #communication with Controller
                 print "Checking for controller commands...\n"
@@ -559,6 +663,8 @@ class NetworkClient():
                 sendCrashedCommandToServer(self, clientsocket)
             clientsocket.close()
             print "Socket has been closed\n"
+            print "----------------------numOfParamsWithExtraData--------------------\n"
+            print "# of Chunk Params with Extra Data attached to the end (had to fix these): "+ str(self.numOfParamsWithExtraData)+"\n"
             print "----------------------Outbound Commands To Server-----------------\n"
             print "# of Next Commands Sent To Server: " + str(self.nextCommandToServerCounter) +"\n"
             print "# of Found Solution Commands Sent To Server: " +str(self.foundSolutionCommandToServerCounter) +"\n"
@@ -584,4 +690,4 @@ class NetworkClient():
                 for index in range(0, len(self.listOfUnknownCommandsFromController)):
                     print "     " + str(index) + ") " + str(self.listOfUnknownCommandsFromController[index]) +"\n"
 
-#NetworkClient() #no longer needed, controller calls NetworkClient now
+
