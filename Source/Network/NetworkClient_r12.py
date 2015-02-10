@@ -514,14 +514,20 @@ class NetworkClient():
                             else:
                                 break
                     except Exception as inst:
-                        print "Error in recv from clientsocket: " +str(inst)+"\n"
+                        if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                            #dont display the time out error
+                            fakeVar=True
+                        else:
+                            print "Error in recv from clientsocket: " +str(inst)+"\n"
                         #if data:
                          #   completeData+= data
                           #  networkSocket.settimeout(0.5)
                        # else:
                         #    break
                     if(len(completeData) < 1):
-                        print "received empty string\n"
+                        #empty string, ignore it
+                        fakeVar=True
+                        #print "received empty string\n"
                     else: #not empty string
                         #print "received data: " + str(data) +"\n" #something is logically wrong with the check for done command
                         if(checkForDoneCommandFromServer(self,str(completeData))==True):
