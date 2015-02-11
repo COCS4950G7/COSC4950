@@ -6,7 +6,7 @@ __author__ = 'chris hamm'
 
 #Must now be called by controller
 
-
+#REVISION IS NOW DEAD, LOCK MECHANISMS TOO COMPLEX AND FRAGILE
 
 from socket import *
 import socket
