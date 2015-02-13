@@ -16,7 +16,7 @@ __author__ = 'chris hamm'
 
 #MAJOR CHANGE IN SENDNEXTCOMMANDTOCLIENT function
 
-#TODO still need to inform controller when server stops
+#TODO still need a variable to indicate when all of the threads need to stop running (aka break from their while loop)
 
 import threading
 import thread
@@ -29,8 +29,11 @@ class NetworkServer():
     #CLASS VARS
     host = ''
     port = 55568
+    myIPAddress = '127.0.0.1' #default to ping back address
+    listOfCrashedClients = []
     dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
                                         #If you try to access a non-existing key it will throw an error
+    #NOTE: NOT GOING TO HAVE A LIST OF CONNECTED CLIENTS, JUST USE THE DICTIONARY OF CURRENT CLIENT TASKS INSTEAD
 
     socketLock = threading.RLock()
 
@@ -165,6 +168,7 @@ class NetworkServer():
             print "Preparing to close the socket\n"
             serverSocket.close()
             print "The serverSocket has been closed\n"
+            #TODO insert command call to let the controller know that server is finished
 
         #FUNCTIONS==========================================================================
         def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
@@ -387,4 +391,12 @@ class NetworkServer():
                 self.socketLock.release()
                 print "Released socketLock\n"
 
+        #dictionaryOfCurrentClientTasks functions================================================================
         #TODO insert functions that operate on the dictionaryOfCurrentClientTasks
+            #TODO function to add a client to the dictionary
+            #TODO function to remove a client from the dictionary
+            #TODO function to check to see if a client is in the dictionary (using the check for a keyerror)
+            #TODO function to get the chunk object from a client's key in the dictionary
+
+        #list of CRashed clients functions====================================================================
+        #TODO insert add function

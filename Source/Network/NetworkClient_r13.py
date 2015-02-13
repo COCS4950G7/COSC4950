@@ -10,7 +10,6 @@ __author__ = 'chris hamm'
 
 #By recommendation, implement without the command logs
 
-#TODO be sure to inform controller when the solution has been found so it can reset itself too!
 
 import socket
 from socket import *
@@ -131,16 +130,18 @@ class NetworkClient():
             print "Error in Primary client while loop: "+str(inst)+"\n"
             print "===================================================================\n"
         finally:
-            #TODO check to see if server has issued the done command, if not, send crashed message to the server
-            try: #send crash message to server, if needed
-                #TODO if server has not issued the done command, then send crash message to server here
-                print "DEBUG: SEND CRASH MESSAGE TO SERVER HERE IF NEEDED\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "Error in send crash message to server, in finally block: "+str(inst)+"\n"
-                print "===================================================================\n"
+            if(self.serverIssuedDoneCommand == False):
+                try: #send crash message to server, if needed
+                    #TODO if server has not issued the done command, then send crash message to server here
+                    print "DEBUG: SEND CRASH MESSAGE TO SERVER HERE IF NEEDED\n"
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Error in send crash message to server, in finally block: "+str(inst)+"\n"
+                    print "===================================================================\n"
+            print "Closing the client socket\n"
             clientSocket.close()
             print "Client Socket has been closed\n"
+            #TODO insert command call here to inform the controller that the client in finished
 
         #FUNCTIONS=========================================================================================
         #CompareString function-----------------------------------------
