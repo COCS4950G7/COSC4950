@@ -259,31 +259,31 @@ class NetworkServer():
             try: #handler main try block
                 socketLock.acquire()
                 print "Handler Acquired socketLock\n"
-                while True:
-                    try: #recv inbound messages try block
-                        inboundClientCommand = clientSocket.recv(2048)
-                    #except socket.error as inst:
-                       # if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
-                        #    import time
-                         #   time.sleep(0.25)
-                          #  continue
-                       # else:
-                        #    print "Error in socket.error recv inbound messages try block: "+str(inst)+"\n"
-                    except Exception as inst:
-                        if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
-                            import time
-                            print "resource unavailable, sleeping then trying again\n"
-                            time.sleep(0.25)
-                            continue
-                        elif(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
-                            print "No input from the client detected\n"
-                            break
-                        else:
-                            print "Error in recv command from the client: "+str(inst)+"\n"
-                            break
-                    #finally:
-                socketLock.release()
-                print "Handler Released socketLock\n"
+                #while True:
+                try: #recv inbound messages try block
+                    inboundClientCommand = clientSocket.recv(2048)
+                #except socket.error as inst:
+                   # if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
+                    #    import time
+                     #   time.sleep(0.25)
+                      #  continue
+                   # else:
+                    #    print "Error in socket.error recv inbound messages try block: "+str(inst)+"\n"
+                except Exception as inst:
+                    #if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
+                     #   import time
+                      #  print "resource unavailable, sleeping then trying again\n"
+                       # time.sleep(0.25)
+                        #continue
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        print "No input from the client detected\n"
+                        #break
+                    else:
+                        print "Error in recv command from the client: "+str(inst)+"\n"
+                        #break
+                finally:
+                    socketLock.release()
+                    print "Handler Released socketLock\n"
                 if(len(inboundClientCommand) < 1):
                     #empty string, no input from controller
                     fakeVar=True
