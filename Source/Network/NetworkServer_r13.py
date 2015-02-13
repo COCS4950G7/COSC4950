@@ -29,6 +29,8 @@ class NetworkServer():
     #CLASS VARS
     host = ''
     port = 55568
+    dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
+                                        #If you try to access a non-existing key it will throw an error
 
     socketLock = threading.RLock()
 
@@ -48,6 +50,7 @@ class NetworkServer():
                 try: #Analyzing received command from the client try block
                     #TODO check to make sure the received command is not the empty string
                     print "DEBUG: CHECK TO SEE IF RECEIVED COMMAND IS THE EMOTY STRING HERE\n"
+                    #TODO else if received command is not the empty string, perform these checks
                     try: #checking to see if the next Command was received from the client try block
                         #TODO check to see if the next command was received from the client
                         print "DEBUG: CHECK TO SEE IF THE NEXT COMMAND WAS RECEIVED FROM THE CLIENT HERE\n"
@@ -72,7 +75,7 @@ class NetworkServer():
                         print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
                         print "===================================================================\n"
 
-                    #TODO print error and the unknown command here
+                    #TODO else, if command is not recognized, print error and the unknown command here
                     print "DEBUG; PRINT THE ERROR AND UNKNOWN COMMAND HERE\n"
                 except Exception as inst:
                     print "===================================================================\n"
@@ -100,7 +103,8 @@ class NetworkServer():
             serverSocket.bind((self.host, self.port))
         except Exception as inst:
             print "===================================================================\n"
-            print "Error: Failed to bind the socket: "+str(inst)+"\n"
+            print "Critical Error: Failed to bind the socket: "+str(inst)+"\n"
+            print "Suggestion: Close this application, then reopen this application and try again\n"
             print "===================================================================\n"
 
         #START LISTENING TO SOCKET
@@ -125,9 +129,10 @@ class NetworkServer():
                     if(self.pipe.poll()):
                         receivedControllerCommand= self.pipe.recv()
                         print "Received a command from the controller\n"
-                        #TODO BEGIN THE IF ELSE'S HERE
+                        #TODO Check to make sure that the received command is not the empty string
+                        #TODO if recieved command is not the empty string, perform these checks
                         try: #checking for nextChunk Command from Controller
-                            #TODO
+                            #TODO insert check for nextChunk Command from comntroller here
                             print "DEBUG: INSERT CALL TO CHECK FOR NEXTCHUNK COMMAND FROM CONTROLLER HERE\n"
                         except Exception as inst:
                             print "===================================================================\n"
@@ -135,14 +140,14 @@ class NetworkServer():
                             print "===================================================================\n"
 
                         try: #checking for done command form controller
-                            #TODO
+                            #TODO insert check for done Command from controller here
                             print "DEBUG: INSERT CALL TO CHECK FOR DONE COMMAND FROM CONTROLLER HERE\n"
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
                             print "===================================================================\n"
 
-                        #TODO
+                        #TODO else if the command was not recognized, print error and display the unknown command
                         print "DEBUG: INSERT ERROR MESSAGE AND PRINT OUT OF UNKNOWN COMMAND FROM THE CONTROLLER\n"
                     else: #if there is nothing on the pipe
                         print "There is no command received from the controller\n"
@@ -266,6 +271,29 @@ class NetworkServer():
                 print "========================================================================\n"
                 return False
 
+        def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to receive normal commands
+            try:
+                print "Acquiring socketLock\n"
+                self.socketLock.acquire()
+                print "Acquired socketLock\n"
+                receivedCommandFromClient= ""
+                print "Checking for inbound client Commands\n"
+                clientInput= clientSocket.recv(4096)
+                if(len(clientInput) > 0):
+                    receivedCommandFromClient= clientInput
+                #return command in finally block for this function
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
+                print "===================================================================\n"
+                receivedCommandFromClient= ""#set to empty string
+            finally:
+                print "Releasing socketLock\n"
+                self.socketLock.release()
+                print "Released socketLock\n"
+                return receivedCommandFromClient
+
+
         #Outbound commands to client==================================================
         def sendDoneCommandToClient(self,networkSocket, clientIP):
             print "Issuing Done Command to Client: " + str(clientIP) +"\n"
@@ -358,3 +386,5 @@ class NetworkServer():
                 print "Releasing socketLock\n"
                 self.socketLock.release()
                 print "Released socketLock\n"
+
+        #TODO insert functions that operate on the dictionaryOfCurrentClientTasks

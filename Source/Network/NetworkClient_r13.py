@@ -22,6 +22,8 @@ class NetworkClient():
 
         host = ''
         port = 55568
+        myIPAddress = '127.0.0.1' #defualt to the ping back address
+        serverIPAddress = '127.0.0.1' #default to the ping back address
         serverIssuedDoneCommand = False
 
         clientSocket = socket.socket(AF_INET, SOCK_STREAM)
@@ -46,7 +48,7 @@ class NetworkClient():
         try:
             clientSocket.settimeout(0.25)
             while True: #primary client while loop
-                #CHECK FOR INBOUND SERVER COMMANDS SECTION
+                #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================
                 try: #check for inbound server commands
                     #TODO insert receive server command here
                     print "DEBUG: INSERT RECEIVE SERVER COMMANDS HERE\n"
@@ -57,6 +59,7 @@ class NetworkClient():
 
                 #TODO check to see if received the empty string
                 print "DEBUG: CHECK TO SEE IF RECV AN EMPTY STRING HERE\n"
+                #TODO else if received string is not empty, perform these checks
                 try: #check for the done command from the server
                     #TODO insert check for done command from server function
                     print "DEBUG: CHECK FOR DONE COMMAND FROM THE SERVER\n"
@@ -73,10 +76,10 @@ class NetworkClient():
                     print "Error in checking for nextChunk command from server: " + str(inst)+"\n"
                     print "===================================================================\n"
 
-                #TODO print error and unknown command here
+                #TODO else, the command is not recognized, print error and unknown command here
                 print "DEBUG: PRINT OUT ERROR AND UNKNOWN COMMAND HERE\n"
 
-                #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION
+                #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION=======================================================
                 try: #check for inbound controller commands try block
                     #TODO check if there is any commands on the pipe
                     print "DEBUG; CHECK FOR INBOUND COMMANDS FROM CONTROLLER HERE\n"
@@ -87,6 +90,7 @@ class NetworkClient():
 
                 #TODO check to see if received the empty string
                 print "DEBUG: CHECK TO SEE IF RECEIVED THE EMPTY STRING \n"
+                #TODO else if recieved string is not empty, perform these checks
                 try: #checking for found solution command from controller
                     #TODO check if received the found solution command from the controller
                     print "DEBUG: CHECK TO SEE IF RECEIVED THE FOUND SOLUTION COMMAND FROM THE CONTROLLER\n"
@@ -119,7 +123,7 @@ class NetworkClient():
                     print "Error in check for done command from the controller: "+str(inst)+"\n"
                     print "===================================================================\n"
 
-                #TODO print out error and unknown command from controller
+                #TODO else, if command is not recognized, print out error and unknown command from controller
                 print "DEBUG: PRINT OUT ERROR AND UNKNOWN COMMAND FROM CONTROLLER HERE\n"
             #end of primary client while loop
         except Exception as inst:
@@ -129,7 +133,7 @@ class NetworkClient():
         finally:
             #TODO check to see if server has issued the done command, if not, send crashed message to the server
             try: #send crash message to server, if needed
-                #TODO send crash message to server here, if needed
+                #TODO if server has not issued the done command, then send crash message to server here
                 print "DEBUG: SEND CRASH MESSAGE TO SERVER HERE IF NEEDED\n"
             except Exception as inst:
                 print "===================================================================\n"
@@ -287,7 +291,156 @@ class NetworkClient():
                 print "===================================================================\n"
                 return False
 
-        #TODO insert check for nextCommand from server here (remember it is modelled differently than previous revisions)
+        def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than previous revisions, this only checks for the NEXT keyword
+            try:
+                print "Checking for nextCommand from server\n"
+                if(compareString(inboundString,"NEXT",0,0,len("NEXT"),len("NEXT"))==True):
+                    print "Next Command was received from the server\n"
+                    return True
+                else:
+                    return False
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in checking for nextCommand from the server: " +str(inst)+"\n"
+                print "===================================================================\n"
+                return False
+
+        def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component to extract the file size of the params from the next command
+            try:
+                print "Extracting size of Params from the next Command\n"
+                firstOpenParenthesisPos= 0
+                firstClosingParenthesisPos= 0
+                sizeOfChunkParams = ""
+                #Command layout: "NEXT PSIZE() DSIZE()"
+                #Step 1: find the first Open Parenthesis, which immeadiately follows the PSIZE
+                try: #step 1 try block
+                    print "Finding the first Open Parenthesis\n"
+                    for index in range(0,len(inboundString)):
+                        if(inboundString[index] == "("):
+                            firstOpenParenthesisPos= index
+                            break
+                    if(firstOpenParenthesisPos == 0):
+                        raise Exception("No open parenthesis was found")
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 1: find first Open parenthesis: " +str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception thrown in step 1 of extractSizeOfParamsFromNextCommand")
+                #Step 2: find the corresponding closing parenthesis
+                try: #Step 2 try block
+                    print "Finding the corresponding closing parenthesis\n"
+                    for index in range(firstOpenParenthesisPos, len(inboundString)):
+                        if(inboundString[index] == ")"):
+                            firstClosingParenthesisPos= index
+                            break
+                    if(firstClosingParenthesisPos == 0):
+                        raise Exception ("No closing parenthesis was found")
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 2: find corresponding closing parenthesis: " +str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception thrown in Step 2 of extractSizeOfParamsFromNextCommand")
+                #Step 3: retreive the params file size
+                try: #step 3 try block
+                    print "Retreiving the params file size\n"
+                    for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
+                        sizeOfChunkParams+= str(inboundString[index])
+                    return sizeOfChunkParams
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 3: retreive the params file size: "+str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception thrown in Step 3 of extractSizeOfParamsFromNextCommand")
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in extractSizeOfParamsFromNextCommand: " +str(inst)+"\n"
+                print "===================================================================\n"
+                return 0 #return filesize of zero if there was an error
+
+        def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component
+            try:
+                print "Extracting size of data from next Command\n"
+                firstOpenParenthesisPos = 0
+                firstClosingParenthesisPos = 0
+                sizeOfChunkData= ""
+                #Command layout: NEXT PSIZE() DSIZE()
+                #Step 1: find the 'D' in the inboundString
+                try: #step 1 try block
+                    print "Finding the 'D' in the nextCommand\n"
+                    for index in range(0,len(inboundString)):
+                        if(inboundString[index] == "D"):
+                            firstOpenParenthesisPos= index + 5 #plus five for the offset between the D and the first open parenthesis
+                            break
+                    if(firstOpenParenthesisPos == 0):
+                        raise Exception ("No 'D' was found in the nextCommand")
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 1: find the 'D' in the inboundString: "+str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception was thrown in step 1 of extractSizeOfDataFromNextCommand")
+                #Step 2: find the corresponding parenthesis
+                try: #Step 2 try block
+                    print "Finding the corresponding parenthesis\n"
+                    for index in range(firstOpenParenthesisPos, len(inboundString)):
+                        if(inboundString[index] == ")"):
+                            firstClosingParenthesisPos= index
+                            break
+                    if(firstClosingParenthesisPos == 0):
+                        raise Exception ("No closing parenthesis found in the nextCommand")
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 2: find corresponding parenthesis: "+str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception thrown in step 2 of extractSizeOfDataFromNextCommand")
+                #Step 3: retreive the data file size
+                try: #step 3 try block
+                    print "Retrieving data file size\n"
+                    for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
+                        sizeOfChunkData+= str(inboundString)
+                    return sizeOfChunkData
+                except Exception as inst:
+                    print "===================================================================\n"
+                    print "Exception thrown in Step 3: retrieve the data file size: " + str(inst)+"\n"
+                    print "===================================================================\n"
+                    raise Exception ("Exception thrown is step 3 of extractSizeOfDataFromNextCommand")
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in extractSizeOfDataFromNextCommand: " +str(inst)+"\n"
+                print "===================================================================\n"
+                return 0
+
+        def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize): #NOTE: New component, call this for receiving params or for receiving data
+            try:
+                receivedPieceOfChunk= ""
+                print "Receiving piece of chunk from the server\n"
+                while(sys.getsizeof(receivedPieceOfChunk) < pieceOfChunkFileSize):
+                    recvInfo= self.clientSocket.recv(4096)
+                    if recvInfo:
+                        receivedPieceOfChunk+= str(recvInfo)
+                    else:
+                        break
+                if(len(receivedPieceOfChunk) < 1):
+                    raise Exception ("receivedPieceOfChunk is empty!")
+                return receivedPieceOfChunk
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in receivePieceOfChunkFromServer: "+str(inst)+"\n"
+                print "===================================================================\n"
+                return "" #the empty string
+
+        def receiveCommandFromServer(self): #NOTE used for normal recv
+            try:
+                receivedCommand= ""
+                print "Checking for command from the server\n"
+                serverInput= self.clientSocket.recv(4096)
+                if(len(serverInput) > 0):
+                    receivedCommand= serverInput
+                return receivedCommand
+            except Exception as inst:
+                print "===================================================================\n"
+                print "ERROR in receiveCommandFromServer: "+str(inst)+"\n"
+                print "===================================================================\n"
+                return "" #the empty string
 
         #Outbound commands to server functions--------------------------------------
         def sendNextChunkCommandToServer(self, networkSocket):
