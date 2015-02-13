@@ -14,6 +14,10 @@ __author__ = 'chris hamm'
 
 #By recommendation, implement with out the command logs
 
+#MAJOR CHANGE IN SENDNEXTCOMMANDTOCLIENT function
+
+#TODO still need to inform controller when server stops
+
 import threading
 import thread
 import socket

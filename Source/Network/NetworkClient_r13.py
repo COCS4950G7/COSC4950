@@ -10,6 +10,8 @@ __author__ = 'chris hamm'
 
 #By recommendation, implement without the command logs
 
+#TODO be sure to inform controller when the solution has been found so it can reset itself too!
+
 import socket
 from socket import *
 
