@@ -27,6 +27,7 @@ class NetworkServer():
 
     socketLock = threading.RLock()
 
+    #START OF CLIENT THREAD HANDLER
     def ClientThreadHandler(self, clientSocket, clientAddr, socketLock):
         try:
             receivedCommandFromClient = "" #initialize the receiving variable
@@ -35,7 +36,10 @@ class NetworkServer():
                     #TODO implement the receive mechanism here for inbound client commands
                     print "DEBUG: INSERT THE RECEIVE MECHANISM FOR INBOUND COMMANDS FROM THE CLIENT HERE\n"
                 except Exception as inst:
+                    print "===================================================================\n"
                     print "Error in check for commands from the client in client thread handler: " +str(inst)+"\n"
+                    print "===================================================================\n"
+
                 try: #Analyzing received command from the client try block
                     #TODO check to make sure the received command is not the empty string
                     print "DEBUG: CHECK TO SEE IF RECEIVED COMMAND IS THE EMOTY STRING HERE\n"
@@ -43,28 +47,44 @@ class NetworkServer():
                         #TODO check to see if the next command was received from the client
                         print "DEBUG: CHECK TO SEE IF THE NEXT COMMAND WAS RECEIVED FROM THE CLIENT HERE\n"
                     except Exception as inst:
+                        print "===================================================================\n"
                         print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
+                        print "===================================================================\n"
+
                     try: #check to see if the found solution command was received from the client
                         #TODO check to see if the found solution command was received from the client
                         print "DEBUG: CHECK TO SEE IF THE FOUNDSOLUTION COMMAND WAS RECEIVED FROM THE CLIENT HERE\n"
                     except Exception as inst:
+                        print "===================================================================\n"
                         print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
+                        print "===================================================================\n"
+
                     try: #check to see if the crashed command was received
                         #TODO check to see if the crashed command was received from the client
                         print "DEBUG: CHECK TO SEE IF CRASHED COMMAND WASS RECEIVED HERE\n"
                     except Exception as inst:
+                        print "===================================================================\n"
                         print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
+                        print "===================================================================\n"
+
                     #TODO print error and the unknown command here
                     print "DEBUG; PRINT THE ERROR AND UNKNOWN COMMAND HERE\n"
                 except Exception as inst:
+                    print "===================================================================\n"
                     print "Error in Analyzing received command from the client try block in the client thread handler: " +str(inst)+"\n"
+                    print "===================================================================\n"
+
         except Exception as inst:
+            print "===================================================================\n"
             print "Error in Client Thread Handler: " + str(inst) +"\n"
+            print "===================================================================\n"
+
         finally:
             clientSocket.close()
             print "clientSocket has been closed\n"
     #end of clientthreadhandler
 
+    #START OF INITIAL SERVER SETUP
     def __init__(self, inboundpipeconnection):
         self.pipe = inboundpipeconnection #pipe that connects to the controller
 
@@ -74,7 +94,9 @@ class NetworkServer():
         try: #try to bind the socket
             serverSocket.bind((self.host, self.port))
         except Exception as inst:
-            print "Error: Failed to bind the socket!"
+            print "===================================================================\n"
+            print "Error: Failed to bind the socket: "+str(inst)+"\n"
+            print "===================================================================\n"
 
         #START LISTENING TO SOCKET
         serverSocket.listen(5)
@@ -89,33 +111,67 @@ class NetworkServer():
                     print "A client has connected!!\n"
                     thread.start_new_thread(self.ClientThreadHandler(inboundClientSocket,inboundClientAddr,self.socketLock))
                 except Exception as inst:
+                    print "===================================================================\n"
                     print "Error in check for client trying to connect try block: " +str(inst)+"\n"
+                    print "===================================================================\n"
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
                     if(self.pipe.poll()):
                         receivedControllerCommand= self.pipe.recv()
                         print "Received a command from the controller\n"
-                        #TODO BEGIN THE IF ELSES HERE
+                        #TODO BEGIN THE IF ELSE'S HERE
                         try: #checking for nextChunk Command from Controller
                             #TODO
                             print "DEBUG: INSERT CALL TO CHECK FOR NEXTCHUNK COMMAND FROM CONTROLLER HERE\n"
                         except Exception as inst:
+                            print "===================================================================\n"
                             print "Error in checking for nextChunk COmmand from Controller Try Block: " +str(inst)+"\n"
+                            print "===================================================================\n"
+
                         try: #checking for done command form controller
                             #TODO
                             print "DEBUG: INSERT CALL TO CHECK FOR DONE COMMAND FROM CONTROLLER HERE\n"
                         except Exception as inst:
+                            print "===================================================================\n"
                             print "Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
+                            print "===================================================================\n"
+
                         #TODO
                         print "DEBUG: INSERT ERROR MESSAGE AND PRINT OUT OF UNKNOWN COMMAND FROM THE CONTROLLER\n"
                     else: #if there is nothing on the pipe
                         print "There is no command received from the controller\n"
                 except Exception as inst:
+                    print "===================================================================\n"
                     print "Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
+                    print "===================================================================\n"
+
         except Exception as inst:
+            print "===================================================================\n"
             print "Error in Main Thread Server Loop: " +str(inst)+"\n"
+            print "===================================================================\n"
+
         finally:
             serverSocket.close()
             print "The serverSocket has been closed\n"
 
+        #TODO insert class functions here, (send and receive functions) [below]
+
+        #TODO insert compareSTring function here
+
+        #TODO insert inbound command functions from controller here
+            #TODO insert check for done command from controller here
+            #TODO insert check for nextChunk from controller here
+        #TODO insert outbound command functions to controller here
+            #TODO insert send nextChunk command to controller here
+        #TODO insert inbound command functions from client here
+            #TODO insert check for crashed command from client here
+            #TODO insert check for found solution from client here
+            #TODO insert check for next command from the client
+        #TODO insert outbound command functions to client here
+            #TODO insert send done command to client here
+            #TODO insert send next Command to client here
+                #Has three parts, do them all together!!!!!!
+                #1). send string with NEXT keyword followed by the size of the params and the size of the data
+                #2). send the params
+                #3). send the data
