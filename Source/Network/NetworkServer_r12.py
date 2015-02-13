@@ -14,6 +14,7 @@ __author__ = 'chris hamm'
     #   lock.acquire()
     #   lock.acquire() #This wont block (this is nested)
 
+#THIS REVISION IS NOW DEAD, LOCKING MECHANISMS ARE TOO COMPLEX AND FRAGILE
 
 import socket
 from socket import *
