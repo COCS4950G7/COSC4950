@@ -996,7 +996,7 @@ class Controller():
                     #fileName = raw_input("What's the file name (___.txt): ")
                     if self.aLane == True:
 
-                        fileName = "dic"
+                        fileName = "dic.txt"
                         print "What's the file name (___.txt): dic"
 
 
