@@ -559,7 +559,7 @@ class NetworkServer():
                 #CHECK TO SEE IF A CLIENT IS TRYING TO CONNECT
                 try:
                     inboundClientSocket, inboundClientAddr = serverSocket.accept()
-                    print "A client has connected!!\n"
+                    print "MAIN THREAD: A client has connected!!\n"
                     thread.start_new_thread(self.ClientThreadHandler(inboundClientSocket,inboundClientAddr,self.socketLock))
                 except Exception as inst:
                     if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
@@ -567,71 +567,71 @@ class NetworkServer():
                         fakeVar= True
                     else:
                         print "===================================================================\n"
-                        print "Error in check for client trying to connect try block: " +str(inst)+"\n"
+                        print "MAIN THREAD: Error in check for client trying to connect try block: " +str(inst)+"\n"
                         print "===================================================================\n"
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
-                    print "Checking for Commands from the controller\n"
+                    print "MAIN THREAD: Checking for Commands from the controller\n"
                     if(self.pipe.poll()):
                         receivedControllerCommand= self.pipe.recv()
                         if(len(receivedControllerCommand) > 0): #ignore the empty string
-                            print "Received command from the controller\n"
+                            print "MAIN THREAD: Received command from the controller\n"
                             identifiedCommand = False
                             try: #checking for nextChunk Command from Controller
                                 if(checkForNextChunkCommandFromController(self,receivedControllerCommand)==True):
                                     identifiedCommand= True
-                                    print "Identified receivedControllerCommand as the nextChunk Command\n"
+                                    print "MAIN THREAD: Identified receivedControllerCommand as the nextChunk Command\n"
                                     #check to see if a client is waiting for the nextChunk
                                     if(len(self.stackOfClientsWaitingForNextChunk) > 0):
-                                        print "A client is waiting for the nextChunk\n"
+                                        print "MAIN THREAD: A client is waiting for the nextChunk\n"
                                         tempClientSocket, tempClientAddress= popClientFromStackOfClientsWaitingForNextChunk(self)
                                         sendNextCommandToClient(self,tempClientSocket, receivedControllerCommand.params, receivedControllerCommand.data)
                                     else: #if there is no client waiting for the  next chunk
-                                        print "No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
+                                        print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
                                         pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
                             except Exception as inst:
                                 print "===================================================================\n"
-                                print "Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
+                                print "MAIN THREAD: Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
                                 print "===================================================================\n"
 
                             try: #checking for done command form controller
                                 if(identifiedCommand == False):
                                     if(checkForDoneCommandFromController(self,receivedControllerCommand)==True):
                                         identifiedCommand= True
-                                        print "Identified receivedControllerCommand as the Done Command\n"
+                                        print "MAIN THREAD: Identified receivedControllerCommand as the Done Command\n"
                                         #No further actions are needed for this command
                             except Exception as inst:
                                 print "===================================================================\n"
-                                print "Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
+                                print "MAIN THREAD: Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
                                 print "===================================================================\n"
 
                             if(identifiedCommand == False):
-                                print "Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
+                                print "MAIN THREAD: Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
                     else: #if there is nothing on the pipe
                         #Do not display the message
                         fakeVar=True
-                        print "There is no command received from the controller\n"
+                        print "MAIN THREAD: There is no command received from the controller\n"
                 except Exception as inst:
                     if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                         #Do not print out an error message
                         fakeVar= True
                     else:
                         print "===================================================================\n"
-                        print "Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
+                        print "MAIN THREAD: Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
                         print "===================================================================\n"
 
         except Exception as inst:
             print "===================================================================\n"
-            print "Error in Main Thread Server Loop: " +str(inst)+"\n"
+            print "MAIN THREAD: Error in Main Thread Server Loop: " +str(inst)+"\n"
             print "===================================================================\n"
 
         finally:
-            print "Preparing to close the socket\n"
+            print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
-            print "The serverSocket has been closed\n"
+            print "MAIN THREAD: The serverSocket has been closed\n"
             sendDoneCommandToController(self)
-            print "Informed the Controller that Server has finished\n"
+            print "MAIN THREAD: Informed the Controller that Server has finished\n"
 
 
         #FUNCTIONS==========================================================================
