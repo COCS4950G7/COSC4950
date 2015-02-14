@@ -147,6 +147,9 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
         except Exception as inst:
             if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
                 print "[Errno 35] Resource is not available in receiveCommandFromClient, trying again.\n"
+            elif(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                #ignore, do no print out error
+                break
             else:
                 print "===================================================================\n"
                 print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
@@ -569,6 +572,7 @@ class NetworkServer():
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
+                    print "Checking for Commands from the controller\n"
                     if(self.pipe.poll()):
                         receivedControllerCommand= self.pipe.recv()
                         if(len(receivedControllerCommand) > 0): #ignore the empty string
@@ -607,7 +611,7 @@ class NetworkServer():
                     else: #if there is nothing on the pipe
                         #Do not display the message
                         fakeVar=True
-                        #print "There is no command received from the controller\n"
+                        print "There is no command received from the controller\n"
                 except Exception as inst:
                     if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                         #Do not print out an error message
