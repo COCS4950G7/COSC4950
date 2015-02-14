@@ -13,7 +13,7 @@ __author__ = 'chris hamm'
 def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
     try:
         receivedCommand= ""
-        print "Checking for command from the server\n"
+        #print "Checking for command from the server\n"
         serverInput= clientSocket.recv(4096)
         if(len(serverInput) > 0):
             receivedCommand= serverInput

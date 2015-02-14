@@ -131,26 +131,32 @@ def checkForNextCommandFromClient(self,inboundData):
         return False
 
 def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to receive normal commands
-    try:
-        print "Acquiring socketLock\n"
-        self.socketLock.acquire()
-        print "Acquired socketLock\n"
-        receivedCommandFromClient= ""
-        print "Checking for inbound client Commands\n"
-        clientInput= clientSocket.recv(4096)
-        if(len(clientInput) > 0):
-            receivedCommandFromClient= clientInput
-        #return command in finally block for this function
-    except Exception as inst:
-        print "===================================================================\n"
-        print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
-        print "===================================================================\n"
-        receivedCommandFromClient= ""#set to empty string
-    finally:
-        print "Releasing socketLock\n"
-        self.socketLock.release()
-        print "Released socketLock\n"
-        return receivedCommandFromClient
+    while True:
+        try:
+            receivedCommandFromClient = ""
+            print "Acquiring socketLock\n"
+            self.socketLock.acquire()
+            print "Acquired socketLock\n"
+            print "Checking for inbound client Commands\n"
+            clientInput= clientSocket.recv(4096)
+            if(len(clientInput) > 0):
+                receivedCommandFromClient= clientInput
+                break
+            #return command in finally block for this function
+        except Exception as inst:
+            if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
+                print "Resource is not available in receiveCommandFromClient, trying again.\n"
+            else:
+                print "===================================================================\n"
+                print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
+                print "===================================================================\n"
+                receivedCommandFromClient= ""#set to empty string
+                break
+        finally:
+            print "Releasing socketLock\n"
+            self.socketLock.release()
+            print "Released socketLock\n"
+            return receivedCommandFromClient
 
 
 #Outbound commands to client==================================================
