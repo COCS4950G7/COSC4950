@@ -16,6 +16,330 @@ __author__ = 'chris hamm'
 
 #MAJOR CHANGE IN SENDNEXTCOMMANDTOCLIENT function
 
+def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
+            try:
+                posA = startA
+                posB = startB
+                #add check here
+                if((endA-startA) != (endB-startB)):
+                    return False
+                for x in range(startA,endA):
+                    tempCharA= inboundStringA[posA]
+                    tempCharB= inboundStringB[posB]
+                    if(tempCharA != tempCharB):
+                        return False
+                    posA+= 1
+                    posB+= 1
+                return True
+            except Exception as inst:
+                print "========================================================================\n"
+                print "Exception thrown in compareString Function: " +str(inst)+"\n"
+                print "========================================================================\n"
+                return False
+
+#Inbound commands from controller==========================================
+def checkForDoneCommandFromController(self, inboundString):
+    try:
+        print "Checking for done Command from the Controller\n"
+        if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
+            print "done Command was received from the Controller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return False
+
+def checkForNextChunkCommandFromController(self, inboundString):
+    try:
+        print "Checking for nextChunk Command from the Controller\n"
+        if(compareString(inboundString, "nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
+            print "nextChunk Command was received from the Controller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception thrown in checkForNextChunkCommandFromController: " +str(inst)+"\n"
+        print "========================================================================\n"
+        return False
+
+#Outbound commands to controller======================================
+def sendNextChunkCommandToController(self):
+    try:
+        print "Sending nextChunk Command to the Controller\n"
+        self.pipe.send("nextChunk")
+        print "Sent the nextChunk Command to the Controller\n"
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
+        print "========================================================================\n"
+
+def sendDoneCommandToController(self):
+    try:
+        print "Sending done Command to the Controller\n"
+        self.pipe.send("done")
+        print "Sent the done Command to the Controller\n"
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
+        print "========================================================================\n"
+
+#Inbound commands from the client=========================================
+def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT modelled after the check for crash command in the previous revisions
+    try:
+        print "Checking for the Crashed Command from the Client\n"
+        if(compareString(inboundData,"CRASHED",0,0,len("CRASHED"),len("CRASHED"))==True):
+            print "Crash Command was received from the Client\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception thrown in checkForCrashedCommandFromClient: " +str(inst)+"\n"
+        print "========================================================================\n"
+        return False
+
+def checkForFoundSolutionCommandFromClient(self,inboundData):
+    try:
+        print "Checking for the Found Solution Command from the client\n"
+        if(compareString(inboundData,"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))):
+            print "FOUNDSOLUTION Command was received from the client\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception thrown in checkForFoundSolutionCommandFromClient: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return False
+
+def checkForNextCommandFromClient(self,inboundData):
+    try:
+        print "Checking for the Next command from the client\n"
+        if(compareString(inboundData,"NEXT",0,0,len("NEXT"),len("NEXT"))):
+            print "NEXT command was received from the client\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception was thrown in checkForNextCommandFromClient: " +str(inst)+"\n"
+        print "========================================================================\n"
+        return False
+
+def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to receive normal commands
+    try:
+        print "Acquiring socketLock\n"
+        self.socketLock.acquire()
+        print "Acquired socketLock\n"
+        receivedCommandFromClient= ""
+        print "Checking for inbound client Commands\n"
+        clientInput= clientSocket.recv(4096)
+        if(len(clientInput) > 0):
+            receivedCommandFromClient= clientInput
+        #return command in finally block for this function
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
+        print "===================================================================\n"
+        receivedCommandFromClient= ""#set to empty string
+    finally:
+        print "Releasing socketLock\n"
+        self.socketLock.release()
+        print "Released socketLock\n"
+        return receivedCommandFromClient
+
+
+#Outbound commands to client==================================================
+def sendDoneCommandToClient(self,networkSocket, clientIP):
+    print "Issuing Done Command to Client: " + str(clientIP) +"\n"
+    print "Acquiring socket lock\n"
+    self.socketLock.acquire()
+    print "Acquired socketLock\n"
+    networkSocket.settimeout(0.25)
+    print "socket lock acquired\n"
+    try: #send try block
+        print "preparing to send done command to client\n"
+        networkSocket.send("done")
+        print "sent Done command to client: " +str(clientIP) +"\n"
+    except Exception as inst:
+        if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
+            print "========================================================================\n"
+            print "Exception thrown in sendDoneCommandToClient: Broken pipe error detected in send try block\n"
+            print "========================================================================\n"
+        else:
+            print "========================================================================\n"
+            print "Exception in send Done command: " +str(inst) +"\n"
+            print "========================================================================\n"
+    finally:
+        print "Releasing the socketLock\n"
+        self.socketLock.release()
+        print "Released socketLock\n"
+
+def sendNextCommandToClient(self,clientSocket,chunkParams,chunkData): #NOTE: This is NOT modelled after the previous revision of sendNextCommandToCLient!!!
+    try: #Main sendNextCommandToClient Try Block
+        print "Acquiring socketLock\n"
+        self.socketLock.acquire()
+        print "Acquired socketLock\n"
+        chunkParamsSize = 0 #initialize var
+        chunkDataSize = 0 #initialize var
+        commandString = "" #initializing var, this will hold the NEXT keyword and the file size of the chunk pieces
+        #Pre-Step 1 (Measure the filesize of chunkParams and chunkData--------------------------------------
+        try: #Measuring filesize of chunkParams and chunkData try block
+            print "Measuring filesize of chunkParams\n"
+            chunkParamsSize = sys.getsizeof(chunkParams)
+            print "filesize of chunkParams: " +str(chunkParamsSize)+"\n"
+            print "Measuring filesize of chunkData\n"
+            chunkDataSize = sys.getsizeof(chunkData)
+            print "filesize of chunkData: "+str(chunkDataSize)+"\n"
+            print "Creating the commandString\n"
+            commandString = "NEXT PSIZE("+str(chunkParamsSize)+") DSIZE("+str(chunkDataSize)+")\n" #PSIZE is the size of chunkParams and DSIZE is the size of chunkData
+            print "Finished creating the commandString\n"
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Inside the sendNextCommandToClient function\n"
+            print "Exception thrown in Pre-Step 1: Measuring filesize of chunkParams and chunkData Try Block: " +str(inst)+"\n"
+            print "========================================================================\n"
+            raise Exception ("Exception thrown in Pre-Step 1")
+        #Step 1 (Send the commandString to the client)---------------------------------------------------------
+        try: #send commandString to client try block
+            print "Sending commandString to the client\n"
+            clientSocket.send(commandString)
+            print "Sent the commandString to the client\n"
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Inside the sendNextCommandToClient function\n"
+            print "Exception was thrown in Step 1: send commandString to client: "+str(inst)+"\n"
+            print "========================================================================\n"
+            raise Exception ("Exception thrown in STep 1")
+        #Step 2 (send the chunkParams to the client)-----------------------------------------------------------
+        try: #send chunkParams to the client try block
+            print "Sending chunkParams to the client\n"
+            clientSocket.send(chunkParams)
+            print "Sent chunkParams to the client\n"
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Inside the sendNextCommandToCLient function\n"
+            print "Exception thrown in Step 2: send chunkParams to client: "+str(inst)+"\n"
+            print "========================================================================\n"
+            raise Exception ("Exception thrown in Step 2")
+        #Step 3 (send the chunkData to the client------------------------------------------------------------
+        try:
+            print "Sending chunkData to the client\n"
+            clientSocket.send(chunkData)
+            print "Sent chunkData to the client\n"
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Inside the sendNextCommandToCLient function\n"
+            print "Exception was thrown in STep 3: send chunkData to client: "+str(inst)+"\n"
+            print "========================================================================\n"
+            raise Exception ("Exception thrown in STep 3")
+    except Exception as inst:
+        print "========================================================================\n"
+        print "Exception was thrown in Main sendNextCommandToClient Try Block: " +str(inst)+"\n"
+        print "========================================================================\n"
+    finally:
+        print "Releasing socketLock\n"
+        self.socketLock.release()
+        print "Released socketLock\n"
+
+#dictionaryOfCurrentClientTasks functions================================================================
+def addClientToDictionaryOfCurrentClientTasks(self, clientAddress, clientChunk): #client Address has both the ip address and port
+    try:
+        self.dictionaryOfCurrentClientTasks[clientAddress] = clientChunk
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in addClientToDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+        print "========================================================================\n"
+
+def delClientFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
+    try:
+        del self.dictionaryOfCurrentClientTasks[clientAddress]
+    except KeyError as inst:
+        print "========================================================================\n"
+        print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
+        print "========================================================================\n"
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in delClientFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+        print "========================================================================\n"
+
+def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
+    try:
+        retrievedChunk = self.dictionaryOfCurrentClientTasks[clientAddress]
+        return retrievedChunk
+    except KeyError as inst:
+        print "========================================================================\n"
+        print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
+        print "========================================================================\n"
+        return None
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in getChunkFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return None
+
+#list of Crashed clients functions====================================================================
+def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the ip and the port
+    try:
+        self.listOfCrashedClients.append(clientAddress)
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in addClientToListOfCrashedClients: " + str(inst)+"\n"
+        print "========================================================================\n"
+
+#stackOfChunksThatNeedToBeReassigned functions==========================================================
+def pushChunkOnToStackOfChunksThatNeedToBeReassigned(self, inboundChunk):
+    try:
+        print "Pushing chunk onto the stackOfChunksThatNeedToBeReassigned\n"
+        self.stackOfChunksThatNeedToBeReassigned.append(inboundChunk)
+        print "Pushed chunk onto the stackOfChunksThatNeedToBeReassigned\n"
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in pushChunkOnToStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
+        print "========================================================================\n"
+
+def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
+    try:
+        poppedChunk = ""
+        print "Popping chunk from stackOfChunksThatNeedToBeReassigned\n"
+        poppedChunk = self.stackOfChunksThatNeedToBeReassigned.pop()
+        print "Popped chunk off the stackOfChunksThatNeedToBeReassigned\n"
+        return poppedChunk
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return None
+
+#stackOfClientsWaitingForNextChunk functions============================================================
+def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAddress):
+    try:
+        print "Pushing client on to stackOfClientsWaitingForNextChunk\n"
+        self.stackOfClientsWaitingForNextChunk.append((clientSocket,clientAddress)) #holds a tuple
+        print "Pushed client on to stackOfClientsWaitingForNextChunk\n"
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
+        print "========================================================================\n"
+
+def popClientFromStackOfClientsWaitingForNextChunk(self):
+    try:
+        poppedClient= ""
+        print "Popping client off the stackOfClientsWaitingForNextChunk\n"
+        poppedClient= self.stackOfClientsWaitingForNextChunk.pop()
+        print "Popped client off the stackOfClientsWaitingForNextChunk\n"
+        return poppedClient
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return None
+
+
 import threading
 import thread
 import socket
@@ -48,7 +372,7 @@ class NetworkServer():
                     print "Stopping the thread\n"
                     break
                 try: #check for commands from client
-                    inboundCommandFromClient = self.receiveCommandFromClient(clientSocket)
+                    inboundCommandFromClient = receiveCommandFromClient(self,clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in check for commands from the client in client thread handler: " +str(inst)+"\n"
@@ -58,19 +382,19 @@ class NetworkServer():
                     if(len(inboundCommandFromClient) > 0): #ignore if the empty string
                         identifiedCommand = False
                         try: #checking to see if the next Command was received from the client try block
-                            if(self.checkForNextCommandFromClient(inboundCommandFromClient)==True):
+                            if(checkForNextCommandFromClient(self,inboundCommandFromClient)==True):
                                 identifiedCommand= True
                                 print "Identified inboundCommandFromClient as the Next Command\n"
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                                     print "There is a chunk that needs to be reassigned.\n"
-                                    tempChunk = self.popChunkFromStackOfChunksThatNeedToBeReassigned()
-                                    self.sendNextChunkToClient(clientSocket,tempChunk.params,tempChunk.data)
+                                    tempChunk = popChunkFromStackOfChunksThatNeedToBeReassigned(self)
+                                    sendNextCommandToClient(self,clientSocket,tempChunk.params,tempChunk.data)
                                 else:
                                     print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
-                                    self.sendNextChunkCommandToController()
+                                    sendNextChunkCommandToController(self)
                                     print "Adding the client to the stackOfClientsWaitingForNextChunk\n"
-                                    self.pushClientOnToStackOfClientsWaitingForNextChunk(clientSocket, clientAddr)
+                                    pushClientOnToStackOfClientsWaitingForNextChunk(self,clientSocket, clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
@@ -78,11 +402,11 @@ class NetworkServer():
 
                         try: #check to see if the found solution command was received from the client
                             if(identifiedCommand == False):
-                                if(self.checkForFoundSolutionCommandFromClient(inboundCommandFromClient)==True):
+                                if(checkForFoundSolutionCommandFromClient(self,inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the found solution command\n"
                                     for key in self.dictionaryOfCurrentClientTasks.keys():
-                                        self.sendDoneCommandToClient(key) #extracts the key from the dictionary and sends the done command to them
+                                        sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
                                     self.stopAllThreads = True
                         except Exception as inst:
@@ -92,13 +416,13 @@ class NetworkServer():
 
                         try: #check to see if the crashed command was received
                             if(identifiedCommand == False):
-                                if(self.checkForCrashedCommandFromClient(inboundCommandFromClient)==True):
+                                if(checkForCrashedCommandFromClient(self,inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the Crashed Command\n"
-                                    tempChunk = self.getChunkFromDictionaryOfCurrentClientTasks(clientAddr)
-                                    self.pushChunkOnToStackOfChunksThatNeedToBeReassigned(tempChunk)
-                                    self.addClientToListOfCrashedClients()
-                                    self.delClientFromDictionaryOfCurrentClientTasks(clientAddr)
+                                    tempChunk = getChunkFromDictionaryOfCurrentClientTasks(self,clientAddr)
+                                    pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,tempChunk)
+                                    addClientToListOfCrashedClients(self)
+                                    delClientFromDictionaryOfCurrentClientTasks(self,clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
@@ -152,7 +476,7 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-
+        '''
         #get the IP address
         try: #getIP tryblock
             print "STATUS: Getting your network IP adddress"
@@ -197,9 +521,10 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-
+        '''
 
         #CREATE THE SOCKET
+        import socket
         serverSocket = socket.socket(AF_INET, SOCK_STREAM)
 
         try: #try to bind the socket
@@ -216,6 +541,7 @@ class NetworkServer():
         #MAIN THREAD SERVER LOOP
         try: #main thread server loop try block
             serverSocket.settimeout(0.25)
+            print "Waiting for client(s) to connect\n"
             while True: #Primary main thread server while loop
                 if(self.stopAllThreads == True):
                     print "Stopping Main Thread\n"
@@ -226,9 +552,13 @@ class NetworkServer():
                     print "A client has connected!!\n"
                     thread.start_new_thread(self.ClientThreadHandler(inboundClientSocket,inboundClientAddr,self.socketLock))
                 except Exception as inst:
-                    print "===================================================================\n"
-                    print "Error in check for client trying to connect try block: " +str(inst)+"\n"
-                    print "===================================================================\n"
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #do not display an error message
+                        fakeVar= True
+                    else:
+                        print "===================================================================\n"
+                        print "Error in check for client trying to connect try block: " +str(inst)+"\n"
+                        print "===================================================================\n"
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
@@ -238,17 +568,17 @@ class NetworkServer():
                             print "Received command from the controller\n"
                             identifiedCommand = False
                             try: #checking for nextChunk Command from Controller
-                                if(self.checkForNextChunkCommandFromController(receivedControllerCommand)==True):
+                                if(checkForNextChunkCommandFromController(self,receivedControllerCommand)==True):
                                     identifiedCommand= True
                                     print "Identified receivedControllerCommand as the nextChunk Command\n"
                                     #check to see if a client is waiting for the nextChunk
                                     if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                         print "A client is waiting for the nextChunk\n"
-                                        tempClientSocket, tempClientAddress= self.popClientFromStackOfClientsWaitingForNextChunk()
-                                        self.sendNextCommandToClient(tempClientSocket, receivedControllerCommand.params, receivedControllerCommand.data)
+                                        tempClientSocket, tempClientAddress= popClientFromStackOfClientsWaitingForNextChunk(self)
+                                        sendNextCommandToClient(self,tempClientSocket, receivedControllerCommand.params, receivedControllerCommand.data)
                                     else: #if there is no client waiting for the  next chunk
                                         print "No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
-                                        self.pushChunkOnToStackOfChunkThatNeedToBeReassigned(receivedControllerCommand)
+                                        pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
                             except Exception as inst:
                                 print "===================================================================\n"
                                 print "Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
@@ -256,7 +586,7 @@ class NetworkServer():
 
                             try: #checking for done command form controller
                                 if(identifiedCommand == False):
-                                    if(self.checkForDoneCommandFromController(receivedControllerCommand)==True):
+                                    if(checkForDoneCommandFromController(self,receivedControllerCommand)==True):
                                         identifiedCommand= True
                                         print "Identified receivedControllerCommand as the Done Command\n"
                                         #No further actions are needed for this command
@@ -268,11 +598,17 @@ class NetworkServer():
                             if(identifiedCommand == False):
                                 print "Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
                     else: #if there is nothing on the pipe
-                        print "There is no command received from the controller\n"
+                        #Do not display the message
+                        fakeVar=True
+                        #print "There is no command received from the controller\n"
                 except Exception as inst:
-                    print "===================================================================\n"
-                    print "Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
-                    print "===================================================================\n"
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #Do not print out an error message
+                        fakeVar= True
+                    else:
+                        print "===================================================================\n"
+                        print "Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
+                        print "===================================================================\n"
 
         except Exception as inst:
             print "===================================================================\n"
@@ -283,330 +619,10 @@ class NetworkServer():
             print "Preparing to close the socket\n"
             serverSocket.close()
             print "The serverSocket has been closed\n"
-            self.sendDoneCommandToController()
+            sendDoneCommandToController(self)
             print "Informed the Controller that Server has finished\n"
 
 
         #FUNCTIONS==========================================================================
-        def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
-            try:
-                posA = startA
-                posB = startB
-                #add check here
-                if((endA-startA) != (endB-startB)):
-                    return False
-                for x in range(startA,endA):
-                    tempCharA= inboundStringA[posA]
-                    tempCharB= inboundStringB[posB]
-                    if(tempCharA != tempCharB):
-                        return False
-                    posA+= 1
-                    posB+= 1
-                return True
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in compareString Function: " +str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        #Inbound commands from controller==========================================
-        def checkForDoneCommandFromController(self, inboundString):
-            try:
-                print "Checking for done Command from the Controller\n"
-                if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
-                    print "done Command was received from the Controller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        def checkForNextChunkCommandFromController(self, inboundString):
-            try:
-                print "Checking for nextChunk Command from the Controller\n"
-                if(compareString(inboundString, "nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
-                    print "nextChunk Command was received from the Controller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in checkForNextChunkCommandFromController: " +str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        #Outbound commands to controller======================================
-        def sendNextChunkCommandToController(self):
-            try:
-                print "Sending nextChunk Command to the Controller\n"
-                self.pipe.send("nextChunk")
-                print "Sent the nextChunk Command to the Controller\n"
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
-                print "========================================================================\n"
-
-        def sendDoneCommandToController(self):
-            try:
-                print "Sending done Command to the Controller\n"
-                self.pipe.send("done")
-                print "Sent the done Command to the Controller\n"
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
-                print "========================================================================\n"
-
-        #Inbound commands from the client=========================================
-        def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT modelled after the check for crash command in the previous revisions
-            try:
-                print "Checking for the Crashed Command from the Client\n"
-                if(compareString(inboundData,"CRASHED",0,0,len("CRASHED"),len("CRASHED"))==True):
-                    print "Crash Command was received from the Client\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in checkForCrashedCommandFromClient: " +str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        def checkForFoundSolutionCommandFromClient(self,inboundData):
-            try:
-                print "Checking for the Found Solution Command from the client\n"
-                if(compareString(inboundData,"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))):
-                    print "FOUNDSOLUTION Command was received from the client\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in checkForFoundSolutionCommandFromClient: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        def checkForNextCommandFromClient(self,inboundData):
-            try:
-                print "Checking for the Next command from the client\n"
-                if(compareString(inboundData,"NEXT",0,0,len("NEXT"),len("NEXT"))):
-                    print "NEXT command was received from the client\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception was thrown in checkForNextCommandFromClient: " +str(inst)+"\n"
-                print "========================================================================\n"
-                return False
-
-        def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to receive normal commands
-            try:
-                print "Acquiring socketLock\n"
-                self.socketLock.acquire()
-                print "Acquired socketLock\n"
-                receivedCommandFromClient= ""
-                print "Checking for inbound client Commands\n"
-                clientInput= clientSocket.recv(4096)
-                if(len(clientInput) > 0):
-                    receivedCommandFromClient= clientInput
-                #return command in finally block for this function
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
-                print "===================================================================\n"
-                receivedCommandFromClient= ""#set to empty string
-            finally:
-                print "Releasing socketLock\n"
-                self.socketLock.release()
-                print "Released socketLock\n"
-                return receivedCommandFromClient
 
 
-        #Outbound commands to client==================================================
-        def sendDoneCommandToClient(self,networkSocket, clientIP):
-            print "Issuing Done Command to Client: " + str(clientIP) +"\n"
-            print "Acquiring socket lock\n"
-            self.socketLock.acquire()
-            print "Acquired socketLock\n"
-            networkSocket.settimeout(0.25)
-            print "socket lock acquired\n"
-            try: #send try block
-                print "preparing to send done command to client\n"
-                networkSocket.send("done")
-                print "sent Done command to client: " +str(clientIP) +"\n"
-            except Exception as inst:
-                if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
-                    print "========================================================================\n"
-                    print "Exception thrown in sendDoneCommandToClient: Broken pipe error detected in send try block\n"
-                    print "========================================================================\n"
-                else:
-                    print "========================================================================\n"
-                    print "Exception in send Done command: " +str(inst) +"\n"
-                    print "========================================================================\n"
-            finally:
-                print "Releasing the socketLock\n"
-                self.socketLock.release()
-                print "Released socketLock\n"
-
-        def sendNextCommandToClient(self,clientSocket,chunkParams,chunkData): #NOTE: This is NOT modelled after the previous revision of sendNextCommandToCLient!!!
-            try: #Main sendNextCommandToClient Try Block
-                print "Acquiring socketLock\n"
-                self.socketLock.acquire()
-                print "Acquired socketLock\n"
-                chunkParamsSize = 0 #initialize var
-                chunkDataSize = 0 #initialize var
-                commandString = "" #initializing var, this will hold the NEXT keyword and the file size of the chunk pieces
-                #Pre-Step 1 (Measure the filesize of chunkParams and chunkData--------------------------------------
-                try: #Measuring filesize of chunkParams and chunkData try block
-                    print "Measuring filesize of chunkParams\n"
-                    chunkParamsSize = sys.getsizeof(chunkParams)
-                    print "filesize of chunkParams: " +str(chunkParamsSize)+"\n"
-                    print "Measuring filesize of chunkData\n"
-                    chunkDataSize = sys.getsizeof(chunkData)
-                    print "filesize of chunkData: "+str(chunkDataSize)+"\n"
-                    print "Creating the commandString\n"
-                    commandString = "NEXT PSIZE("+str(chunkParamsSize)+") DSIZE("+str(chunkDataSize)+")\n" #PSIZE is the size of chunkParams and DSIZE is the size of chunkData
-                    print "Finished creating the commandString\n"
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Inside the sendNextCommandToClient function\n"
-                    print "Exception thrown in Pre-Step 1: Measuring filesize of chunkParams and chunkData Try Block: " +str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception thrown in Pre-Step 1")
-                #Step 1 (Send the commandString to the client)---------------------------------------------------------
-                try: #send commandString to client try block
-                    print "Sending commandString to the client\n"
-                    clientSocket.send(commandString)
-                    print "Sent the commandString to the client\n"
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Inside the sendNextCommandToClient function\n"
-                    print "Exception was thrown in Step 1: send commandString to client: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception thrown in STep 1")
-                #Step 2 (send the chunkParams to the client)-----------------------------------------------------------
-                try: #send chunkParams to the client try block
-                    print "Sending chunkParams to the client\n"
-                    clientSocket.send(chunkParams)
-                    print "Sent chunkParams to the client\n"
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Inside the sendNextCommandToCLient function\n"
-                    print "Exception thrown in Step 2: send chunkParams to client: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception thrown in Step 2")
-                #Step 3 (send the chunkData to the client------------------------------------------------------------
-                try:
-                    print "Sending chunkData to the client\n"
-                    clientSocket.send(chunkData)
-                    print "Sent chunkData to the client\n"
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Inside the sendNextCommandToCLient function\n"
-                    print "Exception was thrown in STep 3: send chunkData to client: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception thrown in STep 3")
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception was thrown in Main sendNextCommandToClient Try Block: " +str(inst)+"\n"
-                print "========================================================================\n"
-            finally:
-                print "Releasing socketLock\n"
-                self.socketLock.release()
-                print "Released socketLock\n"
-
-        #dictionaryOfCurrentClientTasks functions================================================================
-        def addClientToDictionaryOfCurrentClientTasks(self, clientAddress, clientChunk): #client Address has both the ip address and port
-            try:
-                self.dictionaryOfCurrentClientTasks[clientAddress] = clientChunk
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in addClientToDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
-                print "========================================================================\n"
-
-        def delClientFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
-            try:
-                del self.dictionaryOfCurrentClientTasks[clientAddress]
-            except KeyError as inst:
-                print "========================================================================\n"
-                print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
-                print "========================================================================\n"
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in delClientFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
-                print "========================================================================\n"
-
-        def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
-            try:
-                retrievedChunk = self.dictionaryOfCurrentClientTasks[clientAddress]
-                return retrievedChunk
-            except KeyError as inst:
-                print "========================================================================\n"
-                print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
-                print "========================================================================\n"
-                return None
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in getChunkFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return None
-
-        #list of Crashed clients functions====================================================================
-        def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the ip and the port
-            try:
-                self.listOfCrashedClients.append(clientAddress)
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in addClientToListOfCrashedClients: " + str(inst)+"\n"
-                print "========================================================================\n"
-
-        #stackOfChunksThatNeedToBeReassigned functions==========================================================
-        def pushChunkOnToStackOfChunksThatNeedToBeReassigned(self, inboundChunk):
-            try:
-                print "Pushing chunk onto the stackOfChunksThatNeedToBeReassigned\n"
-                self.stackOfChunksThatNeedToBeReassigned.append(inboundChunk)
-                print "Pushed chunk onto the stackOfChunksThatNeedToBeReassigned\n"
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in pushChunkOnToStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
-                print "========================================================================\n"
-
-        def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
-            try:
-                poppedChunk = ""
-                print "Popping chunk from stackOfChunksThatNeedToBeReassigned\n"
-                poppedChunk = self.stackOfChunksThatNeedToBeReassigned.pop()
-                print "Popped chunk off the stackOfChunksThatNeedToBeReassigned\n"
-                return poppedChunk
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return None
-
-        #stackOfClientsWaitingForNextChunk functions============================================================
-        def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAddress):
-            try:
-                print "Pushing client on to stackOfClientsWaitingForNextChunk\n"
-                self.stackOfClientsWaitingForNextChunk.append((clientSocket,clientAddress)) #holds a tuple
-                print "Pushed client on to stackOfClientsWaitingForNextChunk\n"
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
-                print "========================================================================\n"
-
-        def popClientFromStackOfClientsWaitingForNextChunk(self):
-            try:
-                poppedClient= ""
-                print "Popping client off the stackOfClientsWaitingForNextChunk\n"
-                poppedChunk= self.stackOfClientsWaitingForNextChunk.pop()
-                print "Popped client off the stackOfClientsWaitingForNextChunk\n"
-                return poppedClient
-            except Exception as inst:
-                print "========================================================================\n"
-                print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return None

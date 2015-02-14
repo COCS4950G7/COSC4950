@@ -10,6 +10,346 @@ __author__ = 'chris hamm'
 
 #By recommendation, implement without the command logs
 
+def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
+    try:
+        receivedCommand= ""
+        print "Checking for command from the server\n"
+        serverInput= clientSocket.recv(4096)
+        if(len(serverInput) > 0):
+            receivedCommand= serverInput
+        return receivedCommand
+    except Exception as inst:
+        if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+            #Do not display the error message
+            fakeVar=True
+            return ""
+        else:
+            print "===================================================================\n"
+            print "ERROR in receiveCommandFromServer: "+str(inst)+"\n"
+            print "===================================================================\n"
+            return "" #the empty string
+
+#FUNCTIONS=========================================================================================
+#CompareString function-----------------------------------------
+def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
+    try:
+        posA = startA
+        posB = startB
+        #add check here (optional)
+        if((endA-startA) != (endB-startB)):
+            return False
+        for x in range(startA,endA):
+            tempCharA= inboundStringA[posA]
+            tempCharB= inboundStringB[posB]
+            if(tempCharA != tempCharB):
+                return False
+            posA+= 1
+            posB+= 1
+        return True
+    except Exception as inst:
+        print "ERROR in compareString: " + str(inst) +"\n"
+        print "---- inboundStringA: '" + inboundStringA + "'\n"
+        print "-------- startA: " + str(startA) + " endA: " + str(endA) +"\n"
+        print "---- inboundStringB: '" + inboundStringB + "'\n"
+        print "-------- startB: " + str(startB) + " endB: " + str(endB) +"\n"
+        return False
+
+#Inbound commands from controller functions-----------------------------------------
+def receiveServerIPFromController(self):
+    try:
+        print "Receiving the server IP from the Controller\n"
+        self.serverIP= self.pipe.recv()
+        print "Received the server IP from the controller\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
+        print "===================================================================\n"
+
+def checkForDoneCommandFromController(self, inboundString):
+    try:
+        print "Checking for done command from the Controller\n"
+        if(compareString(inboundString, "done",0,0,len("done"), len("done"))==True):
+            print "Received the done command from the controller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checkingForDoneCommandFromController: " +str(inst)+"\n"
+        print "===================================================================\n"
+        return False
+
+def checkForDoingStuffCommandFromController(self, inboundString):
+    try:
+        print "Checking for doingStuff Command from the Controller\n"
+        if(compareString(inboundString,"doingStuff",0,0,len("doingStuff"),len("doingStuff"))==True):
+            print "Received doingSTuff COmmand from the COntroller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checkForDoingStuff Command from the Controller: " + str(inst) +"\n"
+        print "===================================================================\n"
+        return False
+
+def checkForFoundSolutionCommandFromController(self, inboundString):
+    try:
+        print "Checking for foundSolution Command from the Controller\n"
+        if(compareString(inboundString,"foundSolution",0,0,len("foundSolution"),len("foundSolution"))==True):
+            print "Received foundSolution command from the controller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checkForFoundSolutionCommandFromController: " + str(inst) +"\n"
+        print "===================================================================\n"
+        return False
+
+def checkForRequestNextChunkCommandFromController(self, inboundString):
+    try:
+        print "Checking for requestNextChunk Command from the Controller\n"
+        if(compareString(inboundString,"requestNextChunk",0,0,len("requestNextChunk"),len("requestNextChunk"))==True):
+            print "Received requestNextChunk Command from the controller\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checkForRequestNextChunk Command from Controller: " + str(inst) +"\n"
+        print "===================================================================\n"
+        return False
+
+#Outbound commands to controller functions----------------------------------------
+def sendNextChunkCommandToController(self, inboundChunk):
+    try:
+        print "Sending nextChunk Command to the Controller\n"
+        self.pipe.send(inboundChunk)
+        print "Sent nextChunk Command to the controller\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in sendNextChunkCommandToController: " + str(inst)+"\n"
+        print "===================================================================\n"
+
+def sendDoneCommandToController(self):
+    try:
+        print "Sending done Command to the Controller\n"
+        self.pipe.send("done")
+        print "Sent done Command to the controller\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in sendDoneCommandToController: " + str(inst)+"\n"
+        print "===================================================================\n"
+
+def sendConnectedCommandToController(self):
+    try:
+        print "Sending connected Command to the Controller\n"
+        self.pipe.send("connected")
+        print "Sent connected command to the controller\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in sendConnectedCommandToController: " + str(inst)+"\n"
+        print "===================================================================\n"
+
+def sendDoingStuffCommandToController(self):
+    try:
+        print "Sending doingStuff Command to the Controller\n"
+        self.pipe.send("doingStuff")
+        print "Sent doingSTuff Command to the Controller\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
+        print "===================================================================\n"
+
+#Inbound commands from server functions----------------------------------------
+def checkForDoneCommandFromServer(self,inboundString):
+    try:
+        print "Checking for done command from server\n"
+        if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
+            print "Done command was received from the server\n"
+            self.serverIssuedDoneCommand = True
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checkForDoneCommandFromServer: " + str(inst) +"\n"
+        print "===================================================================\n"
+        return False
+
+def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than previous revisions, this only checks for the NEXT keyword
+    try:
+        print "Checking for nextCommand from server\n"
+        if(compareString(inboundString,"NEXT",0,0,len("NEXT"),len("NEXT"))==True):
+            print "Next Command was received from the server\n"
+            return True
+        else:
+            return False
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in checking for nextCommand from the server: " +str(inst)+"\n"
+        print "===================================================================\n"
+        return False
+
+def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component to extract the file size of the params from the next command
+    try:
+        print "Extracting size of Params from the next Command\n"
+        firstOpenParenthesisPos= 0
+        firstClosingParenthesisPos= 0
+        sizeOfChunkParams = ""
+        #Command layout: "NEXT PSIZE() DSIZE()"
+        #Step 1: find the first Open Parenthesis, which immeadiately follows the PSIZE
+        try: #step 1 try block
+            print "Finding the first Open Parenthesis\n"
+            for index in range(0,len(inboundString)):
+                if(inboundString[index] == "("):
+                    firstOpenParenthesisPos= index
+                    break
+            if(firstOpenParenthesisPos == 0):
+                raise Exception("No open parenthesis was found")
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 1: find first Open parenthesis: " +str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception thrown in step 1 of extractSizeOfParamsFromNextCommand")
+        #Step 2: find the corresponding closing parenthesis
+        try: #Step 2 try block
+            print "Finding the corresponding closing parenthesis\n"
+            for index in range(firstOpenParenthesisPos, len(inboundString)):
+                if(inboundString[index] == ")"):
+                    firstClosingParenthesisPos= index
+                    break
+            if(firstClosingParenthesisPos == 0):
+                raise Exception ("No closing parenthesis was found")
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 2: find corresponding closing parenthesis: " +str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception thrown in Step 2 of extractSizeOfParamsFromNextCommand")
+        #Step 3: retreive the params file size
+        try: #step 3 try block
+            print "Retreiving the params file size\n"
+            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
+                sizeOfChunkParams+= str(inboundString[index])
+            return sizeOfChunkParams
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 3: retreive the params file size: "+str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception thrown in Step 3 of extractSizeOfParamsFromNextCommand")
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in extractSizeOfParamsFromNextCommand: " +str(inst)+"\n"
+        print "===================================================================\n"
+        return 0 #return filesize of zero if there was an error
+
+def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component
+    try:
+        print "Extracting size of data from next Command\n"
+        firstOpenParenthesisPos = 0
+        firstClosingParenthesisPos = 0
+        sizeOfChunkData= ""
+        #Command layout: NEXT PSIZE() DSIZE()
+        #Step 1: find the 'D' in the inboundString
+        try: #step 1 try block
+            print "Finding the 'D' in the nextCommand\n"
+            for index in range(0,len(inboundString)):
+                if(inboundString[index] == "D"):
+                    firstOpenParenthesisPos= index + 5 #plus five for the offset between the D and the first open parenthesis
+                    break
+            if(firstOpenParenthesisPos == 0):
+                raise Exception ("No 'D' was found in the nextCommand")
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 1: find the 'D' in the inboundString: "+str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception was thrown in step 1 of extractSizeOfDataFromNextCommand")
+        #Step 2: find the corresponding parenthesis
+        try: #Step 2 try block
+            print "Finding the corresponding parenthesis\n"
+            for index in range(firstOpenParenthesisPos, len(inboundString)):
+                if(inboundString[index] == ")"):
+                    firstClosingParenthesisPos= index
+                    break
+            if(firstClosingParenthesisPos == 0):
+                raise Exception ("No closing parenthesis found in the nextCommand")
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 2: find corresponding parenthesis: "+str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception thrown in step 2 of extractSizeOfDataFromNextCommand")
+        #Step 3: retreive the data file size
+        try: #step 3 try block
+            print "Retrieving data file size\n"
+            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
+                sizeOfChunkData+= str(inboundString)
+            return sizeOfChunkData
+        except Exception as inst:
+            print "===================================================================\n"
+            print "Exception thrown in Step 3: retrieve the data file size: " + str(inst)+"\n"
+            print "===================================================================\n"
+            raise Exception ("Exception thrown is step 3 of extractSizeOfDataFromNextCommand")
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in extractSizeOfDataFromNextCommand: " +str(inst)+"\n"
+        print "===================================================================\n"
+        return 0
+
+def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize): #NOTE: New component, call this for receiving params or for receiving data
+    try:
+        receivedPieceOfChunk= ""
+        print "Receiving piece of chunk from the server\n"
+        while(sys.getsizeof(receivedPieceOfChunk) < pieceOfChunkFileSize):
+            recvInfo= self.clientSocket.recv(4096)
+            if recvInfo:
+                receivedPieceOfChunk+= str(recvInfo)
+            else:
+                break
+        if(len(receivedPieceOfChunk) < 1):
+            raise Exception ("receivedPieceOfChunk is empty!")
+        return receivedPieceOfChunk
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in receivePieceOfChunkFromServer: "+str(inst)+"\n"
+        print "===================================================================\n"
+        return "" #the empty string
+
+
+
+#Outbound commands to server functions--------------------------------------
+def sendNextChunkCommandToServer(self, networkSocket):
+    try:
+        print "Sending nextChunk Command to Server\n"
+        networkSocket.send("NEXT " + str(self.myIPAddress))
+        print "Sent the nextChunk Command to the server\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "Exception thrown in sendNextChunkCommandToServer: " + str(inst)+"\n"
+        print "===================================================================\n"
+
+def sendFoundSolutionCommandToServer(self, networkSocket):
+    try:
+        print "Sending foundSolution Command to Server\n"
+        networkSocket.send("FOUNDSOLUTION")
+        print "Sent FoundSOlution Command to the server\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "Exception thrown in sendFoundSolutionCommandToServer: "+ str(inst)+"\n"
+        print "===================================================================\n"
+
+def sendCrashedCommandToServer(self, networkSocket):
+    try:
+        print "Sending Crashed Command to Server\n"
+        networkSocket.send("CRASHED " + self.myIPAddress)
+        print "Sent Crashed COmmand to the server\n"
+    except Exception as inst:
+        print "===================================================================\n"
+        print "Exception thrown in the sendCrashedCommandToServer: "+str(inst)+"\n"
+        print "===================================================================\n"
+
+
+
 
 import socket
 from socket import *
@@ -21,11 +361,11 @@ class NetworkClient():
     def __init__(self, inboundpipefromcontroller):
         self.pipe = inboundpipefromcontroller
 
-        host = ''
-        port = 55568
-        myIPAddress = '127.0.0.1' #defualt to the ping back address
-        serverIPAddress = '127.0.0.1' #default to the ping back address
-        serverIssuedDoneCommand = False
+        self.host = ''
+        self.port = 55568
+        self.myIPAddress = "127.0.0.1" #defualt to the ping back address
+        self.serverIPAddress = "127.0.0.1" #default to the ping back address
+        self.serverIssuedDoneCommand = False
 
         #.........................................................................
         #Detect the Operating System
@@ -63,6 +403,7 @@ class NetworkClient():
         #.........................................................................
         #Retrieve the local network IP Address
         #.........................................................................
+        '''
         try: #getIP tryblock
             print "STATUS: Getting your network IP adddress"
             if(platform.system()=="Windows"):
@@ -109,14 +450,15 @@ class NetworkClient():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
+        '''
         #.........................................................................
         #End of Retrieve the local network IP Address
         #.........................................................................
-
+        import socket
         clientSocket = socket.socket(AF_INET, SOCK_STREAM)
 
         try: #receive the server ip from the controller
-            serverIPAddress= self.receiveServerIPFromController()
+            self.serverIPAddress= receiveServerIPFromController(self)
         except Exception as inst:
             print "===================================================================\n"
             print "Error in receive server ip from the controller: "+(str(inst))+"\n"
@@ -128,24 +470,25 @@ class NetworkClient():
             print "===================================================================\n"
             print "Error in connect to server try block: " + str(inst) +"\n"
             print "===================================================================\n"
+            raise Exception ("Failed to connect to the server")
 
         #PRIMARY CLIENT WHILE LOOP
         try:
             clientSocket.settimeout(0.25)
             while True: #primary client while loop
-                receivedCommandFromServer = "" #initialize the var
+                inboundCommandFromServer = "" #initialize the var
                 #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================
                 try: #check for inbound server commands
-                    receivedCommandFromServer = self.receiveCommandFromServer()
+                    inboundCommandFromServer = receiveCommandFromServer(self, clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in check for inbound Server Commands Try block: "+str(inst)+"\n"
                     print "===================================================================\n"
 
-                if(len(receivedCommandFromServer) > 0): #if not the empty string, perform the following checks
+                if(len(inboundCommandFromServer) > 0): #if not the empty string, perform the following checks
                     identifiedCommand = False
                     try: #check for the done command from the server
-                        if(self.checkForDoneCommandFromServer(receivedCommandFromServer)==True):
+                        if(checkForDoneCommandFromServer(inboundCommandFromServer)==True):
                             identifiedCommand= True
                             print "Identified Command as the done command from the server\n"
                             print "Server has Issued the Done Command\n"
@@ -158,25 +501,25 @@ class NetworkClient():
 
                     try: #check for nextChunk command from the server
                         if(identifiedCommand == False):
-                            if(self.checkForNextChunkCommandFromServer(receivedCommandFromServer)==True):
+                            if(checkForNextCommandFromServer(self,inboundCommandFromServer)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the nextChunk Command from the server\n"
-                                fileSizeOfChunkParams = self.extractSizeOfParamFromNextCommand(receivedCommandFromServer)
-                                fileSizeOfChunkData = self.extractSizeOfDataFromNextCommand(receivedCommandFromServer)
-                                tempChunkParams = self.receivePieceOfChunkFromServer(fileSizeOfChunkParams)
-                                tempChunkData = self.receivePieceOfChunkFromServer(fileSizeOfChunkData)
+                                fileSizeOfChunkParams = extractSizeOfParamFromNextCommand(self,inboundCommandFromServer)
+                                fileSizeOfChunkData = extractSizeOfDataFromNextCommand(self,inboundCommandFromServer)
+                                tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams)
+                                tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData)
                                 outboundChunk = Chunk.Chunk()
                                 outboundChunk.params = tempChunkParams
                                 outboundChunk.data = tempChunkData
-                                self.sendDoingStuffCommandToController() #notify controller that client will be sending a chunk to it
-                                self.sendNextChunkCommandToController(outboundChunk)
+                                sendDoingStuffCommandToController() #notify controller that client will be sending a chunk to it
+                                sendNextChunkCommandToController(self,outboundChunk)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in checking for nextChunk command from server: " + str(inst)+"\n"
                         print "===================================================================\n"
 
                     if(identifiedCommand == False):
-                        print "Warning: Unknown command received from the server: "+str(receivedCommandFromServer)
+                        print "Warning: Unknown command received from the server: "+str(inboundCommandFromServer)
 
                 #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION=======================================================
                 receivedCommandFromController = "" #initialize thevar
@@ -192,10 +535,10 @@ class NetworkClient():
                 if(len(receivedCommandFromController) > 0): #if not the empty string
                     identifiedCommand= False
                     try: #checking for found solution command from controller
-                        if(self.checkForFoundSolutionCommandFromController(receivedCommandFromController)==True):
+                        if(checkForFoundSolutionCommandFromController(self, receivedCommandFromController)==True):
                             identifiedCommand = True
                             print "Identified Command as Found Solution Command from the controller\n"
-                            self.sendFoundSolutionCommandToServer(clientSocket)
+                            sendFoundSolutionCommandToServer(self,clientSocket)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
@@ -203,10 +546,10 @@ class NetworkClient():
 
                     try: #checking for request next chunk command from controller
                         if(identifiedCommand == False):
-                            if(self.checkForRequestNextChunkCommandFromController(receivedCommandFromController)==True):
+                            if(checkForRequestNextChunkCommandFromController(self,receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the requestNextChunk Command from the Controller\n"
-                                self.sendNextChunkCommandToServer(clientSocket)
+                                sendNextChunkCommandToServer(self,clientSocket)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for request Next Chunk Command from controller: "+str(inst)+"\n"
@@ -214,7 +557,7 @@ class NetworkClient():
 
                     try: #check for doingStuff command form controller
                         if(identifiedCommand == False):
-                            if(self.checkForDoingStuffCommandFromController(receivedCommandFromController)==True):
+                            if(checkForDoingStuffCommandFromController(self,receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the doingStuff Command from the Controller\n"
                                 #The controller parrots this message back to client, no action needed for this
@@ -225,7 +568,7 @@ class NetworkClient():
 
                     try: #check for done command from the controller
                         if(identifiedCommand == False):
-                            if(self.checkForDoneCommandFromController(receivedCommandFromController)==True):
+                            if(checkForDoneCommandFromController(self,receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the done Command from the Controller\n"
                                 #This is just a confirmation message, no action is needed for this
@@ -253,336 +596,6 @@ class NetworkClient():
             print "Closing the client socket\n"
             clientSocket.close()
             print "Client Socket has been closed\n"
-            self.sendDoneCommandToController()
+            sendDoneCommandToController(self)
             print "Informed Controller that Client is finished\n"
 
-        #FUNCTIONS=========================================================================================
-        #CompareString function-----------------------------------------
-        def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
-            try:
-                posA = startA
-                posB = startB
-                #add check here (optional)
-                if((endA-startA) != (endB-startB)):
-                    return False
-                for x in range(startA,endA):
-                    tempCharA= inboundStringA[posA]
-                    tempCharB= inboundStringB[posB]
-                    if(tempCharA != tempCharB):
-                        return False
-                    posA+= 1
-                    posB+= 1
-                return True
-            except Exception as inst:
-                print "ERROR in compareString: " + str(inst) +"\n"
-                print "---- inboundStringA: '" + inboundStringA + "'\n"
-                print "-------- startA: " + str(startA) + " endA: " + str(endA) +"\n"
-                print "---- inboundStringB: '" + inboundStringB + "'\n"
-                print "-------- startB: " + str(startB) + " endB: " + str(endB) +"\n"
-                return False
-
-        #Inbound commands from controller functions-----------------------------------------
-        def receiveServerIPFromController(self):
-            try:
-                print "Receiving the server IP from the Controller\n"
-                self.serverIP= self.pipe.recv()
-                print "Received the server IP from the controller\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
-                print "===================================================================\n"
-
-        def checkForDoneCommandFromController(self, inboundString):
-            try:
-                print "Checking for done command from the Controller\n"
-                if(compareString(inboundString, "done",0,0,len("done"), len("done"))==True):
-                    print "Received the done command from the controller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checkingForDoneCommandFromController: " +str(inst)+"\n"
-                print "===================================================================\n"
-                return False
-
-        def checkForDoingStuffCommandFromController(self, inboundString):
-            try:
-                print "Checking for doingStuff Command from the Controller\n"
-                if(compareString(inboundString,"doingStuff",0,0,len("doingStuff"),len("doingStuff"))==True):
-                    print "Received doingSTuff COmmand from the COntroller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checkForDoingStuff Command from the Controller: " + str(inst) +"\n"
-                print "===================================================================\n"
-                return False
-
-        def checkForFoundSolutionCommandFromController(self, inboundString):
-            try:
-                print "Checking for foundSolution Command from the Controller\n"
-                if(compareString(inboundString,"foundSolution",0,0,len("foundSolution"),len("foundSolution"))==True):
-                    print "Received foundSolution command from the controller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checkForFoundSolutionCommandFromController: " + str(inst) +"\n"
-                print "===================================================================\n"
-                return False
-
-        def checkForRequestNextChunkCommandFromController(self, inboundString):
-            try:
-                print "Checking for requestNextChunk Command from the Controller\n"
-                if(compareString(inboundString,"requestNextChunk",0,0,len("requestNextChunk"),len("requestNextChunk"))==True):
-                    print "Received requestNextChunk Command from the controller\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checkForRequestNextChunk Command from Controller: " + str(inst) +"\n"
-                print "===================================================================\n"
-                return False
-
-        #Outbound commands to controller functions----------------------------------------
-        def sendNextChunkCommandToController(self, inboundChunk):
-            try:
-                print "Sending nextChunk Command to the Controller\n"
-                self.pipe.send(inboundChunk)
-                print "Sent nextChunk Command to the controller\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in sendNextChunkCommandToController: " + str(inst)+"\n"
-                print "===================================================================\n"
-
-        def sendDoneCommandToController(self):
-            try:
-                print "Sending done Command to the Controller\n"
-                self.pipe.send("done")
-                print "Sent done Command to the controller\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in sendDoneCommandToController: " + str(inst)+"\n"
-                print "===================================================================\n"
-
-        def sendConnectedCommandToController(self):
-            try:
-                print "Sending connected Command to the Controller\n"
-                self.pipe.send("connected")
-                print "Sent connected command to the controller\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in sendConnectedCommandToController: " + str(inst)+"\n"
-                print "===================================================================\n"
-
-        def sendDoingStuffCommandToController(self):
-            try:
-                print "Sending doingStuff Command to the Controller\n"
-                self.pipe.send("doingStuff")
-                print "Sent doingSTuff Command to the Controller\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
-                print "===================================================================\n"
-
-        #Inbound commands from server functions----------------------------------------
-        def checkForDoneCommandFromServer(self,inboundString):
-            try:
-                print "Checking for done command from server\n"
-                if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
-                    print "Done command was received from the server\n"
-                    self.serverIssuedDoneCommand = True
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checkForDoneCommandFromServer: " + str(inst) +"\n"
-                print "===================================================================\n"
-                return False
-
-        def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than previous revisions, this only checks for the NEXT keyword
-            try:
-                print "Checking for nextCommand from server\n"
-                if(compareString(inboundString,"NEXT",0,0,len("NEXT"),len("NEXT"))==True):
-                    print "Next Command was received from the server\n"
-                    return True
-                else:
-                    return False
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in checking for nextCommand from the server: " +str(inst)+"\n"
-                print "===================================================================\n"
-                return False
-
-        def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component to extract the file size of the params from the next command
-            try:
-                print "Extracting size of Params from the next Command\n"
-                firstOpenParenthesisPos= 0
-                firstClosingParenthesisPos= 0
-                sizeOfChunkParams = ""
-                #Command layout: "NEXT PSIZE() DSIZE()"
-                #Step 1: find the first Open Parenthesis, which immeadiately follows the PSIZE
-                try: #step 1 try block
-                    print "Finding the first Open Parenthesis\n"
-                    for index in range(0,len(inboundString)):
-                        if(inboundString[index] == "("):
-                            firstOpenParenthesisPos= index
-                            break
-                    if(firstOpenParenthesisPos == 0):
-                        raise Exception("No open parenthesis was found")
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 1: find first Open parenthesis: " +str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception thrown in step 1 of extractSizeOfParamsFromNextCommand")
-                #Step 2: find the corresponding closing parenthesis
-                try: #Step 2 try block
-                    print "Finding the corresponding closing parenthesis\n"
-                    for index in range(firstOpenParenthesisPos, len(inboundString)):
-                        if(inboundString[index] == ")"):
-                            firstClosingParenthesisPos= index
-                            break
-                    if(firstClosingParenthesisPos == 0):
-                        raise Exception ("No closing parenthesis was found")
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 2: find corresponding closing parenthesis: " +str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception thrown in Step 2 of extractSizeOfParamsFromNextCommand")
-                #Step 3: retreive the params file size
-                try: #step 3 try block
-                    print "Retreiving the params file size\n"
-                    for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
-                        sizeOfChunkParams+= str(inboundString[index])
-                    return sizeOfChunkParams
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 3: retreive the params file size: "+str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception thrown in Step 3 of extractSizeOfParamsFromNextCommand")
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in extractSizeOfParamsFromNextCommand: " +str(inst)+"\n"
-                print "===================================================================\n"
-                return 0 #return filesize of zero if there was an error
-
-        def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component
-            try:
-                print "Extracting size of data from next Command\n"
-                firstOpenParenthesisPos = 0
-                firstClosingParenthesisPos = 0
-                sizeOfChunkData= ""
-                #Command layout: NEXT PSIZE() DSIZE()
-                #Step 1: find the 'D' in the inboundString
-                try: #step 1 try block
-                    print "Finding the 'D' in the nextCommand\n"
-                    for index in range(0,len(inboundString)):
-                        if(inboundString[index] == "D"):
-                            firstOpenParenthesisPos= index + 5 #plus five for the offset between the D and the first open parenthesis
-                            break
-                    if(firstOpenParenthesisPos == 0):
-                        raise Exception ("No 'D' was found in the nextCommand")
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 1: find the 'D' in the inboundString: "+str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception was thrown in step 1 of extractSizeOfDataFromNextCommand")
-                #Step 2: find the corresponding parenthesis
-                try: #Step 2 try block
-                    print "Finding the corresponding parenthesis\n"
-                    for index in range(firstOpenParenthesisPos, len(inboundString)):
-                        if(inboundString[index] == ")"):
-                            firstClosingParenthesisPos= index
-                            break
-                    if(firstClosingParenthesisPos == 0):
-                        raise Exception ("No closing parenthesis found in the nextCommand")
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 2: find corresponding parenthesis: "+str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception thrown in step 2 of extractSizeOfDataFromNextCommand")
-                #Step 3: retreive the data file size
-                try: #step 3 try block
-                    print "Retrieving data file size\n"
-                    for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
-                        sizeOfChunkData+= str(inboundString)
-                    return sizeOfChunkData
-                except Exception as inst:
-                    print "===================================================================\n"
-                    print "Exception thrown in Step 3: retrieve the data file size: " + str(inst)+"\n"
-                    print "===================================================================\n"
-                    raise Exception ("Exception thrown is step 3 of extractSizeOfDataFromNextCommand")
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in extractSizeOfDataFromNextCommand: " +str(inst)+"\n"
-                print "===================================================================\n"
-                return 0
-
-        def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize): #NOTE: New component, call this for receiving params or for receiving data
-            try:
-                receivedPieceOfChunk= ""
-                print "Receiving piece of chunk from the server\n"
-                while(sys.getsizeof(receivedPieceOfChunk) < pieceOfChunkFileSize):
-                    recvInfo= self.clientSocket.recv(4096)
-                    if recvInfo:
-                        receivedPieceOfChunk+= str(recvInfo)
-                    else:
-                        break
-                if(len(receivedPieceOfChunk) < 1):
-                    raise Exception ("receivedPieceOfChunk is empty!")
-                return receivedPieceOfChunk
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in receivePieceOfChunkFromServer: "+str(inst)+"\n"
-                print "===================================================================\n"
-                return "" #the empty string
-
-        def receiveCommandFromServer(self): #NOTE used for normal recv
-            try:
-                receivedCommand= ""
-                print "Checking for command from the server\n"
-                serverInput= self.clientSocket.recv(4096)
-                if(len(serverInput) > 0):
-                    receivedCommand= serverInput
-                return receivedCommand
-            except Exception as inst:
-                print "===================================================================\n"
-                print "ERROR in receiveCommandFromServer: "+str(inst)+"\n"
-                print "===================================================================\n"
-                return "" #the empty string
-
-        #Outbound commands to server functions--------------------------------------
-        def sendNextChunkCommandToServer(self, networkSocket):
-            try:
-                print "Sending nextChunk Command to Server\n"
-                networkSocket.send("NEXT " + str(self.myIPAddress))
-                print "Sent the nextChunk Command to the server\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "Exception thrown in sendNextChunkCommandToServer: " + str(inst)+"\n"
-                print "===================================================================\n"
-
-        def sendFoundSolutionCommandToServer(self, networkSocket):
-            try:
-                print "Sending foundSolution Command to Server\n"
-                networkSocket.send("FOUNDSOLUTION")
-                print "Sent FoundSOlution Command to the server\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "Exception thrown in sendFoundSolutionCommandToServer: "+ str(inst)+"\n"
-                print "===================================================================\n"
-
-        def sendCrashedCommandToServer(self, networkSocket):
-            try:
-                print "Sending Crashed Command to Server\n"
-                networkSocket.send("CRASHED " + self.myIPAddress)
-                print "Sent Crashed COmmand to the server\n"
-            except Exception as inst:
-                print "===================================================================\n"
-                print "Exception thrown in the sendCrashedCommandToServer: "+str(inst)+"\n"
-                print "===================================================================\n"
