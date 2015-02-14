@@ -58,12 +58,14 @@ def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
 def receiveServerIPFromController(self):
     try:
         print "Receiving the server IP from the Controller\n"
-        self.serverIP= self.pipe.recv()
+        tempServerIP= self.pipe.recv()
         print "Received the server IP from the controller\n"
+        return tempServerIP
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
         print "===================================================================\n"
+        return ""
 
 def checkForDoneCommandFromController(self, inboundString):
     try:
@@ -469,6 +471,8 @@ class NetworkClient():
         except Exception as inst:
             print "===================================================================\n"
             print "Error in connect to server try block: " + str(inst) +"\n"
+            print "self.serverIPAddress= "+str(self.serverIPAddress)+"\n"
+            print "self.port= "+str(self.port)+"\n"
             print "===================================================================\n"
             raise Exception ("Failed to connect to the server")
 
