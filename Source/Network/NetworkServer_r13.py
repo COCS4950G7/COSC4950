@@ -275,12 +275,12 @@ def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddr
         print "========================================================================\n"
         print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
         print "========================================================================\n"
-        return None
+        return "" #changed from none
     except Exception as inst:
         print "========================================================================\n"
         print "ERROR in getChunkFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
         print "========================================================================\n"
-        return None
+        return "" #changed from none
 
 #list of Crashed clients functions====================================================================
 def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the ip and the port
@@ -313,7 +313,7 @@ def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
         print "========================================================================\n"
         print "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
         print "========================================================================\n"
-        return None
+        return "" #changed from none
 
 #stackOfClientsWaitingForNextChunk functions============================================================
 def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAddress):
@@ -337,7 +337,7 @@ def popClientFromStackOfClientsWaitingForNextChunk(self):
         print "========================================================================\n"
         print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
         print "========================================================================\n"
-        return None
+        return "" #changed from none
 
 
 import threading
