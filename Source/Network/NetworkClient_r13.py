@@ -588,7 +588,7 @@ class NetworkClient():
             if(self.serverIssuedDoneCommand == False):
                 try: #send crash message to server, if needed
                     print "Warning: Server has not issued the done command! Sending Crashed Command to the Server\n"
-                    self.sendCrashedCommandToServer(clientSocket)
+                    sendCrashedCommandToServer(self, clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in send crash message to server, in finally block: "+str(inst)+"\n"
