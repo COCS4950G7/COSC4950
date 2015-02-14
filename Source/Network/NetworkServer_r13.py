@@ -16,8 +16,6 @@ __author__ = 'chris hamm'
 
 #MAJOR CHANGE IN SENDNEXTCOMMANDTOCLIENT function
 
-#TODO still need a variable to indicate when all of the threads need to stop running (aka break from their while loop)
-
 import threading
 import thread
 import socket
@@ -30,7 +28,10 @@ class NetworkServer():
     host = ''
     port = 55568
     myIPAddress = '127.0.0.1' #default to ping back address
+    stopAllThreads = False #set to true to have all threads break out of their while loops
     listOfCrashedClients = []
+    stackOfChunksThatNeedToBeReassigned = []
+    stackOfClientsWaitingForNextChunk = []
     dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
                                         #If you try to access a non-existing key it will throw an error
     #NOTE: NOT GOING TO HAVE A LIST OF CONNECTED CLIENTS, JUST USE THE DICTIONARY OF CURRENT CLIENT TASKS INSTEAD
@@ -40,46 +41,69 @@ class NetworkServer():
     #START OF CLIENT THREAD HANDLER
     def ClientThreadHandler(self, clientSocket, clientAddr, socketLock):
         try: #CLient THread Handler Try Block
-            receivedCommandFromClient = "" #initialize the receiving variable
+            inboundCommandFromClient = "" #initialize the receiving variable
             while True:
+                if(self.stopAllThreads == True):
+                    print "Stopping the thread\n"
+                    break
                 try: #check for commands from client
-                    #TODO implement the receive mechanism here for inbound client commands
-                    print "DEBUG: INSERT THE RECEIVE MECHANISM FOR INBOUND COMMANDS FROM THE CLIENT HERE\n"
+                    inboundCommandFromClient = self.receiveCommandFromClient(clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in check for commands from the client in client thread handler: " +str(inst)+"\n"
                     print "===================================================================\n"
 
                 try: #Analyzing received command from the client try block
-                    #TODO check to make sure the received command is not the empty string
-                    print "DEBUG: CHECK TO SEE IF RECEIVED COMMAND IS THE EMOTY STRING HERE\n"
-                    #TODO else if received command is not the empty string, perform these checks
-                    try: #checking to see if the next Command was received from the client try block
-                        #TODO check to see if the next command was received from the client
-                        print "DEBUG: CHECK TO SEE IF THE NEXT COMMAND WAS RECEIVED FROM THE CLIENT HERE\n"
-                    except Exception as inst:
-                        print "===================================================================\n"
-                        print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
-                        print "===================================================================\n"
+                    if(len(inboundCommandFromClient) > 0): #ignore if the empty string
+                        identifiedCommand = False
+                        try: #checking to see if the next Command was received from the client try block
+                            if(self.checkForNextCommandFromClient(inboundCommandFromClient)==True):
+                                identifiedCommand= True
+                                print "Identified inboundCommandFromClient as the Next Command\n"
+                                #check to see if there is a chunk that needs to be reassigned
+                                if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
+                                    print "There is a chunk that needs to be reassigned.\n"
+                                    #TODO fill in what needs to be done here
+                                else:
+                                    print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
+                                    self.sendNextChunkCommandToController()
+                                    print "Adding the client to the stackOfClientsWaitingForNextChunk\n"
+                                    #TODO extract the ip address and port of the client from the inboundCommand
+                                    #TODO then add the client ip and port to the stackOfClientsWaitingForNextChunk
+                        except Exception as inst:
+                            print "===================================================================\n"
+                            print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
+                            print "===================================================================\n"
 
-                    try: #check to see if the found solution command was received from the client
-                        #TODO check to see if the found solution command was received from the client
-                        print "DEBUG: CHECK TO SEE IF THE FOUNDSOLUTION COMMAND WAS RECEIVED FROM THE CLIENT HERE\n"
-                    except Exception as inst:
-                        print "===================================================================\n"
-                        print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
-                        print "===================================================================\n"
+                        try: #check to see if the found solution command was received from the client
+                            if(identifiedCommand == False):
+                                if(self.checkForFoundSolutionCommandFromClient(inboundCommandFromClient)==True):
+                                    identifiedCommand= True
+                                    print "Identified inboundCommandFromClient as the found solution command\n"
+                                    #TODO send the done command to all clients using the dictionaryOfCurrentClientTasks
+                                    print "Setting the thread termination value to true, stopping all threads\n"
+                                    self.stopAllThreads = True
+                        except Exception as inst:
+                            print "===================================================================\n"
+                            print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
+                            print "===================================================================\n"
 
-                    try: #check to see if the crashed command was received
-                        #TODO check to see if the crashed command was received from the client
-                        print "DEBUG: CHECK TO SEE IF CRASHED COMMAND WASS RECEIVED HERE\n"
-                    except Exception as inst:
-                        print "===================================================================\n"
-                        print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
-                        print "===================================================================\n"
+                        try: #check to see if the crashed command was received
+                            if(identifiedCommand == False):
+                                if(self.checkForCrashedCommandFromClient(inboundCommandFromClient)==True):
+                                    identifiedCommand= True
+                                    print "Identified inboundCommandFromClient as the Crashed Command\n"
+                                    #TODO extract the clients ip address and port from the inboundCommandFromClient
+                                    #TODO add the client's current task (chunk) onto the stackOfChunksThatNeedToBeReassigned
+                                    self.addClientToListOfCrashedClients()
+                                    #TODO delete the client from the dictionaryOfCurrentClientTasks
+                        except Exception as inst:
+                            print "===================================================================\n"
+                            print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
+                            print "===================================================================\n"
 
-                    #TODO else, if command is not recognized, print error and the unknown command here
-                    print "DEBUG; PRINT THE ERROR AND UNKNOWN COMMAND HERE\n"
+                        if(identifiedCommand == False):
+                            print "Warning: Unknown Command Received from the client: "+str(inboundCommandFromClient)+"\n"
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in Analyzing received command from the client try block in the client thread handler: " +str(inst)+"\n"
@@ -117,6 +141,9 @@ class NetworkServer():
         try: #main thread server loop try block
             serverSocket.settimeout(0.25)
             while True: #Primary main thread server while loop
+                if(self.stopAllThreads == True):
+                    print "Stopping Main Thread\n"
+                    break
                 #CHECK TO SEE IF A CLIENT IS TRYING TO CONNECT
                 try:
                     inboundClientSocket, inboundClientAddr = serverSocket.accept()
@@ -131,27 +158,38 @@ class NetworkServer():
                 try:
                     if(self.pipe.poll()):
                         receivedControllerCommand= self.pipe.recv()
-                        print "Received a command from the controller\n"
-                        #TODO Check to make sure that the received command is not the empty string
-                        #TODO if recieved command is not the empty string, perform these checks
-                        try: #checking for nextChunk Command from Controller
-                            #TODO insert check for nextChunk Command from comntroller here
-                            print "DEBUG: INSERT CALL TO CHECK FOR NEXTCHUNK COMMAND FROM CONTROLLER HERE\n"
-                        except Exception as inst:
-                            print "===================================================================\n"
-                            print "Error in checking for nextChunk COmmand from Controller Try Block: " +str(inst)+"\n"
-                            print "===================================================================\n"
+                        if(len(receivedControllerCommand) > 0): #ignore the empty string
+                            print "Received command from the controller\n"
+                            identifiedCommand = False
+                            try: #checking for nextChunk Command from Controller
+                                if(self.checkForNextChunkCommandFromController(receivedControllerCommand)==True):
+                                    identifiedCommand= True
+                                    print "Identified receivedControllerCommand as the nextChunk Command\n"
+                                    #check to see if a client is waiting for the nextChunk
+                                    if(len(self.stackOfClientsWaitingForNextChunk) > 0):
+                                        print "A client is waiting for the nextChunk\n"
+                                        #TODO send the chunk to the client waiting for the next chunk
+                                    else: #if there is no client waiting for the  next chunk
+                                        print "No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
+                                        #TODO add the chunk to the stackOfChunksThatNeedToBeReassigned
+                            except Exception as inst:
+                                print "===================================================================\n"
+                                print "Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
+                                print "===================================================================\n"
 
-                        try: #checking for done command form controller
-                            #TODO insert check for done Command from controller here
-                            print "DEBUG: INSERT CALL TO CHECK FOR DONE COMMAND FROM CONTROLLER HERE\n"
-                        except Exception as inst:
-                            print "===================================================================\n"
-                            print "Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
-                            print "===================================================================\n"
+                            try: #checking for done command form controller
+                                if(identifiedCommand == False):
+                                    if(self.checkForDoneCommandFromController(receivedControllerCommand)==True):
+                                        identifiedCommand= True
+                                        print "Identified receivedControllerCommand as the Done Command\n"
+                                        #No further actions are needed for this command
+                            except Exception as inst:
+                                print "===================================================================\n"
+                                print "Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
+                                print "===================================================================\n"
 
-                        #TODO else if the command was not recognized, print error and display the unknown command
-                        print "DEBUG: INSERT ERROR MESSAGE AND PRINT OUT OF UNKNOWN COMMAND FROM THE CONTROLLER\n"
+                            if(identifiedCommand == False):
+                                print "Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
                     else: #if there is nothing on the pipe
                         print "There is no command received from the controller\n"
                 except Exception as inst:
@@ -168,7 +206,8 @@ class NetworkServer():
             print "Preparing to close the socket\n"
             serverSocket.close()
             print "The serverSocket has been closed\n"
-            #TODO insert command call to let the controller know that server is finished
+            self.sendDoneCommandToController()
+
 
         #FUNCTIONS==========================================================================
         def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
@@ -191,6 +230,7 @@ class NetworkServer():
                 print "Exception thrown in compareString Function: " +str(inst)+"\n"
                 print "========================================================================\n"
                 return False
+
 
         #Inbound commands from controller==========================================
         def checkForDoneCommandFromController(self, inboundString):
@@ -230,6 +270,16 @@ class NetworkServer():
             except Exception as inst:
                 print "========================================================================\n"
                 print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
+                print "========================================================================\n"
+
+        def sendDoneCommandToController(self):
+            try:
+                print "Sending done Command to the Controller\n"
+                self.pipe.send("done")
+                print "Sent the done Command to the Controller\n"
+            except Exception as inst:
+                print "========================================================================\n"
+                print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
                 print "========================================================================\n"
 
         #Inbound commands from the client=========================================
@@ -392,11 +442,94 @@ class NetworkServer():
                 print "Released socketLock\n"
 
         #dictionaryOfCurrentClientTasks functions================================================================
-        #TODO insert functions that operate on the dictionaryOfCurrentClientTasks
-            #TODO function to add a client to the dictionary
-            #TODO function to remove a client from the dictionary
-            #TODO function to check to see if a client is in the dictionary (using the check for a keyerror)
-            #TODO function to get the chunk object from a client's key in the dictionary
+        def addClientToDictionaryOfCurrentClientTasks(self, clientAddress, clientChunk): #client Address has both the ip address and port
+            try:
+                self.dictionaryOfCurrentClientTasks[clientAddress] = clientChunk
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in addClientToDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+                print "========================================================================\n"
 
-        #list of CRashed clients functions====================================================================
-        #TODO insert add function
+        def delClientFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
+            try:
+                del self.dictionaryOfCurrentClientTasks[clientAddress]
+            except KeyError as inst:
+                print "========================================================================\n"
+                print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
+                print "========================================================================\n"
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in delClientFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+                print "========================================================================\n"
+
+        def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
+            try:
+                retrievedChunk = self.dictionaryOfCurrentClientTasks[clientAddress]
+                return retrievedChunk
+            except KeyError as inst:
+                print "========================================================================\n"
+                print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
+                print "========================================================================\n"
+                return None
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in getChunkFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
+                print "========================================================================\n"
+                return None
+
+        #list of Crashed clients functions====================================================================
+        def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the ip and the port
+            try:
+                self.listOfCrashedClients.append(clientAddress)
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in addClientToListOfCrashedClients: " + str(inst)+"\n"
+                print "========================================================================\n"
+
+        #stackOfChunksThatNeedToBeReassigned functions==========================================================
+        def pushChunkOnToStackOfChunksThatNeedToBeReassigned(self, inboundChunk):
+            try:
+                print "Pushing chunk onto the stackOfChunksThatNeedToBeReassigned\n"
+                self.stackOfChunksThatNeedToBeReassigned.append(inboundChunk)
+                print "Pushed chunk onto the stackOfChunksThatNeedToBeReassigned\n"
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in pushChunkOnToStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
+                print "========================================================================\n"
+
+        def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
+            try:
+                poppedChunk = ""
+                print "Popping chunk from stackOfChunksThatNeedToBeReassigned\n"
+                poppedChunk = self.stackOfChunksThatNeedToBeReassigned.pop()
+                print "Popped chunk off the stackOfChunksThatNeedToBeReassigned\n"
+                return poppedChunk
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
+                print "========================================================================\n"
+                return None
+
+        #stackOfClientsWaitingForNextChunk functions============================================================
+        def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientAddress):
+            try:
+                print "Pushing client on to stackOfClientsWaitingForNextChunk\n"
+                self.stackOfClientsWaitingForNextChunk.append(clientAddress)
+                print "Pushed client on to stackOfClientsWaitingForNextChunk\n"
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
+                print "========================================================================\n"
+
+        def popClientFromStackOfClientsWaitingForNextChunk(self):
+            try:
+                poppedChunk= ""
+                print "Popping client off the stackOfClientsWaitingForNextChunk\n"
+                poppedChunk= self.stackOfClientsWaitingForNextChunk.pop()
+                print "Popped client off the stackOfClientsWaitingForNextChunk\n"
+                return poppedChunk
+            except Exception as inst:
+                print "========================================================================\n"
+                print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
+                print "========================================================================\n"
+                return None
