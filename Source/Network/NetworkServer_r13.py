@@ -233,59 +233,6 @@ class NetworkServer():
                 print "========================================================================\n"
                 return False
 
-        def extractIPAddressAndPortFromCommand(self, inboundCommand): #NOTE this is a new function that was added in this revision. Return a tuple containing the clientSocket and the client IP
-            try:
-                clientAddress= ""
-                #Command layout: NEXT addr('192.168.1.1':55568)
-                #Step 1: find the opening parenthesis
-                openParenthesisPos = 0
-                try:
-                    for index in range(0,len(inboundCommand)):
-                        if(inboundCommand[index] == "("):
-                            print "Found the openning parenthesis in the inbound command\n"
-                            openParenthesisPos = index
-                            break
-                    if(openParenthesisPos == 0):
-                        raise Exception ("No openning parenthesis was found")
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Exception was thrown in STep 1 : find openning parenthesis in extractIPAddressAndPortFromCommand: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception was thrown in step 1")
-                #Step 2:find closing parenthesis
-                closingParenthesisPos = 0
-                try:
-                    for index in range(openParenthesisPos,len(inboundCommand)):
-                        if(inboundCommand[index] == ")"):
-                            print "Found the closing parenthesis in the inbound command\n"
-                            closingParenthesisPos = index
-                            break
-                    if(closingParenthesisPos == 0):
-                        raise Exception ("No closing parenthesis was found")
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Exception was thrown in STep 2: find closing parenthesis in extractIPAddressAndPortFromCOmmand: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception was thrown in step 2")
-                #Step 3: Extract the IPAddress and the port
-                try:
-                    for index in range(openParenthesisPos+1, closingParenthesisPos-1):
-                        clientAddress+= inboundCommand[index]
-                    if(len(clientAddress) < 1):
-                        raise Exception ("Extraction failed, clientAddress is the empty string")
-                    else:
-                        return clientAddress
-                except Exception as inst:
-                    print "========================================================================\n"
-                    print "Exception was thrown in Step 3: extract the IPAddress and port: "+str(inst)+"\n"
-                    print "========================================================================\n"
-                    raise Exception ("Exception thrown in step 3")
-            except Exception as inst:
-                print "========================================================================\n"
-                print "Exception thrown in extractIPAddressAndPortFromCommand: "+str(inst)+"\n"
-                print "========================================================================\n"
-                return "" #the empty string
-
         #Inbound commands from controller==========================================
         def checkForDoneCommandFromController(self, inboundString):
             try:
