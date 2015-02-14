@@ -63,6 +63,9 @@ class Controller():
     colidingClock = 0
     colidingClock2 = 0
 
+    #Fast Lane
+    aLane = False
+
     #Constructor
     def __init__(self):
 
@@ -118,7 +121,7 @@ class Controller():
                     userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
-                    goodNames = {"Node", "node", "n", "Server", "server", "ser", "Single", "single", "sin", "About", "about", "Exit", "exit"}
+                    goodNames = {"Node", "node", "n", "Server", "server", "ser", "Single", "single", "sin", "About", "about", "Exit", "exit", "a"}
                     while not userInput in goodNames:
 
                         print "Input Error!"
@@ -137,6 +140,12 @@ class Controller():
                     elif userInput in ("single", "Single", "sin"):
 
                         self.state = "singleStartScreen"
+
+                    elif userInput in ("a"):
+
+                        self.aLane = True
+
+                        self.state = "serverStartScreen"
 
                     elif userInput in ("About", "about"):
 
@@ -436,7 +445,15 @@ class Controller():
                     print
                     print "Go Back (back)"
                     print "(Exit)"
-                    userInput = raw_input("Choice: ")
+                    #userInput = raw_input("Choice: ")
+                    if self.aLane == True:
+
+                        userInput = "d"
+                        print "Choice: d"
+
+                    else:
+
+                        userInput = raw_input("Choice: ")
 
                     #Sterolize inputs
                     goodNames = {"bruteForce", "brute", "bf", "b", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "d", "back", "Back", "b" "Exit", "exit"}
@@ -953,7 +970,15 @@ class Controller():
                     print "(sha256)"
                     print "(sha512)"
                     print
-                    algo = raw_input("Choice: ")
+                    #algo = raw_input("Choice: ")
+                    if self.aLane == True:
+
+                        algo = "md5"
+                        print "Choice: md5"
+
+                    else:
+
+                        algo = raw_input("Choice: ")
 
                     #Sterolize inputs
                     goodNames = {"md5", "sha1", "sha256", "sha512"}
@@ -968,7 +993,17 @@ class Controller():
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the file name (___.txt): ")
+                    #fileName = raw_input("What's the file name (___.txt): ")
+                    if self.aLane == True:
+
+                        fileName = "dic"
+                        print "What's the file name (___.txt): dic"
+
+
+                    else:
+
+                        fileName = raw_input("What's the file name (___.txt): ")
+
                     while not self.dictionary.setFileName(fileName) == "Good":
 
                         print "File not found..."
@@ -976,8 +1011,62 @@ class Controller():
 
                     #Get the hash
                     print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
+                    print "Are we searching for a single hash, or from a file of hashes?"
+                    print
+                    print "Single Hash (s)"
+                    print "From a File (f)"
+                    print
+                    #userInput = raw_input("Choice: ")
+                    if self.aLane == True:
+
+                        userInput = "s"
+                        print "Choice: s"
+
+                    else:
+
+                        userInput = raw_input("Choice: ")
+
+                    #Sterolize inputs
+                    goodNames = {"single", "s", "file", "f", "Single", "File"}
+                    while not userInput in goodNames:
+
+                        print "Input Error!"
+
+                        userInput = raw_input("Try Again: ")
+
+                    if userInput in ("single", "s", "Single"):
+
+                        #Get the hash
+                        print
+                        #hash = raw_input("What's the hash we're searching for: ")
+                        if self.aLane == True:
+
+                            hash = "b6e01cfff96a2233919e4f3c54b01130"
+                            print "What's the hash we're searching for: b6e01cfff96a2233919e4f3c54b01130"
+
+                        else:
+
+                            hash = raw_input("What's the hash we're searching for: ")
+
+                        self.dictionary.setHash(hash)
+                        self.dictionary.singleHash = True
+
+                    elif userInput in ("file", "f", "File"):
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's the hash file name: ")
+                        while not self.dictionary.setHashFileName(fileName) == "Good":
+
+                            print "File not found..."
+                            fileName = raw_input("What's the hash file name: ")
+
+                        #Get the file name
+                        print
+                        fileName = raw_input("What's file name that we'll put the results: ")
+                        self.dictionary.setDoneFileName(fileName)
+
+                        self.dictionary.singleHash = False
 
                     #Get the go-ahead
 
@@ -1042,90 +1131,181 @@ class Controller():
 
                     isEof = False
 
-                    #While we haven't gotten all through the file or found the key...
-                    while not (isEof or isFound):
+                    ################ Single Hash #########################
+                    if self.dictionary.singleHash == True:
 
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
+                        #While we haven't gotten all through the file or found the key...
+                        while not (isEof or isFound):
 
-                        #What's the server saying:
-                        rec = self.controllerPipe.recv()
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
 
-                        #If the server needs a chunk, give one. (this should be the first thing server says)
-                        if rec == "nextChunk":
+                            #What's the server saying:
+                            rec = self.controllerPipe.recv()
 
-                            if not self.dictionary.isEof():
+                            #If the server needs a chunk, give one. (this should be the first thing server says)
+                            if rec == "nextChunk":
 
-                                #chunk is a Chunk object
-                                chunk = self.dictionary.getNextChunk()
+                                if not self.dictionary.isEof():
 
-                                self.controllerPipe.send("nextChunk")
+                                    #chunk is a Chunk object
+                                    chunk = self.dictionary.getNextChunk()
 
+                                    self.controllerPipe.send("nextChunk")
+
+                                    self.controllerPipe.send(chunk)
+
+                                else:
+
+                                    isEof = True
+
+                            #If the server needs a chunk again
+                            elif rec == "chunkAgain":
+
+                                #Get the parameters of the chunk
+                                params = self.controllerPipe.recv()
+
+                                #Get the chunk again (again a Chunk object)
+                                chunk = self.dictionary.getThisChunk(params)
+
+                                self.controllerPipe.send("chunkAgain")
+
+                                #Send the chunk again
                                 self.controllerPipe.send(chunk)
 
-                            else:
+                            #if the server is waiting for nodes to finish
+                            elif rec == "waiting":
 
-                                isEof = True
+                                self.controllerPipe.send("waiting")
 
-                        #If the server needs a chunk again
-                        elif rec == "chunkAgain":
+                                #Placeholder
+                                chrisHamm = True
 
-                            #Get the parameters of the chunk
-                            params = self.controllerPipe.recv()
+                            #If the server has a key
+                            elif rec == "found":
 
-                            #Get the chunk again (again a Chunk object)
-                            chunk = self.dictionary.getThisChunk(params)
+                                self.controllerPipe.send("found")
 
-                            self.controllerPipe.send("chunkAgain")
+                                #Get the key
+                                key = self.controllerPipe.recv()
 
-                            #Send the chunk again
-                            self.controllerPipe.send(chunk)
+                                #This will help for error checking later, though for now not so much
+                                #isFound = self.dictionary.isKey(key)
 
-                        #if the server is waiting for nodes to finish
-                        elif rec == "waiting":
+                                self.dictionary.setKey(key)
 
-                            self.controllerPipe.send("waiting")
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
 
-                            #Placeholder
-                            chrisHamm = True
+                        #Let the network  class know to be done
+                        self.controllerPipe.send("done")
 
-                        #If the server has a key
-                        elif rec == "found":
+                        #if the key has been found
+                        if isFound:
 
-                            self.controllerPipe.send("found")
+                            self.state = "serverDictionaryFoundScreen"
 
-                            #Get the key
-                            key = self.controllerPipe.recv()
+                        else:
 
-                            #This will help for error checking later, though for now not so much
-                            #isFound = self.dictionary.isKey(key)
+                            self.state = "serverDictionaryNotFoundScreen"
 
-                            self.dictionary.setKey(key)
-
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #Let the network  class know to be done
-                    self.controllerPipe.send("done")
-
-                    #if the key has been found
-                    if isFound:
-
-                        self.state = "serverDictionaryFoundScreen"
-
+                #################### Hash File #####################
                     else:
 
-                        self.state = "serverDictionaryNotFoundScreen"
+                        #While we haven't gotten all through the file or found the key...
+                        while not (isEof or isFound):
+
+                            #Clear the screen and re-draw
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            #Ohhh, pretty status pictures
+                            print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                            if starCounter > 11:
+                                starCounter = 0
+                                whiteL = ""
+                                whiteR = "            "
+                            else:
+                                starCounter += 1
+                                whiteL = whiteL + " "
+                                whiteR = whiteR[:-1]
+
+                            #What's the server saying:
+                            rec = self.controllerPipe.recv()
+
+                            #If the server needs a chunk, give one. (this should be the first thing server says)
+                            if rec == "nextChunk":
+
+                                if not self.dictionary.isEof():
+
+                                    #chunk is a Chunk object
+                                    chunk = self.dictionary.getNextChunk()
+
+                                    self.controllerPipe.send("nextChunk")
+
+                                    self.controllerPipe.send(chunk)
+
+                                else:
+
+                                    isEof = True
+
+                            #If the server needs a chunk again
+                            elif rec == "chunkAgain":
+
+                                #Get the parameters of the chunk
+                                params = self.controllerPipe.recv()
+
+                                #Get the chunk again (again a Chunk object)
+                                chunk = self.dictionary.getThisChunk(params)
+
+                                self.controllerPipe.send("chunkAgain")
+
+                                #Send the chunk again
+                                self.controllerPipe.send(chunk)
+
+                            #if the server is waiting for nodes to finish
+                            elif rec == "waiting":
+
+                                self.controllerPipe.send("waiting")
+
+                                #Placeholder
+                                chrisHamm = True
+
+                            #If the server has a key
+                            elif rec == "found":
+
+                                self.controllerPipe.send("found")
+
+                                #Get the key
+                                key = self.controllerPipe.recv()
+
+                                #This will help for error checking later, though for now not so much
+                                #isFound = self.dictionary.isKey(key)
+
+                                self.dictionary.setKey(key)
+
+                        elapsed = (time() - self.clock)
+                        self.clock = elapsed
+
+                        #Let the network  class know to be done
+                        self.controllerPipe.send("done")
+
+                        #if the key has been found
+                        if isFound:
+
+                            self.state = "serverDictionaryFoundScreen"
+
+                        else:
+
+                            self.state = "serverDictionaryNotFoundScreen"
 
                 #############################################
                 #############################################
@@ -2035,11 +2215,11 @@ class Controller():
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the dictionary file name: ")
+                    fileName = raw_input("What's the file name (___.txt): ")
                     while not self.dictionary.setFileName(fileName) == "Good":
 
                         print "File not found..."
-                        fileName = raw_input("What's the dictionary file name: ")
+                        fileName = raw_input("What's the file name (___.txt): ")
 
                     #Get the hash
                     print
