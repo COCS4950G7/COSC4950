@@ -558,6 +558,7 @@ class NetworkServer():
                     break
                 #CHECK TO SEE IF A CLIENT IS TRYING TO CONNECT
                 try:
+                    print "MAIN THREAD: Checking to see if client is trying to connect\n"
                     inboundClientSocket, inboundClientAddr = serverSocket.accept()
                     print "MAIN THREAD: A client has connected!!\n"
                     thread.start_new_thread(self.ClientThreadHandler(inboundClientSocket,inboundClientAddr,self.socketLock))
