@@ -138,6 +138,7 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             self.socketLock.acquire()
             print "Acquired socketLock\n"
             print "Checking for inbound client Commands\n"
+            clientSocket.settimeout(0.25)
             clientInput= clientSocket.recv(4096)
             if(len(clientInput) > 0):
                 receivedCommandFromClient= clientInput
