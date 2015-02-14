@@ -469,6 +469,7 @@ class NetworkClient():
         try: #connect to server try block
             clientSocket.connect((self.serverIPAddress, self.port))
             print "Connected to server\n"
+            sendConnectedCommandToController(self)
         except Exception as inst:
             print "===================================================================\n"
             print "Error in connect to server try block: " + str(inst) +"\n"
