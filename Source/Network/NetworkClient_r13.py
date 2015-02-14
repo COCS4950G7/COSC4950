@@ -484,6 +484,7 @@ class NetworkClient():
                 inboundCommandFromServer = "" #initialize the var
                 #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================
                 try: #check for inbound server commands
+                    print "Checking for inbound Commands From Server\n"
                     inboundCommandFromServer = receiveCommandFromServer(self, clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
