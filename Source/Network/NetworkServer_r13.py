@@ -63,7 +63,8 @@ class NetworkServer():
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                                     print "There is a chunk that needs to be reassigned.\n"
-                                    #TODO fill in what needs to be done here
+                                    #TODO extract the ip and port of the client from the inboundCommand
+                                    #TODO Send the chunk that needs to be reassigned to the client
                                 else:
                                     print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
                                     self.sendNextChunkCommandToController()
@@ -80,7 +81,8 @@ class NetworkServer():
                                 if(self.checkForFoundSolutionCommandFromClient(inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the found solution command\n"
-                                    #TODO send the done command to all clients using the dictionaryOfCurrentClientTasks
+                                    for key in self.dictionaryOfCurrentClientTasks.keys():
+                                        self.sendDoneCommandToClient(key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
                                     self.stopAllThreads = True
                         except Exception as inst:
