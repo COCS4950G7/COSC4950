@@ -63,14 +63,13 @@ class NetworkServer():
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                                     print "There is a chunk that needs to be reassigned.\n"
-                                    #TODO extract the ip and port of the client from the inboundCommand
-                                    #TODO Send the chunk that needs to be reassigned to the client
+                                    tempChunk = self.popChunkFromStackOfChunksThatNeedToBeReassigned()
+                                    self.sendNextChunkToClient(clientSocket,tempChunk.params,tempChunk.data)
                                 else:
                                     print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
                                     self.sendNextChunkCommandToController()
                                     print "Adding the client to the stackOfClientsWaitingForNextChunk\n"
-                                    #TODO extract the ip address and port of the client from the inboundCommand
-                                    #TODO then add the client ip and port to the stackOfClientsWaitingForNextChunk
+                                    self.pushClientOnToStackOfClientsWaitingForNextChunk(clientSocket, clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
@@ -95,10 +94,10 @@ class NetworkServer():
                                 if(self.checkForCrashedCommandFromClient(inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the Crashed Command\n"
-                                    #TODO extract the clients ip address and port from the inboundCommandFromClient
-                                    #TODO add the client's current task (chunk) onto the stackOfChunksThatNeedToBeReassigned
+                                    tempChunk = self.getChunkFromDictionaryOfCurrentClientTasks(clientAddr)
+                                    self.pushChunkOnToStackOfChunksThatNeedToBeReassigned(tempChunk)
                                     self.addClientToListOfCrashedClients()
-                                    #TODO delete the client from the dictionaryOfCurrentClientTasks
+                                    self.delClientFromDictionaryOfCurrentClientTasks(clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
@@ -170,10 +169,11 @@ class NetworkServer():
                                     #check to see if a client is waiting for the nextChunk
                                     if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                         print "A client is waiting for the nextChunk\n"
-                                        #TODO send the chunk to the client waiting for the next chunk
+                                        tempClientSocket, tempClientAddress= self.popClientFromStackOfClientsWaitingForNextChunk()
+                                        self.sendNextCommandToClient(tempClientSocket, receivedControllerCommand.params, receivedControllerCommand.data)
                                     else: #if there is no client waiting for the  next chunk
                                         print "No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
-                                        #TODO add the chunk to the stackOfChunksThatNeedToBeReassigned
+                                        self.pushChunkOnToStackOfChunkThatNeedToBeReassigned(receivedControllerCommand)
                             except Exception as inst:
                                 print "===================================================================\n"
                                 print "Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
@@ -233,6 +233,58 @@ class NetworkServer():
                 print "========================================================================\n"
                 return False
 
+        def extractIPAddressAndPortFromCommand(self, inboundCommand): #NOTE this is a new function that was added in this revision. Return a tuple containing the clientSocket and the client IP
+            try:
+                clientAddress= ""
+                #Command layout: NEXT addr('192.168.1.1':55568)
+                #Step 1: find the opening parenthesis
+                openParenthesisPos = 0
+                try:
+                    for index in range(0,len(inboundCommand)):
+                        if(inboundCommand[index] == "("):
+                            print "Found the openning parenthesis in the inbound command\n"
+                            openParenthesisPos = index
+                            break
+                    if(openParenthesisPos == 0):
+                        raise Exception ("No openning parenthesis was found")
+                except Exception as inst:
+                    print "========================================================================\n"
+                    print "Exception was thrown in STep 1 : find openning parenthesis in extractIPAddressAndPortFromCommand: "+str(inst)+"\n"
+                    print "========================================================================\n"
+                    raise Exception ("Exception was thrown in step 1")
+                #Step 2:find closing parenthesis
+                closingParenthesisPos = 0
+                try:
+                    for index in range(openParenthesisPos,len(inboundCommand)):
+                        if(inboundCommand[index] == ")"):
+                            print "Found the closing parenthesis in the inbound command\n"
+                            closingParenthesisPos = index
+                            break
+                    if(closingParenthesisPos == 0):
+                        raise Exception ("No closing parenthesis was found")
+                except Exception as inst:
+                    print "========================================================================\n"
+                    print "Exception was thrown in STep 2: find closing parenthesis in extractIPAddressAndPortFromCOmmand: "+str(inst)+"\n"
+                    print "========================================================================\n"
+                    raise Exception ("Exception was thrown in step 2")
+                #Step 3: Extract the IPAddress and the port
+                try:
+                    for index in range(openParenthesisPos+1, closingParenthesisPos-1):
+                        clientAddress+= inboundCommand[index]
+                    if(len(clientAddress) < 1):
+                        raise Exception ("Extraction failed, clientAddress is the empty string")
+                    else:
+                        return clientAddress
+                except Exception as inst:
+                    print "========================================================================\n"
+                    print "Exception was thrown in Step 3: extract the IPAddress and port: "+str(inst)+"\n"
+                    print "========================================================================\n"
+                    raise Exception ("Exception thrown in step 3")
+            except Exception as inst:
+                print "========================================================================\n"
+                print "Exception thrown in extractIPAddressAndPortFromCommand: "+str(inst)+"\n"
+                print "========================================================================\n"
+                return "" #the empty string
 
         #Inbound commands from controller==========================================
         def checkForDoneCommandFromController(self, inboundString):
@@ -513,10 +565,10 @@ class NetworkServer():
                 return None
 
         #stackOfClientsWaitingForNextChunk functions============================================================
-        def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientAddress):
+        def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAddress):
             try:
                 print "Pushing client on to stackOfClientsWaitingForNextChunk\n"
-                self.stackOfClientsWaitingForNextChunk.append(clientAddress)
+                self.stackOfClientsWaitingForNextChunk.append((clientSocket,clientAddress)) #holds a tuple
                 print "Pushed client on to stackOfClientsWaitingForNextChunk\n"
             except Exception as inst:
                 print "========================================================================\n"
@@ -525,11 +577,11 @@ class NetworkServer():
 
         def popClientFromStackOfClientsWaitingForNextChunk(self):
             try:
-                poppedChunk= ""
+                poppedClient= ""
                 print "Popping client off the stackOfClientsWaitingForNextChunk\n"
                 poppedChunk= self.stackOfClientsWaitingForNextChunk.pop()
                 print "Popped client off the stackOfClientsWaitingForNextChunk\n"
-                return poppedChunk
+                return poppedClient
             except Exception as inst:
                 print "========================================================================\n"
                 print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
