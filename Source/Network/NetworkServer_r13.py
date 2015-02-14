@@ -209,6 +209,7 @@ class NetworkServer():
             serverSocket.close()
             print "The serverSocket has been closed\n"
             self.sendDoneCommandToController()
+            print "Informed the Controller that Server has finished\n"
 
 
         #FUNCTIONS==========================================================================
