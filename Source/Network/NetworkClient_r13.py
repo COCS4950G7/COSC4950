@@ -13,6 +13,7 @@ __author__ = 'chris hamm'
 
 import socket
 from socket import *
+import Chunk
 
 class NetworkClient():
 
@@ -60,7 +61,9 @@ class NetworkClient():
                         if(self.checkForDoneCommandFromServer(receivedCommandFromServer)==True):
                             identifiedCommand= True
                             print "Identified Command as the done command from the server\n"
-                            #TODO insert what to do here
+                            print "Server has Issued the Done Command\n"
+                            self.serverIssuedDoneCommand = True
+                            break #break out of the main while loop
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in checking for done command from the server: "+str(inst)+"\n"
@@ -71,7 +74,15 @@ class NetworkClient():
                             if(self.checkForNextChunkCommandFromServer(receivedCommandFromServer)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the nextChunk Command from the server\n"
-                                #TODO insert what to do here
+                                fileSizeOfChunkParams = self.extractSizeOfParamFromNextCommand(receivedCommandFromServer)
+                                fileSizeOfChunkData = self.extractSizeOfDataFromNextCommand(receivedCommandFromServer)
+                                tempChunkParams = self.receivePieceOfChunkFromServer(fileSizeOfChunkParams)
+                                tempChunkData = self.receivePieceOfChunkFromServer(fileSizeOfChunkData)
+                                outboundChunk = Chunk.Chunk()
+                                outboundChunk.params = tempChunkParams
+                                outboundChunk.data = tempChunkData
+                                self.sendDoingStuffCommandToController() #notify controller that client will be sending a chunk to it
+                                self.sendNextChunkCommandToController(outboundChunk)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in checking for nextChunk command from server: " + str(inst)+"\n"
@@ -97,7 +108,7 @@ class NetworkClient():
                         if(self.checkForFoundSolutionCommandFromController(receivedCommandFromController)==True):
                             identifiedCommand = True
                             print "Identified Command as Found Solution Command from the controller\n"
-                            #TODO insert what to do here
+                            self.sendFoundSolutionCommandToServer(clientSocket)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
@@ -108,7 +119,7 @@ class NetworkClient():
                             if(self.checkForRequestNextChunkCommandFromController(receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the requestNextChunk Command from the Controller\n"
-                                #TODO insert what to do here
+                                self.sendNextChunkCommandToServer(clientSocket)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for request Next Chunk Command from controller: "+str(inst)+"\n"
@@ -119,7 +130,7 @@ class NetworkClient():
                             if(self.checkForDoingStuffCommandFromController(receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the doingStuff Command from the Controller\n"
-                                #TODO insert what to do here
+                                #The controller parrots this message back to client, no action needed for this
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for doingStuff Command from controller: "+str(inst)+"\n"
@@ -130,7 +141,7 @@ class NetworkClient():
                             if(self.checkForDoneCommandFromController(receivedCommandFromController)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the done Command from the Controller\n"
-                                #TODO insert what to do here
+                                #This is just a confirmation message, no action is needed for this
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for done command from the controller: "+str(inst)+"\n"
