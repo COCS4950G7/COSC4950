@@ -530,6 +530,7 @@ class NetworkClient():
                 #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION=======================================================
                 receivedCommandFromController = "" #initialize thevar
                 try: #check for inbound controller commands try block
+                    print "Checking for Commands from the Controller\n"
                     if(self.pipe.poll()):
                         receivedCommandFromController= self.pipe.recv()
                         print "Received a Command from the controller\n"
