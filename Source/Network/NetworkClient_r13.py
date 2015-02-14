@@ -468,6 +468,8 @@ class NetworkClient():
 
         try: #connect to server try block
             clientSocket.connect((self.serverIPAddress, self.port))
+            print "Connected to server\n"
+            sendConnectedCommandToController(self)
         except Exception as inst:
             print "===================================================================\n"
             print "Error in connect to server try block: " + str(inst) +"\n"
@@ -483,6 +485,7 @@ class NetworkClient():
                 inboundCommandFromServer = "" #initialize the var
                 #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================
                 try: #check for inbound server commands
+                    print "Checking for inbound Commands From Server\n"
                     inboundCommandFromServer = receiveCommandFromServer(self, clientSocket)
                 except Exception as inst:
                     print "===================================================================\n"
@@ -528,6 +531,7 @@ class NetworkClient():
                 #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION=======================================================
                 receivedCommandFromController = "" #initialize thevar
                 try: #check for inbound controller commands try block
+                    print "Checking for Commands from the Controller\n"
                     if(self.pipe.poll()):
                         receivedCommandFromController= self.pipe.recv()
                         print "Received a Command from the controller\n"

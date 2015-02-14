@@ -138,6 +138,7 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             self.socketLock.acquire()
             print "Acquired socketLock\n"
             print "Checking for inbound client Commands\n"
+            clientSocket.settimeout(0.25)
             clientInput= clientSocket.recv(4096)
             if(len(clientInput) > 0):
                 receivedCommandFromClient= clientInput
@@ -145,7 +146,7 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             #return command in finally block for this function
         except Exception as inst:
             if(compareString(str(inst),"[Errno 35] Resource temporarily unavailable",0,0,len("[Errno 35] Resource temporarily unavailable"),len("[Errno 35] Resource temporarily unavailable"))==True):
-                print "Resource is not available in receiveCommandFromClient, trying again.\n"
+                print "[Errno 35] Resource is not available in receiveCommandFromClient, trying again.\n"
             else:
                 print "===================================================================\n"
                 print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
