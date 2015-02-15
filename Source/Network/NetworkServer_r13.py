@@ -531,6 +531,7 @@ class NetworkServer():
                                         sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
                                     self.stopAllThreads = True
+                                    print "A client has found the solution!!!!!\n"
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
@@ -742,6 +743,9 @@ class NetworkServer():
             print "===================================================================\n"
 
         finally:
+            print "Sending done command to all clients, server is finished\n"
+            for key in self.dictionaryOfCurrentClientTasks.keys():
+                sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
