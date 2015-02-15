@@ -602,6 +602,13 @@ class NetworkClient():
                                 lengthOfChunkData = extractSizeOfDataFromNextCommand(self, inboundCommandFromServer)
                                 #tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
                                 tempChunkParams = receivePieceOfChunkFromServerByLength(self, lengthOfChunkParams, clientSocket)
+                                #send command confirmed to the server
+                                try:
+                                    clientSocket.send("commandConfirmed")
+                                except Exception as inst:
+                                    print "=================================================\n"
+                                    print "ERROR in send commandconfirmed to server: "+str(inst)+"\n"
+                                    print "==================================================\n"
                                 #tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
                                 tempChunkData = receivePieceOfChunkFromServerByLength(self, lengthOfChunkData, clientSocket)
                                 outboundChunk = Chunk.Chunk()

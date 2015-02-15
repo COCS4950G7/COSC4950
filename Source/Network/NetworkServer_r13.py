@@ -233,7 +233,6 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             while True:
                 try:
                     clientSocket.send(str(chunkObject.params))
-                    time.sleep(1.0)
                     print "Sent chunk params to the client\n"
                     break
                 except Exception as inst:
@@ -247,13 +246,27 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in send chunk params to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
+        try:
+            print "wait for command confirmed from client\n"
+            while True:
+                try:
+                    cmdConfirmed = receiveCommandFromClient(self, clientSocket)
+                    if((compareString(str(cmdConfirmed)),"commandConfirmed",0,0,len("commandConfirmed"),len("commandConfirmed"))==True):
+                        break
+                except Exception as inst:
+                    #don do anything
+                    fakeVar=True
+        except Exception as inst:
+            print "==============================================================\n"
+            print "ERROR waiting for command confirmed from client: "+str(inst)+"\n"
+            print "==============================================================\n"
         #send the chunk data to the client
         try:
             print "Sending chunk data to the client\n"
             while True:
                 try:
                     clientSocket.send(str(chunkObject.data))
-                    time.sleep(0.25)
+
                     print "Sent chunk data to the client\n"
                     break
                 except Exception as inst:
