@@ -328,9 +328,13 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
             except Exception as inst:
                 if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                     #dont throw error, just keep on receiving
-                    print "socket timed out\n"
-                    #fakeVar=True
-                    break
+                    if(len(receivedPieceOfChunk) < 1):
+                        fakeVar=True
+                        #keep looping
+                    else:
+                        print "socket timed out\n"
+                        #fakeVar=True
+                        break
                 else:
                     raise Exception ("Error in receivePieceOfChunkFromServerByLength infinite while loop")
                     break
