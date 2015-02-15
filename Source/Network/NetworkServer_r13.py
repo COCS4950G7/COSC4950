@@ -233,7 +233,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             while True:
                 try:
                     clientSocket.send(str(chunkObject.params))
-                    time.sleep(0.25)
+                    time.sleep(1.0)
                     print "Sent chunk params to the client\n"
                     break
                 except Exception as inst:

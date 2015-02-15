@@ -303,18 +303,23 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         receivedPieceOfChunk = ""
         print "Receiving Piece of CHunk From The Server By Length\n"
         print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
-        networkSocket.settimeout(None)
+        networkSocket.settimeout(0.25)
         import sys
         while(len(receivedPieceOfChunk) < lengthOfChunkComponent):
             try:
-                receivedPieceOfChunk+= str(networkSocket.recv(1024))
-                if not receivedPieceOfChunk:
+                receivedPieceOfChunk+= str(networkSocket.recv(4096))
+                if(len(receivedPieceOfChunk) >= lengthOfChunkComponent):
+                    break
+                elif not receivedPieceOfChunk:
                     break
                 else:
                     print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
                     if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
                         #not finished yet
                         fakeVar=True
+                        print "Extending the socket timeout\n"
+                        networkSocket.settimeout(networkSocket.gettimeout()+0.25)
+                        print "Socket timeout now set to: " +str(networkSocket.gettimeout())+"\n"
                     else:
                         break
             except Exception as inst:
@@ -322,6 +327,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                     #dont throw error, just keep on receiving
                     print "socket timed out\n"
                     fakeVar=True
+                    break
                 else:
                     raise Exception ("Error in receivePieceOfChunkFromServerByLength infinite while loop")
                     break
@@ -337,6 +343,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         print "===================================================================\n"
     finally:
         networkSocket.settimeout(0.25)
+        print "Socket timeoutout was reset back to default\n"
         return receivedPieceOfChunk
 
 def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize, networkSocket): #NOTE: New component, call this for receiving params or for receiving data
