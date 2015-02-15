@@ -316,10 +316,13 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                     print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
                     if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
                         #not finished yet
-                        fakeVar=True
-                        print "Extending the socket timeout\n"
-                        networkSocket.settimeout(networkSocket.gettimeout()+0.25)
-                        print "Socket timeout now set to: " +str(networkSocket.gettimeout())+"\n"
+                        #fakeVar=True
+                        if(networkSocket.gettimeout() >= 30.0):
+                            print "Timeout at limit of 30 seconds, no extension will be given\n"
+                        else:
+                            print "Extending the socket timeout\n"
+                            networkSocket.settimeout(networkSocket.gettimeout()+0.125)
+                            print "Socket timeout now set to: " +str(networkSocket.gettimeout())+"\n"
                     else:
                         break
             except Exception as inst:
