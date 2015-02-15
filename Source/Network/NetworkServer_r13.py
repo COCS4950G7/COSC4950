@@ -201,6 +201,23 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
         self.socketLock.release()
         print "Released socketLock\n"
 
+def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This sends the measurements to the client in length instead of file size
+    try:
+        print "Acquiring the socketLock\n"
+        self.socketLock.acquire()
+        print "Acquired the socketLock\n"
+
+        #TODO finish implementing this function
+        #TODO change the function calls to sendNextCommandToClient to sendNextCommandToClientByLength
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in sendNextCommandToClientByLength: "+str(inst)+"\n"
+        print "========================================================================\n"
+    finally:
+        print "Releasing the socketLock\n"
+        self.socketLock.release()
+        print "Released the socketLock\n"
+
 def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT modelled after the previous revision of sendNextCommandToCLient!!!
     try: #Main sendNextCommandToClient Try Block
         print "Acquiring socketLock\n"

@@ -195,7 +195,7 @@ def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than pr
         return False
 
 def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component to extract the file size of the params from the next command
-    try:
+    try: #THIS can also extract the length of params from the next command
         print "Extracting size of Params from the next Command\n"
         firstOpenParenthesisPos= 0
         firstClosingParenthesisPos= 0
@@ -246,7 +246,7 @@ def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component
         print "===================================================================\n"
         return 0 #return filesize of zero if there was an error
 
-def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component
+def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component. This can also extract the length of Data from the next command
     try:
         print "Extracting size of data from next Command\n"
         firstOpenParenthesisPos = 0
@@ -297,6 +297,29 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
         print "ERROR in extractSizeOfDataFromNextCommand: " +str(inst)+"\n"
         print "===================================================================\n"
         return 0
+
+def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkSocket): #NOTE: this method receives pieces of chunks by their lengths rather than thier filesizes
+    try:
+        receivedPieceOfChunk = ""
+        print "Receiving Piece of CHunk From The Server By Length\n"
+        print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
+        import sys
+        while True:
+            recvPartOfPieceOfChunk = networkSocket.recv(4096)
+            if recvPartOfPieceOfChunk:
+                receivedPieceOfChunk+= str(recvPartOfPieceOfChunk)
+            else:
+                break
+        if(len(receivedPieceOfChunk) < 1):
+            raise Exception ("receivedPieceOfChunk is the empty string!")
+        elif(len(receivedPieceOfChunk) < lengthOfChunkComponent):
+            raise Exception ("Not all of the Piece of chunk was received")
+    except Exception as inst:
+        print "===================================================================\n"
+        print "ERROR in receivePieceOfChunkFromServerByLength: "+str(inst)+"\n"
+        print "===================================================================\n"
+    finally:
+        return receivedPieceOfChunk
 
 def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize, networkSocket): #NOTE: New component, call this for receiving params or for receiving data
     try:
@@ -537,12 +560,16 @@ class NetworkClient():
                             if(checkForNextCommandFromServer(self,inboundCommandFromServer)==True):
                                 identifiedCommand= True
                                 print "Identified Command as the nextChunk Command from the server\n"
-                                fileSizeOfChunkParams = extractSizeOfParamFromNextCommand(self,inboundCommandFromServer)
-                                print "fileSizeOfChunkParams: "+str(fileSizeOfChunkParams)+"\n"
-                                fileSizeOfChunkData = extractSizeOfDataFromNextCommand(self,inboundCommandFromServer)
-                                print "fileSizeOfChunkData: "+str(fileSizeOfChunkData)+"\n"
-                                tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
-                                tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
+                                #fileSizeOfChunkParams = extractSizeOfParamFromNextCommand(self,inboundCommandFromServer)
+                                #print "fileSizeOfChunkParams: "+str(fileSizeOfChunkParams)+"\n"
+                                #fileSizeOfChunkData = extractSizeOfDataFromNextCommand(self,inboundCommandFromServer)
+                                #print "fileSizeOfChunkData: "+str(fileSizeOfChunkData)+"\n"
+                                lengthOfChunkParams = extractSizeOfParamFromNextCommand(self, inboundCommandFromServer)
+                                lengthOfChunkData = extractSizeOfDataFromNextCommand(self, inboundCommandFromServer)
+                                #tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
+                                tempChunkParams = receivePieceOfChunkFromServerByLength(self, lengthOfChunkParams, clientSocket)
+                                #tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
+                                tempChunkData = receivePieceOfChunkFromServerByLength(self, lengthOfChunkData, clientSocket)
                                 outboundChunk = Chunk.Chunk()
                                 outboundChunk.params = str(tempChunkParams)
                                 outboundChunk.data = str(tempChunkData)
