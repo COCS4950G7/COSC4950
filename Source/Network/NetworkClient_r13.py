@@ -232,7 +232,7 @@ def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component
         #Step 3: retreive the params file size
         try: #step 3 try block
             print "Retreiving the params file size\n"
-            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
+            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos):
                 sizeOfChunkParams+= str(inboundString[index])
             return sizeOfChunkParams
         except Exception as inst:
@@ -284,8 +284,8 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
         #Step 3: retreive the data file size
         try: #step 3 try block
             print "Retrieving data file size\n"
-            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos-1):
-                sizeOfChunkData+= str(inboundString)
+            for index in range(firstOpenParenthesisPos+1,firstClosingParenthesisPos):
+                sizeOfChunkData+= str(inboundString[index])
             return sizeOfChunkData
         except Exception as inst:
             print "===================================================================\n"
@@ -298,24 +298,50 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
         print "===================================================================\n"
         return 0
 
-def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize): #NOTE: New component, call this for receiving params or for receiving data
+def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize, networkSocket): #NOTE: New component, call this for receiving params or for receiving data
     try:
         receivedPieceOfChunk= ""
-        print "Receiving piece of chunk from the server\n"
+        print "Receiving Piece Of Chunk From The Server\n"
+        #adjust receive size depending on amount to be received
+        presetRecvValue= 0
+        if(pieceOfChunkFileSize < 1024):
+            presetRecvValue= 256
+            print "Using pre-setRecvValue of: 256\n"
+        elif(pieceOfChunkFileSize < 4096):
+            presetRecvValue= 1024
+            print "Using pre-setRecvValue of: 1024\n"
+        else:
+            presetRecvValue= 4096
+            print "Using pre-setRecvValue of: 4096\n"
+        print "PieceOfChunkFileSize: "+str(pieceOfChunkFileSize)+"\n"
+        import sys
         while(sys.getsizeof(receivedPieceOfChunk) < pieceOfChunkFileSize):
-            recvInfo= self.clientSocket.recv(4096)
-            if recvInfo:
-                receivedPieceOfChunk+= str(recvInfo)
-            else:
-                break
+            #try: #recieve try block
+            try:
+                #print "Current fileSize of receivedPieceOfChunk: "+str(sys.getsizeof(receivedPieceOfChunk))+"\n"
+                recvInfo= networkSocket.recv(presetRecvValue)
+                if recvInfo:
+                    receivedPieceOfChunk+= str(recvInfo)
+                else:
+                    break
+            except Exception as inst:
+                if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                    #dont throw an error, keep trying
+                    fakeVar=True
+                else:
+                    raise Exception ("Error in receivePieceOfChunkFrom Server recv try block")
+                    break
         if(len(receivedPieceOfChunk) < 1):
             raise Exception ("receivedPieceOfChunk is empty!")
-        return receivedPieceOfChunk
+        elif(sys.getsizeof(receivedPieceOfChunk) < pieceOfChunkFileSize):
+            raise Exception ("Did not receive all of the Piece of Chunk")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in receivePieceOfChunkFromServer: "+str(inst)+"\n"
         print "===================================================================\n"
-        return "" #the empty string
+    finally:
+        print "complete receivedPieceOfChunk: "+str(receivedPieceOfChunk)+"\n"
+        return receivedPieceOfChunk
 
 
 
@@ -495,7 +521,7 @@ class NetworkClient():
                 if(len(inboundCommandFromServer) > 0): #if not the empty string, perform the following checks
                     identifiedCommand = False
                     try: #check for the done command from the server
-                        if(checkForDoneCommandFromServer(inboundCommandFromServer)==True):
+                        if(checkForDoneCommandFromServer(self,inboundCommandFromServer)==True):
                             identifiedCommand= True
                             print "Identified Command as the done command from the server\n"
                             print "Server has Issued the Done Command\n"
@@ -512,13 +538,15 @@ class NetworkClient():
                                 identifiedCommand= True
                                 print "Identified Command as the nextChunk Command from the server\n"
                                 fileSizeOfChunkParams = extractSizeOfParamFromNextCommand(self,inboundCommandFromServer)
+                                print "fileSizeOfChunkParams: "+str(fileSizeOfChunkParams)+"\n"
                                 fileSizeOfChunkData = extractSizeOfDataFromNextCommand(self,inboundCommandFromServer)
-                                tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams)
-                                tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData)
+                                print "fileSizeOfChunkData: "+str(fileSizeOfChunkData)+"\n"
+                                tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
+                                tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
                                 outboundChunk = Chunk.Chunk()
-                                outboundChunk.params = tempChunkParams
-                                outboundChunk.data = tempChunkData
-                                sendDoingStuffCommandToController() #notify controller that client will be sending a chunk to it
+                                outboundChunk.params = str(tempChunkParams)
+                                outboundChunk.data = str(tempChunkData)
+                                sendDoingStuffCommandToController(self) #notify controller that client will be sending a chunk to it
                                 sendNextChunkCommandToController(self,outboundChunk)
                     except Exception as inst:
                         print "===================================================================\n"

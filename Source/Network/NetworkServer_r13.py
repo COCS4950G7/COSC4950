@@ -66,6 +66,18 @@ def checkForNextChunkCommandFromController(self, inboundString):
         print "========================================================================\n"
         return False
 
+def receiveNextChunkFromController(self):
+    try:
+        print "Receiving Chunk From the Pipe\n"
+        inboundChunk= self.pipe.recv()
+        print "Received the Chunk from the pipe\n"
+        return inboundChunk
+    except Exception as inst:
+        print "========================================================================\n"
+        print "ERROR in receiveNextChunkFromController: "+str(inst)+"\n"
+        print "========================================================================\n"
+        return ""
+
 #Outbound commands to controller======================================
 def sendNextChunkCommandToController(self):
     try:
@@ -191,11 +203,12 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
 
 def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT modelled after the previous revision of sendNextCommandToCLient!!!
     try: #Main sendNextCommandToClient Try Block
-        chunkParams = chunkObject.params
-        chunkData = chunkObject.data
         print "Acquiring socketLock\n"
         self.socketLock.acquire()
         print "Acquired socketLock\n"
+        print "Type of the chunkObject: "+str(type(chunkObject))+"\n"
+        chunkParams = str(chunkObject.params)
+        chunkData = str(chunkObject.data)
         chunkParamsSize = 0 #initialize var
         chunkDataSize = 0 #initialize var
         commandString = "" #initializing var, this will hold the NEXT keyword and the file size of the chunk pieces
@@ -230,8 +243,18 @@ def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT m
         #Step 2 (send the chunkParams to the client)-----------------------------------------------------------
         try: #send chunkParams to the client try block
             print "Sending chunkParams to the client\n"
-            clientSocket.send(chunkParams)
-            print "Sent chunkParams to the client\n"
+            while True:
+                try:
+                    clientSocket.send(chunkParams)
+                    print "Sent chunkParams to client\n"
+                    break
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"), len("timed out"))==True):
+                        #dont throw error or this, just try again
+                        fakeVar=True
+                    else:
+                        raise Exception ("Error in sending chunkParams to client")
+                        break
         except Exception as inst:
             print "========================================================================\n"
             print "Inside the sendNextCommandToCLient function\n"
@@ -241,8 +264,18 @@ def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT m
         #Step 3 (send the chunkData to the client------------------------------------------------------------
         try:
             print "Sending chunkData to the client\n"
-            clientSocket.send(chunkData)
-            print "Sent chunkData to the client\n"
+            while True:
+                try:
+                    clientSocket.send(chunkData)
+                    print "Sent chunkData to the client\n"
+                    break
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #dont throw error, just try again
+                        fakeVar=True
+                    else:
+                        raise Exception ("Error in sending chunkData to client")
+                        break
         except Exception as inst:
             print "========================================================================\n"
             print "Inside the sendNextCommandToCLient function\n"
@@ -590,8 +623,8 @@ class NetworkServer():
                                     if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                         print "MAIN THREAD: A client is waiting for the nextChunk\n"
                                         tempClientSocket, tempClientAddress= popClientFromStackOfClientsWaitingForNextChunk(self)
-
-                                        sendNextCommandToClient(self,tempClientSocket, receivedControllerCommand)
+                                        outboundChunk = receiveNextChunkFromController(self)
+                                        sendNextCommandToClient(self,tempClientSocket, outboundChunk)
                                     else: #if there is no client waiting for the  next chunk
                                         print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
                                         pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
