@@ -303,7 +303,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         receivedPieceOfChunk = ""
         print "Receiving Piece of CHunk From The Server By Length\n"
         print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
-        networkSocket.settimeout(0.25)
+        networkSocket.settimeout(0.5)
         import sys
         while(len(receivedPieceOfChunk) < lengthOfChunkComponent):
             try:
