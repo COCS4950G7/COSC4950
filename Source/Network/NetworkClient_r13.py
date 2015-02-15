@@ -303,22 +303,40 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         receivedPieceOfChunk = ""
         print "Receiving Piece of CHunk From The Server By Length\n"
         print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
+        networkSocket.settimeout(None)
         import sys
-        while True:
-            recvPartOfPieceOfChunk = networkSocket.recv(4096)
-            if recvPartOfPieceOfChunk:
-                receivedPieceOfChunk+= str(recvPartOfPieceOfChunk)
-            else:
-                break
+        while(len(receivedPieceOfChunk) < lengthOfChunkComponent):
+            try:
+                receivedPieceOfChunk+= str(networkSocket.recv(1024))
+                if not receivedPieceOfChunk:
+                    break
+                else:
+                    print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
+                    if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
+                        #not finished yet
+                        fakeVar=True
+                    else:
+                        break
+            except Exception as inst:
+                if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                    #dont throw error, just keep on receiving
+                    print "socket timed out\n"
+                    fakeVar=True
+                else:
+                    raise Exception ("Error in receivePieceOfChunkFromServerByLength infinite while loop")
+                    break
         if(len(receivedPieceOfChunk) < 1):
             raise Exception ("receivedPieceOfChunk is the empty string!")
-        elif(len(receivedPieceOfChunk) < lengthOfChunkComponent):
-            raise Exception ("Not all of the Piece of chunk was received")
+        elif(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
+            raise Exception ("Not all of the Piece of chunk was received\n receivedPieceOfChunk length:"+str(len(receivedPieceOfChunk))+"")
+        else:
+            print "Finished receiving Piece of chunk from the server. length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in receivePieceOfChunkFromServerByLength: "+str(inst)+"\n"
         print "===================================================================\n"
     finally:
+        networkSocket.settimeout(0.25)
         return receivedPieceOfChunk
 
 def receivePieceOfChunkFromServer(self, pieceOfChunkFileSize, networkSocket): #NOTE: New component, call this for receiving params or for receiving data

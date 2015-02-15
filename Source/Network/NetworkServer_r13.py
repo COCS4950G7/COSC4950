@@ -220,6 +220,8 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
         try:
             print "Sending command string to the client\n"
             clientSocket.send(commandString)
+            import time
+            time.sleep(0.25)
             print "Sent the command string to the client\n"
         except Exception as inst:
             print "========================================================================\n"
@@ -231,6 +233,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             while True:
                 try:
                     clientSocket.send(str(chunkObject.params))
+                    time.sleep(0.25)
                     print "Sent chunk params to the client\n"
                     break
                 except Exception as inst:
@@ -250,6 +253,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             while True:
                 try:
                     clientSocket.send(str(chunkObject.data))
+                    time.sleep(0.25)
                     print "Sent chunk data to the client\n"
                     break
                 except Exception as inst:
