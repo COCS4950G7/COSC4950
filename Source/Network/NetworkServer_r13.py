@@ -206,9 +206,63 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
         print "Acquiring the socketLock\n"
         self.socketLock.acquire()
         print "Acquired the socketLock\n"
-
-        #TODO finish implementing this function
-        #TODO change the function calls to sendNextCommandToClient to sendNextCommandToClientByLength
+        chunkParamLength = len(str(chunkObject.params))
+        chunkDataLength = len(str(chunkObject.data))
+        #Create the command string
+        commandString= ""
+        try:
+            commandString = "NEXT PSIZE("+str(chunkParamLength)+") DSIZE("+str(chunkDataLength)+")\n" #keeping same names, even though it is length
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Error in create command string step of sendNextCommandToCLientByLength: "+str(inst)+"\n"
+            print "========================================================================\n"
+        #Send command string to the client
+        try:
+            print "Sending command string to the client\n"
+            clientSocket.send(commandString)
+            print "Sent the command string to the client\n"
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Error in send command string to client in sendNextCOmmandToCLientByLength: "+str(inst)+"\n"
+            print "========================================================================\n"
+        #Send the chunk params to the client
+        try:
+            print "Sending chunk params to the client\n"
+            while True:
+                try:
+                    clientSocket.send(str(chunkObject.params))
+                    print "Sent chunk params to the client\n"
+                    break
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #dont throw an error, just try again
+                        fakeVar=True
+                    else:
+                        raise Exception ("Error in sending chunk params to the client in infinite while loop")
+                        break
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Error in send chunk params to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
+            print "========================================================================\n"
+        #send the chunk data to the client
+        try:
+            print "Sending chunk data to the client\n"
+            while True:
+                try:
+                    clientSocket.send(str(chunkObject.data))
+                    print "Sent chunk data to the client\n"
+                    break
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        #dont throw error, just try again
+                        fakeVar=True
+                    else:
+                        raise Exception ("Error in sending chunk data to the client in infinite loop")
+                    break
+        except Exception as inst:
+            print "========================================================================\n"
+            print "Error in send chunk data to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
+            print "========================================================================\n"
     except Exception as inst:
         print "========================================================================\n"
         print "ERROR in sendNextCommandToClientByLength: "+str(inst)+"\n"
@@ -452,7 +506,8 @@ class NetworkServer():
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
                                     print "There is a chunk that needs to be reassigned.\n"
                                     tempChunk = popChunkFromStackOfChunksThatNeedToBeReassigned(self)
-                                    sendNextCommandToClient(self,clientSocket,tempChunk)
+                                    #sendNextCommandToClient(self,clientSocket,tempChunk)
+                                    sendNextCommandToClientByLength(self, clientSocket, tempChunk)
                                 else:
                                     print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
                                     sendNextChunkCommandToController(self)
@@ -641,7 +696,8 @@ class NetworkServer():
                                         print "MAIN THREAD: A client is waiting for the nextChunk\n"
                                         tempClientSocket, tempClientAddress= popClientFromStackOfClientsWaitingForNextChunk(self)
                                         outboundChunk = receiveNextChunkFromController(self)
-                                        sendNextCommandToClient(self,tempClientSocket, outboundChunk)
+                                        #sendNextCommandToClient(self,tempClientSocket, outboundChunk)
+                                        sendNextCommandToClientByLength(self, tempClientSocket, outboundChunk)
                                     else: #if there is no client waiting for the  next chunk
                                         print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
                                         pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
