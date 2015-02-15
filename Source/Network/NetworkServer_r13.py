@@ -769,11 +769,13 @@ class NetworkServer():
             print "Sending done command to all clients, server is finished\n"
             for key in self.dictionaryOfCurrentClientTasks.keys():
                 sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
+                print "Sent done command to: " + str(key)+"\n"
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
             sendDoneCommandToController(self)
             print "MAIN THREAD: Informed the Controller that Server has finished\n"
+
 
 
         #FUNCTIONS==========================================================================

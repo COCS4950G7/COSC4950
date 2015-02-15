@@ -313,7 +313,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                 elif not receivedPieceOfChunk:
                     break
                 else:
-                    print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
+                    #print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
                     if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
                         #not finished yet
                         fakeVar=True
@@ -338,6 +338,8 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
             raise Exception ("receivedPieceOfChunk is the empty string!")
         elif(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             raise Exception ("Not all of the Piece of chunk was received\n receivedPieceOfChunk length:"+str(len(receivedPieceOfChunk))+"")
+        elif(len(receivedPieceOfChunk) == lengthOfChunkComponent):
+            raise Exception ("Received extra information !!!!!! \n receivedPieceOfChunk length:"+str(len(receivedPieceOfChunk))+"")
         else:
             print "Finished receiving Piece of chunk from the server. length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
     except Exception as inst:
