@@ -402,6 +402,15 @@ def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddr
         print "========================================================================\n"
         return "" #changed from none
 
+def setChunkToDictionaryOfCurrentClientTasks(self, clientAddr, chunkObject):
+    try:
+        self.dictionaryOfCurrentClientTasks[clientAddr] = chunkObject
+    except Exception as inst:
+        print "=======================================================================\n"
+        print "ERROR in setChunkToDIctionaryOfCurrentCLientTasks: " +str(inst)+"\n"
+        print "=======================================================================\n"
+
+
 #list of Crashed clients functions====================================================================
 def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the ip and the port
     try:
@@ -512,6 +521,13 @@ class NetworkServer():
                                     tempChunk = popChunkFromStackOfChunksThatNeedToBeReassigned(self)
                                     #sendNextCommandToClient(self,clientSocket,tempChunk)
                                     sendNextCommandToClientByLength(self, clientSocket, tempChunk)
+                                    try:
+                                        tempChunk = getChunkFromDictionaryOfCurrentClientTasks(self,clientAddr)
+                                        #if suceed, set value
+                                        setChunkToDictionaryOfCurrentClientTasks(self,clientAddr,tempChunk)
+                                    except Exception as inst:
+                                        #add client to the dictionary
+                                        addClientToDictionaryOfCurrentClientTasks(self,clientAddr,tempChunk)
                                 else:
                                     print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
                                     sendNextChunkCommandToController(self)
@@ -544,7 +560,7 @@ class NetworkServer():
                                     print "Identified inboundCommandFromClient as the Crashed Command\n"
                                     tempChunk = getChunkFromDictionaryOfCurrentClientTasks(self,clientAddr)
                                     pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,tempChunk)
-                                    addClientToListOfCrashedClients(self)
+                                    addClientToListOfCrashedClients(self, clientAddr)
                                     delClientFromDictionaryOfCurrentClientTasks(self,clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
@@ -703,6 +719,13 @@ class NetworkServer():
                                         outboundChunk = receiveNextChunkFromController(self)
                                         #sendNextCommandToClient(self,tempClientSocket, outboundChunk)
                                         sendNextCommandToClientByLength(self, tempClientSocket, outboundChunk)
+                                        try:
+                                            tempChunk = getChunkFromDictionaryOfCurrentClientTasks(self,tempClientAddress)
+                                            #if, suceeds, override the old chunk
+                                            setChunkToDictionaryOfCurrentClientTasks(self,tempClientAddress,outboundChunk)
+                                        except Exception as inst:
+                                            #add it if there is not key for that client yet
+                                            addClientToDictionaryOfCurrentClientTasks(self,tempClientAddress, outboundChunk)
                                     else: #if there is no client waiting for the  next chunk
                                         print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
                                         pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
