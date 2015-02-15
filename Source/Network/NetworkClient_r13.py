@@ -163,7 +163,7 @@ def sendDoingStuffCommandToController(self):
         print "===================================================================\n"
         print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
         print "===================================================================\n"
-
+#Temp
 #Inbound commands from server functions----------------------------------------
 def checkForDoneCommandFromServer(self,inboundString):
     try:

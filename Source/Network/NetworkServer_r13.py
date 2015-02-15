@@ -764,7 +764,7 @@ class NetworkServer():
             print "===================================================================\n"
             print "MAIN THREAD: Error in Main Thread Server Loop: " +str(inst)+"\n"
             print "===================================================================\n"
-
+#temp
         finally:
             print "Sending done command to all clients, server is finished\n"
             for key in self.dictionaryOfCurrentClientTasks.keys():
