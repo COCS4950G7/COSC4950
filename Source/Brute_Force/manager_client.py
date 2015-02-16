@@ -30,10 +30,11 @@ def runclient():
             if result:
                 print "Hooray!"
                 print "key is: " + dictionary.showKey()
-                result_q.put(("win", dictionary.showKey()))
+                key = dictionary.showkey()
+                result_q.put(("win", key))
                 return
             else:
-                result_q.put(("fail", ))
+                result_q.put(("fail", chunk.params))
         except Queue.Empty:
             return
 

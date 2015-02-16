@@ -20,8 +20,6 @@ def runserver():
     dictionary.setFileName("dic")
     dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
 
-    isFound = False
-    isEof = False
     while not dictionary.isEof():
 
         #chunk is a Chunk object
@@ -29,14 +27,14 @@ def runserver():
         newChunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data})
         shared_job_q.put(newChunk)
 
-    isEof = True
-
-
-
     while True:
         result = shared_result_q.get()
         if result[0] is "win":
-            print result[1]
+            key = result[1]
+            print "Key is: %s" % key
+            break
+        else:
+            print "Chunk finished with params: %s" %result[1]
 
     # Sleep a bit before shutting down the server - to give clients time to
     # realize the job queue is empty and exit in an orderly way.
