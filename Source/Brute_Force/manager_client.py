@@ -1,10 +1,8 @@
 from multiprocessing.managers import SyncManager
-import multiprocessing
 import Dictionary
 import Queue
 import Chunk
 import time
-from ctypes import c_char_p
 
 
 IP = "192.168.2.136"
