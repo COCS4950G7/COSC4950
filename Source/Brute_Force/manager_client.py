@@ -59,4 +59,8 @@ def make_client_manager(ip, port, authkey):
 
 
 if __name__ == '__main__':
+    import time
+    start_time= time.time()
     runclient()
+    end_time= time.time() - start_time
+    print "Client ran for: "+str(end_time)+" seconds"

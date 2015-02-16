@@ -260,6 +260,8 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "==============================================================\n"
             print "ERROR waiting for command confirmed from client: "+str(inst)+"\n"
             print "==============================================================\n"
+            while True:
+                fakeVar=True
         #send the chunk data to the client
         try:
             print "Sending chunk data to the client\n"

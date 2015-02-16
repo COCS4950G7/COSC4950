@@ -13,22 +13,22 @@ dictionary = Dictionary.Dictionary()
 
 def runserver():
     # Start a shared manager server and access its queues
-    manager = make_server_manager(PORTNUM, AUTHKEY)
+    manager = make_server_manager(PORTNUM, AUTHKEY) #create the server manager
     shared_job_q = manager.get_job_q()
     shared_result_q = manager.get_result_q()
     dictionary.setAlgorithm('md5')
     dictionary.setFileName("dic")
-    dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-
+   # dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+    dictionary.setHash("2a3ec66488847e798c29e6b500a1bcc6")
     while not dictionary.isEof():
 
         #chunk is a Chunk object
-        chunk = dictionary.getNextChunk()
+        chunk = dictionary.getNextChunk() #get the next chunk from dictionary
         newChunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data})
-        shared_job_q.put(newChunk)
+        shared_job_q.put(newChunk) #put newChunk on the shared_job queue
 
     while True:
-        result = shared_result_q.get()
+        result = shared_result_q.get() #get shared_result_queue value
         if result[0] is "win":
             key = result[1]
             print "Key is: %s" % key
@@ -68,4 +68,20 @@ def make_server_manager(port, authkey):
 
 
 if __name__ == '__main__':
-    runserver()
+    try:
+        import time
+        start_time= time.time() #timer for how long server ran
+        runserver()
+    except Exception as inst:
+        print "==============================================================="
+        print "Exception was thrown in Main"
+        #the exception instance
+        print type(inst)
+        #arguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "=============================================================="
+    finally:
+        end_time= time.time() - start_time
+        print "Server ran for "+str(end_time)+" seconds"

@@ -313,7 +313,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                 elif not receivedPieceOfChunk:
                     break
                 else:
-                    #print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
+                    print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
                     if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
                         #not finished yet
                         fakeVar=True
@@ -331,6 +331,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                     if(len(receivedPieceOfChunk) < 1):
                         fakeVar=True
                         #keep looping
+                        break
                     else:
                         print "socket timed out\n"
                         #fakeVar=True
@@ -605,6 +606,7 @@ class NetworkClient():
                                 #send command confirmed to the server
                                 try:
                                     clientSocket.send("commandConfirmed")
+                                    print "commandConfirmed sent to the server\n"
                                 except Exception as inst:
                                     print "=================================================\n"
                                     print "ERROR in send commandconfirmed to server: "+str(inst)+"\n"
