@@ -42,7 +42,11 @@ def runserver():
     manager.shutdown()
     return
 
-
+ # This is based on the examples in the official docs of multiprocessing.
+    # get_{job|result}_q return synchronized proxies for the actual Queue
+    # objects.
+class JobQueueManager(SyncManager):
+    pass
 
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
@@ -51,16 +55,12 @@ def make_server_manager(port, authkey):
     job_q = Queue.Queue(maxsize=1000)
     result_q = Queue.Queue()
 
-    # This is based on the examples in the official docs of multiprocessing.
-    # get_{job|result}_q return synchronized proxies for the actual Queue
-    # objects.
-    class JobQueueManager(SyncManager):
-        pass
+
 #t
     JobQueueManager.register('get_job_q', callable=lambda: job_q)
     JobQueueManager.register('get_result_q', callable=lambda: result_q)
 
-    manager = JobQueueManager(address=('', port), authkey=authkey)
+    manager = JobQueueManager(address=(IP, port), authkey=authkey)
     manager.start()
     print 'Server started at port %s' % port
     return manager
@@ -68,4 +68,20 @@ def make_server_manager(port, authkey):
 
 
 if __name__ == '__main__':
-    runserver()
+    try:
+        import  time
+        start_time= time.time()
+        runserver()
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in Main"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
+    finally:
+        end_time= time.time() - start_time
+        print "Server ran for "+str(end_time)+" seconds"

@@ -59,8 +59,20 @@ def make_client_manager(ip, port, authkey):
 
 
 if __name__ == '__main__':
-    import time
-    start_time= time.time()
-    runclient()
-    end_time= time.time() - start_time
-    print "Client ran for: "+str(end_time)+" seconds"
+    try:
+        import time
+        start_time= time.time()
+        runclient()
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in Main"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
+    finally:
+        end_time= time.time() - start_time
+        print "Client ran for: "+str(end_time)+" seconds"
