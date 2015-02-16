@@ -56,7 +56,7 @@ def make_server_manager(port, authkey):
     # objects.
     class JobQueueManager(SyncManager):
         pass
-
+#t
     JobQueueManager.register('get_job_q', callable=lambda: job_q)
     JobQueueManager.register('get_result_q', callable=lambda: result_q)
 
