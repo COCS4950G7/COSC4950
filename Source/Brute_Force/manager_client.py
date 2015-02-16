@@ -1,4 +1,4 @@
-import dill
+
 from multiprocessing.managers import SyncManager
 import Dictionary
 import Queue
@@ -11,32 +11,43 @@ AUTHKEY = "Popcorn is awesome!!!"
 
 
 def runclient():
-    manager = make_client_manager(IP, PORTNUM, AUTHKEY)
-    job_q = manager.get_job_q()
-    result_q = manager.get_result_q()
-    dictionary = Dictionary.Dictionary()
+    try: #runclient definition try block
+        manager = make_client_manager(IP, PORTNUM, AUTHKEY)
+        job_q = manager.get_job_q()
+        result_q = manager.get_result_q()
+        dictionary = Dictionary.Dictionary()
 
-    while True:
-        try:
-            job = job_q.get_nowait()
-            chunk = Chunk.Chunk()
-            chunk.params = job.value['params']
-            chunk.data = job.value['data']
-            print chunk.params
-            time.sleep(.01)
-            dictionary.find(chunk)
-            result = dictionary.isFound()
-            time.sleep(0.00)
-            if result:
-                print "Hooray!"
-                print "key is: " + dictionary.showKey()
-                key = dictionary.showkey()
-                result_q.put(("win", key))
+        while True:
+            try:
+                job = job_q.get_nowait()
+                chunk = Chunk.Chunk()
+                chunk.params = job.value['params']
+                chunk.data = job.value['data']
+                print chunk.params
+                time.sleep(.01)
+                dictionary.find(chunk)
+                result = dictionary.isFound()
+                time.sleep(0.00)
+                if result:
+                    print "Hooray!"
+                    print "key is: " + dictionary.showKey()
+                    key = dictionary.showkey()
+                    result_q.put(("win", key))
+                    return
+                else:
+                    result_q.put(("fail", chunk.params))
+            except Queue.Empty:
                 return
-            else:
-                result_q.put(("fail", chunk.params))
-        except Queue.Empty:
-            return
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in runclient definition try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 
 def make_client_manager(ip, port, authkey):
@@ -45,6 +56,7 @@ def make_client_manager(ip, port, authkey):
         accessing the shared queues from the server.
         Return a manager object.
     """
+
     class ServerQueueManager(SyncManager):
         pass
 
@@ -59,7 +71,7 @@ def make_client_manager(ip, port, authkey):
 
 
 if __name__ == '__main__':
-    try:
+    try: #Main
         import time
         start_time= time.time()
         runclient()
