@@ -5,7 +5,7 @@ import Queue
 
 import Dictionary
 
-IP = "10.121.15.6"
+IP = "10.121.0.158"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
@@ -56,9 +56,19 @@ def make_server_manager(port, authkey):
     result_q = Queue.Queue()
 
 
-#t
-    JobQueueManager.register('get_job_q', callable=lambda: job_q)
-    JobQueueManager.register('get_result_q', callable=lambda: result_q)
+    try:
+        JobQueueManager.register('get_job_q', callable=lambda: job_q)
+        JobQueueManager.register('get_result_q', callable=lambda: result_q)
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in Make_server_Manager: JobQueueManager"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
     manager = JobQueueManager(address=(IP, port), authkey=authkey)
     manager.start()
