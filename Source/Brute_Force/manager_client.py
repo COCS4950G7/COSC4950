@@ -48,7 +48,9 @@ def runclient():
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-
+        
+class ServerQueueManager(SyncManager):
+    pass
 
 def make_client_manager(ip, port, authkey):
     """ Create a manager for a client. This manager connects to a server on the
@@ -57,8 +59,7 @@ def make_client_manager(ip, port, authkey):
         Return a manager object.
     """
 
-    class ServerQueueManager(SyncManager):
-        pass
+
 
     ServerQueueManager.register('get_job_q')
     ServerQueueManager.register('get_result_q')
