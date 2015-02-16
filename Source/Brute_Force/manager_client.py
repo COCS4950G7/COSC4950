@@ -26,6 +26,7 @@ def runclient():
             time.sleep(.01)
             dictionary.find(chunk)
             result = dictionary.isFound()
+            time.sleep(10)
             if result:
                 print "Hooray!"
                 print "key is: " + dictionary.showKey()
