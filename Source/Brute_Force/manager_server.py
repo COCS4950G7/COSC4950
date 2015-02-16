@@ -1,3 +1,4 @@
+import dill
 from multiprocessing.managers import SyncManager
 
 import time
@@ -5,7 +6,7 @@ import Queue
 
 import Dictionary
 
-IP = "10.121.15.6"
+IP = "10.121.15.106"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
@@ -18,7 +19,8 @@ def runserver():
     shared_result_q = manager.get_result_q()
     dictionary.setAlgorithm('md5')
     dictionary.setFileName("dic")
-    dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+    #dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+    dictionary.setHash("2a3ec66488847e798c29e6b500a1bcc6")  #antidisestablishmentarianism
 
     while not dictionary.isEof():
 
@@ -42,7 +44,8 @@ def runserver():
     manager.shutdown()
     return
 
-
+class JobQueueManager(SyncManager):
+        pass
 
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
@@ -54,13 +57,13 @@ def make_server_manager(port, authkey):
     # This is based on the examples in the official docs of multiprocessing.
     # get_{job|result}_q return synchronized proxies for the actual Queue
     # objects.
-    class JobQueueManager(SyncManager):
-        pass
+
 
     JobQueueManager.register('get_job_q', callable=lambda: job_q)
     JobQueueManager.register('get_result_q', callable=lambda: result_q)
 
-    manager = JobQueueManager(address=('', port), authkey=authkey)
+    #must pass IP when using this command in Windows or it will fail to open the socket
+    manager = JobQueueManager(address=(IP, port), authkey=authkey)
     manager.start()
     print 'Server started at port %s' % port
     return manager
