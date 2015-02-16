@@ -52,16 +52,32 @@ def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
         Return a manager object with get_job_q and get_result_q methods.
     """
-    job_q = Queue.Queue(maxsize=1000)
-    result_q = Queue.Queue()
-
-
     try:
-        JobQueueManager.register('get_job_q', callable=lambda: job_q)
-        JobQueueManager.register('get_result_q', callable=lambda: result_q)
+        job_q = Queue.Queue(maxsize=1000)
+        result_q = Queue.Queue()
+
+
+        try:
+            JobQueueManager.register('get_job_q', callable=lambda: job_q)
+            JobQueueManager.register('get_result_q', callable=lambda: result_q)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in Make_server_Manager: JobQueueManager/Lambda functions"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+        manager = JobQueueManager(address=(IP, port), authkey=authkey)
+        manager.start()
+        print 'Server started at port %s' % port
+        return manager
     except Exception as inst:
         print "============================================================================================="
-        print "ERROR: An exception was thrown in Make_server_Manager: JobQueueManager"
+        print "ERROR: An exception was thrown in Make_server_manager definition"
         #the exception instance
         print type(inst)
         #srguments stored in .args
@@ -69,11 +85,6 @@ def make_server_manager(port, authkey):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-
-    manager = JobQueueManager(address=(IP, port), authkey=authkey)
-    manager.start()
-    print 'Server started at port %s' % port
-    return manager
 
 
 
