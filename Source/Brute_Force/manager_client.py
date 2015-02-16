@@ -5,7 +5,7 @@ import Chunk
 import time
 
 
-IP = "192.168.2.136"
+IP = "10.121.15.106"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 

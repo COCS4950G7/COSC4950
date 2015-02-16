@@ -5,7 +5,7 @@ import Queue
 
 import Dictionary
 
-IP = "192.168.2.136"
+IP = "10.121.15.6"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
@@ -40,6 +40,8 @@ def runserver():
     # realize the job queue is empty and exit in an orderly way.
     time.sleep(2)
     manager.shutdown()
+    return
+
 
 
 def make_server_manager(port, authkey):
