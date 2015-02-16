@@ -31,7 +31,7 @@ def runclient():
                 if result:
                     print "Hooray!"
                     print "key is: " + dictionary.showKey()
-                    key = dictionary.showkey()
+                    key = dictionary.showKey()
                     result_q.put(("win", key))
                     return
                 else:
@@ -48,7 +48,7 @@ def runclient():
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-        
+
 class ServerQueueManager(SyncManager):
     pass
 
