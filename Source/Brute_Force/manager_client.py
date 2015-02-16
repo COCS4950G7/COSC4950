@@ -4,6 +4,7 @@ import Dictionary
 import Queue
 import Chunk
 import time
+from ctypes import c_char_p
 
 
 IP = "192.168.2.136"
@@ -55,3 +56,7 @@ def make_client_manager(ip, port, authkey):
 
     print 'Client connected to %s:%s' % (ip, port)
     return manager
+
+
+if __name__ == '__main__':
+    runclient()
