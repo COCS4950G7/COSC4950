@@ -1,11 +1,11 @@
+import dill
 from multiprocessing.managers import SyncManager
 import Dictionary
 import Queue
 import Chunk
 import time
 
-
-IP = "10.121.15.106"
+IP = "10.121.0.158"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
@@ -26,7 +26,7 @@ def runclient():
             time.sleep(.01)
             dictionary.find(chunk)
             result = dictionary.isFound()
-            time.sleep(10)
+            time.sleep(0.00)
             if result:
                 print "Hooray!"
                 print "key is: " + dictionary.showKey()
