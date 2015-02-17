@@ -676,9 +676,9 @@ class NetworkClient():
                             sendFoundSolutionCommandToServer(self,clientSocket)
                             self.solutionWasFound= True
                             self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
-                            #print "Listening for the solution from the Controller...\n"
-                            #theSolution= receiveSolutionFromController(self, clientSocket)
-                            #print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
+                            print "Listening for the solution from the Controller...\n"
+                            theSolution= receiveSolutionFromController(self, clientSocket)
+                            print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
