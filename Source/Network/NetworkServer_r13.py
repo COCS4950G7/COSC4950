@@ -854,7 +854,7 @@ class NetworkServer():
             #for index in range(0,len(self.listOfServerErrors)):
             #    print str(index) + " "+str(self.listOfServerErrors[index])+"\n"
 
-
+        #NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
 
         #FUNCTIONS==========================================================================
 
