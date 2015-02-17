@@ -146,10 +146,10 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
     while True:
         try:
             receivedCommandFromClient = ""
-            print "Acquiring socketLock\n"
+            #print "Acquiring socketLock"
             self.socketLock.acquire()
-            print "Acquired socketLock\n"
-            print "Checking for inbound client Commands\n"
+            #print "Acquired socketLock"
+            #print "Checking for inbound client Commands"
             clientSocket.settimeout(0.25)
             clientInput= clientSocket.recv(4096)
             if(len(clientInput) > 0):
@@ -169,20 +169,20 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
                 receivedCommandFromClient= ""#set to empty string
                 break
         finally:
-            print "Releasing socketLock\n"
+            #print "Releasing socketLock\n"
             self.socketLock.release()
-            print "Released socketLock\n"
+            #print "Released socketLock\n"
             return receivedCommandFromClient
 
 
 #Outbound commands to client==================================================
 def sendDoneCommandToClient(self,networkSocket, clientIP):
     print "Issuing Done Command to Client: " + str(clientIP) +"\n"
-    print "Acquiring socket lock\n"
+    #print "Acquiring socket lock\n"
     self.socketLock.acquire()
-    print "Acquired socketLock\n"
+    #print "Acquired socketLock\n"
     networkSocket.settimeout(0.25)
-    print "socket lock acquired\n"
+    #print "socket lock acquired\n"
     try: #send try block
         print "preparing to send done command to client\n"
         networkSocket.send("done")
@@ -197,9 +197,9 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
             print "Exception in send Done command: " +str(inst) +"\n"
             print "========================================================================\n"
     finally:
-        print "Releasing the socketLock\n"
+        #print "Releasing the socketLock\n"
         self.socketLock.release()
-        print "Released socketLock\n"
+        #print "Released socketLock\n"
 
 def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This sends the measurements to the client in length instead of file size
     try:
@@ -246,23 +246,6 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in send chunk params to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
-
-    #    try:
-     #       print "wait for command confirmed from client\n"
-      #      while True:
-       #         try:
-        #            cmdConfirmed = receiveCommandFromClient(self, clientSocket)
-         #           if((compareString(str(cmdConfirmed)),"commandConfirmed",0,0,len("commandConfirmed"),len("commandConfirmed"))==True):
-          #              #time.sleep(0.5)
-           #             break
-            #    except Exception as inst:
-      #              #don do anything
-       #             fakeVar=True
-       # except Exception as inst:
-        #    print "==============================================================\n"
-       #     print "ERROR waiting for command confirmed from client: "+str(inst)+"\n"
-      #      print "==============================================================\n"
-
         #send the chunk data to the client
         try:
             print "Sending chunk data to the client\n"
@@ -288,15 +271,15 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
         print "ERROR in sendNextCommandToClientByLength: "+str(inst)+"\n"
         print "========================================================================\n"
     finally:
-        print "Releasing the socketLock\n"
+        #print "Releasing the socketLock\n"
         self.socketLock.release()
-        print "Released the socketLock\n"
+        #print "Released the socketLock\n"
 
 def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT modelled after the previous revision of sendNextCommandToCLient!!!
     try: #Main sendNextCommandToClient Try Block
-        print "Acquiring socketLock\n"
+        #print "Acquiring socketLock\n"
         self.socketLock.acquire()
-        print "Acquired socketLock\n"
+        #print "Acquired socketLock\n"
         print "Type of the chunkObject: "+str(type(chunkObject))+"\n"
         chunkParams = str(chunkObject.params)
         chunkData = str(chunkObject.data)
@@ -378,9 +361,9 @@ def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT m
         print "Exception was thrown in Main sendNextCommandToClient Try Block: " +str(inst)+"\n"
         print "========================================================================\n"
     finally:
-        print "Releasing socketLock\n"
+        #print "Releasing socketLock\n"
         self.socketLock.release()
-        print "Released socketLock\n"
+        #print "Released socketLock\n"
 
 #dictionaryOfCurrentClientTasks functions================================================================
 def addClientToDictionaryOfCurrentClientTasks(self, clientAddress, clientChunk): #client Address has both the ip address and port
@@ -533,7 +516,7 @@ class NetworkServer():
                                 print "Identified inboundCommandFromClient as the Next Command\n"
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
-                                    print "There is a chunk that needs to be reassigned.\n"
+                                    print "There is a chunk that needs to be reassigned."
                                     tempChunk = popChunkFromStackOfChunksThatNeedToBeReassigned(self)
                                     #sendNextCommandToClient(self,clientSocket,tempChunk)
                                     sendNextCommandToClientByLength(self, clientSocket, tempChunk)
@@ -545,9 +528,9 @@ class NetworkServer():
                                         #add client to the dictionary
                                         addClientToDictionaryOfCurrentClientTasks(self,clientAddr,tempChunk)
                                 else:
-                                    print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller\n"
+                                    print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller"
                                     sendNextChunkCommandToController(self)
-                                    print "Adding the client to the stackOfClientsWaitingForNextChunk\n"
+                                    print "Adding the client to the stackOfClientsWaitingForNextChunk"
                                     pushClientOnToStackOfClientsWaitingForNextChunk(self,clientSocket, clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
@@ -560,10 +543,11 @@ class NetworkServer():
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the found solution command\n"
                                     for key in self.dictionaryOfCurrentClientTasks.keys():
-                                        sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
+                                        sendDoneCommandToClient(self,clientSocket, key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
                                     self.stopAllThreads = True
                                     print "A client has found the solution!!!!!\n"
+                                    break
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
@@ -745,7 +729,7 @@ class NetworkServer():
                                             #add it if there is not key for that client yet
                                             addClientToDictionaryOfCurrentClientTasks(self,tempClientAddress, outboundChunk)
                                     else: #if there is no client waiting for the  next chunk
-                                        print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned\n"
+                                        print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned"
                                         pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
                             except Exception as inst:
                                 print "===================================================================\n"
@@ -784,10 +768,21 @@ class NetworkServer():
             print "===================================================================\n"
 #temp
         finally:
+            print "Setting stop variable to stop all threads"
+            self.stopAllThreads = True
             print "Sending done command to all clients, server is finished\n"
             for key in self.dictionaryOfCurrentClientTasks.keys():
-                sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
-                print "Sent done command to: " + str(key)+"\n"
+                #sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
+                try:
+                    serverSocket.sendto("done", key)
+                    print "Sent done command to: " + str(key)+"\n"
+                except Exception as inst:
+                    if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                        print "Timed out while sending 'done' command to "+ str(key)+"\n"
+                    else:
+                        print "===========================================================\n"
+                        print "MAIN THREAD ERROR in finally block send done command to clients: " +str(inst)+"\n"
+                        print "============================================================\n"
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
