@@ -577,7 +577,13 @@ class NetworkServer():
                                     for key in self.dictionaryOfCurrentClientTasks.keys():
                                         sendDoneCommandToClient(self,clientSocket, key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
+                                    print "Acquiring stopAllThreads Lock\n"
+                                    self.stopAllThreadsLock.acquire()
+                                    print "Acquired stopAllThreads Lock\n"
                                     self.stopAllThreads = True
+                                    print "Releasing stopAllThreads Lock\n"
+                                    self.stopAllThreadsLock.release()
+                                    print "Released stopAllThreads Lock\n"
                                     print "A client has found the solution!!!!!\n"
                                     break
                         except Exception as inst:
@@ -624,6 +630,7 @@ class NetworkServer():
     #START OF INITIAL SERVER SETUP
     def __init__(self, inboundpipeconnection):
         self.pipe = inboundpipeconnection #pipe that connects to the controller
+        self.stopAllThreadsLock = thread.allocate_lock()
 
         #CREATE THE SOCKET
         import socket
@@ -814,14 +821,20 @@ class NetworkServer():
 #temp
         finally:
             print "Setting stop variable to stop all threads"
+            print "Acquiring stopAllThreads Lock\n"
+            self.stopAllThreadsLock.acquire()
+            print "Acquired stopAllThreads Lock\n"
             self.stopAllThreads = True
+            print "Releasing stopAllThreads Lock\n"
+            self.stopAllThreadsLock.release()
+            print "Released stopAllThreads Lock\n"
             print "Sending done command to all clients, server is finished\n"
             serverSocket.settimeout(0.25)
             for key in self.dictionaryOfCurrentClientTasks.keys():
                 #sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
                 try:
                     self.socketLock.acquire()
-                    serverSocket.sendto("done", key)
+                    serverSocket.sendall("done")
                     self.socketLock.release()
                     print "Sent done command to: " + str(key)+"\n"
                 except Exception as inst:

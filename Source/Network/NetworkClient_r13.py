@@ -632,15 +632,7 @@ class NetworkClient():
                                 lengthOfChunkData = extractSizeOfDataFromNextCommand(self, inboundCommandFromServer)
                                 #tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
                                 tempChunkParams = receivePieceOfChunkFromServerByLength(self, lengthOfChunkParams, clientSocket)
-                                #send command confirmed to the server
-                               # try:
-                                #    clientSocket.send("commandConfirmed")
-                                 #   print "commandConfirmed sent to the server\n"
-                            #    except Exception as inst:
-                             #       print "=================================================\n"
-                              #      print "ERROR in send commandconfirmed to server: "+str(inst)+"\n"
-                               #     print "==================================================\n"
-                                #tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
+
                                 tempChunkData = receivePieceOfChunkFromServerByLength(self, lengthOfChunkData, clientSocket)
                                 outboundChunk = Chunk.Chunk()
                                 outboundChunk.params = str(tempChunkParams)
@@ -676,9 +668,9 @@ class NetworkClient():
                             sendFoundSolutionCommandToServer(self,clientSocket)
                             self.solutionWasFound= True
                             self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
-                            #print "Listening for the solution from the Controller...\n"
-                            #theSolution= receiveSolutionFromController(self, clientSocket)
-                            #print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
+                            print "Listening for the solution from the Controller...\n"
+                            theSolution= receiveSolutionFromController(self, clientSocket)
+                            print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
