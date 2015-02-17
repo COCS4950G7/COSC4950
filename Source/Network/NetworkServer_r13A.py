@@ -6,7 +6,8 @@ __author__ = 'chris hamm'
 
 #BUG WITH CONTROLLER OUTPUT WHEN MULTIPLE CLIENTS ARE CONNECTED (SEE BOTTOM OF PAGE)
 
-#Changes/Additions made to this revision
+#Changes/Additions made to this revision:
+    #Added a IO command stack that contains all IO commands tthe have been sent/received
 
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
@@ -28,6 +29,23 @@ def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
                 print "Exception thrown in compareString Function: " +str(inst)+"\n"
                 print "========================================================================\n"
                 return False
+#Stack of IO Commands=======================================================
+def pushCommandOntoTheStackOfIOCommands(self, commandName, commandOrigin_Destination, commandDirection):
+    try:
+        import time
+        current_time= time.time()
+        print "Acquiring the stackOfIOCommands Lock"
+        self.stackOfIOCommandsLock.acquire()
+        print "Acquired the stackOfIOCommands Lock"
+        self.stackOfIOCommands.append((commandName, commandOrigin_Destination, commandDirection, current_time ))#tuple contains name, origin/destination, direction, time
+    except Exception as inst:
+        print "======================================================\n"
+        print "Exception was thrown in pushCommandOntoTheStackOfIOCommands: "+str(inst)+"\n"
+        print "=======================================================\n"
+    finally:
+        print "Releasing the stackOfIOCommands Lock"
+        self.stackOfIOCommandsLock.release()
+        print "Released the stackOfIOCommands Lock"
 
 #Inbound commands from controller==========================================
 def checkForDoneCommandFromController(self, inboundString):
@@ -35,6 +53,7 @@ def checkForDoneCommandFromController(self, inboundString):
         print "Checking for done Command from the Controller\n"
         if(compareString(str(inboundString),"done",0,0,len("done"),len("done"))==True):
             print "done Command was received from the Controller\n"
+            pushCommandOntoTheStackOfIOCommands(self, "done", "Controller","Inbound" )
             return True
         else:
             return False
@@ -49,6 +68,7 @@ def checkForNextChunkCommandFromController(self, inboundString):
         print "Checking for nextChunk Command from the Controller\n"
         if(compareString(str(inboundString),"nextChunk",0,0,len("nextChunk"),len("nextChunk"))==True):
             print "nextChunk Command was received from the Controller\n"
+            pushCommandOntoTheStackOfIOCommands(self, "nextChunk", "Controller", "Inbound")
             return True
         else:
             return False
@@ -63,6 +83,7 @@ def receiveNextChunkFromController(self):
         print "Receiving Chunk From the Pipe\n"
         inboundChunk= self.pipe.recv()
         print "Received the Chunk from the pipe\n"
+        pushCommandOntoTheStackOfIOCommands(self, "nextChunk", "Controller", "Inbound")
         return inboundChunk
     except Exception as inst:
         print "========================================================================\n"
@@ -76,6 +97,7 @@ def sendNextChunkCommandToController(self):
         print "Sending nextChunk Command to the Controller\n"
         self.pipe.send("nextChunk")
         print "Sent the nextChunk Command to the Controller\n"
+        pushCommandOntoTheStackOfIOCommands(self, "nextChunk", "Controller", "Outbound")
     except Exception as inst:
         print "========================================================================\n"
         print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
@@ -87,6 +109,7 @@ def sendDoneCommandToController(self):
         print "Sending done Command to the Controller\n"
         self.pipe.send("done")
         print "Sent the done Command to the Controller\n"
+        pushCommandOntoTheStackOfIOCommands(self, "done", "Controller", "Outbound")
     except Exception as inst:
         print "========================================================================\n"
         print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
@@ -98,6 +121,7 @@ def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT mode
         print "Checking for the Crashed Command from the Client\n"
         if(compareString(str(inboundData),"CRASHED",0,0,len("CRASHED"),len("CRASHED"))==True):
             print "Crash Command was received from the Client\n"
+            pushCommandOntoTheStackOfIOCommands(self, "CRASHED", "Client", "Inbound")
             return True
         else:
             return False
@@ -112,6 +136,7 @@ def checkForFoundSolutionCommandFromClient(self,inboundData):
         print "Checking for the Found Solution Command from the client\n"
         if(compareString(str(inboundData),"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))):
             print "FOUNDSOLUTION Command was received from the client\n"
+            pushCommandOntoTheStackOfIOCommands(self, "FOUNDSOLUTION", "Client", "Inbound")
             return True
         else:
             return False
@@ -126,6 +151,7 @@ def checkForNextCommandFromClient(self,inboundData):
         print "Checking for the Next command from the client\n"
         if(compareString(str(inboundData),"NEXT",0,0,len("NEXT"),len("NEXT"))):
             print "NEXT command was received from the client\n"
+            pushCommandOntoTheStackOfIOCommands(self, "NEXT", "Client", "Inbound")
             return True
         else:
             return False
@@ -180,6 +206,7 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
         print "preparing to send done command to client\n"
         networkSocket.send("done")
         print "sent Done command to client: " +str(clientIP) +"\n"
+        pushCommandOntoTheStackOfIOCommands(self, "done", "Client", "Outbound")
     except Exception as inst:
         if(compareString(str(inst),"[Errno 32] Broken pipe",0,0,len("[Errno 32] Broken pipe"),len("[Errno 32] Broken pipe"))):
             print "========================================================================\n"
@@ -227,6 +254,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
                 try:
                     clientSocket.send(str(chunkObject.params))
                     print "Sent chunk params to the client\n"
+                    pushCommandOntoTheStackOfIOCommands(self, "next: chunk.params", "Client", "Outbound")
                     break
                 except Exception as inst:
                     if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
@@ -247,6 +275,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
                     clientSocket.send(str(chunkObject.data))
 
                     print "Sent chunk data to the client\n"
+                    pushCommandOntoTheStackOfIOCommands(self, "next: chunk.data", "Client", "Outbound")
                     break
                 except Exception as inst:
                     if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
@@ -475,6 +504,7 @@ class NetworkServer():
     myIPAddress = '127.0.0.1' #default to ping back address
     stopAllThreads = False #set to true to have all threads break out of their while loops
     listOfCrashedClients = []
+    stackOfIOCommands = [] #holds a record all the IO commands that have been sent through server
     stackOfChunksThatNeedToBeReassigned = []
     stackOfClientsWaitingForNextChunk = []
     dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
@@ -586,6 +616,7 @@ class NetworkServer():
         #CLASS VARS
         self.pipe = inboundpipeconnection #pipe that connects to the controller
         self.stopAllThreadsLock = thread.allocate_lock()
+        self.stackOfIOCommandsLock = thread.allocate_lock()
 
         #CREATE THE SOCKET
         import socket
@@ -788,6 +819,14 @@ class NetworkServer():
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
+            print "-----------------------Stack of IO Commands---------------------------------\n"
+            for index in range(0,len(self.stackOfIOCommands)):
+                tempCommandName, tempOrigin_Destination, tempCommandDirection, tempTime = self.stackOfIOCommands.pop(0)
+                if(compareString(tempCommandDirection, "Inbound",0,0,len("Inbound"),len("Inbound"))==True):
+                    print str(tempCommandDirection)+" command: "+str(tempCommandName)+" was received from: "+str(tempOrigin_Destination)+" at: "+str(tempTime)
+                else: #if outbound
+                    print str(tempCommandDirection)+" command: "+str(tempCommandName)+" was sent to: "+str(tempOrigin_Destination)+" at: "+str(tempTime)
+            print "-----------------------End of Stack of IO Commands------------------------\n"
             sendDoneCommandToController(self)
             print "MAIN THREAD: Informed the Controller that Server has finished\n"
 
