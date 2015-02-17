@@ -166,7 +166,7 @@ try: #Master try block
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-            
+
         #prompt user for the servers IP address
         serverIPAddress= str(raw_input('What is the host (server) IP Address?'))
         try:
