@@ -109,6 +109,42 @@ def checkForFoundSolutionCommandFromController(self, inboundString):
         print "===================================================================\n"
         return False
 
+def receiveSolutionFromController(self, networkSocket):
+    networkSocket.settimeout(0.5)
+    while True:
+        try:
+            receivedSolution= ""
+            controllerInput= networkSocket.recv(4096)
+            if(len(controllerInput) > 0):
+                receivedSolution= controllerInput
+                #NOTE: This will cut off the string if the solution is too long
+                import sys
+                if(sys.getsizeof(receivedSolution) >= 4000):
+                    print "----------------------------------------------------------------------------------------\n"
+                    print "WARNING: size of solution is getting/or is too large. Max fileSize of solution is 4096.\n Your solution fileSize is: "+str(sys.getsizeof(receivedSolution))+"\n"
+                    print "----------------------------------------------------------------------------------------\n"
+                return receivedSolution
+                break
+            else:
+                print "Waiting for Controller to send the solution\n"
+        except Exception as inst:
+            if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
+                import sys
+                if(sys.getsizeof(receivedSolution) > 0):
+                    return receivedSolution
+                    break
+                else:
+                    fakeVar=True
+                    print "The socket has timed out\n"
+                    import sys
+                    print "size of receivedSolution: "+str(sys.getsizeof(receivedSolution))+"\n"
+            else:
+                print "===================================================================\n"
+                print "ERROR in receiveSolutionFromController: "+str(inst)+"\n"
+                print "===================================================================\n"
+                return ""
+                break
+
 def checkForRequestNextChunkCommandFromController(self, inboundString):
     try:
         print "Checking for requestNextChunk Command from the Controller\n"
@@ -303,24 +339,25 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         receivedPieceOfChunk = ""
         print "Receiving Piece of CHunk From The Server By Length\n"
         print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
-        networkSocket.settimeout(2.0)
+        networkSocket.settimeout(0.25)
         import sys
-        while(len(receivedPieceOfChunk) < lengthOfChunkComponent):
+        while(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             try:
-                receivedPieceOfChunk+= str(networkSocket.recv(4096))
-                if(len(receivedPieceOfChunk) >= lengthOfChunkComponent):
+                receivedPieceOfChunk+= str(networkSocket.recv(512))
+                if(len(receivedPieceOfChunk) >= int(lengthOfChunkComponent)):
                     break
-                elif not receivedPieceOfChunk:
-                    print "No more data is being received. breaking out of loop\n"
-                    break
+               # elif not receivedPieceOfChunk:
+                #    print "No more data is being received. breaking out of loop\n"
+                 #   break
                 else:
-                    fakeVar=True
+                    print "Received "+str(len(receivedPieceOfChunk))+" characters so far\n"
             except Exception as inst:
                 if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                     #dont throw error, just keep on receiving
                     if(len(receivedPieceOfChunk) < 1):
                         fakeVar=True
                         #keep looping
+                        print "Error: receivedString in the empty string\n"
                     else:
                         #print "socket timed out\n"
                         #fakeVar=True
@@ -441,6 +478,7 @@ class NetworkClient():
         self.myIPAddress = "127.0.0.1" #defualt to the ping back address
         self.serverIPAddress = "127.0.0.1" #default to the ping back address
         self.serverIssuedDoneCommand = False
+        self.solutionWasFound = False
 
         #.........................................................................
         #Detect the Operating System
@@ -593,13 +631,13 @@ class NetworkClient():
                                 #tempChunkParams = receivePieceOfChunkFromServer(self,fileSizeOfChunkParams, clientSocket)
                                 tempChunkParams = receivePieceOfChunkFromServerByLength(self, lengthOfChunkParams, clientSocket)
                                 #send command confirmed to the server
-                                try:
-                                    clientSocket.send("commandConfirmed")
-                                    print "commandConfirmed sent to the server\n"
-                                except Exception as inst:
-                                    print "=================================================\n"
-                                    print "ERROR in send commandconfirmed to server: "+str(inst)+"\n"
-                                    print "==================================================\n"
+                               # try:
+                                #    clientSocket.send("commandConfirmed")
+                                 #   print "commandConfirmed sent to the server\n"
+                            #    except Exception as inst:
+                             #       print "=================================================\n"
+                              #      print "ERROR in send commandconfirmed to server: "+str(inst)+"\n"
+                               #     print "==================================================\n"
                                 #tempChunkData = receivePieceOfChunkFromServer(self,fileSizeOfChunkData, clientSocket)
                                 tempChunkData = receivePieceOfChunkFromServerByLength(self, lengthOfChunkData, clientSocket)
                                 outboundChunk = Chunk.Chunk()
@@ -634,6 +672,11 @@ class NetworkClient():
                             identifiedCommand = True
                             print "Identified Command as Found Solution Command from the controller\n"
                             sendFoundSolutionCommandToServer(self,clientSocket)
+                            self.solutionWasFound= True
+                            self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
+                            #print "Listening for the solution from the Controller...\n"
+                            #theSolution= receiveSolutionFromController(self, clientSocket)
+                            #print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
@@ -672,8 +715,11 @@ class NetworkClient():
                         print "Error in check for done command from the controller: "+str(inst)+"\n"
                         print "===================================================================\n"
 
-                    if(identifiedCommand == False):
+                    if((identifiedCommand == False) and (self.solutionWasFound == False)):
                         print "Warning: Received Unknown Command From The Controller: "+str(receivedCommandFromController)+"\n"
+                    elif((identifiedCommand == False) and (self.solutionWasFound == True)):
+                        print "The Solution is '" + str(receivedCommandFromController)+"'\n"
+                        break
             #end of primary client while loop
         except Exception as inst:
             print "===================================================================\n"
