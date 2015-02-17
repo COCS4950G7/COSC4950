@@ -603,6 +603,10 @@ class NetworkServer():
     def __init__(self, inboundpipeconnection):
         self.pipe = inboundpipeconnection #pipe that connects to the controller
 
+        #CREATE THE SOCKET
+        import socket
+        serverSocket = socket.socket(AF_INET, SOCK_STREAM)
+
         #detect the OS
         try: #getOS try block
             print "*************************************"
@@ -630,7 +634,7 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-        '''
+
         #get the IP address
         try: #getIP tryblock
             print "STATUS: Getting your network IP adddress"
@@ -675,11 +679,9 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-        '''
 
-        #CREATE THE SOCKET
-        import socket
-        serverSocket = socket.socket(AF_INET, SOCK_STREAM)
+
+
 
         try: #try to bind the socket
             serverSocket.bind((self.host, self.port))

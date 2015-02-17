@@ -311,29 +311,18 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                 if(len(receivedPieceOfChunk) >= lengthOfChunkComponent):
                     break
                 elif not receivedPieceOfChunk:
+                    print "No more data is being received. breaking out of loop\n"
                     break
                 else:
-                    print "Length of receivedPieceOfChunk:"+str(len(receivedPieceOfChunk))+"\n"
-                    if(len(receivedPieceOfChunk) < lengthOfChunkComponent):
-                        #not finished yet
-                        fakeVar=True
-                        #if(networkSocket.gettimeout() >= 5.0):
-                         #   print "Timeout at limit of 5 seconds, no extension will be given\n"
-                        #else:
-                         #   print "Extending the socket timeout\n"
-                          #  networkSocket.settimeout(networkSocket.gettimeout()+0.125)
-                          #  print "Socket timeout now set to: " +str(networkSocket.gettimeout())+"\n"
-                    else:
-                        break
+                    fakeVar=True
             except Exception as inst:
                 if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                     #dont throw error, just keep on receiving
                     if(len(receivedPieceOfChunk) < 1):
                         fakeVar=True
                         #keep looping
-                        break
                     else:
-                        print "socket timed out\n"
+                        #print "socket timed out\n"
                         #fakeVar=True
                         break
                 else:
