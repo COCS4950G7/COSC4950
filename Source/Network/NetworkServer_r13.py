@@ -50,7 +50,6 @@ def checkForDoneCommandFromController(self, inboundString):
         print "========================================================================\n"
         print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
         return False
 
 def checkForNextChunkCommandFromController(self, inboundString):
@@ -65,7 +64,6 @@ def checkForNextChunkCommandFromController(self, inboundString):
         print "========================================================================\n"
         print "Exception thrown in checkForNextChunkCommandFromController: " +str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
         return False
 
 def receiveNextChunkFromController(self):
@@ -78,7 +76,6 @@ def receiveNextChunkFromController(self):
         print "========================================================================\n"
         print "ERROR in receiveNextChunkFromController: "+str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
         return ""
 
 #Outbound commands to controller======================================
@@ -91,7 +88,7 @@ def sendNextChunkCommandToController(self):
         print "========================================================================\n"
         print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
+
 
 def sendDoneCommandToController(self):
     try:
@@ -214,9 +211,9 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
 
 def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This sends the measurements to the client in length instead of file size
     try:
-        print "Acquiring the socketLock\n"
+        #print "Acquiring the socketLock\n"
         self.socketLock.acquire()
-        print "Acquired the socketLock\n"
+        #print "Acquired the socketLock\n"
         chunkParamLength = len(str(chunkObject.params))
         chunkDataLength = len(str(chunkObject.data))
         #Create the command string
@@ -531,7 +528,7 @@ class NetworkServer():
             inboundCommandFromClient = "" #initialize the receiving variable
             while True:
                 if(self.stopAllThreads == True):
-                    print "Stopping the thread\n"
+                    print "MAIN THREAD: Stopping the thread\n"
                     break
                 try: #check for commands from client
                     inboundCommandFromClient = receiveCommandFromClient(self,clientSocket)
@@ -550,7 +547,7 @@ class NetworkServer():
                                 print "Identified inboundCommandFromClient as the Next Command\n"
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
-                                    print "There is a chunk that needs to be reassigned."
+                                    #print "There is a chunk that needs to be reassigned."
                                     tempChunk = popChunkFromStackOfChunksThatNeedToBeReassigned(self)
                                     #sendNextCommandToClient(self,clientSocket,tempChunk)
                                     sendNextCommandToClientByLength(self, clientSocket, tempChunk)
@@ -562,9 +559,9 @@ class NetworkServer():
                                         #add client to the dictionary
                                         addClientToDictionaryOfCurrentClientTasks(self,clientAddr,tempChunk)
                                 else:
-                                    print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller"
+                                    #print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller"
                                     sendNextChunkCommandToController(self)
-                                    print "Adding the client to the stackOfClientsWaitingForNextChunk"
+                                    #print "Adding the client to the stackOfClientsWaitingForNextChunk"
                                     pushClientOnToStackOfClientsWaitingForNextChunk(self,clientSocket, clientAddr)
                         except Exception as inst:
                             print "===================================================================\n"
@@ -621,6 +618,7 @@ class NetworkServer():
         finally:
             clientSocket.close()
             print "clientSocket has been closed\n"
+            print "this thread has closed.\n"
     #end of clientthreadhandler
 
     #START OF INITIAL SERVER SETUP
@@ -838,7 +836,7 @@ class NetworkServer():
             print "MAIN THREAD: The serverSocket has been closed\n"
             sendDoneCommandToController(self)
             print "MAIN THREAD: Informed the Controller that Server has finished\n"
-            print "-------------------List of Server Errors--------------------------\n"
+            #print "-------------------List of Server Errors--------------------------\n"
             #for index in range(0,len(self.listOfServerErrors)):
             #    print str(index) + " "+str(self.listOfServerErrors[index])+"\n"
 

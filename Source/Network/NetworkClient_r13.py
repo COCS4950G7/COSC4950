@@ -741,4 +741,5 @@ class NetworkClient():
             print "Client Socket has been closed\n"
             sendDoneCommandToController(self)
             print "Informed Controller that Client is finished\n"
+            print "Value of self.solutionWasFound: "+str(self.solutionWasFound)+"\n"
 
