@@ -480,7 +480,6 @@ def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAd
         print "========================================================================\n"
         print "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
 
 def popClientFromStackOfClientsWaitingForNextChunk(self):
     try:
@@ -493,7 +492,6 @@ def popClientFromStackOfClientsWaitingForNextChunk(self):
         print "========================================================================\n"
         print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
         print "========================================================================\n"
-        #self.listOfServerErrors.append(str(inst))
         return "" #changed from none
 
 
@@ -536,7 +534,6 @@ class NetworkServer():
                     print "===================================================================\n"
                     print "Error in check for commands from the client in client thread handler: " +str(inst)+"\n"
                     print "===================================================================\n"
-                    #self.listOfServerErrors.append(str(inst))
 
                 try: #Analyzing received command from the client try block
                     if(len(inboundCommandFromClient) > 0): #ignore if the empty string
@@ -567,7 +564,6 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
                             print "===================================================================\n"
-                            #self.listOfServerErrors.append(str(inst))
 
                         try: #check to see if the found solution command was received from the client
                             if(identifiedCommand == False):
@@ -590,7 +586,6 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
                             print "===================================================================\n"
-                            #self.listOfServerErrors.append(str(inst))
 
                         try: #check to see if the crashed command was received
                             if(identifiedCommand == False):
@@ -605,7 +600,6 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
                             print "===================================================================\n"
-                            #self.listOfServerErrors.append(str(inst))
 
                         if(identifiedCommand == False):
                             print "Warning: Unknown Command Received from the client: "+str(inboundCommandFromClient)+"\n"
@@ -613,13 +607,11 @@ class NetworkServer():
                     print "===================================================================\n"
                     print "Error in Analyzing received command from the client try block in the client thread handler: " +str(inst)+"\n"
                     print "===================================================================\n"
-                    #self.listOfServerErrors.append(str(inst))
 
         except Exception as inst:
             print "===================================================================\n"
             print "Error in Client Thread Handler: " + str(inst) +"\n"
             print "===================================================================\n"
-            #self.listOfServerErrors.append(str(inst))
 
         finally:
             clientSocket.close()
@@ -709,7 +701,6 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
-            #self.listOfServerErrors.append(str(inst))
 
 
 
@@ -721,7 +712,6 @@ class NetworkServer():
             print "Critical Error: Failed to bind the socket: "+str(inst)+"\n"
             print "Suggestion: Close this application, then reopen this application and try again\n"
             print "===================================================================\n"
-            #self.listOfServerErrors.append(str(inst))
 
         #START LISTENING TO SOCKET
         serverSocket.listen(5)
@@ -748,7 +738,6 @@ class NetworkServer():
                         print "===================================================================\n"
                         print "MAIN THREAD: Error in check for client trying to connect try block: " +str(inst)+"\n"
                         print "===================================================================\n"
-                        #self.listOfServerErrors.append(str(inst))
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
@@ -783,7 +772,6 @@ class NetworkServer():
                                 print "===================================================================\n"
                                 print "MAIN THREAD: Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
                                 print "===================================================================\n"
-                                #self.listOfServerErrors.append(str(inst))
 
                             try: #checking for done command form controller
                                 if(identifiedCommand == False):
@@ -795,7 +783,6 @@ class NetworkServer():
                                 print "===================================================================\n"
                                 print "MAIN THREAD: Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
                                 print "===================================================================\n"
-                                #self.listOfServerErrors.append(str(inst))
 
                             if(identifiedCommand == False):
                                 print "MAIN THREAD: Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
@@ -811,14 +798,11 @@ class NetworkServer():
                         print "===================================================================\n"
                         print "MAIN THREAD: Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
                         print "===================================================================\n"
-                        #self.listOfServerErrors.append(str(inst))
 
         except Exception as inst:
             print "===================================================================\n"
             print "MAIN THREAD: Error in Main Thread Server Loop: " +str(inst)+"\n"
             print "===================================================================\n"
-            #self.listOfServerErrors.append(str(inst))
-#temp
         finally:
             print "Setting stop variable to stop all threads"
             print "Acquiring stopAllThreads Lock\n"
@@ -844,18 +828,14 @@ class NetworkServer():
                         print "===========================================================\n"
                         print "MAIN THREAD ERROR in finally block send done command to clients: " +str(inst)+"\n"
                         print "============================================================\n"
-                        #self.listOfServerErrors.append(str(inst))
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
             sendDoneCommandToController(self)
             print "MAIN THREAD: Informed the Controller that Server has finished\n"
-            #print "-------------------List of Server Errors--------------------------\n"
-            #for index in range(0,len(self.listOfServerErrors)):
-            #    print str(index) + " "+str(self.listOfServerErrors[index])+"\n"
 
-        #NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
+        #BUG NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
 
-        #FUNCTIONS==========================================================================
+
 
 
