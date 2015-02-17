@@ -343,14 +343,16 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         import sys
         while(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             try:
-                receivedPieceOfChunk+= str(networkSocket.recv(512))
+                #receivedPieceOfChunk+= str(networkSocket.recv(512))#this works very well, but misses the last entry
+                receivedPieceOfChunk+= str(networkSocket.recv(256))
                 if(len(receivedPieceOfChunk) >= int(lengthOfChunkComponent)):
                     break
                # elif not receivedPieceOfChunk:
                 #    print "No more data is being received. breaking out of loop\n"
                  #   break
                 else:
-                    print "Received "+str(len(receivedPieceOfChunk))+" characters so far\n"
+                    #print "Received "+str(len(receivedPieceOfChunk))+" characters so far\n"
+                    fakeVar=True
             except Exception as inst:
                 if(compareString(str(inst),"timed out",0,0,len("timed out"),len("timed out"))==True):
                     #dont throw error, just keep on receiving
