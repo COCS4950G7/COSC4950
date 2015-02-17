@@ -595,6 +595,7 @@ class NetworkServer():
 
                         if(identifiedCommand == False):
                             print "Warning: Unknown Command Received from the client: "+str(inboundCommandFromClient)+"\n"
+                            pushCommandOntoTheStackOfIOCommands(self, "UNKNOWN: "+str(inboundCommandFromClient), "Client", "Inbound")
                 except Exception as inst:
                     print "===================================================================\n"
                     print "Error in Analyzing received command from the client try block in the client thread handler: " +str(inst)+"\n"
@@ -775,6 +776,7 @@ class NetworkServer():
 
                             if(identifiedCommand == False):
                                 print "MAIN THREAD: Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
+                                pushCommandOntoTheStackOfIOCommands(self, "UNKNOWN: "+str(receivedControllerCommand), "Controller", "Inbound")
                     else: #if there is nothing on the pipe
                         #Do not display the message
                         fakeVar=True

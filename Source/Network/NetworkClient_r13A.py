@@ -725,6 +725,7 @@ class NetworkClient():
 
                     if((identifiedCommand == False) and (self.solutionWasFound == False)):
                         print "Warning: Received Unknown Command From The Controller: "+str(receivedCommandFromController)+"\n"
+                        addCommandToListOfIOCommands(self, "UNKNOWN: "+str(receivedCommandFromController), "Controller", "Inbound")
                     elif((identifiedCommand == False) and (self.solutionWasFound == True)):
                         print "The Solution is '" + str(receivedCommandFromController)+"'\n"
                         break
