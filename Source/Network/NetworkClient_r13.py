@@ -343,8 +343,8 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         import sys
         while(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             try:
-                #receivedPieceOfChunk+= str(networkSocket.recv(512))#this works very well, but misses the last entry
-                receivedPieceOfChunk+= str(networkSocket.recv(256))
+                receivedPieceOfChunk+= str(networkSocket.recv(512))#this works very well, but misses the last entry
+                #receivedPieceOfChunk+= str(networkSocket.recv(256))
                 if(len(receivedPieceOfChunk) >= int(lengthOfChunkComponent)):
                     break
                # elif not receivedPieceOfChunk:
