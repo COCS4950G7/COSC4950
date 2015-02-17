@@ -5,6 +5,7 @@ __author__ = 'chris hamm'
 #Designed to run with NetworkClient_r13A
 
 #REVISION NOTES:
+    #Added a listOfIOCommands that records all IO commands received and sent to/from the controller and to/from the server
 
 def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
     try:
@@ -26,6 +27,18 @@ def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
             return "" #the empty string
 
 #FUNCTIONS=========================================================================================
+#List of Inbound Command Functions-------------------------------------------------------
+def addCommandToListOfIOCommands(self, inboundCommandName, commandOrigin_Destination, directionOfCommand):  #command origin is who sent the command
+    try:            #direction of command is inbound or outboound
+        import time
+        current_time= time.time()
+        self.listOfIOCommands.append((inboundCommandName, commandOrigin_Destination, directionOfCommand, current_time)) #holds a tuple of command, origin of command, and time
+    except Exception as inst:
+        print "========================================================\n"
+        print "Exception was thrown in addCommandToListOfIOCommands: "+str(inst)+"\n"
+        print "========================================================\n"
+
+
 #CompareString function-----------------------------------------
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
     try:
@@ -55,6 +68,7 @@ def receiveServerIPFromController(self):
         print "Receiving the server IP from the Controller\n"
         tempServerIP= self.pipe.recv()
         print "Received the server IP from the controller\n"
+        addCommandToListOfIOCommands(self,"receiveServerIP", "Controller", "Inbound")
         return tempServerIP
     except Exception as inst:
         print "===================================================================\n"
@@ -67,6 +81,7 @@ def checkForDoneCommandFromController(self, inboundString):
         print "Checking for done command from the Controller\n"
         if(compareString(inboundString, "done",0,0,len("done"), len("done"))==True):
             print "Received the done command from the controller\n"
+            addCommandToListOfIOCommands(self,"done", "Controller", "Inbound")
             return True
         else:
             return False
@@ -81,6 +96,7 @@ def checkForDoingStuffCommandFromController(self, inboundString):
         print "Checking for doingStuff Command from the Controller\n"
         if(compareString(inboundString,"doingStuff",0,0,len("doingStuff"),len("doingStuff"))==True):
             print "Received doingSTuff COmmand from the COntroller\n"
+            addCommandToListOfIOCommands(self, "doingStuff", "Controller", "Inbound")
             return True
         else:
             return False
@@ -95,6 +111,7 @@ def checkForFoundSolutionCommandFromController(self, inboundString):
         print "Checking for foundSolution Command from the Controller\n"
         if(compareString(inboundString,"foundSolution",0,0,len("foundSolution"),len("foundSolution"))==True):
             print "Received foundSolution command from the controller\n"
+            addCommandToListOfIOCommands(self, "foundSolution", "Controller", "Inbound")
             return True
         else:
             return False
@@ -112,6 +129,7 @@ def receiveSolutionFromController(self, networkSocket):
             controllerInput= networkSocket.recv(4096)
             if(len(controllerInput) > 0):
                 receivedSolution= controllerInput
+                addCommandToListOfIOCommands(self, "receiveSolution", "Controller", "Inbound")
                 #NOTE: This will cut off the string if the solution is too long
                 import sys
                 if(sys.getsizeof(receivedSolution) >= 4000):
@@ -145,6 +163,7 @@ def checkForRequestNextChunkCommandFromController(self, inboundString):
         print "Checking for requestNextChunk Command from the Controller\n"
         if(compareString(inboundString,"requestNextChunk",0,0,len("requestNextChunk"),len("requestNextChunk"))==True):
             print "Received requestNextChunk Command from the controller\n"
+            addCommandToListOfIOCommands(self, "requestNextChunk", "Controller", "Inbound")
             return True
         else:
             return False
@@ -160,6 +179,7 @@ def sendNextChunkCommandToController(self, inboundChunk):
         print "Sending nextChunk Command to the Controller\n"
         self.pipe.send(inboundChunk)
         print "Sent nextChunk Command to the controller\n"
+        addCommandToListOfIOCommands(self, "nextChunk", "Controller", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in sendNextChunkCommandToController: " + str(inst)+"\n"
@@ -170,6 +190,7 @@ def sendDoneCommandToController(self):
         print "Sending done Command to the Controller\n"
         self.pipe.send("done")
         print "Sent done Command to the controller\n"
+        addCommandToListOfIOCommands(self, "done", "Controller", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in sendDoneCommandToController: " + str(inst)+"\n"
@@ -180,6 +201,7 @@ def sendConnectedCommandToController(self):
         print "Sending connected Command to the Controller\n"
         self.pipe.send("connected")
         print "Sent connected command to the controller\n"
+        addCommandToListOfIOCommands(self, "connected", "Controller", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in sendConnectedCommandToController: " + str(inst)+"\n"
@@ -190,6 +212,7 @@ def sendDoingStuffCommandToController(self):
         print "Sending doingStuff Command to the Controller\n"
         self.pipe.send("doingStuff")
         print "Sent doingSTuff Command to the Controller\n"
+        addCommandToListOfIOCommands(self, "doingStuff", "Controller", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
@@ -201,6 +224,7 @@ def checkForDoneCommandFromServer(self,inboundString):
         print "Checking for done command from server\n"
         if(compareString(inboundString,"done",0,0,len("done"),len("done"))==True):
             print "Done command was received from the server\n"
+            addCommandToListOfIOCommands(self, "done", "Server", "Inbound")
             self.serverIssuedDoneCommand = True
             return True
         else:
@@ -216,6 +240,7 @@ def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than pr
         print "Checking for nextCommand from server\n"
         if(compareString(inboundString,"NEXT",0,0,len("NEXT"),len("NEXT"))==True):
             print "Next Command was received from the server\n"
+            addCommandToListOfIOCommands(self, "NEXT", "Server", "Inbound")
             return True
         else:
             return False
@@ -358,6 +383,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
                 else:
                     raise Exception ("Error in receivePieceOfChunkFromServerByLength infinite while loop")
                     break
+        addCommandToListOfIOCommands(self, "receivePieceOfChunk", "Server", "Inbound")
         if(len(receivedPieceOfChunk) < 1):
             raise Exception ("receivedPieceOfChunk is the empty string!")
         elif(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
@@ -429,6 +455,7 @@ def sendNextChunkCommandToServer(self, networkSocket):
         print "Sending nextChunk Command to Server\n"
         networkSocket.send("NEXT " + str(self.myIPAddress))
         print "Sent the nextChunk Command to the server\n"
+        addCommandToListOfIOCommands(self, "nextChunk", "Server", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "Exception thrown in sendNextChunkCommandToServer: " + str(inst)+"\n"
@@ -439,6 +466,7 @@ def sendFoundSolutionCommandToServer(self, networkSocket):
         print "Sending foundSolution Command to Server\n"
         networkSocket.send("FOUNDSOLUTION")
         print "Sent FoundSOlution Command to the server\n"
+        addCommandToListOfIOCommands(self, "FOUNDSOLUTION", "Server", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "Exception thrown in sendFoundSolutionCommandToServer: "+ str(inst)+"\n"
@@ -449,6 +477,7 @@ def sendCrashedCommandToServer(self, networkSocket):
         print "Sending Crashed Command to Server\n"
         networkSocket.send("CRASHED " + self.myIPAddress)
         print "Sent Crashed COmmand to the server\n"
+        addCommandToListOfIOCommands(self, "Crashed", "Server", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "Exception thrown in the sendCrashedCommandToServer: "+str(inst)+"\n"
@@ -468,6 +497,7 @@ class NetworkClient():
         self.port = 55568
         self.myIPAddress = "127.0.0.1" #defualt to the ping back address
         self.serverIPAddress = "127.0.0.1" #default to the ping back address
+        self.listOfIOCommands = [] #keeps a record of what commands have been received from controller and server
         self.serverIssuedDoneCommand = False
         self.solutionWasFound = False
 
@@ -717,6 +747,14 @@ class NetworkClient():
             print "Client Socket has been closed\n"
             sendDoneCommandToController(self)
             print "Informed Controller that Client is finished\n"
+            print "------------------Printing ListOfIOCommands-------------------\n"
+            for index in range(0,len(self.listOfIOCommands)):
+                tempCommand, tempOrigin, tempDirection, tempTime= self.listOfIOCommands[index]
+                if(compareString(tempDirection, "Inbound",0,0,len("Inbound"),len("Inbound"))==True):
+                    print str(tempDirection)+ " command: "+str(tempCommand)+" was received from: "+str(tempOrigin)+" at: "+str(tempTime)
+                else: #direction is outbound
+                    print str(tempDirection)+" command: "+str(tempCommand)+" was sent to: "+str(tempOrigin)+" at: "+str(tempTime)
+            print "----------------End of List of IO Commands--------------------------\n"
             print "Value of self.solutionWasFound: "+str(self.solutionWasFound)+"\n"
 
 
