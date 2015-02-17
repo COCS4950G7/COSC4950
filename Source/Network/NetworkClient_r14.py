@@ -1,6 +1,9 @@
 __author__ = 'chris hamm'
 #NetworkClient_r14
 
+#REVERTING BACK TO REVISION 13
+
+
 
 from multiprocessing.managers import SyncManager
 import Dictionary
