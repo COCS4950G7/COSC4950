@@ -816,6 +816,7 @@ class NetworkServer():
             print "Setting stop variable to stop all threads"
             self.stopAllThreads = True
             print "Sending done command to all clients, server is finished\n"
+            serverSocket.settimeout(0.25)
             for key in self.dictionaryOfCurrentClientTasks.keys():
                 #sendDoneCommandToClient(self,key) #extracts the key from the dictionary and sends the done command to them
                 try:
