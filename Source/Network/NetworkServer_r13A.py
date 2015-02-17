@@ -520,6 +520,8 @@ class NetworkServer():
             while True:
                 if(self.stopAllThreads == True):
                     print "MAIN THREAD: Stopping the thread\n"
+                    print "Sending done command to connected client\n"
+                    sendDoneCommandToClient(self, clientSocket, clientAddr)
                     break
                 try: #check for commands from client
                     inboundCommandFromClient = receiveCommandFromClient(self,clientSocket)
@@ -805,7 +807,7 @@ class NetworkServer():
             print "Released stopAllThreads Lock\n"
             print "Sending done command to all clients, server is finished\n"
             serverSocket.settimeout(0.25)
-            for key in self.dictionaryOfCurrentClientTasks.keys():
+            for key in self.dictionaryOfCurrentClientTasks.keys(): #This is potentially replaced by the sendDoneCommand in thread
                 try:
                     self.socketLock.acquire()
                     serverSocket.sendall("done")
