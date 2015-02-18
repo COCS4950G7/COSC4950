@@ -499,7 +499,8 @@ def sendFoundSolutionCommandToServer(self, networkSocket, theSolution):
     try:
         print "Sending foundSolution Command to Server\n"
         #networkSocket.send("FOUNDSOLUTION")
-        networkSocket.send(("FOUNDSOLUTION", str(theSolution))) #also send the solution to the server
+        combinedStrings= "FOUNDSOLUTION [" + str(theSolution)+"]"
+        networkSocket.send(combinedStrings) #also send the solution to the server
         print "Sent FoundSOlution Command to the server\n"
         addCommandToListOfIOCommands(self, "FOUNDSOLUTION", "Server", "Outbound")
     except Exception as inst:
@@ -725,7 +726,6 @@ class NetworkClient():
                         if(checkForFoundSolutionCommandFromController(self, receivedCommandFromController)==True):
                             identifiedCommand = True
                             print "Identified Command as Found Solution Command from the controller\n"
-                            #sendFoundSolutionCommandToServer(self,clientSocket) #send found solution after received the solution
                             self.solutionWasFound= True
                             self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
                             print "Listening for the solution from the Controller...\n"

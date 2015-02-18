@@ -13,6 +13,8 @@ __author__ = 'chris hamm'
     #Added theSolution variable that stores what the solution is, this is printed out at the end
     #Added function that sends the solution to the controller
     #Now sends the solution to the controller after sending the found solution command to the coontroller
+    #stackOfIOCommands now also stores errors
+    
 
 
 
@@ -44,6 +46,7 @@ def extractSolutionFromFoundSolutionTuple(self, inboundTuple):
         print "===========================================================\n"
         print "Exception thrown in extractSolutionFromFoundSolutionTuple: "+str(inst)+"\n"
         print "===========================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in extractSolutionFromFoundSolutionTuple", "Self", "Self")
         return "" #return empty string
 
 #Stack of IO Commands=======================================================
@@ -51,18 +54,19 @@ def pushCommandOntoTheStackOfIOCommands(self, commandName, commandOrigin_Destina
     try:
         import time
         current_time= time.time()
-        print "Acquiring the stackOfIOCommands Lock"
+        #print "Acquiring the stackOfIOCommands Lock"
         self.stackOfIOCommandsLock.acquire()
-        print "Acquired the stackOfIOCommands Lock"
+        #print "Acquired the stackOfIOCommands Lock"
         self.stackOfIOCommands.append((commandName, commandOrigin_Destination, commandDirection, current_time ))#tuple contains name, origin/destination, direction, time
     except Exception as inst:
         print "======================================================\n"
         print "Exception was thrown in pushCommandOntoTheStackOfIOCommands: "+str(inst)+"\n"
         print "=======================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in pushCommandOnToTheStackOfIOCommands", "Self", "Self")
     finally:
-        print "Releasing the stackOfIOCommands Lock"
+        #print "Releasing the stackOfIOCommands Lock"
         self.stackOfIOCommandsLock.release()
-        print "Released the stackOfIOCommands Lock"
+        #print "Released the stackOfIOCommands Lock"
 
 #Inbound commands from controller==========================================
 def checkForDoneCommandFromController(self, inboundString):
@@ -78,6 +82,7 @@ def checkForDoneCommandFromController(self, inboundString):
         print "========================================================================\n"
         print "Exception thrown in checkForDoneCommandFromController: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in checkForDoneCommandFromCOntroller", "Controller", "Inbound")
         return False
 
 def checkForNextChunkCommandFromController(self, inboundString):
@@ -93,6 +98,7 @@ def checkForNextChunkCommandFromController(self, inboundString):
         print "========================================================================\n"
         print "Exception thrown in checkForNextChunkCommandFromController: " +str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in checkForNextChunkCommandFromController", "Controller", "Inbound")
         return False
 
 def receiveNextChunkFromController(self):
@@ -106,6 +112,7 @@ def receiveNextChunkFromController(self):
         print "========================================================================\n"
         print "ERROR in receiveNextChunkFromController: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in receiveNextChunkFromController", "Controller", "Inbound")
         return ""
 
 #Outbound commands to controller======================================
@@ -119,6 +126,7 @@ def sendNextChunkCommandToController(self):
         print "========================================================================\n"
         print "Exception was thrown in sendNextChunkCommandToController: " +str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in sendNextChunkCommandToController", "Controller", "Outbound")
 
 
 def sendDoneCommandToController(self):
@@ -131,6 +139,7 @@ def sendDoneCommandToController(self):
         print "========================================================================\n"
         print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in sendDoneCommandToController", "Controller", "Outbound")
 
 def sendSolutionToController(self):
     try:
@@ -143,6 +152,7 @@ def sendSolutionToController(self):
         print "==================================================================\n"
         print "Exception thrown in sendSolutionToController: "+str(inst)+"\n"
         print "==================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in sendSolutionToController", "Controller", "Outbound")
 
 #Inbound commands from the client=========================================
 def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT modelled after the check for crash command in the previous revisions
@@ -158,14 +168,33 @@ def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT mode
         print "========================================================================\n"
         print "Exception thrown in checkForCrashedCommandFromClient: " +str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in checkForCrashedCommandFromClient", "Client", "Inbound")
         return False
 
 def checkForFoundSolutionCommandFromClient(self,inboundData):
     try:
         print "Checking for the Found Solution Command from the client\n"
-        if(compareString(str(inboundData[0]),"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))): #access the first element iin the tuple
+        if(compareString(str(inboundData),"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))): #access the first element iin the tuple
             print "FOUNDSOLUTION Command was received from the client\n"
+            #Extracting solution from the string
+            #inboundData= FOUNDSOLUTION [solution]
+            #inboundData[0:14]= FOUNDSOLUTION (including the space)
+            #first bracket is at [15]
+            openingBracketPos = 15
+            closingBracketPos = 15
+            theInboundSolution = ""
+            for index in range(openingBracketPos, len(inboundData)):
+                if(inboundData[index] == "]"):
+                    print "Extraction of solution is complete\n"
+                    closingBracketPos= index
+                    break
+                else:
+                    theInboundSolution+= str(inboundData[index])
+            if(closingBracketPos == 15): #where it started
+                raise Exception("closing bracket not found")
             pushCommandOntoTheStackOfIOCommands(self, "FOUNDSOLUTION", "Client", "Inbound")
+            #set the class variab;e that holds the solution
+            self.theSolution= theInboundSolution
             return True
         else:
             return False
@@ -173,6 +202,7 @@ def checkForFoundSolutionCommandFromClient(self,inboundData):
         print "========================================================================\n"
         print "Exception thrown in checkForFoundSolutionCommandFromClient: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in checkForFoundSOlutionCommandFromClient", "Client", "Inbound")
         return False
 
 def checkForNextCommandFromClient(self,inboundData):
@@ -188,6 +218,7 @@ def checkForNextCommandFromClient(self,inboundData):
         print "========================================================================\n"
         print "Exception was thrown in checkForNextCommandFromClient: " +str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in checkForNextCommandFromCLient", "Client", "Inbound")
         return False
 
 def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to receive normal commands
@@ -214,6 +245,7 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
                 print "===================================================================\n"
                 print "ERROR in receiveCommandFromClient: " +str(inst)+"\n"
                 print "===================================================================\n"
+                pushCommandOntoTheStackOfIOCommands(self, "ERROR in receiveCommandFromClient", "Client", "Inbound")
                 receivedCommandFromClient= ""#set to empty string
                 break
         finally:
@@ -241,10 +273,12 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
             print "========================================================================\n"
             print "Exception thrown in sendDoneCommandToClient: Broken pipe error detected in send try block\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in sendDoneCommandToClient: Broken Pipe", "Client", "Outbound")
         else:
             print "========================================================================\n"
             print "Exception in send Done command: " +str(inst) +"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in sendDoneCommandToClient", "Client", "Outbound")
     finally:
         #print "Releasing the socketLock\n"
         self.socketLock.release()
@@ -265,6 +299,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in create command string step of sendNextCommandToCLientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in createCommandStringStep of sendNextCommandToClientByLength", "Client", "Outbound")
         #Send command string to the client
         try:
             print "Sending command string to the client\n"
@@ -276,6 +311,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in send command string to client in sendNextCOmmandToCLientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in sendCommandStringToClient of sendNextCommandToClientByLength", "Client", "Outbound")
         #Send the chunk params to the client
         try:
             print "Sending chunk params to the client\n"
@@ -296,6 +332,7 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in send chunk params to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in sendChunkParamsToClient of sendNextCommandToClientByLength", "Client", "Outbound")
         #send the chunk data to the client
         try:
             print "Sending chunk data to the client\n"
@@ -317,10 +354,12 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             print "========================================================================\n"
             print "Error in send chunk data to the client in sendNextCOmmandToClientByLength: "+str(inst)+"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in sendChunkDataToClient of sendNextCommandToClientByLength", "Client", "Outbound")
     except Exception as inst:
         print "========================================================================\n"
         print "ERROR in sendNextCommandToClientByLength: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in sendNextCommandToClientByLength", "Client", "Outbound")
     finally:
         #print "Releasing the socketLock\n"
         self.socketLock.release()
@@ -353,6 +392,7 @@ def sendNextCommandToClient(self,clientSocket,chunkObject): #NOTE: This is NOT m
             print "Inside the sendNextCommandToClient function\n"
             print "Exception thrown in Pre-Step 1: Measuring filesize of chunkParams and chunkData Try Block: " +str(inst)+"\n"
             print "========================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "EXCEPTION in Pre-Step 1 of sendNextCommandToClient", "Client", "Outbound")
             raise Exception ("Exception thrown in Pre-Step 1")
         #Step 1 (Send the commandString to the client)---------------------------------------------------------
         try: #send commandString to client try block
@@ -424,6 +464,7 @@ def addClientToDictionaryOfCurrentClientTasks(self, clientAddress, clientChunk):
         print "========================================================================\n"
         print "ERROR in addClientToDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in addClientToDictionaryOfCurrentClientTasks", "Self", "Self")
 
 def delClientFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
     try:
@@ -432,10 +473,12 @@ def delClientFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAdd
         print "========================================================================\n"
         print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR (Key Error) in delClientFromDictionaryOfCurrentClientTasks", "Self", "Self")
     except Exception as inst:
         print "========================================================================\n"
         print "ERROR in delClientFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in delClientFromDictionaryOfCurrentClientTasks", "Self", "Self")
 
 def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddress contains IP and port
     try:
@@ -445,11 +488,13 @@ def getChunkFromDictionaryOfCurrentClientTasks(self, clientAddress): #clientAddr
         print "========================================================================\n"
         print "ERROR: " +str(clientAddress)+" does not exist in the dictionaryOfCurrentClientTasks\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR (Key Error) in getClientFromDictionaryOfCurrentClientTasks", "Self", "Self")
         return "" #changed from none
     except Exception as inst:
         print "========================================================================\n"
         print "ERROR in getChunkFromDictionaryOfCurrentClientTasks: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in getClientFromDictionaryOfCurrentClientTasks", "Self", "Self")
         return "" #changed from none
 
 def setChunkToDictionaryOfCurrentClientTasks(self, clientAddr, chunkObject):
@@ -459,6 +504,7 @@ def setChunkToDictionaryOfCurrentClientTasks(self, clientAddr, chunkObject):
         print "=======================================================================\n"
         print "ERROR in setChunkToDIctionaryOfCurrentCLientTasks: " +str(inst)+"\n"
         print "=======================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in setClientFromDictionaryOfCurrentClientTasks", "Self", "Self")
 
 
 #list of Crashed clients functions====================================================================
@@ -469,6 +515,7 @@ def addClientToListOfCrashedClients(self, clientAddress): #clientAddress has the
         print "========================================================================\n"
         print "ERROR in addClientToListOfCrashedClients: " + str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in addClientToListOfCrashedClients", "Self", "Self")
 
 #stackOfChunksThatNeedToBeReassigned functions==========================================================
 def pushChunkOnToStackOfChunksThatNeedToBeReassigned(self, inboundChunk):
@@ -480,6 +527,7 @@ def pushChunkOnToStackOfChunksThatNeedToBeReassigned(self, inboundChunk):
         print "========================================================================\n"
         print "ERROR in pushChunkOnToStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in pushChunksOnToStackOfChunksThatNeedToBeReassigned", "Self", "Self")
 
 def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
     try:
@@ -492,6 +540,7 @@ def popChunkFromStackOfChunksThatNeedToBeReassigned(self):
         print "========================================================================\n"
         print "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in popChunkFromStackOfChunksThatNeedToBeReassigned", "Self", "Self")
         return "" #changed from none
 
 #stackOfClientsWaitingForNextChunk functions============================================================
@@ -504,6 +553,7 @@ def pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAd
         print "========================================================================\n"
         print "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in pushClientOnToStackOfClientsWaitingForNextChunk", "Self", "Self")
 
 def popClientFromStackOfClientsWaitingForNextChunk(self):
     try:
@@ -516,6 +566,7 @@ def popClientFromStackOfClientsWaitingForNextChunk(self):
         print "========================================================================\n"
         print "ERROR in popClientFromStackOfClientsWaitingForNextChunk: "+str(inst)+"\n"
         print "========================================================================\n"
+        pushCommandOntoTheStackOfIOCommands(self, "ERROR in popClientFromStackOfClientsWaitingForNextChunk", "Self", "Self")
         return "" #changed from none
 
 
@@ -559,6 +610,7 @@ class NetworkServer():
                     print "===================================================================\n"
                     print "Error in check for commands from the client in client thread handler: " +str(inst)+"\n"
                     print "===================================================================\n"
+                    pushCommandOntoTheStackOfIOCommands(self, "ERROR in checkForCommandsFromTheClientInClientThreadHeader", "Self", "Self")
 
                 try: #Analyzing received command from the client try block
                     if(len(inboundCommandFromClient) > 0): #ignore if the empty string
@@ -588,6 +640,7 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
                             print "===================================================================\n"
+                            pushCommandOntoTheStackOfIOCommands(self, "ERROR in checkingForNextCommandFromClient", "Self", "Self")
 
                         try: #check to see if the found solution command was received from the client
                             if(identifiedCommand == False):
@@ -613,6 +666,7 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in check to see if found solution command was received from the client in client thread handler: "+str(inst)+"\n"
                             print "===================================================================\n"
+                            pushCommandOntoTheStackOfIOCommands(self, "ERROR in checkForFoundSOlutionCommandFromClient", "Self", "Self")
 
                         try: #check to see if the crashed command was received
                             if(identifiedCommand == False):
@@ -627,6 +681,7 @@ class NetworkServer():
                             print "===================================================================\n"
                             print "Error in check to see if crashed command was received from client in client thread handler: "+ str(inst)+"\n"
                             print "===================================================================\n"
+                            pushCommandOntoTheStackOfIOCommands(self, "ERROR in checkForCrashedCommandFromClient", "Self", "Self")
 
                         if(identifiedCommand == False):
                             print "Warning: Unknown Command Received from the client: "+str(inboundCommandFromClient)+"\n"
@@ -635,11 +690,13 @@ class NetworkServer():
                     print "===================================================================\n"
                     print "Error in Analyzing received command from the client try block in the client thread handler: " +str(inst)+"\n"
                     print "===================================================================\n"
+                    pushCommandOntoTheStackOfIOCommands(self, "ERROR in Analyzing received command from the Client", "Self", "Self")
 
         except Exception as inst:
             print "===================================================================\n"
             print "Error in Client Thread Handler: " + str(inst) +"\n"
             print "===================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in client Thread Handler", "Self", "Self")
 
         finally:
             clientSocket.close()
@@ -685,6 +742,7 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in getOS try block", "Self", "Self")
 
         #get the IP address
         try: #getIP tryblock
@@ -730,6 +788,7 @@ class NetworkServer():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
+            pushCommandOntoTheStackOfIOCommands(self, "ERROR in getIP try block", "Self", "Self")
 
         try: #try to bind the socket
             serverSocket.bind((self.host, self.port))
@@ -764,6 +823,7 @@ class NetworkServer():
                         print "===================================================================\n"
                         print "MAIN THREAD: Error in check for client trying to connect try block: " +str(inst)+"\n"
                         print "===================================================================\n"
+                        pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in checkForClientTryingToConnect" , "Self", "Self")
 
                 #CHECK TO SEE IF CONTROLLER HAS SENT A MESSAGE TO SERVER
                 try:
@@ -797,6 +857,7 @@ class NetworkServer():
                                 print "===================================================================\n"
                                 print "MAIN THREAD: Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
                                 print "===================================================================\n"
+                                pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in checkingForNextChunkCommand from Controller", "Self", "Self")
 
                             try: #checking for done command form controller
                                 if(identifiedCommand == False):
@@ -808,6 +869,7 @@ class NetworkServer():
                                 print "===================================================================\n"
                                 print "MAIN THREAD: Error in checking for done command from Controller Try Block: "+str(inst)+"\n"
                                 print "===================================================================\n"
+                                pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in checkingForDoneCommand from COntroller", "Self", "Self")
 
                             if(identifiedCommand == False):
                                 print "MAIN THREAD: Warning: Unknown Command Received from the Controller: "+str(receivedControllerCommand)+"\n"
@@ -824,11 +886,13 @@ class NetworkServer():
                         print "===================================================================\n"
                         print "MAIN THREAD: Error in check to see if controller has sent a message to server try block: " + str(inst) +"\n"
                         print "===================================================================\n"
+                        pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in checkToSeeIfControllerHasSentAMessage", "Self", "Self")
 
         except Exception as inst:
             print "===================================================================\n"
             print "MAIN THREAD: Error in Main Thread Server Loop: " +str(inst)+"\n"
             print "===================================================================\n"
+            pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in Main Thread Server Loop", "Self", "Self")
         finally:
             print "Setting stop variable to stop all threads"
             print "Acquiring stopAllThreads Lock\n"
@@ -853,10 +917,13 @@ class NetworkServer():
                         print "===========================================================\n"
                         print "MAIN THREAD ERROR in finally block send done command to clients: " +str(inst)+"\n"
                         print "============================================================\n"
+                        pushCommandOntoTheStackOfIOCommands(self, "Main Thread ERROR in finally block sendDoneCommand", "Self", "Self")
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
             sendDoneCommandToController(self)
+            print "MAIN THREAD: Informed the Controller that Server has finished\n"
+            sendSolutionToController(self) #solution is saved in the class variable
             print "-----------------------Stack of IO Commands---------------------------------\n"
             for index in range(0,len(self.stackOfIOCommands)):
                 tempCommandName, tempOrigin_Destination, tempCommandDirection, tempTime = self.stackOfIOCommands.pop(0)
@@ -865,8 +932,7 @@ class NetworkServer():
                 else: #if outbound
                     print str(tempCommandDirection)+" command: "+str(tempCommandName)+" was sent to: "+str(tempOrigin_Destination)+" at: "+str(tempTime)
             print "-----------------------End of Stack of IO Commands------------------------\n"
-            print "MAIN THREAD: Informed the Controller that Server has finished\n"
-            sendSolutionToController(self) #solution is saved in the class variable
+
             print "The Solution is: '"+str(self.theSolution)+"'\n"
 
         #BUG NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
