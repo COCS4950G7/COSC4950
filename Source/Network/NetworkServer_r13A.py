@@ -8,6 +8,12 @@ __author__ = 'chris hamm'
 
 #Changes/Additions made to this revision:
     #Added a IO command stack that contains all IO commands tthe have been sent/received
+    #Changed checkforFOundSolutionCOmmandFromClient to look at the first element in the inbound tuple for the foundsolution string
+    #Added a extractSolutionFromFOundSolutionTuple function
+    #Added theSolution variable that stores what the solution is, this is printed out at the end
+    #Added function that sends the solution to the controller
+    #Now sends the solution to the controller after sending the found solution command to the coontroller
+
 
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
@@ -29,6 +35,17 @@ def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
                 print "Exception thrown in compareString Function: " +str(inst)+"\n"
                 print "========================================================================\n"
                 return False
+
+def extractSolutionFromFoundSolutionTuple(self, inboundTuple):
+    try:
+        theSolution = str(inboundTuple[1]) #second element in the tuple
+        return theSolution
+    except Exception as inst:
+        print "===========================================================\n"
+        print "Exception thrown in extractSolutionFromFoundSolutionTuple: "+str(inst)+"\n"
+        print "===========================================================\n"
+        return "" #return empty string
+
 #Stack of IO Commands=======================================================
 def pushCommandOntoTheStackOfIOCommands(self, commandName, commandOrigin_Destination, commandDirection):
     try:
@@ -115,6 +132,18 @@ def sendDoneCommandToController(self):
         print "Exception thrown in sendDoneCommandToController: "+str(inst)+"\n"
         print "========================================================================\n"
 
+def sendSolutionToController(self):
+    try:
+        #get the solution from the class variable that  stores it
+        print "Sending Solution To Controller\n"
+        self.pipe.send(str(self.theSolution))
+        print "Sent solution to the controller\n"
+        pushCommandOntoTheStackOfIOCommands(self, "sendSolution", "Controller", "Outbound")
+    except Exception as inst:
+        print "==================================================================\n"
+        print "Exception thrown in sendSolutionToController: "+str(inst)+"\n"
+        print "==================================================================\n"
+
 #Inbound commands from the client=========================================
 def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT modelled after the check for crash command in the previous revisions
     try:
@@ -134,7 +163,7 @@ def checkForCrashedCommandFromClient(self,inboundData):  #NOTE: This is NOT mode
 def checkForFoundSolutionCommandFromClient(self,inboundData):
     try:
         print "Checking for the Found Solution Command from the client\n"
-        if(compareString(str(inboundData),"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))):
+        if(compareString(str(inboundData[0]),"FOUNDSOLUTION",0,0,len("FOUNDSOLUTION"),len("FOUNDSOLUTION"))): #access the first element iin the tuple
             print "FOUNDSOLUTION Command was received from the client\n"
             pushCommandOntoTheStackOfIOCommands(self, "FOUNDSOLUTION", "Client", "Inbound")
             return True
@@ -504,6 +533,7 @@ class NetworkServer():
     myIPAddress = '127.0.0.1' #default to ping back address
     stopAllThreads = False #set to true to have all threads break out of their while loops
     listOfCrashedClients = []
+    theSolution = "" #holds the solution if found
     stackOfIOCommands = [] #holds a record all the IO commands that have been sent through server
     stackOfChunksThatNeedToBeReassigned = []
     stackOfClientsWaitingForNextChunk = []
@@ -564,6 +594,9 @@ class NetworkServer():
                                 if(checkForFoundSolutionCommandFromClient(self,inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the found solution command\n"
+                                    print "Extracting solution from the FoundSolution Tuple\n"
+                                    self.theSolution= extractSolutionFromFoundSolutionTuple(self, inboundCommandFromClient)
+                                    print "The solution has been extracted from the found solution tuple\n"
                                     for key in self.dictionaryOfCurrentClientTasks.keys():
                                         sendDoneCommandToClient(self,clientSocket, key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
@@ -823,6 +856,7 @@ class NetworkServer():
             print "MAIN THREAD: Preparing to close the socket\n"
             serverSocket.close()
             print "MAIN THREAD: The serverSocket has been closed\n"
+            sendDoneCommandToController(self)
             print "-----------------------Stack of IO Commands---------------------------------\n"
             for index in range(0,len(self.stackOfIOCommands)):
                 tempCommandName, tempOrigin_Destination, tempCommandDirection, tempTime = self.stackOfIOCommands.pop(0)
@@ -831,8 +865,9 @@ class NetworkServer():
                 else: #if outbound
                     print str(tempCommandDirection)+" command: "+str(tempCommandName)+" was sent to: "+str(tempOrigin_Destination)+" at: "+str(tempTime)
             print "-----------------------End of Stack of IO Commands------------------------\n"
-            sendDoneCommandToController(self)
             print "MAIN THREAD: Informed the Controller that Server has finished\n"
+            sendSolutionToController(self) #solution is saved in the class variable
+            print "The Solution is: '"+str(self.theSolution)+"'\n"
 
         #BUG NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
 

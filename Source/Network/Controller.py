@@ -1192,9 +1192,9 @@ class Controller():
                             chrisHamm = True
 
                         #If the server has a key
-                        elif rec == "found":
-
-                            self.controllerPipe.send("found")
+                        #elif rec == "found":
+                        elif rec == "done":
+                            self.controllerPipe.send("done")#changed from found
 
                             #Get the key
                             key = self.controllerPipe.recv()
@@ -1203,6 +1203,7 @@ class Controller():
                             #isFound = self.dictionary.isKey(key)
 
                             self.dictionary.setKey(key)
+                            isFound = True #added in by chris hamm
 
                     elapsed = (time() - self.clock)
                     self.clock = elapsed

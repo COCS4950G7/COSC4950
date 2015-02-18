@@ -6,9 +6,14 @@ __author__ = 'chris hamm'
 
 #BUG: the received solution from controller is often empty string, sometimes the wrong value, sometimes correct
 
+
 #REVISION NOTES:
     #Added a listOfIOCommands that records all IO commands received and sent to/from the controller and to/from the server
     #Added solutionString variable that holds what the solution was if the solution was found
+    #Changed receiveSolution function to listen on the pipe, not the network socket
+    #Changed the sendFoundSOlution command to server function to take the solution as a parameter, then send 'foundsolution',the solution as a tuple to the server
+    #listOfIOCommands now keeps track of ERRORS
+
 
 def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
     try:
@@ -27,6 +32,7 @@ def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
             print "===================================================================\n"
             print "ERROR in receiveCommandFromServer: "+str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "ERROR in receiveCommandFromServer", "Self", "Self")
             return "" #the empty string
 
 #FUNCTIONS=========================================================================================
@@ -40,6 +46,7 @@ def addCommandToListOfIOCommands(self, inboundCommandName, commandOrigin_Destina
         print "========================================================\n"
         print "Exception was thrown in addCommandToListOfIOCommands: "+str(inst)+"\n"
         print "========================================================\n"
+        addCommandToListOfIOCommands(self, "EXCEPTION in addCommandToListOfIOCommands", "Self", "Self")
 
 
 #CompareString function-----------------------------------------
@@ -77,6 +84,7 @@ def receiveServerIPFromController(self):
         print "===================================================================\n"
         print "ERROR in receiveServerIPFromController: " + str(inst) + "\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in receiveServerIPFromController", "Controller", "Inbound")
         return ""
 
 def checkForDoneCommandFromController(self, inboundString):
@@ -92,6 +100,7 @@ def checkForDoneCommandFromController(self, inboundString):
         print "===================================================================\n"
         print "ERROR in checkingForDoneCommandFromController: " +str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkingForDoneCommandFromController", "Controller", "Inbound")
         return False
 
 def checkForDoingStuffCommandFromController(self, inboundString):
@@ -107,6 +116,7 @@ def checkForDoingStuffCommandFromController(self, inboundString):
         print "===================================================================\n"
         print "ERROR in checkForDoingStuff Command from the Controller: " + str(inst) +"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkForDoingStuffCommandFromController", "Controller", "Inbound")
         return False
 
 def checkForFoundSolutionCommandFromController(self, inboundString):
@@ -122,14 +132,16 @@ def checkForFoundSolutionCommandFromController(self, inboundString):
         print "===================================================================\n"
         print "ERROR in checkForFoundSolutionCommandFromController: " + str(inst) +"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkForFoundSolutionCommandFromController", "Controller", "Inbound")
         return False
 
 def receiveSolutionFromController(self, networkSocket):
-    networkSocket.settimeout(0.5)
+    #networkSocket.settimeout(0.5) #controller communicates via the pipe
     while True:
         try:
             receivedSolution= ""
-            controllerInput= networkSocket.recv(4096)
+            #controllerInput= networkSocket.recv(4096) #controller communicates via the pipe
+            controllerInput= self.pipe.recv()
             if(len(controllerInput) > 0):
                 receivedSolution= controllerInput
                 addCommandToListOfIOCommands(self, "receiveSolution", "Controller", "Inbound")
@@ -139,6 +151,7 @@ def receiveSolutionFromController(self, networkSocket):
                     print "----------------------------------------------------------------------------------------\n"
                     print "WARNING: size of solution is getting/or is too large. Max fileSize of solution is 4096.\n Your solution fileSize is: "+str(sys.getsizeof(receivedSolution))+"\n"
                     print "----------------------------------------------------------------------------------------\n"
+                    addCommandToListOfIOCommands(self, "WARNING: size of solution is/getting to large", "Controller", "Inbound")
                 return receivedSolution
                 break
             else:
@@ -158,6 +171,7 @@ def receiveSolutionFromController(self, networkSocket):
                 print "===================================================================\n"
                 print "ERROR in receiveSolutionFromController: "+str(inst)+"\n"
                 print "===================================================================\n"
+                addCommandToListOfIOCommands(self, "ERROR in receiveSolutionFromController", "Controller", "Inbound")
                 return ""
                 break
 
@@ -174,6 +188,7 @@ def checkForRequestNextChunkCommandFromController(self, inboundString):
         print "===================================================================\n"
         print "ERROR in checkForRequestNextChunk Command from Controller: " + str(inst) +"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkForRequestNextChunkCommandFromController", "Controller", "Inbound")
         return False
 
 #Outbound commands to controller functions-----------------------------------------------------
@@ -187,6 +202,7 @@ def sendNextChunkCommandToController(self, inboundChunk):
         print "===================================================================\n"
         print "ERROR in sendNextChunkCommandToController: " + str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in sendNextChunkCommandToController", "Controller", "Outbound")
 
 def sendDoneCommandToController(self):
     try:
@@ -198,6 +214,7 @@ def sendDoneCommandToController(self):
         print "===================================================================\n"
         print "ERROR in sendDoneCommandToController: " + str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in sendDoneCommandToController", "Controller", "Outbound")
 
 def sendConnectedCommandToController(self):
     try:
@@ -209,6 +226,7 @@ def sendConnectedCommandToController(self):
         print "===================================================================\n"
         print "ERROR in sendConnectedCommandToController: " + str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in sendConnectedCommandToController", "Controller", "Outbound")
 
 def sendDoingStuffCommandToController(self):
     try:
@@ -220,6 +238,7 @@ def sendDoingStuffCommandToController(self):
         print "===================================================================\n"
         print "ERROR in sendDoingStuffCommandToController: " + str(inst)+ "\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in sendDoingStuffCommandToController", "Controller", "Outbound")
 
 #Inbound commands from server functions-----------------------------------------------------------
 def checkForDoneCommandFromServer(self,inboundString):
@@ -236,6 +255,7 @@ def checkForDoneCommandFromServer(self,inboundString):
         print "===================================================================\n"
         print "ERROR in checkForDoneCommandFromServer: " + str(inst) +"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkForDOneCOmmandFromServer", "Server", "Inbound")
         return False
 
 def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than previous revisions, this only checks for the NEXT keyword
@@ -251,6 +271,7 @@ def checkForNextCommandFromServer(self, inboundString): #NOTE: Different than pr
         print "===================================================================\n"
         print "ERROR in checking for nextCommand from the server: " +str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in checkingForNextCommandFromServer", "Server", "Inbound")
         return False
 
 def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component to extract the file size of the params from the next command
@@ -273,6 +294,7 @@ def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component
             print "===================================================================\n"
             print "Exception thrown in Step 1: find first Open parenthesis: " +str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 1 of ExtractSizeOfParams", "Server", "Inbound")
             raise Exception ("Exception thrown in step 1 of extractSizeOfParamsFromNextCommand")
         #Step 2: find the corresponding closing parenthesis
         try: #Step 2 try block
@@ -287,6 +309,7 @@ def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component
             print "===================================================================\n"
             print "Exception thrown in Step 2: find corresponding closing parenthesis: " +str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 2 of ExtractSizeOfParams", "Server", "Inbound")
             raise Exception ("Exception thrown in Step 2 of extractSizeOfParamsFromNextCommand")
         #Step 3: retreive the params file size
         try: #step 3 try block
@@ -298,11 +321,13 @@ def extractSizeOfParamFromNextCommand(self, inboundString): #NOTE: New component
             print "===================================================================\n"
             print "Exception thrown in Step 3: retreive the params file size: "+str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 3 of ExtractSizeOfParams", "Server", "Inbound")
             raise Exception ("Exception thrown in Step 3 of extractSizeOfParamsFromNextCommand")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in extractSizeOfParamsFromNextCommand: " +str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in ExtractSizeOfParams", "Server", "Inbound")
         return 0 #return filesize of zero if there was an error
 
 def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new component. This can also extract the length of Data from the next command
@@ -325,6 +350,7 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
             print "===================================================================\n"
             print "Exception thrown in Step 1: find the 'D' in the inboundString: "+str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 1 of ExtractSizeOfData", "Server", "Inbound")
             raise Exception ("Exception was thrown in step 1 of extractSizeOfDataFromNextCommand")
         #Step 2: find the corresponding parenthesis
         try: #Step 2 try block
@@ -339,6 +365,7 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
             print "===================================================================\n"
             print "Exception thrown in Step 2: find corresponding parenthesis: "+str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 2 of ExtractSizeOfData", "Server", "Inbound")
             raise Exception ("Exception thrown in step 2 of extractSizeOfDataFromNextCommand")
         #Step 3: retreive the data file size
         try: #step 3 try block
@@ -350,11 +377,13 @@ def extractSizeOfDataFromNextCommand(self, inboundString): #NOTE: this is a new 
             print "===================================================================\n"
             print "Exception thrown in Step 3: retrieve the data file size: " + str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "EXCEPTION in STep 3 of ExtractSizeOfData", "Server", "Inbound")
             raise Exception ("Exception thrown is step 3 of extractSizeOfDataFromNextCommand")
     except Exception as inst:
         print "===================================================================\n"
         print "ERROR in extractSizeOfDataFromNextCommand: " +str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in ExtractSizeOfData", "Server", "Inbound")
         return 0
 
 def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkSocket): #NOTE: this method receives pieces of chunks by their lengths rather than thier filesizes
@@ -399,6 +428,7 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         print "===================================================================\n"
         print "ERROR in receivePieceOfChunkFromServerByLength: "+str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "ERROR in receivePieceOfChunkFromServerByLength", "Server", "Inbound")
     finally:
         networkSocket.settimeout(0.25)
         print "Socket timeout was reset back to default\n"
@@ -463,17 +493,20 @@ def sendNextChunkCommandToServer(self, networkSocket):
         print "===================================================================\n"
         print "Exception thrown in sendNextChunkCommandToServer: " + str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "EXCEPTION in sendNextChunkCommandToServer", "Server", "Outbound")
 
-def sendFoundSolutionCommandToServer(self, networkSocket):
+def sendFoundSolutionCommandToServer(self, networkSocket, theSolution):
     try:
         print "Sending foundSolution Command to Server\n"
-        networkSocket.send("FOUNDSOLUTION")
+        #networkSocket.send("FOUNDSOLUTION")
+        networkSocket.send(("FOUNDSOLUTION", str(theSolution))) #also send the solution to the server
         print "Sent FoundSOlution Command to the server\n"
         addCommandToListOfIOCommands(self, "FOUNDSOLUTION", "Server", "Outbound")
     except Exception as inst:
         print "===================================================================\n"
         print "Exception thrown in sendFoundSolutionCommandToServer: "+ str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "EXCEPTION in sendFoundSOlutionCommandToServer", "Server", "Outbound")
 
 def sendCrashedCommandToServer(self, networkSocket):
     try:
@@ -485,6 +518,7 @@ def sendCrashedCommandToServer(self, networkSocket):
         print "===================================================================\n"
         print "Exception thrown in the sendCrashedCommandToServer: "+str(inst)+"\n"
         print "===================================================================\n"
+        addCommandToListOfIOCommands(self, "EXCEPTION in sendCrashedCommandToServer", "Server", "Outbound")
 
 
 from socket import *
@@ -534,6 +568,7 @@ class NetworkClient():
             print inst.args #srguments stored in .args
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
+            addCommandToListOfIOCommands(self, "ERROR in getOS try block", "Self", "Self")
         #......................................
         #End of detect OS
         #......................................
@@ -601,6 +636,7 @@ class NetworkClient():
             print "===================================================================\n"
             print "Error in receive server ip from the controller: "+(str(inst))+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "ERROR in receiveServerIPFromController", "Self", "Self")
 
         try: #connect to server try block
             clientSocket.connect((self.serverIPAddress, self.port))
@@ -612,6 +648,7 @@ class NetworkClient():
             print "self.serverIPAddress= "+str(self.serverIPAddress)+"\n"
             print "self.port= "+str(self.port)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "ERROR in connectToServer", "Self", "Self")
             raise Exception ("Failed to connect to the server")
 
         #PRIMARY CLIENT WHILE LOOP
@@ -627,6 +664,7 @@ class NetworkClient():
                     print "===================================================================\n"
                     print "Error in check for inbound Server Commands Try block: "+str(inst)+"\n"
                     print "===================================================================\n"
+                    addCommandToListOfIOCommands(self, "ERROR in checkForInboundServerCommands", "Self", "Self")
 
                 if(len(inboundCommandFromServer) > 0): #if not the empty string, perform the following checks
                     identifiedCommand = False
@@ -641,6 +679,7 @@ class NetworkClient():
                         print "===================================================================\n"
                         print "Error in checking for done command from the server: "+str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkingForDoneCommandFromServer", "Self", "Self")
 
                     try: #check for nextChunk command from the server
                         if(identifiedCommand == False):
@@ -661,9 +700,11 @@ class NetworkClient():
                         print "===================================================================\n"
                         print "Error in checking for nextChunk command from server: " + str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkingForNextChunkFromServer", "Self", "Self")
 
                     if(identifiedCommand == False):
                         print "Warning: Unknown command received from the server: "+str(inboundCommandFromServer)
+                        addCommandToListOfIOCommands(self, "UNKNOWN Command", "Server", "Inbound")
 
                 #CHECK FOR INBOUND CONTROLLER COMMANDS SECTION=======================================================
                 receivedCommandFromController = "" #initialize thevar
@@ -676,6 +717,7 @@ class NetworkClient():
                     print "===================================================================\n"
                     print "Error in check for inbound commands from controller try block: "+str(inst)+"\n"
                     print "===================================================================\n"
+                    addCommandToListOfIOCommands(self, "ERROR in checkForInboundCOmmandsFromCOntroller", "Self", "Self")
 
                 if(len(receivedCommandFromController) > 0): #if not the empty string
                     identifiedCommand= False
@@ -683,16 +725,19 @@ class NetworkClient():
                         if(checkForFoundSolutionCommandFromController(self, receivedCommandFromController)==True):
                             identifiedCommand = True
                             print "Identified Command as Found Solution Command from the controller\n"
-                            sendFoundSolutionCommandToServer(self,clientSocket)
+                            #sendFoundSolutionCommandToServer(self,clientSocket) #send found solution after received the solution
                             self.solutionWasFound= True
                             self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
                             print "Listening for the solution from the Controller...\n"
                             theSolution= receiveSolutionFromController(self, clientSocket)
                             print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
+                            sendFoundSolutionCommandToServer(self, clientSocket, theSolution)#send the solution also
+                            print "Sent Found solution command to the servere"
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkForFoundSOlutionCommandFromController", "Self", "Self")
 
                     try: #checking for request next chunk command from controller
                         if(identifiedCommand == False):
@@ -704,6 +749,7 @@ class NetworkClient():
                         print "===================================================================\n"
                         print "Error in check for request Next Chunk Command from controller: "+str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkForRequestNextChunkCommandFromController", "Self", "Self")
 
                     try: #check for doingStuff command form controller
                         if(identifiedCommand == False):
@@ -715,6 +761,7 @@ class NetworkClient():
                         print "===================================================================\n"
                         print "Error in check for doingStuff Command from controller: "+str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkForDoingStuffCommandFromCOntroller", "Self", "Self")
 
                     try: #check for done command from the controller
                         if(identifiedCommand == False):
@@ -726,6 +773,7 @@ class NetworkClient():
                         print "===================================================================\n"
                         print "Error in check for done command from the controller: "+str(inst)+"\n"
                         print "===================================================================\n"
+                        addCommandToListOfIOCommands(self, "ERROR in checkForDoneCommandFromController", "Self", "Self")
 
                     if((identifiedCommand == False) and (self.solutionWasFound == False)):
                         print "Warning: Received Unknown Command From The Controller: "+str(receivedCommandFromController)+"\n"
@@ -739,6 +787,7 @@ class NetworkClient():
             print "===================================================================\n"
             print "Error in Primary client while loop: "+str(inst)+"\n"
             print "===================================================================\n"
+            addCommandToListOfIOCommands(self, "ERROR in PrimaryClientWhileLoop", "Self", "Self")
         finally:
             if(self.serverIssuedDoneCommand == False):
                 try: #send crash message to server, if needed
@@ -748,6 +797,7 @@ class NetworkClient():
                     print "===================================================================\n"
                     print "Error in send crash message to server, in finally block: "+str(inst)+"\n"
                     print "===================================================================\n"
+                    addCommandToListOfIOCommands(self, "ERROR in sendCrashedMessageToServerFinallyBlock", "Self", "Self")
             print "Closing the client socket\n"
             clientSocket.close()
             print "Client Socket has been closed\n"
