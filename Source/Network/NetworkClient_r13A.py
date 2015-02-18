@@ -4,7 +4,7 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkClient_r13A
 
-#BUG: the received solution from controller is often empty string, sometimes the wrong value, sometimes correct
+#BUG: If node does not find solution, the node does not always receive the done command fro the server
 
 
 #REVISION NOTES:
@@ -495,11 +495,11 @@ def sendNextChunkCommandToServer(self, networkSocket):
         print "===================================================================\n"
         addCommandToListOfIOCommands(self, "EXCEPTION in sendNextChunkCommandToServer", "Server", "Outbound")
 
-def sendFoundSolutionCommandToServer(self, networkSocket, theSolution):
+def sendFoundSolutionCommandToServer(self, networkSocket, theInboundSolution):
     try:
         print "Sending foundSolution Command to Server\n"
         #networkSocket.send("FOUNDSOLUTION")
-        combinedStrings= "FOUNDSOLUTION [" + str(theSolution)+"]"
+        combinedStrings= "FOUNDSOLUTION [" + str(theInboundSolution)+"]"
         networkSocket.send(combinedStrings) #also send the solution to the server
         print "Sent FoundSOlution Command to the server\n"
         addCommandToListOfIOCommands(self, "FOUNDSOLUTION", "Server", "Outbound")
@@ -729,10 +729,11 @@ class NetworkClient():
                             self.solutionWasFound= True
                             self.serverIssuedDoneCommand = True #set this so a crash report wont be sent to the server
                             print "Listening for the solution from the Controller...\n"
-                            theSolution= receiveSolutionFromController(self, clientSocket)
-                            print "Solution was received. The solution is: '"+str(theSolution)+"'\n"
-                            sendFoundSolutionCommandToServer(self, clientSocket, theSolution)#send the solution also
+                            theInboundSolution= receiveSolutionFromController(self, clientSocket)
+                            print "Solution was received. The solution is: '"+str(theInboundSolution)+"'\n"
+                            sendFoundSolutionCommandToServer(self, clientSocket, str(theInboundSolution))#send the solution also
                             print "Sent Found solution command to the servere"
+                            self.solutionString= str(theInboundSolution)
                     except Exception as inst:
                         print "===================================================================\n"
                         print "Error in check for found solution command from controller: "+str(inst)+"\n"

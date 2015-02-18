@@ -4,7 +4,6 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkClient_r13A
 
-#BUG WITH CONTROLLER OUTPUT WHEN MULTIPLE CLIENTS ARE CONNECTED (SEE BOTTOM OF PAGE)
 
 #Changes/Additions made to this revision:
     #Added a IO command stack that contains all IO commands tthe have been sent/received
@@ -647,9 +646,6 @@ class NetworkServer():
                                 if(checkForFoundSolutionCommandFromClient(self,inboundCommandFromClient)==True):
                                     identifiedCommand= True
                                     print "Identified inboundCommandFromClient as the found solution command\n"
-                                    print "Extracting solution from the FoundSolution Tuple\n"
-                                    self.theSolution= extractSolutionFromFoundSolutionTuple(self, inboundCommandFromClient)
-                                    print "The solution has been extracted from the found solution tuple\n"
                                     for key in self.dictionaryOfCurrentClientTasks.keys():
                                         sendDoneCommandToClient(self,clientSocket, key) #extracts the key from the dictionary and sends the done command to them
                                     print "Setting the thread termination value to true, stopping all threads\n"
@@ -935,7 +931,7 @@ class NetworkServer():
 
             print "The Solution is: '"+str(self.theSolution)+"'\n"
 
-        #BUG NOTICE: when server is run, the found solution command is received from a client, but controller reports the solution is not found.
+
 
 
 
