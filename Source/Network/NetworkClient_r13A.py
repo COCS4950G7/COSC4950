@@ -6,6 +6,7 @@ __author__ = 'chris hamm'
 
 #REVISION NOTES:
     #Added a listOfIOCommands that records all IO commands received and sent to/from the controller and to/from the server
+    #Added solutionString variable that holds what the solution was if the solution was found
 
 def receiveCommandFromServer(self, clientSocket): #NOTE used for normal recv
     try:
@@ -500,6 +501,7 @@ class NetworkClient():
         self.listOfIOCommands = [] #keeps a record of what commands have been received from controller and server
         self.serverIssuedDoneCommand = False
         self.solutionWasFound = False
+        self.solutionString = ""#stores what the solution was if found
 
         #.........................................................................
         #Detect the Operating System
@@ -728,6 +730,7 @@ class NetworkClient():
                         addCommandToListOfIOCommands(self, "UNKNOWN: "+str(receivedCommandFromController), "Controller", "Inbound")
                     elif((identifiedCommand == False) and (self.solutionWasFound == True)):
                         print "The Solution is '" + str(receivedCommandFromController)+"'\n"
+                        self.solutionString= str(receivedCommandFromController)
                         break
             #end of primary client while loop
         except Exception as inst:
@@ -757,5 +760,9 @@ class NetworkClient():
                     print str(tempDirection)+" command: "+str(tempCommand)+" was sent to: "+str(tempOrigin)+" at: "+str(tempTime)
             print "----------------End of List of IO Commands--------------------------\n"
             print "Value of self.solutionWasFound: "+str(self.solutionWasFound)+"\n"
+            if(self.solutionWasFound == True):
+                print "The solution is: '"+str(self.solutionString)+"'\n"
+            else:
+                print "This Node did not find the solution\n"
 
 
