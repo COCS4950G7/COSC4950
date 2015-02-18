@@ -4,6 +4,8 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkClient_r13A
 
+#BUG: the received solution from controller is often empty string, sometimes the wrong value, sometimes correct
+
 #REVISION NOTES:
     #Added a listOfIOCommands that records all IO commands received and sent to/from the controller and to/from the server
     #Added solutionString variable that holds what the solution was if the solution was found
