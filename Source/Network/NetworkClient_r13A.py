@@ -16,7 +16,7 @@ __author__ = 'chris hamm'
     #Optimized for speed (see below)
 
     #Speed Optimization changes:
-        #socket timeouts have been set to 0.0001 seconds
+        #socket timeouts have been set to 0.000001 seconds (tried using 0.0000001, but it caused a crash)
         #commented out almost all print statements
 
 
@@ -401,7 +401,10 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.00001)
+        #networkSocket.settimeout(0.000001)
+        networkSocket.settimeout(0.0000001)
         import sys
         while(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             try:
@@ -446,7 +449,10 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.00001)
+        #networkSocket.settimeout(0.000001)
+        networkSocket.settimeout(0.0000001)
         #print "Socket timeout was reset back to default\n"
         return receivedPieceOfChunk
 
@@ -675,7 +681,10 @@ class NetworkClient():
             #clientSocket.settimeout(0.05)
             #clientSocket.settimeout(0.01)
             #clientSocket.settimeout(0.001)
-            clientSocket.settimeout(0.0001)
+            #clientSocket.settimeout(0.0001)
+            #clientSocket.settimeout(0.00001)
+            #clientSocket.settimeout(0.000001)
+            clientSocket.settimeout(0.0000001)
             while True: #primary client while loop
                 inboundCommandFromServer = "" #initialize the var
                 #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================

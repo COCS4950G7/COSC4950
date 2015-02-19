@@ -17,9 +17,10 @@ __author__ = 'chris hamm'
     #Optimized for speed (see below)
 
     #Speed optimization changes:
-        #socket timeouts set to 0.0001 seconds
+        #socket timeouts set to 0.000001 seconds (tried using 0.0000001 but it caused a crash)
         #commented out most print statements
-        #changed the time.sleep(0.25) to time.sleep(0.0001)
+        #changed the time.sleep(0.25) to time.sleep(0.000001) (tried using 0.0000001 but it caused a crash)
+
 
 
 def compareString(inboundStringA, inboundStringB, startA, startB, endA, endB):
@@ -238,7 +239,9 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             #clientSocket.settimeout(0.05)
             #clientSocket.settimeout(0.01)
             #clientSocket.settimeout(0.001)
-            clientSocket.settimeout(0.0001)
+            #clientSocket.settimeout(0.0001)
+            #clientSocket.settimeout(0.00001)
+            clientSocket.settimeout(0.0000001)
             clientInput= clientSocket.recv(4096)
             if(len(clientInput) > 0):
                 receivedCommandFromClient= clientInput
@@ -275,7 +278,9 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
     #networkSocket.settimeout(0.05)
     #networkSocket.settimeout(0.01)
     #networkSocket.settimeout(0.001)
-    networkSocket.settimeout(0.0001)
+    #networkSocket.settimeout(0.0001)
+    #networkSocket.settimeout(0.00001)
+    networkSocket.settimeout(0.0000001)
     #print "socket lock acquired\n"
     try: #send try block
        # print "preparing to send done command to client\n"
@@ -320,8 +325,13 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
             clientSocket.send(commandString)
             import time
             #time.sleep(0.25)
+           #time.sleep(0.05)
+           #time.sleep(0.01)
             #time.sleep(0.001)
-            time.sleep(0.0001)
+            #time.sleep(0.0001)
+            #time.sleep(0.00001)
+           # time.sleep(0.000001)
+            time.sleep(0.0000001)
            # print "Sent the command string to the client\n"
         except Exception as inst:
             print "========================================================================\n"
@@ -823,7 +833,10 @@ class NetworkServer():
             #serverSocket.settimeout(0.05)
             #serverSocket.settimeout(0.01)
             #serverSocket.settimeout(0.001)
-            serverSocket.settimeout(0.0001)
+            #serverSocket.settimeout(0.0001)
+            #serverSocket.settimeout(0.00001)
+            #serverSocket.settimeout(0.000001)
+            serverSocket.settimeout(0.0000001)
            # print "MAIN THREAD: Waiting for client(s) to connect\n"
             while True: #Primary main thread server while loop
                 if(self.stopAllThreads == True):
@@ -928,7 +941,10 @@ class NetworkServer():
             #serverSocket.settimeout(0.05)
             #serverSocket.settimeout(0.01)
             #serverSocket.settimeout(0.001)
-            serverSocket.settimeout(0.0001)
+            #serverSocket.settimeout(0.0001)
+            #serverSocket.settimeout(0.00001)
+            #serverSocket.settimeout(0.000001)
+            serverSocket.settimeout(0.0000001)
             for key in self.dictionaryOfCurrentClientTasks.keys(): #This is potentially replaced by the sendDoneCommand in thread
                 try:
                     self.socketLock.acquire()
