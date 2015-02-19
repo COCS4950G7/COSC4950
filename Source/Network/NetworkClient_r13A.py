@@ -16,7 +16,7 @@ __author__ = 'chris hamm'
     #Optimized for speed (see below)
 
     #Speed Optimization changes:
-        #[currently running at 0.0001] socket timeouts have been set to 0.000001 seconds (tried using 0.0000001, but it caused a crash)
+        #[currently running at 0.1] socket timeouts have been set to 0.000001 seconds (tried using 0.0000001, but it caused a crash)
         #commented out almost all print statements
 
 
@@ -397,11 +397,11 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         #print "Receiving Piece of CHunk From The Server By Length\n"
        # print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
         #networkSocket.settimeout(0.25)
-        #networkSocket.settimeout(0.1)
+        networkSocket.settimeout(0.1)
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.0001)
         #networkSocket.settimeout(0.00001)
         #networkSocket.settimeout(0.000001)
         #networkSocket.settimeout(0.0000001)
@@ -445,11 +445,11 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         addCommandToListOfIOCommands(self, "ERROR in receivePieceOfChunkFromServerByLength", "Server", "Inbound")
     finally:
         #networkSocket.settimeout(0.25)
-        #networkSocket.settimeout(0.1)
+        networkSocket.settimeout(0.1)
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        networkSocket.settimeout(0.0001)
+        #networkSocket.settimeout(0.0001)
         #networkSocket.settimeout(0.00001)
         #networkSocket.settimeout(0.000001)
         #networkSocket.settimeout(0.0000001)
@@ -677,11 +677,11 @@ class NetworkClient():
         #PRIMARY CLIENT WHILE LOOP
         try:
            # clientSocket.settimeout(0.25)
-            #clientSocket.settimeout(0.1)
+            clientSocket.settimeout(0.1)
             #clientSocket.settimeout(0.05)
             #clientSocket.settimeout(0.01)
             #clientSocket.settimeout(0.001)
-            clientSocket.settimeout(0.0001)
+            #clientSocket.settimeout(0.0001)
             #clientSocket.settimeout(0.00001)
             #clientSocket.settimeout(0.000001)
             #clientSocket.settimeout(0.0000001)
