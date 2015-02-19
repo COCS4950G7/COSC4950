@@ -69,6 +69,10 @@ class Controller():
     #Constructor
     def __init__(self):
 
+        if not __name__ == '__main__':
+
+            return
+
         args = sys.argv
 
         #If we didn't get the argument "-c" in command-line
