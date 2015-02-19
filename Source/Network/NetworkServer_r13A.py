@@ -17,9 +17,9 @@ __author__ = 'chris hamm'
     #Optimized for speed (see below)
 
     #Speed optimization changes:
-        #[currently running at 0.1] socket timeouts set to 0.000001 seconds (tried using 0.0000001 but it caused a crash)
+        #[currently running at 0.25] socket timeouts set to 0.000001 seconds (tried using 0.0000001 but it caused a crash)
         #commented out most print statements
-        #[currently running at 0.1] changed the time.sleep(0.25) to time.sleep(0.000001) (tried using 0.0000001 but it caused a crash)
+        #[currently running at 0.25] changed the time.sleep(0.25) to time.sleep(0.000001) (tried using 0.0000001 but it caused a crash)
 
 
 
@@ -234,8 +234,8 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             self.socketLock.acquire()
             #print "Acquired socketLock"
             #print "Checking for inbound client Commands"
-            #clientSocket.settimeout(0.25)
-            clientSocket.settimeout(0.1)
+            clientSocket.settimeout(0.25)
+            #clientSocket.settimeout(0.1)
             #clientSocket.settimeout(0.05)
             #clientSocket.settimeout(0.01)
             #clientSocket.settimeout(0.001)
@@ -273,8 +273,8 @@ def sendDoneCommandToClient(self,networkSocket, clientIP):
     #print "Acquiring socket lock\n"
     self.socketLock.acquire()
     #print "Acquired socketLock\n"
-    #networkSocket.settimeout(0.25)
-    networkSocket.settimeout(0.1)
+    networkSocket.settimeout(0.25)
+    #networkSocket.settimeout(0.1)
     #networkSocket.settimeout(0.05)
     #networkSocket.settimeout(0.01)
     #networkSocket.settimeout(0.001)
@@ -324,8 +324,8 @@ def sendNextCommandToClientByLength(self, clientSocket, chunkObject): #This send
            # print "Sending command string to the client\n"
             clientSocket.send(commandString)
             import time
-            #time.sleep(0.25)
-            time.sleep(0.1)
+            time.sleep(0.25)
+            #time.sleep(0.1)
            #time.sleep(0.05)
            #time.sleep(0.01)
             #time.sleep(0.001)
@@ -829,8 +829,8 @@ class NetworkServer():
 
         #MAIN THREAD SERVER LOOP
         try: #main thread server loop try block
-            #serverSocket.settimeout(0.25)
-            serverSocket.settimeout(0.1)
+            serverSocket.settimeout(0.25)
+            #serverSocket.settimeout(0.1)
             #serverSocket.settimeout(0.05)
             #serverSocket.settimeout(0.01)
             #serverSocket.settimeout(0.001)
@@ -937,8 +937,8 @@ class NetworkServer():
             self.stopAllThreadsLock.release()
             #print "Released stopAllThreads Lock\n"
             #print "Sending done command to all clients, server is finished\n"
-            #serverSocket.settimeout(0.25)
-            serverSocket.settimeout(0.1)
+            serverSocket.settimeout(0.25)
+            #serverSocket.settimeout(0.1)
             #serverSocket.settimeout(0.05)
             #serverSocket.settimeout(0.01)
             #serverSocket.settimeout(0.001)
