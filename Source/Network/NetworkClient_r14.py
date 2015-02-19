@@ -56,6 +56,8 @@ def runclient():
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+        result_q.put(("c", chunk.params)) #tell server that client crashed
+        print "Sent crash message to server"
 
 class ServerQueueManager(SyncManager):
     pass
@@ -66,18 +68,27 @@ def make_client_manager(ip, port, authkey):
         accessing the shared queues from the server.
         Return a manager object.
     """
+    try:
 
 
+        ServerQueueManager.register('get_job_q')
+        ServerQueueManager.register('get_result_q')
 
-    ServerQueueManager.register('get_job_q')
-    ServerQueueManager.register('get_result_q')
+        manager = ServerQueueManager(address=(ip, port), authkey=authkey)
+        manager.connect()
 
-    manager = ServerQueueManager(address=(ip, port), authkey=authkey)
-    manager.connect()
-
-    print 'Client connected to %s:%s' % (ip, port)
-    return manager
-
+        print 'Client connected to %s:%s' % (ip, port)
+        return manager
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in make_client_manager definition try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 if __name__ == '__main__':
     try: #Main
