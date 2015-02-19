@@ -76,7 +76,7 @@ class Dictionary():
 
         #Checks for filenotfound and returns code to caller class
         try:
-            file = open(fileName + ".txt", "r")
+            file = open(self.fileName, "r")
             file.close()
 
         except (OSError, IOError):

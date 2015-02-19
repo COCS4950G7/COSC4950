@@ -996,7 +996,7 @@ class Controller():
                     #fileName = raw_input("What's the file name (___.txt): ")
                     if self.aLane == True:
 
-                        fileName = "dic.txt"
+                        fileName = "dic"
                         print "What's the file name (___.txt): dic"
 
 
@@ -1192,9 +1192,9 @@ class Controller():
                                 chrisHamm = True
 
                             #If the server has a key
-                            elif rec == "found":
+                            elif rec == "done":
 
-                                self.controllerPipe.send("found")
+                                self.controllerPipe.send("done")
 
                                 #Get the key
                                 key = self.controllerPipe.recv()
@@ -1203,6 +1203,8 @@ class Controller():
                                 #isFound = self.dictionary.isKey(key)
 
                                 self.dictionary.setKey(key)
+
+                                isFound = True
 
                         elapsed = (time() - self.clock)
                         self.clock = elapsed
@@ -1595,7 +1597,7 @@ class Controller():
 
 
                          #Serve up the next chunk
-                        chunk = self.brute_force.get_chunk()
+                        chunk = self.brute_force.get_chunk().next()
 
                         #and process it using the node-side instance
                         brute_force2.run_chunk(chunk)
@@ -1642,7 +1644,9 @@ class Controller():
                         userInput = raw_input("Try Again: ")
 
                     #Reset the variables
-                    self.brute_force.reset()
+                    #self.brute_force.reset()
+                    self.brute_force = 0
+                    self.brute_force = Brute_Force()
 
                     if userInput in ("Back", "back", "b"):
 
@@ -1680,7 +1684,9 @@ class Controller():
                         userInput = raw_input("Try Again: ")
 
                     #Reset the variables
-                    self.brute_force.reset()
+                    #self.brute_force.reset()
+                    self.brute_force = 0
+                    self.brute_force = Brute_Force()
 
                     if userInput in ("Back", "back", "b"):
 

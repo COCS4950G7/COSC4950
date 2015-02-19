@@ -996,7 +996,7 @@ class Controller():
                 #fileName = raw_input("What's the file name (___.txt): ")
                 if self.aLane == True:
 
-                    fileName = "dic.txt"
+                    fileName = "dic"
                     print "What's the file name (___.txt): dic"
 
 
@@ -1192,9 +1192,9 @@ class Controller():
                             chrisHamm = True
 
                         #If the server has a key
-                        #elif rec == "found":
                         elif rec == "done":
-                            self.controllerPipe.send("done")#changed from found
+
+                            self.controllerPipe.send("done")
 
                             #Get the key
                             key = self.controllerPipe.recv()
@@ -1203,6 +1203,7 @@ class Controller():
                             #isFound = self.dictionary.isKey(key)
 
                             self.dictionary.setKey(key)
+
                             isFound = True #added in by chris hamm
 
                     elapsed = (time() - self.clock)
