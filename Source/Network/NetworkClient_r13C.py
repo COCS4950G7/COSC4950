@@ -4,6 +4,11 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkServer_r13C
 
+#IMPORTANT!!!!!!!
+    #THIS REVISION HAS BROKEN THE CRASH HANDLING SYSTEM OF SERVER, STILL RUNS THOUGH
+    #INSIGNIFICANT SPEED BOOST FROM ADDING QUEUES TO THE CLIENTS
+    #REV13B is stable and server still has queues which has a significant speed boost
+
 #Changes to be made to this revision:
     #(Implemented) Add a queue of chunks so that when controller requests the next chunk, controller can work on a stored chunk, for slight speed improvements
     #(Implemented) When client connects to server initially, request for 2 chunks, 1 for crunch now, the other for crunch while waiting for next chunk

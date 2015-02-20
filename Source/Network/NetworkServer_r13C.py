@@ -4,6 +4,11 @@ __author__ = 'chris hamm'
 
 #DEsigned to run with NetworkClient_r13C
 
+#IMPORTANT!!!!!!!
+    #THIS REVISION HAS BROKEN THE CRASH HANDLING SYSTEM OF SERVER, STILL RUNS THOUGH
+    #INSIGNIFICANT SPEED BOOST FROM ADDING QUEUES TO THE CLIENTS
+    #REV13B is stable and server still has queues which has a significant speed boost
+
 #Changes made in this revision:
     #NOTICE: The dictionary of current client tasks will not function properly since dictoinary only holds a single chunk
     #(Implemented) changed getClientFromDictionaryOfCurrentClient Tasks to silently error since that error is intentional
