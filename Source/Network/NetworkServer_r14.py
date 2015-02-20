@@ -3,6 +3,8 @@ __author__ = 'chris hamm'
 
 #REVERTED BACK TO REVISION 13
 
+#Instantly crashes, errno 49 can't assign requested address
+
 from multiprocessing.managers import SyncManager
 
 import time

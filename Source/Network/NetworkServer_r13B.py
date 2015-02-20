@@ -493,7 +493,7 @@ class NetworkServer():
     theSolution = "" #holds the solution if found
     stackOfIOCommands = [] #holds a record all the IO commands that have been sent through server
     stackOfChunksThatNeedToBeReassigned = [] #THIS CONTAINER IS TO BE REPLACED BY THE QUEUE OF STORED CHUNKS
-    queueOfStoredChunks = Queue() #This is the replacement for the staockOFChunkS that need to be reassigned
+    queueOfStoredChunks = Queue.Queue() #This is the replacement for the staockOFChunkS that need to be reassigned
     stackOfClientsWaitingForNextChunk = []
     dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
                                         #If you try to access a non-existing key it will throw an error
@@ -525,7 +525,11 @@ class NetworkServer():
                             if(checkForNextCommandFromClient(self,inboundCommandFromClient)==True):
                                 identifiedCommand= True
                                 if(self.queueOfStoredChunks.qsize() > 0):
+                                    #import Chunk
+                                    #tempChunk = Chunk.Chunk()
                                     tempChunk = self.queueOfStoredChunks.get()
+                                    #tempChunk.params = tempChunk2.params
+                                    #tempChunk.data = tempChunk2.data
                                     sendNextCommandToClientByLength(self, clientSocket, tempChunk)
                                     try:
                                         testChunk = getChunkFromDictionaryOfCurrentClientTasks(self, clientAddr)
@@ -769,14 +773,14 @@ class NetworkServer():
                             try: #checking for nextChunk Command from Controller
                                 if(checkForNextChunkCommandFromController(self,receivedControllerCommand)==True):
                                     identifiedCommand= True
-                                    if(len(self.stackOfClientsWaitingForNextChunk()) > 0):
+                                    if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                         tempClientSocket, tempClientAddr = popClientFromStackOfClientsWaitingForNextChunk(self)
                                         #send straight to client
-                                        outboundChunk = receivedControllerCommand
+                                        outboundChunk = receiveNextChunkFromController(self)
                                         sendNextCommandToClientByLength(self, tempClientSocket, outboundChunk)
                                         sendNextChunkCommandToController(self)
                                     else:
-                                        self.queueOfStoredChunks.put(receivedControllerCommand) #put into the queue [NOT USING THE BLOCKING FEATURE]
+                                        self.queueOfStoredChunks.put(receiveNextChunkFromController(self)) #put into the queue [NOT USING THE BLOCKING FEATURE]
                                    # print "MAIN THREAD: Identified receivedControllerCommand as the nextChunk Command\n"
                                     ''' (Needs to just add the chunk to the queue)
                                     #check to see if a client is waiting for the nextChunk

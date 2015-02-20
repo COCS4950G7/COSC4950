@@ -4,7 +4,9 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkClient_r13A
 
-#BUG: If node does not find solution, the node does not always receive the done command fro the server
+#BUG: Windows crashes
+
+#WARD CLAIMS THAT THERE IS A SEVERE FLAW IN THIS DESIGN
 
 
 #REVISION NOTES:

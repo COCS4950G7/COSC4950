@@ -4,6 +4,11 @@ __author__ = 'chris hamm'
 
 #Designed to work with NetworkClient_r13A
 
+#WARD CLAIMS THIS LAYOUT HAS A SEVERE DESIGN FLAW*****************************************
+#Using the timeouts is a sever flaw
+#need to change what threads you use, and kinds of threads
+
+#BUG:Windows crashes
 
 #Changes/Additions made to this revision:
     #Added a IO command stack that contains all IO commands tthe have been sent/received
