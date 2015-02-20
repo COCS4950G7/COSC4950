@@ -7,6 +7,7 @@ __author__ = 'chris hamm'
 #Changes made to this revision:
     #(Not yet implemented) Add a queue of chunks so that when client requests the next chunk, it can work on a stored chunk, for slight speed improvements
     #(Not yet implemented) When client connects to server initially, request for 2 chunks, 1 for crunch now, the other for crunch while waiting for next chunk
+        #NOTE: this will break the dictionary of currentclient tasks
     #(Implemented) Removed old outdated comments that are no longer useful
     #(Implemented) Removed old functions that are no longer used, including the getIP function since client's IP is irrelevant
 

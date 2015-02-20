@@ -5,8 +5,13 @@ __author__ = 'chris hamm'
 #DEsigned to run with NetworkClient_r13B
 
 #Changes from previous revision:
-    #(Not yet implemented) When server starts up, immeadiately request 5 chunks from the controller
-    #(Not yet implemented) Add a queue to hold excess chunks at all times, the queue is a buffer to improve speed slightly
+    #(Implemented) Replace the stackOfChunksThatNeedToBeReassigned with the queue of chunks
+        #changed receive chunk from controller setup to have chunk stored in the queue
+        #changed the receive nextchunk request from client setup to send the chunk from the queue, and if queue is empty, throw a warning
+        #STill checks for if clients are in the stackof waiting
+    #[MIGHT NOT BE NEEDED](Not implemented yet) Add a lock for the queue of stored chunks so there is no threading conflict
+    #(Implemented) When server starts up, immeadiately request 5 chunks from the controller
+    #(Implemented) Add a queue to hold excess chunks at all times, the queue is a buffer to improve speed slightly
     #(Implemented) Removed old unused functions and useless comments
 
 
@@ -247,7 +252,6 @@ def receiveCommandFromClient(self, clientSocket): #NOTE new function, used to re
             #print "Released socketLock\n"
             return receivedCommandFromClient
 
-
 #Outbound commands to client==================================================
 def sendDoneCommandToClient(self,networkSocket, clientIP):
     #print "Issuing Done Command to Client: " + str(clientIP) +"\n"
@@ -475,8 +479,8 @@ def popClientFromStackOfClientsWaitingForNextChunk(self):
 import threading
 import thread
 from socket import *
-import sys
 import platform
+import Queue
 
 class NetworkServer():
 
@@ -488,11 +492,11 @@ class NetworkServer():
     listOfCrashedClients = []
     theSolution = "" #holds the solution if found
     stackOfIOCommands = [] #holds a record all the IO commands that have been sent through server
-    stackOfChunksThatNeedToBeReassigned = []
+    stackOfChunksThatNeedToBeReassigned = [] #THIS CONTAINER IS TO BE REPLACED BY THE QUEUE OF STORED CHUNKS
+    queueOfStoredChunks = Queue() #This is the replacement for the staockOFChunkS that need to be reassigned
     stackOfClientsWaitingForNextChunk = []
     dictionaryOfCurrentClientTasks = {} #key is the client's IP Address , the value is the chunk that client is working on
                                         #If you try to access a non-existing key it will throw an error
-    #NOTE: NOT GOING TO HAVE A LIST OF CONNECTED CLIENTS, JUST USE THE DICTIONARY OF CURRENT CLIENT TASKS INSTEAD
 
     socketLock = threading.RLock()
 
@@ -520,6 +524,28 @@ class NetworkServer():
                         try: #checking to see if the next Command was received from the client try block
                             if(checkForNextCommandFromClient(self,inboundCommandFromClient)==True):
                                 identifiedCommand= True
+                                if(self.queueOfStoredChunks.qsize() > 0):
+                                    tempChunk = self.queueOfStoredChunks.get()
+                                    sendNextCommandToClientByLength(self, clientSocket, tempChunk)
+                                    try:
+                                        testChunk = getChunkFromDictionaryOfCurrentClientTasks(self, clientAddr)
+                                        #if succeeds, , then set value
+                                        setChunkToDictionaryOfCurrentClientTasks(self, clientAddr, tempChunk)
+                                    except Exception as inst:
+                                        #add client to the dictionary
+                                        addClientToDictionaryOfCurrentClientTasks(self, clientAddr, tempChunk)
+                                    #then request nextchunk from controller
+                                    sendNextChunkCommandToController(self)
+                                else:
+                                    #put client in stack of clients waiting
+                                    pushClientOnToStackOfClientsWaitingForNextChunk(self, clientSocket, clientAddr)
+                                    #request nextchunk from controller
+                                    sendNextChunkCommandToController(self)
+                                    print "==================================================\n"
+                                    print "WARNING: The queueOfStoredChunks is empty!!!!"
+                                    print "==================================================\n"
+                                    pushCommandOntoTheStackOfIOCommands(self, "WARNING: QueueOfSToredChunks is Empty!", "Self", "Self")
+                                ''' (Now checks the queue)
                                 #print "Identified inboundCommandFromClient as the Next Command\n"
                                 #check to see if there is a chunk that needs to be reassigned
                                 if(len(self.stackOfChunksThatNeedToBeReassigned) > 0):
@@ -537,7 +563,7 @@ class NetworkServer():
                                     #print "There is no chunk that needs to be reassigned. Requesting nextChunk from the Controller"
                                     sendNextChunkCommandToController(self)
                                     #print "Adding the client to the stackOfClientsWaitingForNextChunk"
-                                    pushClientOnToStackOfClientsWaitingForNextChunk(self,clientSocket, clientAddr)
+                                    pushClientOnToStackOfClientsWaitingForNextChunk(self,clientSocket, clientAddr) '''
                         except Exception as inst:
                             print "===================================================================\n"
                             print "Error in checking to see if the next Command was received from the client in client thread handler: "+str(inst)+"\n"
@@ -700,6 +726,14 @@ class NetworkServer():
         #START LISTENING TO SOCKET
         serverSocket.listen(5)
 
+        #MAKE INITIAL REQUEST OF CHUNKS TO CONTROLLER FOR THE QUEUE
+        #Initially requesting 5 chunks
+        sendNextChunkCommandToController(self)
+        sendNextChunkCommandToController(self)
+        sendNextChunkCommandToController(self)
+        sendNextChunkCommandToController(self)
+        sendNextChunkCommandToController(self)
+
         #MAIN THREAD SERVER LOOP
         try: #main thread server loop try block
             serverSocket.settimeout(0.25)
@@ -735,7 +769,16 @@ class NetworkServer():
                             try: #checking for nextChunk Command from Controller
                                 if(checkForNextChunkCommandFromController(self,receivedControllerCommand)==True):
                                     identifiedCommand= True
+                                    if(len(self.stackOfClientsWaitingForNextChunk()) > 0):
+                                        tempClientSocket, tempClientAddr = popClientFromStackOfClientsWaitingForNextChunk(self)
+                                        #send straight to client
+                                        outboundChunk = receivedControllerCommand
+                                        sendNextCommandToClientByLength(self, tempClientSocket, outboundChunk)
+                                        sendNextChunkCommandToController(self)
+                                    else:
+                                        self.queueOfStoredChunks.put(receivedControllerCommand) #put into the queue [NOT USING THE BLOCKING FEATURE]
                                    # print "MAIN THREAD: Identified receivedControllerCommand as the nextChunk Command\n"
+                                    ''' (Needs to just add the chunk to the queue)
                                     #check to see if a client is waiting for the nextChunk
                                     if(len(self.stackOfClientsWaitingForNextChunk) > 0):
                                        # print "MAIN THREAD: A client is waiting for the nextChunk\n"
@@ -751,7 +794,8 @@ class NetworkServer():
                                             addClientToDictionaryOfCurrentClientTasks(self,tempClientAddress, outboundChunk)
                                     else: #if there is no client waiting for the  next chunk
                                         #print "MAIN THREAD: No clients are waiting for the nextChunk. Adding chunk to the stackOfChunksThatNeedToBeReassigned"
-                                        pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)
+                                        pushChunkOnToStackOfChunksThatNeedToBeReassigned(self,receivedControllerCommand)'''
+
                             except Exception as inst:
                                 print "===================================================================\n"
                                 print "MAIN THREAD: Error in checking for nextChunk Command from Controller Try Block: " +str(inst)+"\n"
