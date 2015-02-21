@@ -3,7 +3,7 @@ __author__ = 'chris hamm'
 
 #REVERTED BACK TO REVISION 13
 
-#Instantly crashes, errno 49 can't assign requested address
+#Instantly crashes, errno 49 can't assign requested address (NEED TO CHANGE THE IP ADDRESS)
 
 from multiprocessing.managers import SyncManager
 
@@ -12,7 +12,7 @@ import Queue
 
 import Dictionary
 
-IP = "192.168.1.103"
+IP = "10.121.3.200"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
@@ -21,11 +21,11 @@ dictionary = Dictionary.Dictionary()
 def runserver():
     try: #runserver definition try block
         # Start a shared manager server and access its queues
-        manager = make_server_manager(PORTNUM, AUTHKEY)
+        manager = make_server_manager(PORTNUM, AUTHKEY) #Make a new manager
         shared_job_q = manager.get_job_q()
-        shared_result_q = manager.get_result_q()
+        shared_result_q = manager.get_result_q() #Shared result queue
         dictionary.setAlgorithm('md5')
-        dictionary.setFileName("dic.txt")
+        dictionary.setFileName("dic")
         dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
 
         while not dictionary.isEof():
@@ -36,15 +36,15 @@ def runserver():
             shared_job_q.put(newChunk) #put next chunk on the job queue
 
         while True:
-            result = shared_result_q.get()
-            if result[0] == "w":
+            result = shared_result_q.get() #get chunk from shared result queue
+            if result[0] == "w": #check to see if solution was found
                 print "The solution was found!"
                 key = result[1]
                 print "Key is: %s" % key
                 break
-            elif(result[0] == "c"):
+            elif(result[0] == "c"):  #check to see if client has crashed
                 print "A client has crashed!"
-            else: #f
+            else: #solution has not been found
                 print "Chunk finished with params: %s" %result[1]
 
         # Sleep a bit before shutting down the server - to give clients time to
