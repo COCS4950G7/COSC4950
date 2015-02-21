@@ -12,7 +12,7 @@ import Queue
 
 import Dictionary
 
-IP = "10.121.3.200"
+IP = "192.168.1.119"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
