@@ -3,6 +3,7 @@ __author__ = 'jwright'
 import Tkinter as tk
 from Tkinter import *
 import ttk
+import commands
 
 root = tk.Tk()
 root.title('Main Window')
@@ -25,7 +26,10 @@ def dic_win():
     QuitButton = tk.Button(DicWin, text='Quit', command=quit_win)
     QuitButton.pack()
 
-DicWinButton = tk.Button(root, text='Dictionary', command=dic_win)
+def dic_script():
+    print commands.getstatusoutput('python frameGUI_DIC.py')
+
+DicWinButton = tk.Button(root, text='Dictionary', command=dic_script)
 DicWinButton.pack()
 
 def brut_win():
