@@ -8,7 +8,10 @@ __author__ = 'chris hamm'
     #(Implemented) Added additional comments and section dividers
     #(Implemented) Reorganized the code to fit the sectional dividers better
     #(Implemented) Added in OS detection at the beginning of client, will also display your OS
-    #(Implemented) Requests for the server's IP address on startup. 
+    #(Implemented) Requests for the server's IP address on startup.
+
+#ENCOUNTERED MANY LIMITATIONS AND ISSUES IN TRYING TO IMPLEMENT A WAY TO MAKE CLIENTS STOP WHEN THE SOLUTION IS FOUND (SEE SERVER FOR MORE DETAILS)
+
 
 #IMPORTS===========================================================================================================
 from multiprocessing.managers import SyncManager
@@ -31,6 +34,7 @@ def runclient(): #Client Primary loop
 
         while True:
             try:
+
                 job = job_q.get_nowait()
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
@@ -49,8 +53,10 @@ def runclient(): #Client Primary loop
                     return
                 else:
                     result_q.put(("f", chunk.params))
-                    #result_q.put(("c", chunk.params))
+                        #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
+
             except Queue.Empty:
+                print "There are no more chunks to grab!!!"
                 return
     except Exception as inst:
         print "============================================================================================="
@@ -62,7 +68,7 @@ def runclient(): #Client Primary loop
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-        result_q.put(("c", chunk.params)) #tell server that client crashed
+        result_q.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TESted
         print "Sent crash message to server"
 #End of runclient function-------------------------------------------------------------------
 #make_client_manager function---------------------------------------------------------------

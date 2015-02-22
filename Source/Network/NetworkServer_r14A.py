@@ -10,6 +10,15 @@ __author__ = 'chris hamm'
     #(Implemented) Added OS detection at the beginning of server startup, also prints what OS you are using
     #(Implemented) Added in IP detection. It will automatically detect your ip for you, and set the IP variable to that IP address
 
+#NOTES/PROBLEMS ENCOUNTERED:
+    #THE MANAGERS DO NOT ALLOW INDEXING ONN THIER AUTOPROXY OBJECTS (MAKING SHARING SINGLE VALUE NOT POSSIBLE VIA THIS METHOD)
+        #POSSIBLE OPTION: SHARED CTYPE OBJECTS (QUITE COMPLICATED)
+        #POSSIBLE OPTION: "CONTAINER PROXY"
+    #QUEUE IS NOT PRACTICAL DATA TYPE TO USE TO SHARE VALUE BECAUSE YOU MUST CONSTANTLY PUT MORE VALUS IN, THEREFORE CAUSING LATENCY DEFEATING THE PURPOSE
+    #MODIFICATIONS TO MUTABLE VALUES/ITEMS IN DICT AND LIST PROXIES WILL NOT BE PROPOGATED THROUGH THE MANAGER BECAUSE THE PROXY HAS NO WAY OF KNOWING WHEN THE VALUES HAVE CHANGED
+
+
+
 #IMPORTS===============================================================================================================
 from multiprocessing.managers import SyncManager
 import platform
@@ -30,21 +39,26 @@ def runserver():  #the primary server loop
         dictionary.setAlgorithm('md5')
         dictionary.setFileName("dic")
         dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+        #foundSolution= False#DIDNT WORK
 
-        while not dictionary.isEof(): #Keep looping while it is not the end of the file
+
+        while(not dictionary.isEof()): #Keep looping while it is not the end of the file
                                         #NOTE: this causes clients to continue grabbing chunks even after the solution is found
+                                        #ATTEMPTED TO FIX THIS WITH A TERMINATING VALUE, BUT CLIENTS STILL DIDNT STOP
 
             #chunk is a Chunk object
             chunk = dictionary.getNextChunk() #get next chunk from dictionary
             newChunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data})
             shared_job_q.put(newChunk) #put next chunk on the job queue
 
-        while True:
+        while True: #original code
+        #while(foundSolution==False): #Potential flaw, if no solution is found, DIDNT WORK
             result = shared_result_q.get() #get chunk from shared result queue
             if result[0] == "w": #check to see if solution was found
                 print "The solution was found!"
                 key = result[1]
                 print "Key is: %s" % key
+                #foundSolution= True#DIDNT WORK
                 break
             elif(result[0] == "c"):  #check to see if client has crashed
                 print "A client has crashed!" #THIS FUNCTION IS UNTESTED
@@ -75,6 +89,7 @@ def make_server_manager(port, authkey):
     try: #Make_server_manager definition try block
         job_q = Queue.Queue(maxsize=1000)
         result_q = Queue.Queue()
+
 
         try: #JobQueueManager/Lambda functions Try Block
             JobQueueManager.register('get_job_q', callable=lambda: job_q)
