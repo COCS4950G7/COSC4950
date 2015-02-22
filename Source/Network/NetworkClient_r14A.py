@@ -33,31 +33,27 @@ def runclient(): #Client Primary loop
         dictionary = Dictionary.Dictionary()
 
         while True:
-            try:
 
-                job = job_q.get_nowait()
-                chunk = Chunk.Chunk()
-                chunk.params = job.value['params']
-                chunk.data = job.value['data']
-                print chunk.params
-                time.sleep(.01)
-                dictionary.find(chunk)
-                result = dictionary.isFound()
-                time.sleep(0.00)
-                if result:
-                    print "Hooray!"
-                    print "key is: " + dictionary.showKey()
-                    key = dictionary.showKey()
-                    result_q.put(("w", key))
-                   # result_q.put(("c", key))
-                    return
-                else:
-                    result_q.put(("f", chunk.params))
-                        #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
-
-            except Queue.Empty:
-                print "There are no more chunks to grab!!!"
+            job = job_q.get()
+            if job.value['halt']:
                 return
+            chunk = Chunk.Chunk()
+            chunk.params = job.value['params']
+            chunk.data = job.value['data']
+            print chunk.params
+            dictionary.find(chunk)
+            result = dictionary.isFound()
+            if result:
+                print "Hooray!"
+                print "key is: " + dictionary.showKey()
+                key = dictionary.showKey()
+                result_q.put(("w", key))
+               # result_q.put(("c", key))
+                return
+            else:
+                result_q.put(("f", chunk.params))
+                    #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
+
     except Exception as inst:
         print "============================================================================================="
         print "ERROR: An exception was thrown in runclient definition try block"
@@ -83,6 +79,7 @@ def make_client_manager(ip, port, authkey):
 
         ServerQueueManager.register('get_job_q')
         ServerQueueManager.register('get_result_q')
+        ServerQueueManager.register('get_command_value')
 
         manager = ServerQueueManager(address=(ip, port), authkey=authkey)
         manager.connect()

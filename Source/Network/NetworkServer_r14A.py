@@ -39,7 +39,7 @@ def runserver():  #the primary server loop
         shared_job_q = manager.get_job_q()
         shared_result_q = manager.get_result_q() #Shared result queue
         dictionary.setAlgorithm('md5')
-        dictionary.setFileName("realuniq")
+        dictionary.setFileName("dic")
         dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
         found_solution.value = False
 
@@ -51,6 +51,7 @@ def runserver():  #the primary server loop
         # block while there is no result, then terminate chunking and checking
         result_monitor.join()
         result_monitor.terminate()
+        chunk_maker.join()
         chunk_maker.terminate()
         # Sleep a bit before shutting down the server - to give clients time to
         # realize the job queue is empty and exit in an orderly way.
@@ -76,7 +77,6 @@ def make_server_manager(port, authkey):
     try: #Make_server_manager definition try block
         job_q = Queue.Queue(maxsize=100)
         result_q = Queue.Queue()
-
 
         try: #JobQueueManager/Lambda functions Try Block
             JobQueueManager.register('get_job_q', callable=lambda: job_q)
@@ -117,8 +117,7 @@ def check_results(results_queue):
             key = result[1]
             found_solution.value = True
             print "Key is: %s" % key
-            #foundSolution= True#DIDNT WORK
-            break
+
         elif(result[0] == "c"):  #check to see if client has crashed
             print "A client has crashed!" #THIS FUNCTION IS UNTESTED
         else: #solution has not been found
@@ -130,14 +129,23 @@ def check_results(results_queue):
 
 # feed dictionary chunks to job queue
 def chunk_dictionary(dictionary, manager, job_queue):
-    while not dictionary.isEof():  # Keep looping while it is not the end of the file
+    while not dictionary.isEof() and not found_solution.value:  # Keep looping while it is not the end of the file
         #chunk is a Chunk object
         chunk = dictionary.getNextChunk() #get next chunk from dictionary
-        new_chunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data, 'timestamp': time.time()})
+        new_chunk = manager.Value(dict, {'params': chunk.params,
+                                         'data': chunk.data,
+                                         'timestamp': time.time(),
+                                         'halt': False})
         job_queue.put(new_chunk)  # put next chunk on the job queue.
                                   # queue is blocking by default, so will just wait until it is no longer full before adding another.
         #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
         sent_chunks.append((chunk.params, time.time()))
+    if found_solution.value:
+        while True:
+            try:
+                job_queue.get_nowait()
+            except Queue.Empty:
+                return
 
 # placeholder for brute force integration
 def chunk_brute_force(bf, job_queue):
