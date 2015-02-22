@@ -8,6 +8,7 @@ __author__ = 'chris hamm'
     #(Implemented) Added additional comments and section dividers
     #(Implemented) Reorganized the code to fit the sectional dividers better
     #(Implemented) Added in OS detection at the beginning of client, will also display your OS
+    #(Implemented) Requests for the server's IP address on startup. 
 
 #IMPORTS===========================================================================================================
 from multiprocessing.managers import SyncManager
@@ -118,7 +119,7 @@ if __name__ == '__main__': #Equivalent to Main
         #detect the OS
         try: #getOS try block
             print "*************************************"
-            print "    Network Server"
+            print "    Network Client"
             print "*************************************"
             print "OS DETECTION:"
             if(platform.system()=="Windows"): #Detecting Windows
@@ -143,6 +144,20 @@ if __name__ == '__main__': #Equivalent to Main
             print inst #_str_ allows args tto be printed directly
             print "========================================================================================"
         #end of detect the OS
+
+        #Get the servers IP address from the user
+        try:
+            #request for the server's IP address
+            user_input = raw_input("Enter the Server's IP Address:")  #NOTE: needs to be made more tolerant of input errors
+            IP = user_input
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in get server IP address from user try block"
+            print type(inst) #the exception instance
+            print inst.args #srguments stored in .args
+            print inst #_str_ allows args tto be printed directly
+            print "========================================================================================"
+        #End of get the server IP address from the user
 
         #Start the primary client while loop
         runclient()
