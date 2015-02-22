@@ -1,9 +1,7 @@
 __author__ = 'chris hamm'
 #NetworkServer_r14
 
-#REVERTED BACK TO REVISION 13
 
-#Instantly crashes, errno 49 can't assign requested address (NEED TO CHANGE THE IP ADDRESS)
 
 from multiprocessing.managers import SyncManager
 

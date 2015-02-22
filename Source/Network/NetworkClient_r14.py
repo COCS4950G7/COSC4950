@@ -1,9 +1,7 @@
 __author__ = 'chris hamm'
 #NetworkClient_r14
 
-#REVERTING BACK TO REVISION 13
 
-#Instantly crashes, attribute error, and unboundlocalerror
 
 from multiprocessing.managers import SyncManager
 import Dictionary
