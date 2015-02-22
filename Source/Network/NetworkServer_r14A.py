@@ -22,6 +22,7 @@ __author__ = 'chris hamm'
 
 #IMPORTS===============================================================================================================
 from multiprocessing.managers import SyncManager
+from multiprocessing import Process, Value
 import platform
 import time
 import Queue
@@ -38,34 +39,19 @@ def runserver():  #the primary server loop
         shared_job_q = manager.get_job_q()
         shared_result_q = manager.get_result_q() #Shared result queue
         dictionary.setAlgorithm('md5')
-        dictionary.setFileName("dic")
+        dictionary.setFileName("realuniq")
         dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-        #foundSolution= False#DIDNT WORK
+        found_solution.value = False
 
-
-        while(not dictionary.isEof()): #Keep looping while it is not the end of the file
-                                        #NOTE: this causes clients to continue grabbing chunks even after the solution is found
-                                        #ATTEMPTED TO FIX THIS WITH A TERMINATING VALUE, BUT CLIENTS STILL DIDNT STOP
-
-            #chunk is a Chunk object
-            chunk = dictionary.getNextChunk() #get next chunk from dictionary
-            newChunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data})
-            shared_job_q.put(newChunk) #put next chunk on the job queue
-
-        while True: #original code
-        #while(foundSolution==False): #Potential flaw, if no solution is found, DIDNT WORK
-            result = shared_result_q.get() #get chunk from shared result queue
-            if result[0] == "w": #check to see if solution was found
-                print "The solution was found!"
-                key = result[1]
-                print "Key is: %s" % key
-                #foundSolution= True#DIDNT WORK
-                break
-            elif(result[0] == "c"):  #check to see if client has crashed
-                print "A client has crashed!" #THIS FUNCTION IS UNTESTED
-            else: #solution has not been found
-                print "Chunk finished with params: %s" %result[1]
-
+        # Spawn processes to feed the queue and monitor the result queue
+        chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
+        chunk_maker.start()
+        result_monitor = Process(target=check_results, args=(shared_result_q,))
+        result_monitor.start()
+        # block while there is no result, then terminate chunking and checking
+        result_monitor.join()
+        result_monitor.terminate()
+        chunk_maker.terminate()
         # Sleep a bit before shutting down the server - to give clients time to
         # realize the job queue is empty and exit in an orderly way.
         time.sleep(2)
@@ -88,7 +74,7 @@ def make_server_manager(port, authkey):
         Return a manager object with get_job_q and get_result_q methods.
     """
     try: #Make_server_manager definition try block
-        job_q = Queue.Queue(maxsize=1000)
+        job_q = Queue.Queue(maxsize=100)
         result_q = Queue.Queue()
 
 
@@ -121,6 +107,46 @@ def make_server_manager(port, authkey):
         print inst
         print "============================================================================================="
 #End of make_server_manager function-------------------------------------------------------------------------------
+
+# monitor reesults queue
+def check_results(results_queue):
+    while not found_solution.value:
+        result = results_queue.get() #get chunk from shared result queue
+        if result[0] == "w": #check to see if solution was found
+            print "The solution was found!"
+            key = result[1]
+            found_solution.value = True
+            print "Key is: %s" % key
+            #foundSolution= True#DIDNT WORK
+            break
+        elif(result[0] == "c"):  #check to see if client has crashed
+            print "A client has crashed!" #THIS FUNCTION IS UNTESTED
+        else: #solution has not been found
+            print "Chunk finished with params: %s" %result[1]
+            # go through the sent chunks list and remove the finished chunk
+            for chunk in sent_chunks:
+                if chunk[0] == result[1]:
+                    sent_chunks.remove(chunk)
+
+# feed dictionary chunks to job queue
+def chunk_dictionary(dictionary, manager, job_queue):
+    while not dictionary.isEof():  # Keep looping while it is not the end of the file
+        #chunk is a Chunk object
+        chunk = dictionary.getNextChunk() #get next chunk from dictionary
+        new_chunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data, 'timestamp': time.time()})
+        job_queue.put(new_chunk)  # put next chunk on the job queue.
+                                  # queue is blocking by default, so will just wait until it is no longer full before adding another.
+        #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
+        sent_chunks.append((chunk.params, time.time()))
+
+# placeholder for brute force integration
+def chunk_brute_force(bf, job_queue):
+    return
+
+# placeholder for rainbow table integration
+def chunk_rainbow(rainbow, job_queue):
+    return
+
 #END OF FUNCTIONS======================================================================================================
 
 #AUXILLERY CLASSES===============================================================================================================
@@ -141,7 +167,8 @@ PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
 dictionary = Dictionary.Dictionary()
-
+sent_chunks = []  # list of chunks added to queue, added with timestamp to keep track of missing pieces
+found_solution = Value('b', False)  # synchronized found solution variable
 
 
 if __name__ == '__main__': #Equivalent to Main
