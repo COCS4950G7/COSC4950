@@ -5,21 +5,23 @@ __author__ = 'chris hamm'
 #Designed to run with NetworkServer_r14A
 
 #Things that where changed in this revision (compared to original rev14)
+    #(Implemented) Added additional comments and section dividers
+    #(Implemented) Reorganized the code to fit the sectional dividers better
+    #(Implemented) Added in OS detection at the beginning of client, will also display your OS
 
-
-
+#IMPORTS===========================================================================================================
 from multiprocessing.managers import SyncManager
 import Dictionary
 import Queue
 import Chunk
 import time
+import platform
 
-IP = "192.168.2.136"
-PORTNUM = 22536
-AUTHKEY = "Popcorn is awesome!!!"
+#END OF IMPORTS===================================================================================================
 
-
-def runclient():
+#FUNCTIONS========================================================================================================
+#runclient function---------------------------------------------------------------------------
+def runclient(): #Client Primary loop
     try: #runclient definition try block
         manager = make_client_manager(IP, PORTNUM, AUTHKEY)
         job_q = manager.get_job_q()
@@ -61,10 +63,8 @@ def runclient():
         print "============================================================================================="
         result_q.put(("c", chunk.params)) #tell server that client crashed
         print "Sent crash message to server"
-
-class ServerQueueManager(SyncManager):
-    pass
-
+#End of runclient function-------------------------------------------------------------------
+#make_client_manager function---------------------------------------------------------------
 def make_client_manager(ip, port, authkey):
     """ Create a manager for a client. This manager connects to a server on the
         given address and exposes the get_job_q and get_result_q methods for
@@ -92,11 +92,59 @@ def make_client_manager(ip, port, authkey):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#End of make_client_manager function------------------------------------------------------------------------------
+#END OF FUNCTIONS===================================================================================================
 
-if __name__ == '__main__':
+#Auxillery CLASSES===========================================================================================================
+class ServerQueueManager(SyncManager):
+    pass
+
+#End of Auxillery Classes======================================================================================================
+
+
+
+IP = "127.0.0.1" #default is pingback
+PORTNUM = 22536
+AUTHKEY = "Popcorn is awesome!!!"
+
+
+
+if __name__ == '__main__': #Equivalent to Main
     try: #Main
+        #Create timer to keep track of how long the client ran for
         import time
         start_time= time.time()
+
+        #detect the OS
+        try: #getOS try block
+            print "*************************************"
+            print "    Network Server"
+            print "*************************************"
+            print "OS DETECTION:"
+            if(platform.system()=="Windows"): #Detecting Windows
+                print platform.system()
+                print platform.win32_ver()
+            elif(platform.system()=="Linux"): #Detecting Linux
+                print platform.system()
+                print platform.dist()
+            elif(platform.system()=="Darwin"): #Detecting OSX
+                print platform.system()
+                print platform.mac_ver()
+            else:                           #Detecting an OS that is not listed
+                print platform.system()
+                print platform.version()
+                print platform.release()
+            print "*************************************"
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in getOS try block"
+            print type(inst) #the exception instance
+            print inst.args #srguments stored in .args
+            print inst #_str_ allows args tto be printed directly
+            print "========================================================================================"
+        #end of detect the OS
+
+        #Start the primary client while loop
         runclient()
     except Exception as inst:
         print "============================================================================================="
@@ -109,6 +157,7 @@ if __name__ == '__main__':
         print inst
         print "============================================================================================="
     finally:
+        #output the timer, stating how long client ran for
         end_time= time.time() - start_time
         print "Client ran for: "+str(end_time)+" seconds"
 
