@@ -79,7 +79,7 @@ def make_client_manager(ip, port, authkey):
 
         ServerQueueManager.register('get_job_q')
         ServerQueueManager.register('get_result_q')
-        ServerQueueManager.register('get_command_value')
+        ServerQueueManager.register('get_command_value') #NOTE: THIS IS NEVER USED !!!!!!!!!!!!111
 
         manager = ServerQueueManager(address=(ip, port), authkey=authkey)
         manager.connect()

@@ -110,50 +110,96 @@ def make_server_manager(port, authkey):
 
 # monitor reesults queue
 def check_results(results_queue):
-    while not found_solution.value:
-        result = results_queue.get() #get chunk from shared result queue
-        if result[0] == "w": #check to see if solution was found
-            print "The solution was found!"
-            key = result[1]
-            found_solution.value = True
-            print "Key is: %s" % key
+    try:
+        while not found_solution.value:
+            result = results_queue.get() #get chunk from shared result queue
+            if result[0] == "w": #check to see if solution was found
+                print "The solution was found!"
+                key = result[1]
+                found_solution.value = True
+                print "Key is: %s" % key
 
-        elif(result[0] == "c"):  #check to see if client has crashed
-            print "A client has crashed!" #THIS FUNCTION IS UNTESTED
-        else: #solution has not been found
-            print "Chunk finished with params: %s" %result[1]
-            # go through the sent chunks list and remove the finished chunk
-            for chunk in sent_chunks:
-                if chunk[0] == result[1]:
-                    sent_chunks.remove(chunk)
+            elif(result[0] == "c"):  #check to see if client has crashed
+                print "A client has crashed!" #THIS FUNCTION IS UNTESTED
+            else: #solution has not been found
+                print "Chunk finished with params: %s" %result[1]
+                # go through the sent chunks list and remove the finished chunk
+                for chunk in sent_chunks:
+                    if chunk[0] == result[1]:
+                        sent_chunks.remove(chunk)
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in check_results definition Try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 # feed dictionary chunks to job queue
 def chunk_dictionary(dictionary, manager, job_queue):
-    while not dictionary.isEof() and not found_solution.value:  # Keep looping while it is not the end of the file
-        #chunk is a Chunk object
-        chunk = dictionary.getNextChunk() #get next chunk from dictionary
-        new_chunk = manager.Value(dict, {'params': chunk.params,
-                                         'data': chunk.data,
-                                         'timestamp': time.time(),
-                                         'halt': False})
-        job_queue.put(new_chunk)  # put next chunk on the job queue.
-                                  # queue is blocking by default, so will just wait until it is no longer full before adding another.
-        #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
-        sent_chunks.append((chunk.params, time.time()))
-    if found_solution.value:
-        while True:
-            try:
-                job_queue.get_nowait()
-            except Queue.Empty:
-                return
+    try:
+        while not dictionary.isEof() and not found_solution.value:  # Keep looping while it is not the end of the file
+            #chunk is a Chunk object
+            chunk = dictionary.getNextChunk() #get next chunk from dictionary
+            new_chunk = manager.Value(dict, {'params': chunk.params,
+                                             'data': chunk.data,
+                                             'timestamp': time.time(),
+                                             'halt': False})
+            job_queue.put(new_chunk)  # put next chunk on the job queue.
+                                      # queue is blocking by default, so will just wait until it is no longer full before adding another.
+            #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
+            sent_chunks.append((chunk.params, time.time()))
+        if found_solution.value:
+            while True:
+                try:
+                    job_queue.get_nowait()
+                except Queue.Empty:
+                    return
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in chunk_dictionary definition Try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 # placeholder for brute force integration
 def chunk_brute_force(bf, job_queue):
-    return
+    try:
+        #INSERT CODE HERE
+        return
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in chunk_brute_force definition Try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 # placeholder for rainbow table integration
 def chunk_rainbow(rainbow, job_queue):
-    return
+    try:
+        #INSERT CODE HERE
+        return
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in chunk_rainbow definition Try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
 
 #END OF FUNCTIONS======================================================================================================
 
