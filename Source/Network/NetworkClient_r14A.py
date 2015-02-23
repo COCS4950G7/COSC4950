@@ -76,7 +76,6 @@ def make_client_manager(ip, port, authkey):
     """
     try:
 
-
         ServerQueueManager.register('get_job_q')
         ServerQueueManager.register('get_result_q')
         ServerQueueManager.register('get_command_value') #NOTE: THIS IS NEVER USED !!!!!!!!!!!!111
