@@ -10,13 +10,8 @@ __author__ = 'chris hamm'
     #(Implemented) Added OS detection at the beginning of server startup, also prints what OS you are using
     #(Implemented) Added in IP detection. It will automatically detect your ip for you, and set the IP variable to that IP address
 
-#NOTES/PROBLEMS ENCOUNTERED:
-    #THE MANAGERS DO NOT ALLOW INDEXING ONN THIER AUTOPROXY OBJECTS (MAKING SHARING SINGLE VALUE NOT POSSIBLE VIA THIS METHOD)
-        #POSSIBLE OPTION: SHARED CTYPE OBJECTS (QUITE COMPLICATED)
-        #POSSIBLE OPTION: "CONTAINER PROXY"
-        #POSSIBLE OPTION: USE SOCKETS TO SEND MESSAGES TO EACH OF THE CLIENTS INSTEAD OF THE MANAGERS
-    #QUEUE IS NOT PRACTICAL DATA TYPE TO USE TO SHARE VALUE BECAUSE YOU MUST CONSTANTLY PUT MORE VALUS IN, THEREFORE CAUSING LATENCY DEFEATING THE PURPOSE
-    #MODIFICATIONS TO MUTABLE VALUES/ITEMS IN DICT AND LIST PROXIES WILL NOT BE PROPOGATED THROUGH THE MANAGER BECAUSE THE PROXY HAS NO WAY OF KNOWING WHEN THE VALUES HAVE CHANGED
+#NOTES:
+    #The dictionary class is directly connected to the server, This is Nick's area of expertese
 
 
 
@@ -24,7 +19,6 @@ __author__ = 'chris hamm'
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, Value
 import platform
-import time
 import Queue
 import socket
 import Dictionary
@@ -77,6 +71,7 @@ def make_server_manager(port, authkey):
     try: #Make_server_manager definition try block
         job_q = Queue.Queue(maxsize=100)
         result_q = Queue.Queue()
+
 
         try: #JobQueueManager/Lambda functions Try Block
             JobQueueManager.register('get_job_q', callable=lambda: job_q)
