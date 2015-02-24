@@ -9,6 +9,13 @@
 #   brute forcing is going to ba a long term computation, it makes sense to minimize network overhead by giving
 #   work units that last from a few tens to a couple hundred seconds.
 
+#   2/23/2015
+#   Removed internal get_chunk() method as chunking has moved into server to resolve a major issue. Removed internal
+#   testing method as this class should never be run directly anymore. Changed the name of from_controller to set_params
+#   to better reflect the new program structure. Added start_processes() method to start a global pool of processes
+#   which are fed by the internal queue. Changed run_chunk to simply add the chunk to the queue. This should improve
+#   efficiency of parallel processing with the new network client functionality by minimizing downtime and overhead.
+
 import hashlib
 import os
 import itertools
@@ -25,12 +32,13 @@ class WorkUnit(object):
         self.length = length
         self.alphabet = alphabet
 
+
 class Brute_Force():
     minKeyLength = 6
     maxKeyLength = 16
     alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
-    algorithm = "sha256"
-    origHash = ''
+    algorithm = "md5"
+    origHash = '12c8de03d4562ba9f810e7e1e7c6fc15'
     key = ''
     rec = None
     charactersToCheck = 3
@@ -41,13 +49,14 @@ class Brute_Force():
     total_work_units = 0
     possibilities_exhausted = False
     first_unit = True
+    children = []
 
     def __init__(self):
         if not __name__ == '__main__':
                 return
         self.test_me()
 
-    def from_controller(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
+    def set_params(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
         self.alphabet = alphabet
         self.algorithm = algorithm
         self.origHash = origHash
@@ -60,7 +69,7 @@ class Brute_Force():
         self.maxKeyLength = 16
         self.alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
         self.algorithm = "sha256"
-        self.origHash = ''
+        self.origHash = '12c8de03d4562ba9f810e7e1e7c6fc15'
         self.key = ''
         self.rec = None
         self.charactersToCheck = 3
@@ -81,8 +90,13 @@ class Brute_Force():
     def possibilitiesEhausted(self):
         return self.possibilities_exhausted
 
-    def terminate_processes(self, children):
-        for process in children:
+    def start_processes(self):
+        for j in range(0, cpu_count()):
+            self.children.append(Process(target=self.check_keys))
+            self.children[j].start()
+
+    def terminate_processes(self):
+        for process in self.children:
             process.terminate()
 
     def check_short_keys(self):
@@ -90,7 +104,7 @@ class Brute_Force():
             return
         print "check_short_keys called for lengths %d-%d and no prefix." % (self.minKeyLength, self.charactersToCheck)
 
-        keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j) for j in range(self.minKeyLength-1, self.charactersToCheck+1))
+        keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j) for j in range(self.minKeyLength, self.charactersToCheck+1))
         for key in keylist:
             tempkey = ''.join(key)
             if self.isSolution(tempkey):
@@ -103,6 +117,7 @@ class Brute_Force():
         return False
 
     def check_keys(self):
+
         while self.queue:
             if self.done.value:
                 return
@@ -112,14 +127,16 @@ class Brute_Force():
             print "check_keys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
 
             prefix = ''.join(workunit.prefix)
-            keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=(workunit.length)))
+            keylist = itertools.product(self.alphabet, repeat=(self.charactersToCheck))
 
             for key in keylist:
-                tempkey = prefix + ''.join(workunit.prefix)
+                tempkey = prefix + ''.join(key)
+                #print tempkey
                 if self.isSolution(tempkey):
                     while not self.queue.empty():
                         self.queue.get()
                     self.countey.value += 1
+                    self.queue.close()
                     print "We win!"
                     return True
             self.countey.value += 1
@@ -130,9 +147,15 @@ class Brute_Force():
     def get_prefix(self):
         if self.minKeyLength < self.charactersToCheck:
             yield ''
-        for i in range(self.charactersToCheck-1, self.maxKeyLength-self.charactersToCheck+1):
+        if self.minKeyLength < self.charactersToCheck:
+            min_length = self.charactersToCheck
+        else:
+            min_length = self.minKeyLength-self.charactersToCheck
+        for i in range(1, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             for prefix in prefixes:
+                if self.done.value:
+                    return
                 yield ''.join(prefix)
 
 #   Hash a possible key and check if it is equal to the hashed input.
@@ -156,7 +179,7 @@ class Brute_Force():
         while True:
             iterations *= self.alphabet.__len__()
             self.charactersToCheck += 1
-            if iterations > 100000000:
+            if iterations > 10000000:
                 self.charactersToCheck -= 1
                 iterations /= self.alphabet.__len__()
                 break
@@ -165,24 +188,21 @@ class Brute_Force():
         for i in range(self.minKeyLength, self.maxKeyLength):
             self.total_work_units += ((self.alphabet.__len__() ^ i)/self.chunk_size)
 
-#   get_chunk() is an iterator which yields a new chunk of data each time it is called.
-    def get_chunk(self):
-        for prefix in self.get_prefix():
-            print "get chunk prefix: %s" % prefix
-            if prefix == '':
-                prefix = "-99999999999999999999999999999999999"
-                min_length = self.minKeyLength
-                if self.charactersToCheck > self.maxKeyLength:
-                    max_length = self.maxKeyLength
-                else:
-                    max_length = self.charactersToCheck
-            else:
-                min_length = len(prefix) + self.charactersToCheck-1
-                max_length = min_length
-            chunk = Chunk.Chunk()
-            chunk.params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" + str(min_length) + "\n" + str(max_length) + "\n" + prefix + "\n0\n0\n0"
-            yield chunk
-        self.possibilities_exhausted = True
+#   get_chunk() is an iterator which yields a new chunk of data each time get_chunk.next() is called.
+        # BROKEN, DO NOT USE!
+    # def get_chunk(self):
+    #
+    #     for prefix in self.get_prefix():
+    #
+    #         print "get chunk prefix: %s" % prefix
+    #         if prefix == '':
+    #             prefix = "-99999999999999999999999999999999999"
+    #
+    #         chunk = Chunk.Chunk()
+    #         chunk.params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" + str(self.minKeyLength) + "\n" + str(self.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
+    #
+    #         yield chunk
+    #     self.possibilities_exhausted = True
 
 #   run_chunk takes an object of type Chunk.Chunk(), checks all possibilities within the parameters of the chunk,
 #   sets global variables according to the chunk data and returns True or False to indicate if the cracking succeeded.
@@ -192,84 +212,29 @@ class Brute_Force():
         self.algorithm = settings_list[1]
         self.origHash = settings_list[2]
         self.alphabet = settings_list[3]
-        self.minKeyLength = int(settings_list[4])
-        self.maxKeyLength = int(settings_list[5])
+
         prefix = settings_list[6]
-        self.set_chars_to_check()
-        self.charactersToCheck -= 1
-        children = []
+
         alphabet = self.alphabet
-        print "run chunk prefix: %s" % prefix
         if prefix == "-99999999999999999999999999999999999":
             prefix = ''
+        if prefix == '' and self.first_unit:
+            self.first_unit = False
             self.check_short_keys()
         else:
-            for j in range(0, cpu_count()):
-                children.append(Process(target=self.check_keys))
-                children[j].start()
-            for letter in alphabet:
-                if self.done.value:
-                    while not self.queue.empty():
-                        self.queue.get()
-                    self.queue.close()
-                    self.terminate_processes(children)
-                    return
-                else:
-                    pref = prefix
-                    pref.join(letter)
-                    self.queue.put(WorkUnit(pref, self.charactersToCheck-1, self.alphabet))
 
-            #wait while we burn through any remaining queue
-            while self.queue:
-                if self.done.value:
-                    break
+            if self.done.value:
+                return True
+            else:
+                print "run chunk prefix: %s" % prefix
 
-            self.queue.close()
-            self.terminate_processes(children)
+                self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet))
 
         if self.done:
             return True
         else:
             return False
 
-#   This method tests the operation of the chunking and cracking methods.
-    def test_me(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-        self.what_we_got()
-        key = raw_input("Enter a key from %d to %d characters: " % (self.minKeyLength, self.maxKeyLength))
-        self.key = key
-        self.origHash = hashlib.new(self.algorithm, key).hexdigest()
-        print "The Key you entered was: ", key
-        print "Which has a hash of: ", self.origHash
-        os.system('cls' if os.name == 'nt' else 'clear')
-        self.what_we_got()
-
-        self.set_chars_to_check()
-        self.done.value = False
-        start = time()
-        while not self.done.value and not self.possibilities_exhausted:
-            chunk = self.get_chunk().next()
-            print "\n\nData from chunk:"
-            settings = chunk.params
-            settings_list = settings.split()
-            self.algorithm = settings_list[1]
-            print "Algorithm: " + self.algorithm
-            self.origHash = settings_list[2]
-            print "Hash: " + self.origHash
-            self.alphabet = settings_list[3]
-            print "Alphabet: " + self.alphabet
-            self.minKeyLength = int(settings_list[4])
-            self.maxKeyLength = int(settings_list[5])
-            print "Checking keys from " + str(self.minKeyLength) + " to " + str(self.maxKeyLength) + " characters."
-            prefix = settings_list[6]
-            print "Prefix: " + prefix
-            self.run_chunk(chunk)
-
-        finish = time()
-        speed = self.chunk_size / (finish - start)
-
-        print "That took: %d seconds." %((finish - start))
-        print "At about: %d hashes per second." % speed
 
     def what_we_got(self):
 
@@ -283,4 +248,4 @@ class Brute_Force():
 
 if __name__ == '__main__':
     bf = Brute_Force()
-    bf
+    #bf
