@@ -50,7 +50,8 @@ def runserver():  #the primary server loop
             # this will be replaced by input from the user once controller is reworked
             dictionary.setAlgorithm('md5')
             dictionary.setFileName("realuniq")
-            dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+            #dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+            dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
             found_solution.value = False
             chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
         else:
