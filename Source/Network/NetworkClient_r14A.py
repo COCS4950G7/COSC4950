@@ -10,12 +10,15 @@ __author__ = 'chris hamm'
     #(Implemented) Added in OS detection at the beginning of client, will also display your OS
     #(Implemented) Requests for the server's IP address on startup.
 
-#Dictionary is directly integrated into Client, this is Nick's expertese
+#ENCOUNTERED MANY LIMITATIONS AND ISSUES IN TRYING TO IMPLEMENT A WAY TO MAKE CLIENTS STOP WHEN THE SOLUTION IS FOUND (SEE SERVER FOR MORE DETAILS)
+
 
 #IMPORTS===========================================================================================================
 from multiprocessing.managers import SyncManager
 import Dictionary
+import Queue
 import Chunk
+import time
 import platform
 
 #END OF IMPORTS===================================================================================================
@@ -27,9 +30,11 @@ def runclient(): #Client Primary loop
         manager = make_client_manager(IP, PORTNUM, AUTHKEY)
         job_q = manager.get_job_q()
         result_q = manager.get_result_q()
+        shutdown = manager.get_shutdown()
         dictionary = Dictionary.Dictionary()
 
-        while True:
+
+        while not shutdown.is_set():
 
             job = job_q.get()
             if job.value['halt']:
@@ -45,10 +50,13 @@ def runclient(): #Client Primary loop
                 print "key is: " + dictionary.showKey()
                 key = dictionary.showKey()
                 result_q.put(("w", key))
-                return
+               # result_q.put(("c", key))
+
             else:
                 result_q.put(("f", chunk.params))
-
+                    #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
+        if shutdown.is_set():
+            print "received shutdown notice from server."
     except Exception as inst:
         print "============================================================================================="
         print "ERROR: An exception was thrown in runclient definition try block"
@@ -59,7 +67,7 @@ def runclient(): #Client Primary loop
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-        result_q.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TEStED
+        result_q.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TESted
         print "Sent crash message to server"
 #End of runclient function-------------------------------------------------------------------
 #make_client_manager function---------------------------------------------------------------
@@ -71,9 +79,10 @@ def make_client_manager(ip, port, authkey):
     """
     try:
 
+
         ServerQueueManager.register('get_job_q')
         ServerQueueManager.register('get_result_q')
-        ServerQueueManager.register('get_command_value') #NOTE: THIS IS NEVER USED !!!!!!!!!!!!111
+        ServerQueueManager.register('get_shutdown')
 
         manager = ServerQueueManager(address=(ip, port), authkey=authkey)
         manager.connect()

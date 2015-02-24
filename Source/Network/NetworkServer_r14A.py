@@ -23,7 +23,7 @@ __author__ = 'chris hamm'
 
 #IMPORTS===============================================================================================================
 from multiprocessing.managers import SyncManager
-from multiprocessing import Process, Value
+from multiprocessing import Process, Value, Event
 import platform
 import Queue
 import socket
@@ -42,13 +42,14 @@ def runserver():  #the primary server loop
         manager = make_server_manager(PORTNUM, AUTHKEY) #Make a new manager
         shared_job_q = manager.get_job_q()
         shared_result_q = manager.get_result_q() #Shared result queue
+        shutdown = manager.get_shutdown()
 
         # Spawn processes to feed the queue and monitor the result queue
         if cracking_mode == "dic":
             dictionary = Dictionary.Dictionary()
             # this will be replaced by input from the user once controller is reworked
             dictionary.setAlgorithm('md5')
-            dictionary.setFileName("dic")
+            dictionary.setFileName("realuniq")
             dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
             found_solution.value = False
             chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
@@ -72,7 +73,7 @@ def runserver():  #the primary server loop
                         return "wtf?"
         chunk_maker.start()
 
-        result_monitor = Process(target=check_results, args=(shared_result_q,))
+        result_monitor = Process(target=check_results, args=(shared_result_q, shutdown))
         result_monitor.start()
         # block while there is no result, then terminate chunking and checking
         result_monitor.join()
@@ -103,11 +104,13 @@ def make_server_manager(port, authkey):
     try: #Make_server_manager definition try block
         job_q = Queue.Queue(maxsize=100)
         result_q = Queue.Queue()
-
+        shutdown = Event()
+        shutdown.clear()
 
         try: #JobQueueManager/Lambda functions Try Block
             JobQueueManager.register('get_job_q', callable=lambda: job_q)
             JobQueueManager.register('get_result_q', callable=lambda: result_q)
+            JobQueueManager.register('get_shutdown', callable=lambda: shutdown)
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in Make_server_Manager: JobQueueManager/Lambda functions Try Block"
@@ -135,13 +138,15 @@ def make_server_manager(port, authkey):
         print "============================================================================================="
 #End of make_server_manager function-------------------------------------------------------------------------------
 
-# monitor reesults queue
-def check_results(results_queue):
+# monitor results queue
+def check_results(results_queue, shutdown):
     try:
         while not found_solution.value:
             result = results_queue.get() #get chunk from shared result queue
             if result[0] == "w": #check to see if solution was found
                 print "The solution was found!"
+                shutdown.set()
+                print "shutdown notice sent to clients"
                 key = result[1]
                 found_solution.value = True
                 print "Key is: %s" % key

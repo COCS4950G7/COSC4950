@@ -103,7 +103,8 @@ class Brute_Force():
             return
         print "check_short_keys called for lengths %d-%d and no prefix." % (self.minKeyLength, self.charactersToCheck)
 
-        keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j) for j in range(self.minKeyLength, self.charactersToCheck+1))
+        keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)
+                                                for j in range(self.minKeyLength, self.charactersToCheck+1))
         for key in keylist:
             tempkey = ''.join(key)
             if self.isSolution(tempkey):
