@@ -146,7 +146,11 @@ class Brute_Force():
     def get_prefix(self):
         if self.minKeyLength < self.charactersToCheck:
             yield ''
-        for i in range(self.minKeyLength-self.charactersToCheck, (self.maxKeyLength - self.charactersToCheck + 1)):
+        if self.minKeyLength < self.charactersToCheck:
+            min_length = self.charactersToCheck
+        else:
+            min_length = self.minKeyLength-self.charactersToCheck
+        for i in range(1, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             for prefix in prefixes:
                 if self.done.value:
