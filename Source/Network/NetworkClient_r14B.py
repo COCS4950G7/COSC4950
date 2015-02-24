@@ -1,16 +1,10 @@
 __author__ = 'chris hamm'
-#NetworkClient_r14A
-#Created: 2/21/2015
+#NetworkClient_r14B
+#Created: 2/24/2015
 
-#Designed to run with NetworkServer_r14A
+#Designed to run with NetworkServer_r14B
 
-#Things that where changed in this revision (compared to original rev14)
-    #(Implemented) Added additional comments and section dividers
-    #(Implemented) Reorganized the code to fit the sectional dividers better
-    #(Implemented) Added in OS detection at the beginning of client, will also display your OS
-    #(Implemented) Requests for the server's IP address on startup.
 
-#ENCOUNTERED MANY LIMITATIONS AND ISSUES IN TRYING TO IMPLEMENT A WAY TO MAKE CLIENTS STOP WHEN THE SOLUTION IS FOUND (SEE SERVER FOR MORE DETAILS)
 
 
 #IMPORTS===========================================================================================================

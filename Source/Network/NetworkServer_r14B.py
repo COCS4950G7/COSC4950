@@ -1,24 +1,8 @@
 __author__ = 'chris hamm'
-#NetworkServer_r14A
-#Created: 2/21/2015
+#NetworkServer_r14B
+#Created: 2/24/2015
 
-#Designed to run with NetworkClient_r14A
-
-#Things that have changed in this revision (compared to the original rev14)
-    #(Implemented) Added additional comments and section dividers
-    #(Implemented) Reorganized code to fit section dividers better
-    #(Implemented) Added OS detection at the beginning of server startup, also prints what OS you are using
-    #(Implemented) Added in IP detection. It will automatically detect your ip for you, and set the IP variable to that IP address
-
-#NOTES:
-    #The dictionary class is directly connected to the server, This is Nick's area of expertese
-
-#   2/23/2015
-
-#   No longer exclusively tied to dictionary, added preliminary support for setting cracking modes. Added brute force
-#   chunking compatible with latest streamlined brute force setup. Added skeleton code for rainbow maker/user.
-#   Brute force should work networked as soon as client is updated to remove dictionary hardcoding and replace it with
-#   new mode detection based code.
+#Designed to run with NetworkClient_r14B
 
 
 #IMPORTS===============================================================================================================
