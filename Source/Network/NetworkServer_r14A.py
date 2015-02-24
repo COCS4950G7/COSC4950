@@ -13,6 +13,12 @@ __author__ = 'chris hamm'
 #NOTES:
     #The dictionary class is directly connected to the server, This is Nick's area of expertese
 
+#   2/23/2015
+
+#   No longer exclusively tied to dictionary, added preliminary support for setting cracking modes. Added brute force
+#   chunking compatible with latest streamlined brute force setup. Added skeleton code for rainbow maker/user.
+#   Brute force should work networked as soon as client is updated to remove dictionary hardcoding and replace it with
+#   new mode detection based code.
 
 
 #IMPORTS===============================================================================================================
@@ -21,7 +27,11 @@ from multiprocessing import Process, Value
 import platform
 import Queue
 import socket
+import string
 import Dictionary
+import Brute_Force
+import RainbowMaker
+import RainbowUser
 #END OF IMPORTS=======================================================================================================
 
 #FUNCTIONS============================================================================================================
@@ -32,14 +42,36 @@ def runserver():  #the primary server loop
         manager = make_server_manager(PORTNUM, AUTHKEY) #Make a new manager
         shared_job_q = manager.get_job_q()
         shared_result_q = manager.get_result_q() #Shared result queue
-        dictionary.setAlgorithm('md5')
-        dictionary.setFileName("dic")
-        dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-        found_solution.value = False
 
         # Spawn processes to feed the queue and monitor the result queue
-        chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
+        if cracking_mode == "dic":
+            dictionary = Dictionary.Dictionary()
+            # this will be replaced by input from the user once controller is reworked
+            dictionary.setAlgorithm('md5')
+            dictionary.setFileName("dic")
+            dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+            found_solution.value = False
+            chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
+        else:
+            if cracking_mode == "bf":
+                bf = Brute_Force.Brute_Force()
+                # this will be replaced by input from the user once controller is reworked
+                bf.set_params(alphabet=string.ascii_lowercase + string.ascii_uppercase + string.digits,
+                              algorithm="md5",
+                              origHash="12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999
+                              min_key_length=6,
+                              max_key_length=16)
+                chunk_maker = Process(target=chunk_brute_force, args=(bf, manager, shared_job_q))
+            else:
+                if cracking_mode == "rain":
+                    return  # haven't figured out how to set this up yet
+                else:
+                    if cracking_mode == "rainmaker":
+                        return  # haven't figured out how to set this up yet
+                    else:
+                        return "wtf?"
         chunk_maker.start()
+
         result_monitor = Process(target=check_results, args=(shared_result_q,))
         result_monitor.start()
         # block while there is no result, then terminate chunking and checking
@@ -136,6 +168,7 @@ def check_results(results_queue):
 # feed dictionary chunks to job queue
 def chunk_dictionary(dictionary, manager, job_queue):
     try:
+
         while not dictionary.isEof() and not found_solution.value:  # Keep looping while it is not the end of the file
             #chunk is a Chunk object
             chunk = dictionary.getNextChunk() #get next chunk from dictionary
@@ -165,10 +198,31 @@ def chunk_dictionary(dictionary, manager, job_queue):
         print "============================================================================================="
 
 # placeholder for brute force integration
-def chunk_brute_force(bf, job_queue):
+def chunk_brute_force(bf, manager, job_queue):
     try:
-        #INSERT CODE HERE
-        return
+
+        # Had strange difficulties with the internal chunking method, so extracted the funtional bits here
+        for prefix in bf.get_prefix():
+            if prefix == '':
+                prefix = "-99999999999999999999999999999999999"
+            params = "bruteforce\n" + bf.algorithm + "\n" + bf.origHash + "\n" + bf.alphabet + "\n" \
+                     + str(bf.minKeyLength) + "\n" + str(bf.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
+
+            new_chunk = manager.Value(dict, {'params': params,
+                                             'data': '',
+                                             'timestamp': time.time(),
+                                             'halt': False})
+            job_queue.put(new_chunk)  # put next chunk on the job queue.
+                                      # queue is blocking by default, so will just wait until it is no longer full before adding another.
+            #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
+            sent_chunks.append((params, time.time()))
+        if found_solution.value:
+            while True:
+                try:
+                    job_queue.get_nowait()
+                except Queue.Empty:
+                    return
+
     except Exception as inst:
         print "============================================================================================="
         print "ERROR: An exception was thrown in chunk_brute_force definition Try block"
@@ -196,6 +250,22 @@ def chunk_rainbow(rainbow, job_queue):
         print inst
         print "============================================================================================="
 
+# placeholder for rainbow maker integration
+def chunk_rainbow_maker(rainmaker, job_queue):
+    try:
+        #INSERT CODE HERE
+        return
+    except Exception as inst:
+        print "============================================================================================="
+        print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
+
 #END OF FUNCTIONS======================================================================================================
 
 #AUXILLERY CLASSES===============================================================================================================
@@ -215,7 +285,7 @@ IP = "127.0.0.1" #defaults to the pingback
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
-dictionary = Dictionary.Dictionary()
+cracking_mode = "dic" # possible values are dic, bf, rain, rainmaker
 sent_chunks = []  # list of chunks added to queue, added with timestamp to keep track of missing pieces
 found_solution = Value('b', False)  # synchronized found solution variable
 
