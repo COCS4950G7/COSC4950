@@ -4,6 +4,7 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkClient_r14B
 
+#Changes made in this revision:
 
 #IMPORTS===============================================================================================================
 from multiprocessing.managers import SyncManager
