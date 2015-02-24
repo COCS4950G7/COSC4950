@@ -5,6 +5,7 @@ __author__ = 'chris hamm'
 #Designed to run with NetworkServer_r14B
 
 #Changes made in this revision:
+    #Now follows the network layout notes
 
 #=====================================================================================================================
 #IMPORTS
