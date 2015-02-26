@@ -105,7 +105,7 @@ class Brute_Force():
     def check_short_keys(self):
         if self.done.value:
             return
-        print "check_short_keys called for lengths %d-%d and no prefix." % (self.minKeyLength, self.charactersToCheck)
+        #print "check_short_keys called for lengths %d-%d and no prefix." % (self.minKeyLength, self.charactersToCheck)
 
         keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)
                                                 for j in range(self.minKeyLength, self.charactersToCheck+1))
@@ -133,7 +133,7 @@ class Brute_Force():
             workunit = self.queue.get()
             length = workunit.length + workunit.prefix.__len__()
 
-            print "check_keys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
+            #print "check_keys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
 
             prefix = ''.join(workunit.prefix)
             keylist = itertools.product(self.alphabet, repeat=self.charactersToCheck)
@@ -242,7 +242,7 @@ class Brute_Force():
             if self.done.value:
                 return True
             else:
-                print "run chunk prefix: %s" % prefix
+                #print "run chunk prefix: %s" % prefix
 
                 self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet))
 
