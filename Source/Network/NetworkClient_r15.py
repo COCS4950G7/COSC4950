@@ -146,7 +146,10 @@ class Client():
     def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
         try:
             while not shutdown.is_set():
-                job = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
+                try:
+                    job = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
+                except Queue.Empty:
+                    continue
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']
@@ -159,7 +162,6 @@ class Client():
                     print "key is: " + dictionary.showKey()
                     key = dictionary.showKey()
                     result_queue.put(("w", key))
-                    time.sleep(1)
                    # result_queue.put(("c", key))
                 elif params[10] == "True":
                     result_queue.put(("e", chunk.params))
@@ -179,16 +181,16 @@ class Client():
 
     def run_brute_force(self, bf, job_queue, result_queue, shutdown):
         try:
+            bf.result_queue = result_queue
             while not shutdown.is_set():
-
                 job = job_queue.get()
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']
                 print chunk.params
-                bf.result_queue = result_queue
                 bf.start_processes()
                 bf.run_chunk(chunk)
+
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in run_brute_force definition try block"
@@ -200,7 +202,7 @@ class Client():
             print inst
             print "============================================================================================="
         finally:
-            return
+            bf.terminate_processes()
 
 
     def run_rain_user(self, rain, job_queue, result_queue, shutdown):

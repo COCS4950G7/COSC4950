@@ -91,6 +91,9 @@ class Brute_Force():
     def possibilitiesEhausted(self):
         return self.possibilities_exhausted
 
+    def set_result_queue(self, result_queue):
+        self.result_queue = result_queue
+
     def start_processes(self):
         if not self.processes_running:
             for j in range(0, cpu_count()):
