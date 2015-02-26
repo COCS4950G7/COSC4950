@@ -31,7 +31,7 @@ class Server():
     PORTNUM = 22536
     AUTHKEY = "Popcorn is awesome!!!"
 
-    cracking_mode = "dic"  # possible values are dic, bf, rain, rainmaker
+    cracking_mode = "bf"  # possible values are dic, bf, rain, rainmaker
     sent_chunks = []  # list of chunks added to queue, added with timestamp to keep track of missing pieces
     found_solution = Value('b', False)  # synchronized found solution variable
     variables = []
@@ -58,9 +58,9 @@ class Server():
                 dictionary = Dictionary.Dictionary()
                 # this will be replaced by input from the user once controller is reworked
                 dictionary.setAlgorithm('md5')
-                dictionary.setFileName("dic") #reset this value to dic if you dont have this file
-                #dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-                dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
+                dictionary.setFileName("realuniq") #reset this value to dic if you dont have this file
+                dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+                #dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
                 self.found_solution.value = False
                 chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, manager, shared_job_q))
             else:
@@ -256,12 +256,14 @@ class Server():
                                           # queue is blocking by default, so will just wait until it is no longer full before adding another.
                 #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
                 self.sent_chunks.append((params, time.time()))
-            if self.found_solution.value:
-                while True:
-                    try:
-                        job_queue.get_nowait()
-                    except Queue.Empty:
-                        return
+                if self.found_solution.value:
+                    while True:
+                        try:
+                            job_queue.get_nowait()
+                        except Queue.Empty:
+                            return
+                        finally:
+                            return
 
         except Exception as inst:
             print "============================================================================================="
