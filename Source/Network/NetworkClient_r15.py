@@ -65,9 +65,11 @@ class Client():
                             return "wtf?"
 
             chunk_runner.start()
-
+            chunk_runner.join()
             if shutdown.is_set():
                 print "received shutdown notice from server."
+                chunk_runner.terminate()
+            return
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in runclient definition try block"
