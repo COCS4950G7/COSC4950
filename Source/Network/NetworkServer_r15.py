@@ -57,7 +57,7 @@ class Server():
             if self.cracking_mode == "dic":
                 dictionary = Dictionary.Dictionary()
                 # this will be replaced by input from the user once controller is reworked
-                dictionary.setAlgorithm('sha1')
+                dictionary.setAlgorithm('md5')
                 dictionary.setFileName("dic") #reset this value to dic if you dont have this file
                 dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
                 #dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
