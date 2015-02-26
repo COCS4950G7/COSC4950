@@ -485,7 +485,7 @@ class Dictionary():
 
         chunk.data = data
 
-        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 "
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 " + str(eof)
 
         return chunk
 

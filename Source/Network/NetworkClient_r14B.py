@@ -5,7 +5,7 @@ __author__ = 'chris hamm'
 #Designed to run with NetworkServer_r14B
 
 #Changes made in this revision:
-    #Now follows the network layout notes
+    #moved where the start_timer begins to after the os and ip detection for better accuracy
 
 #=====================================================================================================================
 #IMPORTS
@@ -58,6 +58,7 @@ def runclient(): #Client Primary loop
                     #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
         if shutdown.is_set():
             print "received shutdown notice from server."
+
     except Exception as inst:
         print "============================================================================================="
         print "ERROR: An exception was thrown in runclient definition try block"
@@ -132,8 +133,8 @@ AUTHKEY = "Popcorn is awesome!!!"
 if __name__ == '__main__': #Equivalent to Main
     try: #Main
         #Create timer to keep track of how long the client ran for
-        import time
-        start_time= time.time()
+       # import time
+       # start_time= time.time()
 
         #--------------------------------------------------------------------------------------------------
         #detect the OS
@@ -189,6 +190,8 @@ if __name__ == '__main__': #Equivalent to Main
         #--------------------------------------------------------------------------------------------------
         #Start the primary client while loop
         #--------------------------------------------------------------------------------------------------
+        import time
+        start_time = time.time() #start timer after the os and ip detection for better accuracy
         runclient()
         #--------------------------------------------------------------------------------------------------
         #End the primary client while loop
@@ -207,6 +210,7 @@ if __name__ == '__main__': #Equivalent to Main
         #output the timer, stating how long client ran for
         end_time= time.time() - start_time
         print "Client ran for: "+str(end_time)+" seconds"
+
 
 #=====================================================================================================================
 #END OF MAIN

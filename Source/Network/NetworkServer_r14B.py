@@ -5,7 +5,7 @@ __author__ = 'chris hamm'
 #Designed to run with NetworkClient_r14B
 
 #Changes made in this revision:
-    #Now follows the Network Layout notes
+    #Moved the start_time timer to after the os and ip detection to inprove on run time accuracy
 
 #=====================================================================================================================
 #IMPORTS
@@ -331,8 +331,8 @@ found_solution = Value('b', False)  # synchronized found solution variable
 if __name__ == '__main__': #Equivalent to Main
     try: #Main
         #setup timer to record how long the server ran for
-        import  time
-        start_time= time.time()
+        #import  time
+       # start_time= time.time()
 
         #detect the OS
         try: #getOS try block
@@ -414,6 +414,8 @@ if __name__ == '__main__': #Equivalent to Main
         #end of get the IP address
 
         #start the primary server loop
+        import time
+        start_time = time.time() #moved to after the os detection and ip detection for better accuracy
         runserver()
     except Exception as inst:
         print "============================================================================================="
