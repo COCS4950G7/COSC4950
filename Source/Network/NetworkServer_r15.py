@@ -238,7 +238,7 @@ class Server():
     #--------------------------------------------------------------------------------------------------
     # Chunk for brute force function
     #--------------------------------------------------------------------------------------------------
-    def chunk_brute_force(bf, manager, job_queue):
+    def chunk_brute_force(self, bf, manager, job_queue):
         try:
 
             # Had strange difficulties with the internal chunking method, so extracted the funtional bits here
