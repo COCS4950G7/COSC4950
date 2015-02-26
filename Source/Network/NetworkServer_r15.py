@@ -419,7 +419,7 @@ class Server():
      # This is based on the examples in the official docs of multiprocessing.
         # get_{job|result}_q return synchronized proxies for the actual Queue
         # objects.
-    class JobQueueManager(SyncManager):
+    class JobQueueManager(SyncManager):  
         pass
 
 
