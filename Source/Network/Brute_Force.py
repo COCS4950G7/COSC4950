@@ -50,6 +50,8 @@ class Brute_Force():
     possibilities_exhausted = False
     first_unit = True
     children = []
+    result_queue = None
+    processes_running = False
 
     def __init__(self):
         if not __name__ == '__main__':
@@ -72,7 +74,7 @@ class Brute_Force():
         self.key = ''
         self.rec = None
         self.charactersToCheck = 3
-        self.queue = Queue(cpu_count()*10)
+        self.queue = Queue(cpu_count()*5)
         self.chunk_size = 0
         self.countey = Value('I', 0)
         self.done = Value('b', False)
@@ -90,9 +92,11 @@ class Brute_Force():
         return self.possibilities_exhausted
 
     def start_processes(self):
-        for j in range(0, cpu_count()):
-            self.children.append(Process(target=self.check_keys))
-            self.children[j].start()
+        if not self.processes_running:
+            for j in range(0, cpu_count()):
+                self.children.append(Process(target=self.check_keys))
+                self.children[j].start()
+            self.processes_running = True
 
     def terminate_processes(self):
         for process in self.children:
@@ -108,12 +112,17 @@ class Brute_Force():
         for key in keylist:
             tempkey = ''.join(key)
             if self.isSolution(tempkey):
+                self.result_queue.put(('w', tempkey))
                 while not self.queue.empty():
                     self.queue.get()
                 self.countey.value += 1
                 print "We win!"
                 return True
             self.countey.value += 1
+        params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" \
+                 + str(self.minKeyLength) + "\n" + str(self.maxKeyLength) + "\n" \
+                 + "-99999999999999999999999999999999999" + "\n0\n0\n0"
+        self.result_queue.put(('f', params))
         return False
 
     def check_keys(self):
@@ -127,12 +136,13 @@ class Brute_Force():
             print "check_keys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
 
             prefix = ''.join(workunit.prefix)
-            keylist = itertools.product(self.alphabet, repeat=(self.charactersToCheck))
+            keylist = itertools.product(self.alphabet, repeat=self.charactersToCheck)
 
             for key in keylist:
                 tempkey = prefix + ''.join(key)
                 #print tempkey
                 if self.isSolution(tempkey):
+                    self.result_queue.put(('w', tempkey))
                     while not self.queue.empty():
                         self.queue.get()
                     self.countey.value += 1
@@ -140,6 +150,10 @@ class Brute_Force():
                     print "We win!"
                     return True
             self.countey.value += 1
+            params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" \
+                     + str(self.minKeyLength) + "\n" + str(self.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
+            self.result_queue.put(('f', params))
+
         return False
 
 #   get_prefix() is an iterator which produces all possible prefixes of appropriate length
@@ -151,7 +165,7 @@ class Brute_Force():
             min_length = self.charactersToCheck
         else:
             min_length = self.minKeyLength-self.charactersToCheck
-        for i in range(1, (self.maxKeyLength - self.charactersToCheck + 1)):
+        for i in range(min_length, (self.maxKeyLength - self.charactersToCheck + 1)):
             prefixes = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)for j in range(i, i+1))
             for prefix in prefixes:
                 if self.done.value:
@@ -206,13 +220,15 @@ class Brute_Force():
 
 #   run_chunk takes an object of type Chunk.Chunk(), checks all possibilities within the parameters of the chunk,
 #   sets global variables according to the chunk data and returns True or False to indicate if the cracking succeeded.
+
     def run_chunk(self, chunk):
         settings = chunk.params
         settings_list = settings.split()
         self.algorithm = settings_list[1]
         self.origHash = settings_list[2]
         self.alphabet = settings_list[3]
-
+        self.minKeyLength = int(settings_list[4])
+        self.maxKeyLength = int(settings_list[5])
         prefix = settings_list[6]
 
         alphabet = self.alphabet
