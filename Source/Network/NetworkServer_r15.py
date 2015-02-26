@@ -57,10 +57,10 @@ class Server():
             if self.cracking_mode == "dic":
                 dictionary = Dictionary.Dictionary()
                 # this will be replaced by input from the user once controller is reworked
-                dictionary.setAlgorithm('md5')
+                dictionary.setAlgorithm('sha1')
                 dictionary.setFileName("dic") #reset this value to dic if you dont have this file
-                #dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-                dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
+                dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+                #dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
                 self.found_solution.value = False
                 chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, manager, shared_job_q))
             else:
@@ -177,6 +177,10 @@ class Server():
 
                 elif(result[0] == "c"):  #check to see if client has crashed
                     print "A client has crashed!" #THIS FUNCTION IS UNTESTED
+                elif result[0] == "e":
+                    print "Final chunk processed, no solution found."
+                    shutdown.set()
+                    break
                 else: #solution has not been found
                     print "Chunk finished with params: %s" %result[1]
                     # go through the sent chunks list and remove the finished chunk
@@ -215,6 +219,8 @@ class Server():
                                           # queue is blocking by default, so will just wait until it is no longer full before adding another.
                 #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
                 self.sent_chunks.append((chunk.params, time.time()))
+                if dictionary.isEof():
+                    break
             if self.found_solution.value:
                 while True:
                     try:
@@ -256,12 +262,14 @@ class Server():
                                           # queue is blocking by default, so will just wait until it is no longer full before adding another.
                 #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
                 self.sent_chunks.append((params, time.time()))
-            if self.found_solution.value:
-                while True:
-                    try:
-                        job_queue.get_nowait()
-                    except Queue.Empty:
-                        return
+                if self.found_solution.value:
+                    while True:
+                        try:
+                            job_queue.get_nowait()
+                        except Queue.Empty:
+                            return
+                        finally:
+                            return
 
         except Exception as inst:
             print "============================================================================================="
