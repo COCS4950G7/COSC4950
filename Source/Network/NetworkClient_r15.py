@@ -38,7 +38,6 @@ class Client():
     #--------------------------------------------------------------------------------------------------
     def run_client(self): #Client Primary loop
         start_time = time.time()
-        print "start"
         try: #runclient definition try block
             manager = self.make_client_manager(self.IP, self.PORTNUM, self.AUTHKEY)
             job_queue = manager.get_job_q()
