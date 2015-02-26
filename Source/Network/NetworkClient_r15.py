@@ -27,6 +27,8 @@ class Client():
     def __init__(self):
         self.get_ip()
         self.run_client()
+        self.start_time = 0
+        self.end_time = 0
 
     #===================================================================================================================
     #FUNCTIONS
@@ -37,7 +39,7 @@ class Client():
     #runclient function
     #--------------------------------------------------------------------------------------------------
     def run_client(self): #Client Primary loop
-        start_time = time.time()
+        #start_time = time.time()
         try: #runclient definition try block
             manager = self.make_client_manager(self.IP, self.PORTNUM, self.AUTHKEY)
             job_queue = manager.get_job_q()
@@ -82,8 +84,8 @@ class Client():
             print "Sent crash message to server"
         finally:
             #output the timer, stating how long client ran for
-            end_time= time.time() - start_time
-            print "Client ran for: "+str(end_time)+" seconds"
+            self.end_time= time.time() - self.start_time
+            print "Client ran for: "+str(self.end_time)+" seconds"
     #--------------------------------------------------------------------------------------------------
     #End of runclient function
     #--------------------------------------------------------------------------------------------------
@@ -106,6 +108,8 @@ class Client():
 
             manager = self.ServerQueueManager(address=(ip, port), authkey=authkey)
             manager.connect()
+            import time
+            self.start_time = time.time()
 
             print 'Client connected to %s:%s' % (ip, port)
             return manager
