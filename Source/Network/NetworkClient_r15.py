@@ -158,6 +158,7 @@ class Client():
     def run_brute_force(self, bf, job_queue, result_queue, shutdown):
 
         while not shutdown.is_set():
+
             job = job_queue.get()
             chunk = Chunk.Chunk()
             chunk.params = job.value['params']
