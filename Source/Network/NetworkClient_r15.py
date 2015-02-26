@@ -129,58 +129,87 @@ class Client():
 
 
     def get_ip(self):
+        try:
             user_input = raw_input("Enter the Server's IP Address:")  #NOTE: needs to be made more tolerant of input errors
             self.IP = user_input
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in get_ip definition try block"  
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
     def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
-
-        while not shutdown.is_set():
-            job = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
-            chunk = Chunk.Chunk()
-            chunk.params = job.value['params']
-            chunk.data = job.value['data']
-            print chunk.params
-            dictionary.find(chunk)
-            result = dictionary.isFound()
-            params = chunk.params.split()
-            if result:
-                print "Hooray!"
-                print "key is: " + dictionary.showKey()
-                key = dictionary.showKey()
-                result_queue.put(("w", key))
-                time.sleep(1)
-               # result_queue.put(("c", key))
-            elif params[10] == "True":
-                result_queue.put(("e", chunk.params))
-            else:
-                result_queue.put(("f", chunk.params))
-                    #result_q.put(("c", chunk.params)) #unction has never been tested
-
+        try:
+            while not shutdown.is_set():
+                job = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
+                chunk = Chunk.Chunk()
+                chunk.params = job.value['params']
+                chunk.data = job.value['data']
+                print chunk.params
+                dictionary.find(chunk)
+                result = dictionary.isFound()
+                params = chunk.params.split()
+                if result:
+                    print "Hooray!"
+                    print "key is: " + dictionary.showKey()
+                    key = dictionary.showKey()
+                    result_queue.put(("w", key))
+                    time.sleep(1)
+                   # result_queue.put(("c", key))
+                elif params[10] == "True":
+                    result_queue.put(("e", chunk.params))
+                else:
+                    result_queue.put(("f", chunk.params))
+                        #result_q.put(("c", chunk.params)) #unction has never been tested
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in run_dictionary definition try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
     def run_brute_force(self, bf, job_queue, result_queue, shutdown):
+        try:
+            while not shutdown.is_set():
 
-        while not shutdown.is_set():
-
-            job = job_queue.get()
-            chunk = Chunk.Chunk()
-            chunk.params = job.value['params']
-            chunk.data = job.value['data']
-            print chunk.params
-            bf.result_queue = result_queue
-            bf.start_processes()
-            bf.run_chunk(chunk)
-
-
-        return
+                job = job_queue.get()
+                chunk = Chunk.Chunk()
+                chunk.params = job.value['params']
+                chunk.data = job.value['data']
+                print chunk.params
+                bf.result_queue = result_queue
+                bf.start_processes()
+                bf.run_chunk(chunk)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in run_brute_force definition try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+        finally:
+            return
 
 
     def run_rain_user(self, rain, job_queue, result_queue, shutdown):
-
+        #NEEDS ERROR HANDLING!!!!!!!!!!
         return
 
 
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-
+        #NEEDS ERROR HANDLING!!!!!!!!!!!!!!!!!!
         return
 
     #=====================================================================================================================

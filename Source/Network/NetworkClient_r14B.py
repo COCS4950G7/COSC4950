@@ -103,7 +103,7 @@ def make_client_manager(ip, port, authkey):
         print type(inst)
         #srguments stored in .args
         print inst.args
-        #_str_ allows args tto be printed directly
+        #_str_ allows args to be printed directly
         print inst
         print "============================================================================================="
 #--------------------------------------------------------------------------------------------------
