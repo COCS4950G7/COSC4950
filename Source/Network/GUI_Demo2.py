@@ -34,7 +34,6 @@ class guiMainMenu(Frame):
             fileMenu.add_command(label="Command Line Interface")
             menuBar.add_cascade(label="View", menu=fileMenu)
 
-
             self.pack(fill=BOTH, expand=1)
 
             self.closeButton= Button(self,text="Close", command=self.onExit)
@@ -74,8 +73,7 @@ class guiMainMenu(Frame):
             self.backToMMButton.pack(side=RIGHT, padx=5, pady=5)
             self.runServerButton= Button(self, text="Run Server", command=self.startServer)
             self.runServerButton.pack(side=TOP, padx=5, pady=5)
-            #self.runClientButton= Button(self, text="Run Client", command=self.promptForIP_startClient) #use when ready
-            self.runClientButton= Button(self, text="Run Client", command=self.startClient)
+            self.runClientButton= Button(self, text="Run Client", command=self.promptForIP_startClient)
             self.runClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
@@ -109,11 +107,9 @@ class guiMainMenu(Frame):
             print inst
             print "============================================================================================="
 
-    #def startClient(self,inputIP): #starts the network client, use when ready
-    def startClient(self):
+    def startClient(self, inputIP):
         try:
-            self.networkClient = Process(target=Client)
-        #    self.networkClient.start(inputIP)
+            self.networkClient = Process(target=Client, args=(inputIP,))
             self.networkClient.start()
         except Exception as inst:
             print "============================================================================================="
@@ -132,6 +128,7 @@ class guiMainMenu(Frame):
         inputIPLabel.pack(side=TOP, padx=5, pady=5)
         inputIP.pack(side=TOP, padx=5, pady=5)
         self.startClient(inputIP)
+    #TODO need to setup client to accept an inbound ip address
 
 def main():
     root =Tk()
