@@ -34,7 +34,6 @@ class guiDemo3(Frame):
             self.networkModeButton= Button(self, text="Networking Mode", command=self.unpackInitUI_LoadNetworkMode)
             self.networkModeButton.pack(side=TOP, padx=5, pady=5)
 
-
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in initUI definition Try block"
@@ -45,6 +44,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of initUI////////////////////////////
 
     def unpackInitUI_LoadSingleComputerMode(self):
         self.closeButton.pack_forget()
@@ -71,15 +71,34 @@ class guiDemo3(Frame):
         self.initUI()
 
     def unpackSingleModeUI_LoadSingleDictionaryUI(self):
-        #TODO create single dictionary cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.singleModeLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.dictionaryCrackingMethodUI("single")
+
     def unpackSingleModeUI_LoadSingleBruteForceUI(self):
-        #TODO create single brute force cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.singleModeLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodUI("single")
 
     def unpackSingleModeUI_LoadSingleRainbowTableUI(self):
-        #TODO create single rainbow table cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.singleModeLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodUI("single")
 
     def singleModeUI(self):
         try:
@@ -104,7 +123,6 @@ class guiDemo3(Frame):
             self.bruteForceCrackingMethodButton.pack(side=TOP, padx=5, pady=5)
             self.rainbowTableCrackingMethodButton= Button(self, text="Rainbow Table", command=self.unpackSingleModeUI_LoadSingleRainbowTableUI)
             self.rainbowTableCrackingMethodButton.pack(side=TOP, padx=5, pady=5)
-
 
         except Exception as inst:
             print "============================================================================================="
@@ -279,16 +297,91 @@ class guiDemo3(Frame):
             print "============================================================================================="
 
     def unpackNetworkServerUI_LoadNetworkDictionaryUI(self):
-        #TODO create network dictionary cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.networkServerLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.dictionaryCrackingMethodUI("network")
 
     def unpackNetwrokServerUI_LoadNetworkBruteForceUI(self):
-        #TODO create network brute force cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.networkServerLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodUI("network")
 
     def unpackNetworkServerUI_LoadNetworkRainbowTableUI(self):
-        #TODO create network rainbow table cracking method window
-        fakeVar=False
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.networkServerLabel.pack_forget()
+        self.selectCrackingMethodLabel.pack_forget()
+        self.dictionaryCrackingMethodButton.pack_forget()
+        self.bruteForceCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodButton.pack_forget()
+        self.rainbowTableCrackingMethodUI("network")
+
+    def dictionaryCrackingMethodUI(self,mode):
+        #mode is either network or single
+        try:
+           # if(mode is not "network" or "single"):
+           #     raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+            #TODO fix the check above
+            #TODO create the dictionary cracking method window
+            fakeVar=True
+        except Exception as inst:
+            print "============================================================================================="
+            print "GUI ERROR: An exception was thrown in dictionaryCrackingMethodUI definition Try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+    def bruteForceCrackingMethodUI(self, mode):
+        #mode is either network or single
+        try:
+           # if(mode is not "network" or "single"):
+           #     raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+           #TODO fix the check above
+            #TODO create the brute force cracking method window
+            fakeVar=True
+        except Exception as inst:
+            print "============================================================================================="
+            print "GUI ERROR: An exception was thrown in bruteForceCrackingMethodUI definition Try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+
+    def rainbowTableCrackingMethodUI(self, mode):
+        #mode is either network or single
+        try:
+            #if(mode is not "network" or "single"):
+             #   raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+            #TODO fix the check above
+            #TODO create the rainbow table cracking method window
+            fakeVar=True
+        except Exception as inst:
+            print "============================================================================================="
+            print "GUI ERROR: An exception was thrown in rainbowTableCrackingMethodUI definition Try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
     def onExit(self):
         self.quit()
