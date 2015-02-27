@@ -45,7 +45,7 @@ class guiMainMenu(Frame):
             self.networkButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
-            print "ERROR: An exception was thrown in initUI definition Try block"
+            print "GUI ERROR: An exception was thrown in initUI definition Try block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -78,7 +78,7 @@ class guiMainMenu(Frame):
             self.runClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
-            print "ERROR: An exception was thrown in networkUI definition Try block"
+            print "GUI ERROR: An exception was thrown in networkUI definition Try block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -99,7 +99,7 @@ class guiMainMenu(Frame):
             self.networkServer.start()
         except Exception as inst:
             print "============================================================================================="
-            print "ERROR: An exception was thrown in startServer definition Try block"
+            print "GUI ERROR: An exception was thrown in startServer definition Try block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
@@ -114,7 +114,7 @@ class guiMainMenu(Frame):
             self.networkClient.start()
         except Exception as inst:
             print "============================================================================================="
-            print "ERROR: An exception was thrown in startClient definition Try block"
+            print "GUI ERROR: An exception was thrown in startClient definition Try block"
             #the exception instance
             print type(inst)
             #srguments stored in .args
