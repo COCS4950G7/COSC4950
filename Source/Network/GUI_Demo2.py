@@ -3,6 +3,9 @@ __author__ = 'Chris Hamm'
 
 from Tkinter import Tk,RIGHT,TOP, BOTH, RAISED, Menu
 from ttk import Frame, Button, Style
+from NetworkServer_r15 import Server
+from NetworkClient_r15 import Client
+from multiprocessing import Process
 
 class guiMainMenu(Frame):
 
@@ -18,9 +21,6 @@ class guiMainMenu(Frame):
         self.style = Style()
         self.style.theme_use("default")
 
-        #this is the additional frame
-        #frame = Frame(self,relief=RAISED, borderwidth=1)
-        #frame.pack(fill=BOTH, expand=1)
 
         menuBar = Menu(self.parent)
         self.parent.config(menu=menuBar)
@@ -28,18 +28,57 @@ class guiMainMenu(Frame):
         fileMenu = Menu(menuBar)
         fileMenu.add_command(label="Exit", command=self.onExit)
         menuBar.add_cascade(label="File", menu=fileMenu)
+        fileMenu.add_command(label="Settings")
+        menuBar.add_cascade(label="Edit", menu=fileMenu)
+        fileMenu.add_command(label="GUI Interface")
+        fileMenu.add_command(label="Command Line Interface")
+        menuBar.add_cascade(label="View", menu=fileMenu)
+
 
         self.pack(fill=BOTH, expand=1)
 
-        closeButton= Button(self,text="Close", command=self.onExit)
-        closeButton.pack(side=RIGHT, padx=5, pady=5)
-        singleButton= Button(self, text="Single Computer")
-        singleButton.pack(side=TOP, padx=5,pady=5)
-        networkButton= Button(self, text="Network Mode")
-        networkButton.pack(side=TOP, padx=5, pady=5)
+        self.closeButton= Button(self,text="Close", command=self.onExit)
+        self.closeButton.pack(side=RIGHT, padx=5, pady=5)
+        self.singleButton= Button(self, text="Single Computer")
+        self.singleButton.pack(side=TOP, padx=5,pady=5)
+        self.networkButton= Button(self, text="Network Mode", command=self.unpack_initUI_andLoadNetwork)
+        self.networkButton.pack(side=TOP, padx=5, pady=5)
+
+    def unpack_initUI_andLoadNetwork(self):
+        self.closeButton.pack_forget()
+        self.singleButton.pack_forget()
+        self.networkButton.pack_forget()
+        self.networkUI()
 
     def onExit(self):
         self.quit()
+
+    def networkUI(self):
+        self.parent.title("Network Mode")
+        self.style= Style()
+        self.style.theme_use("default")
+
+        #load new buttons
+        self.backToMMButton= Button(self, text="Back to Main Menu", command=self.unpack_networkUI_andLoadMM)
+        self.backToMMButton.pack(side=RIGHT, padx=5, pady=5)
+        self.runServerButton= Button(self, text="Run Server", command=self.startServer)
+        self.runServerButton.pack(side=TOP, padx=5, pady=5)
+        self.runClientButton= Button(self, text="Run Client", command=self.startClient)
+        self.runClientButton.pack(side=TOP, padx=5, pady=5)
+
+    def unpack_networkUI_andLoadMM(self):
+        self.backToMMButton.pack_forget()
+        self.runServerButton.pack_forget()
+        self.runClientButton.pack_forget()
+        self.initUI()
+
+    def startServer(self): #starts the network server
+        self.networkServer = Process(target=Server)
+        self.networkServer.start()
+
+    def startClient(self): #starts the network client
+        self.networkClient = Process(target=Client)
+        self.networkClient.start()
 
 def main():
     root =Tk()
