@@ -1,7 +1,7 @@
 __author__ = 'Chris Hamm'
 #GUI_Demo2
 
-from Tkinter import Tk,RIGHT,TOP, BOTH, RAISED, Menu
+from Tkinter import Tk,RIGHT,TOP, BOTH, RAISED, Menu, Label, Entry
 from ttk import Frame, Button, Style
 from NetworkServer_r15 import Server
 from NetworkClient_r15 import Client
@@ -74,6 +74,7 @@ class guiMainMenu(Frame):
             self.backToMMButton.pack(side=RIGHT, padx=5, pady=5)
             self.runServerButton= Button(self, text="Run Server", command=self.startServer)
             self.runServerButton.pack(side=TOP, padx=5, pady=5)
+            #self.runClientButton= Button(self, text="Run Client", command=self.promptForIP_startClient) #use when ready
             self.runClientButton= Button(self, text="Run Client", command=self.startClient)
             self.runClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
@@ -108,9 +109,11 @@ class guiMainMenu(Frame):
             print inst
             print "============================================================================================="
 
-    def startClient(self): #starts the network client
+    #def startClient(self,inputIP): #starts the network client, use when ready
+    def startClient(self):
         try:
             self.networkClient = Process(target=Client)
+        #    self.networkClient.start(inputIP)
             self.networkClient.start()
         except Exception as inst:
             print "============================================================================================="
@@ -122,6 +125,13 @@ class guiMainMenu(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+
+    def promptForIP_startClient(self): #use when ready
+        inputIPLabel= Label(self, text="Server's IP:")
+        inputIP= Entry(self, bd=5)
+        inputIPLabel.pack(side=TOP, padx=5, pady=5)
+        inputIP.pack(side=TOP, padx=5, pady=5)
+        self.startClient(inputIP)
 
 def main():
     root =Tk()
