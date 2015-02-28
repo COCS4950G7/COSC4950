@@ -393,6 +393,7 @@ class guiDemo3(Frame):
             else:
                 raise Exception("GUI ERROR: Invalid currentMode in startDictionaryCrackButton: '"+str(currentMode)+"'")
 
+
             self.dictionaryCrackingMethodLabel= Label(self, text="Dictionary Cracking Method")
             self.dictionaryCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel = Label(self,text="Current Mode: "+str(currentMode))
