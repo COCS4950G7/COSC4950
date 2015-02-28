@@ -21,10 +21,11 @@
 #   ############################ W I P ###########################
 
 #Imports
-from time import time
+#from time import time
+import time
 import sys
 import os
-from multiprocessing import Process, Pipe
+from multiprocessing import Process, Pipe, Value, Array
 import string
 
 #import GUI
@@ -41,16 +42,21 @@ from RainbowUser import RainbowUser
 class Controller():
 
     #Class variables
+    settings = dict()
     done = False
     rainbowMaker = RainbowMaker()
     rainbowUser = RainbowUser()
     dictionary = Dictionary()
     brute_force = Brute_Force()
 
+    magic_is_done = Value('b', False)
+    magic_is_found = Value('b', False)
+    magic_key = Array('c', 128)
+
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer, args=(networkPipe,))
+    networkServer = Process(target=NetworkServer, args=(settings, magic_is_done, magic_is_found, magic_key,))
     networkClient = Process(target=NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
@@ -820,7 +826,7 @@ class Controller():
                 #Start up the networkServer class (as sub-process in the background)
                 self.networkServer.start()
 
-                self.clock = time()
+                #self.clock = time()
 
 
                 #rainbowMaker2 = RainbowMaker()
@@ -904,8 +910,8 @@ class Controller():
                     #Then give the result back to the server
                     #self.rainbowMaker.putChunkInFile(chunkOfDone)
 
-                elapsed = (time() - self.clock)
-                self.clock = elapsed
+                #elapsed = (time() - self.clock)
+                #self.clock = elapsed
 
                 #Let the network  class know to be done
                 self.controllerPipe.send("done")
@@ -1116,8 +1122,8 @@ class Controller():
 
                 #Start up the networkServer class (as sub-process in the background)
                 self.networkServer.start()
-
-                self.clock = time()
+                #time = time()
+                #self.clock = time()
 
                 #Have another dictionary (ie server-size) that chunks the data
                 #   So you don't have to send the whole file to every node
@@ -1210,8 +1216,8 @@ class Controller():
 
                             isFound = True #added in by chris hamm
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
+                    #elapsed = (time() - self.clock)
+                    #self.clock = elapsed
 
                     #Let the network  class know to be done
                     self.controllerPipe.send("done")
@@ -1298,8 +1304,8 @@ class Controller():
 
                             self.dictionary.setKey(key)
 
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
+                    #elapsed = (time() - self.clock)
+                    #self.clock = elapsed
 
                     #Let the network  class know to be done
                     self.controllerPipe.send("done")
@@ -1571,7 +1577,7 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Searching..."
 
-                self.clock = time()
+                #self.clock = time()
 
                 #Splitting the work up to simulate network functionality.
                 #self.brute_force will be our server instance and
@@ -1606,8 +1612,8 @@ class Controller():
                     #and process it using the node-side instance
                     brute_force2.run_chunk(chunk)
 
-                elapsed = (time() - self.clock)
-                self.clock = elapsed
+                #elapsed = (time() - self.clock)
+                #self.clock = elapsed
 
                 #if a(the) node finds a key
                 if brute_force2.isFound():
@@ -1763,7 +1769,7 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Searching..."
 
-                self.clock = time()
+                #self.clock = time()
 
                 #Gets and sets variables from file for setup
                 self.rainbowUser.gatherInfo()
@@ -1802,8 +1808,8 @@ class Controller():
                     #and process it using the node-side client
                     rainbowUser2.find(chunk)
 
-                elapsed = (time() - self.clock)
-                self.clock = elapsed
+                #elapsed = (time() - self.clock)
+                #self.clock = elapsed
 
                 #if a(the) node finds a key
                 if rainbowUser2.isFound():
@@ -2020,7 +2026,7 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow Maker -> Working..."
 
-                self.clock = time()
+                #self.clock = time()
 
                 rainbowMaker2 = RainbowMaker()
 
@@ -2055,8 +2061,8 @@ class Controller():
 
                     self.rainbowMaker.putChunkInFile(chunkOfDone)
 
-                elapsed = (time() - self.clock)
-                self.clock = elapsed
+                #elapsed = (time() - self.clock)
+                #self.clock = elapsed
 
                 #If there are 10,000 or less rows, run collision detection
                 if self.rainbowMaker.getHeight() <= 10000:
@@ -2067,14 +2073,14 @@ class Controller():
                     print "Collision Detector Running..."
                     print "(This should take less than a minute)"
 
-                    self.colidingClock = time()
+                    #self.colidingClock = time()
 
                     collisions = self.rainbowMaker.collisionFinder()
 
                     print "Collision Detector Complete"
 
-                    elapsed = (time() - self.colidingClock)
-                    self.colidingClock = elapsed
+                    #elapsed = (time() - self.colidingClock)
+                    #self.colidingClock = elapsed
                     print "And it took", self.colidingClock, "seconds."
                     print
 
@@ -2116,7 +2122,7 @@ class Controller():
 
                         if userInput in ("Yes", "yes", "Y"):
 
-                            self.colidingClock2 = time()
+                            #self.colidingClock2 = time()
 
                             while collisions > 0:
 
@@ -2138,8 +2144,8 @@ class Controller():
 
                                 collisions = self.rainbowMaker.collisionFinder()
 
-                            elapsed = (time() - self.colidingClock2)
-                            self.colidingClock2 = elapsed
+                           # elapsed = (time() - self.colidingClock2)
+                            #self.colidingClock2 = elapsed
 
                 #Done, next screen
                 self.state = "singleRainMakerDoneScreen"
@@ -2198,6 +2204,10 @@ class Controller():
                 print "Start -> Single-User Mode -> Dictionary"
                 print
 
+                #dictionaryyy = dict({'algo': "md5", 'hash': "ldkfjlk3"})
+
+                #self.settings = dict()
+
                 #Get the algorithm
 
                 print "What's the algorithm: "
@@ -2217,12 +2227,12 @@ class Controller():
                     algo = raw_input("Try Again: ")
 
                 #Set algorithm of dictionary to user input of 'algo'
-                self.dictionary.setAlgorithm(algo)
+                #self.dictionary.setAlgorithm(algo)
 
                 #Get the file name
                 print
                 fileName = raw_input("What's the file name (___.txt): ")
-                while not self.dictionary.setFileName(fileName) == "Good":
+                while not self.does_file_exist(fileName):
 
                     print "File not found..."
                     fileName = raw_input("What's the file name (___.txt): ")
@@ -2234,40 +2244,44 @@ class Controller():
                 print "Single Hash (s)"
                 print "From a File (f)"
                 print
-                userInput = raw_input("Choice: ")
+                single_or_file = raw_input("Choice: ")
 
                 #Sterolize inputs
                 goodNames = {"single", "s", "file", "f", "Single", "File"}
-                while not userInput in goodNames:
+                while not single_or_file in goodNames:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    single_or_file = raw_input("Try Again: ")
 
-                if userInput in ("single", "s", "Single"):
+                if single_or_file in ("single", "s", "Single"):
 
                     #Get the hash
                     print
                     hash = raw_input("What's the hash we're searching for: ")
-                    self.dictionary.setHash(hash)
-                    self.dictionary.singleHash = True
+                    #self.dictionary.setHash(hash)
+                    #self.dictionary.singleHash = True
 
-                elif userInput in ("file", "f", "File"):
+                elif single_or_file in ("file", "f", "File"):
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the hash file name: ")
-                    while not self.dictionary.setHashFileName(fileName) == "Good":
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
 
                         print "File not found..."
-                        fileName = raw_input("What's the hash file name: ")
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's file name that we'll put the results: ")
-                    self.dictionary.setDoneFileName(fileName)
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    #self.dictionary.setDoneFileName(fileName)
 
-                    self.dictionary.singleHash = False
+                    #self.dictionary.singleHash = False
+
+                self.settings['algorithm'] = algo
+                self.settings['file name'] = fileName
+                self.settings['hash'] = hash
 
                 #Get the go-ahead
 
@@ -2310,8 +2324,48 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Searching..."
 
-                self.clock = time()
+                #self.clock = time()
 
+                self.networkServer.start()
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                while not self.magic_is_done.value:
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
+                    else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
+
+                    #time = time()
+                    #time.sleep()
+                    #timey = time.sleep()
+                    time.sleep(1)
+
+                if self.magic_is_found.value:
+
+                    self.state = "singleDictionaryFoundScreen"
+
+                else:
+
+                    self.state = "singleDictionaryNotFoundScreen"
+
+
+
+
+
+                '''
                 #Have another dictionary (ie server-size) that chunks the data
                 #   So you don't have to send the whole file to every node
                 dictionary2 = Dictionary()
@@ -2408,6 +2462,7 @@ class Controller():
                     else:
 
                         self.state = "singleDictionaryNotFoundScreen"
+                '''
 
             #############################################
             #############################################
@@ -2420,6 +2475,9 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Found!"
 
+                print "Key is: ", self.magic_key.value
+
+                '''
                 if self.dictionary.singleHash == True:
                     print "Key is: ", self.dictionary.showKey()
                     print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
@@ -2427,10 +2485,11 @@ class Controller():
                 else:
                     print "Your File, (", self.dictionary.doneFileName, ") of hash/key pairs is ready."
                 print "And it took", self.clock, "seconds."
+                '''
 
                 print "Go Back (back)"
                 print "(Exit)"
-                self.dictionary.reset()
+                #self.dictionary.reset()
                 userInput = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -2466,7 +2525,7 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                self.dictionary.reset()
+                #self.dictionary.reset()
                 userInput = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -2497,6 +2556,21 @@ class Controller():
         except ValueError:
 
             return False
+
+    #Checks to see if file exists
+    def does_file_exist(self, fileName):
+
+        file = str(fileName) + ".txt"
+
+        #Checks for filenotfound and returns code to caller class
+        try:
+            file = open(fileName, "r")
+            file.close()
+            return True
+
+        except (OSError, IOError):
+            return False
+
 
 Controller()
 
