@@ -4,7 +4,6 @@
 
 # Now requires a dictionary parameter which contains all necessary settings.
 
-
 #=====================================================================================================================
 #IMPORTS
 #=====================================================================================================================
@@ -15,7 +14,6 @@ import platform
 import Queue
 import time
 import socket
-import string
 import Dictionary
 import Brute_Force
 import RainbowMaker
