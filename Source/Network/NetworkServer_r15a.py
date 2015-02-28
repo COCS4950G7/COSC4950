@@ -1,11 +1,8 @@
-# NetworkServer_r15
+# NetworkServer_r15a
 
-# 2/25/2015
+# 2/28/2015
 
-# Adapted r14B into a class based server so we can instantiate it from other classes. Moved IP detection to get_ip()
-# method. Timer now runs inside run_server() function.
-
-
+# Now requires a dictionary parameter which contains all necessary settings.
 
 #=====================================================================================================================
 #IMPORTS
@@ -17,7 +14,6 @@ import platform
 import Queue
 import time
 import socket
-import string
 import Dictionary
 import Brute_Force
 import RainbowMaker
@@ -72,7 +68,7 @@ class Server():
                     bf = Brute_Force.Brute_Force()
                     bf.set_params(alphabet=self.settings["alphabet"],
                                   algorithm=self.settings["algorithm"],
-                                  origHash=self.settings["hash"],  # aa9999
+                                  origHash=self.settings["hash"],
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
                     self.total_chunks = bf.get_total_chunks()
