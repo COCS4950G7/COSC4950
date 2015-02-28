@@ -434,7 +434,7 @@ class guiDemo3(Frame):
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
                  #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
-                if(len(self.inputHashTextField) < 1):
+                if(len(str(self.inputHashTextField)) < 1):
                     showwarning("Empty hash text field", "The hash text field is empty")
                 else:
                     dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': self.inputHashTextField.get()}
