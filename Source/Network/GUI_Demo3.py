@@ -1,12 +1,15 @@
 __author__ = 'Chris Hamm'
 #GUI_Demo3
+#TODO thought, have a event trigger a wake up in GUI, to indicate that something changed in the status
+#TODO condense the unpack methods into one function that adapts based on which screen you where using
+#TODO reference www.pyton-course.eu/tkinter_entry_widgets.php for more sophisticated gui layouts
 
 try: #importing libraries try block
     from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
     from ttk import Frame, Button, Style, Radiobutton
     from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
     from tkFileDialog import askopenfilename #used for creating an open file dialog
-    from NetworkServer_r15 import Server
+    from NetworkServer_r15a import Server
     from NetworkClient_r15a import Client
     from multiprocessing import Process
 except Exception as inst:
@@ -237,7 +240,9 @@ class guiDemo3(Frame):
             self.insertServerIPLabel.pack(side=TOP, padx=5, pady=5)
             self.insertServerIPTextfield= Entry(self, bd=5)
             self.insertServerIPTextfield.pack(side=TOP, padx=5, pady=5)
+            #TODO allow right click for pasting into box
             self.startClientButton= Button(self, text="Start Client", command=lambda:self.startClient(str(self.insertServerIPTextfield.get())))
+            #TODO pass values in by a dictionary, see server_r15a to dictionary chunk manager for reference
             self.startClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
@@ -391,7 +396,8 @@ class guiDemo3(Frame):
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
                  #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer("Dictionary"))
+                dict = {'cracking method': "dictionary", 'file name': "dic"}
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(dict))
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
             else:
@@ -408,6 +414,9 @@ class guiDemo3(Frame):
             self.selectedDictionaryFileLabel.pack(side=TOP, padx=5, pady=5)
             self.selectDictionaryFileButton= Button(self, text="Select Dictionary File", command=self.selectFileWindow)
             self.selectDictionaryFileButton.pack(side=TOP, padx=5, pady=5)
+            #TODO check for dictionary file existance before handling (and file extensions for windows)
+            #TODO insert option to crack a file of hashes (pass file to the server/single)
+            #TODO check for file existance before handling (and file extensions for windows)
             self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
             self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
             self.inputHashTextField= Entry(self, bd=5)
@@ -424,6 +433,7 @@ class guiDemo3(Frame):
             self.sha256RadioButton.pack(side=LEFT, padx=5, pady=5)
             self.sha512RadioButton= Radiobutton(self, text="SHA 512", variable= selectedAlgorithm, value="SHA 512")
             self.sha512RadioButton.pack(side=LEFT, padx=5, pady=5)
+            #TODO display result in a noneditable text view
 
         except Exception as inst:
             print "============================================================================================="
@@ -437,7 +447,7 @@ class guiDemo3(Frame):
             print "============================================================================================="
 
     def startNetworkServer(self, crackingMethod):
-        self.networkServer= Process(target=Server, args=())
+        self.networkServer= Process(target=Server, args=(crackingMethod,))
         self.networkServer.start()
 
     def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
@@ -486,10 +496,13 @@ class guiDemo3(Frame):
             self.bruteForceCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel= Label(self, text="Current Mode: "+str(currentMode))
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            #TODO insert option to hash a file of hashes (pass the file to server/single)
+            #TODO check for file existance before handling (and file extensions for windows)
             self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
             self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
             self.inputHashTextField= Entry(self, bd=5)
             self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
+            #TODO display results is a copiable textview
 
         except Exception as inst:
             print "============================================================================================="
