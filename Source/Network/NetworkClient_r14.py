@@ -9,7 +9,7 @@ import Queue
 import Chunk
 import time
 
-IP = "192.168.2.136"
+IP = "10.121.14.225"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 

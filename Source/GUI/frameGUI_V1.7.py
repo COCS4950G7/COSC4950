@@ -19,34 +19,43 @@ def dic_win():
         DicWin.destroy()
         DicWinButton.config(state='normal')
 
-    #progressbar = ttk.Progressbar(orient=HORIZONTAL, length=200, mode='determinate')
-    #progressbar.pack(side="bottom")
-    #progressbar.start()
-
     QuitButton = tk.Button(DicWin, text='Quit', command=quit_win)
     QuitButton.pack()
 
 def dic_script():
     print commands.getstatusoutput('python frameGUI_DIC.py')
+    quit_win()
 
 DicWinButton = tk.Button(root, text='Dictionary', command=dic_script)
 DicWinButton.pack()
+#=======================================================================================
+#def brut_win():
+#    brutWin = tk.Toplevel(root)
+#    brutWin.title('Brut Force')
+#    brutWin.geometry('300x300')
+#    brutWinButton.config(state='disable')
 
-def brut_win():
-    BrutWin = tk.Toplevel(root)
-    BrutWin.title('Brute Force')
-    BrutWin.geometry('300x300')
-    BrutWinButton.config(state='disable')
+#    def quit_win():
+#        brutWin.destroy()
+#        brutWinButton.config(state='normal')
 
-    def quit_win():
-        BrutWin.destroy()
-        BrutWinButton.config(state='normal')
+#    QuitButton = tk.Button(brutWin, text='Quit', command=quit_win)
+#    QuitButton.pack()
 
-    QuitButton = tk.Button(BrutWin, text='Quit', command=quit_win)
-    QuitButton.pack()
+def brut_script():
+    hideRoot()
+    print commands.getstatusoutput('python frameGUI_BRUT.py')
+    showRoot()
 
-BrutWinButton = tk.Button(root, text='Brute Force', command=brut_win)
-BrutWinButton.pack()
+brutWinButton = tk.Button(root, text='Brute Force', command=brut_script)
+brutWinButton.pack()
+
+def hideRoot():
+    root.withdraw()
+
+def showRoot():
+    root.update()
+    root.deiconify()
 
 
 def quit_win():
