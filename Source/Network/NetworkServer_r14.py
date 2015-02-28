@@ -7,10 +7,13 @@ from multiprocessing.managers import SyncManager
 
 import time
 import Queue
+import socket
 
 import Dictionary
 
-IP = "192.168.1.119"
+#IP = "192.168.1.119"
+# This is platform independent to get IP address, requires "import socket".
+IP = socket.gethostbyname(socket.gethostname())
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 

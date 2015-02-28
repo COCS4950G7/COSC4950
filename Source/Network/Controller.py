@@ -49,14 +49,17 @@ class Controller():
     dictionary = Dictionary()
     brute_force = Brute_Force()
 
+    #Magical shared variables with server
     magic_is_done = Value('b', False)
     magic_is_found = Value('b', False)
     magic_key = Array('c', 128)
+    magic_is_connected = Value('b', False)
+    magic_doing_stuff = Value('b', False)
 
     controllerPipe, networkPipe = Pipe()
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer, args=(settings, magic_is_done, magic_is_found, magic_key,))
+    networkServer = Process(target=NetworkServer, args=(settings, magic_is_done, magic_is_found, magic_key, magic_is_connected, magic_doing_stuff,))
     networkClient = Process(target=NetworkClient, args=(networkPipe,))
 
     #Initializing variable to a default value
@@ -291,6 +294,11 @@ class Controller():
 
                 #Start up the networkServer class (as sub-process in the background)
                 #self.networkClient = Process(target=NetworkClient.NetworkClient(self.networkPipe))
+
+                #In the form of: "single" or "server" or "client"
+                self.settings['network mode'] = "client"
+                self.settings['server ip'] = self.serverIP
+
                 self.networkClient.start()
 
                 #What did the user pick? (Be a Node, Back, Exit)
@@ -305,10 +313,10 @@ class Controller():
                 #then switch to nodeConnectedToScreen
 
                 #Send the server IP over the pipe to network class
-                self.controllerPipe.send(self.serverIP)
+                #self.controllerPipe.send(self.serverIP)
 
                 #Get response from network class, (looking for "connected")
-                rec = self.controllerPipe.recv()
+                #rec = self.controllerPipe.recv()
 
                 #Stuff for those pretty status pictures stuff
                 starCounter = 0
@@ -316,7 +324,7 @@ class Controller():
                 whiteR = "            "
 
                 #While not connected, print a "connecting" bar
-                while not rec == "connected":
+                while not self.magic_is_connected:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -331,6 +339,8 @@ class Controller():
                         whiteL = whiteL + " "
                         whiteR = whiteR[:-1]
 
+                    time.sleep(1)
+
                 #Got connected, so switch screens
                 self.state = "nodeConnectedToScreen"
 
@@ -339,10 +349,44 @@ class Controller():
             #if we're at the node connected state (Screen)
             elif state == "nodeConnectedToScreen":
 
-                #First command that requests
-                self.controllerPipe.send("requestNextChunk")
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
 
-                done = False
+                #While not connected, print a "connecting" bar
+                while self.magic_is_connected and not self.magic_doing_stuff:
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Connected--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
+                    else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
+
+                    time.sleep(1)
+
+                if not self.magic_is_connected:
+
+                    self.state = "nodeConnectingScreen"
+
+                elif self.magic_doing_stuff:
+
+                    self.state = "nodeDoingStuffScreen"
+
+
+                '''
+
+                #First command that requests
+                #self.controllerPipe.send("requestNextChunk")
+
+                #done = False
 
                 #While the current job is not done
                 while not done:
@@ -428,11 +472,52 @@ class Controller():
                             #Ask the server for another chunk
                             self.controllerPipe.send("requestNextChunk")
 
-                self.networkClient.join()
+                    '''
+
+
+
+                #self.networkClient.join()
                 #self.networkClient.terminate()
 
                 #Go back to the nodeStart screen since we're done here
-                self.state = "nodeStartScreen"
+                #self.state = "nodeStartScreen"
+
+
+            #############################################
+            #############################################
+            #if we're at the node connected state (Screen)
+            elif state == "nodeDoingStuffScreen":
+
+                #Stuff for those pretty status pictures stuff
+                starCounter = 0
+                whiteL = ""
+                whiteR = "            "
+
+                #While not connected, print a "connecting" bar
+                while self.magic_is_connected and self.magic_doing_stuff:
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Working--> [" + whiteL + "*" + whiteR + "]"
+                    if starCounter > 11:
+                        starCounter = 0
+                        whiteL = ""
+                        whiteR = "            "
+                    else:
+                        starCounter += 1
+                        whiteL = whiteL + " "
+                        whiteR = whiteR[:-1]
+
+                    time.sleep(1)
+
+                if not self.magic_is_connected:
+
+                    self.state = "nodeConnectingScreen"
+
+                elif not self.magic_doing_stuff:
+
+                    self.state = "nodeConnectedScreen"
 
 
             ####################################################################################
@@ -2282,6 +2367,8 @@ class Controller():
                 self.settings['algorithm'] = algo
                 self.settings['file name'] = fileName
                 self.settings['hash'] = hash
+                #In the form of: "single" or "server" or "client"
+                self.settings['network mode'] = "single"
 
                 #Get the go-ahead
 
