@@ -1,11 +1,22 @@
 __author__ = 'Chris Hamm'
 #GUI_Demo3
 
-from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
-from ttk import Frame, Button, Style
-from NetworkServer_r15 import Server
-from NetworkClient_r15 import Client
-from multiprocessing import Process
+try: #importing libraries try block
+    from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
+    from ttk import Frame, Button, Style
+    from NetworkServer_r15 import Server
+    from NetworkClient_r15 import Client
+    from multiprocessing import Process
+except Exception as inst:
+    print "============================================================================================="
+    print "GUI ERROR: An exception was thrown in importing libraries try block"
+    #the exception instance
+    print type(inst)
+    #srguments stored in .args
+    print inst.args
+    #_str_ allows args tto be printed directly
+    print inst
+    print "============================================================================================="
 
 class guiDemo3(Frame):
 
