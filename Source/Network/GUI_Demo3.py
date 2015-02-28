@@ -396,17 +396,7 @@ class guiDemo3(Frame):
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackDictionaryCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
-            if(currentMode is 'Single'):
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)")
-                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                 #TODO create call method to start the dictionary crack
-            elif(currentMode is 'Network'):
-                dict = {'cracking method': "dictionary", 'file name': "dic"}
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(dict))
-                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
-            else:
-                raise Exception("GUI ERROR: Invalid currentMode in startDictionaryCrackButton: '"+str(currentMode)+"'")
 
 
             self.dictionaryCrackingMethodLabel= Label(self, text="Dictionary Cracking Method")
@@ -439,6 +429,17 @@ class guiDemo3(Frame):
             self.sha512RadioButton= Radiobutton(self, text="SHA 512", variable= selectedAlgorithm, value="SHA 512")
             self.sha512RadioButton.pack(side=LEFT, padx=5, pady=5)
             #TODO display result in a noneditable text view
+            if(currentMode is 'Single'):
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)")
+                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                 #TODO create call method to start the dictionary crack
+            elif(currentMode is 'Network'):
+                dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': self.inputHashTextField.get()}
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(dict))
+                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+
+            else:
+                raise Exception("GUI ERROR: Invalid currentMode in startDictionaryCrackButton: '"+str(currentMode)+"'")
 
         except Exception as inst:
             print "============================================================================================="
