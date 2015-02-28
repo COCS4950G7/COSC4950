@@ -4,6 +4,8 @@ __author__ = 'Chris Hamm'
 try: #importing libraries try block
     from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
     from ttk import Frame, Button, Style, Radiobutton
+    from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
+    from tkFileDialog import askopenfilename #used for creating an open file dialog
     from NetworkServer_r15 import Server
     from NetworkClient_r15 import Client
     from multiprocessing import Process
@@ -36,7 +38,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.mainMenuLabel= Label(self, text="Main Menu")
             self.mainMenuLabel.pack(side=TOP,padx=5, pady=5)
@@ -120,7 +122,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackSingleModeUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
@@ -130,7 +132,7 @@ class guiDemo3(Frame):
             self.selectCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.dictionaryCrackingMethodButton= Button(self, text="Dictionary", command=self.unpackSingleModeUI_LoadSingleDictionaryUI)
             self.dictionaryCrackingMethodButton.pack(side=TOP, padx=5, pady=5)
-            self.bruteForceCrackingMethodButton= Button(self, text="Brute-Force", command=self.unpackSingleModeUI_LoadSingleBruteForceUI)
+            self.bruteForceCrackingMethodButton= Button(self, text="Brute-Force (default)", command=self.unpackSingleModeUI_LoadSingleBruteForceUI)
             self.bruteForceCrackingMethodButton.pack(side=TOP, padx=5, pady=5)
             self.rainbowTableCrackingMethodButton= Button(self, text="Rainbow Table", command=self.unpackSingleModeUI_LoadSingleRainbowTableUI)
             self.rainbowTableCrackingMethodButton.pack(side=TOP, padx=5, pady=5)
@@ -165,7 +167,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackNetworkModeUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
@@ -225,7 +227,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackNetworkClientUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
@@ -282,7 +284,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackNetworkServerUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
@@ -342,14 +344,24 @@ class guiDemo3(Frame):
         self.returnToInitUIButton.pack_forget()
         self.dictionaryCrackingMethodLabel.pack_forget()
         self.currentModeLabel.pack_forget()
+        self.dictionaryFileLocationLabel.pack_forget()
+        self.selectedDictionaryFileLabel.pack_forget()
+        self.selectDictionaryFileButton.pack_forget()
+        self.inputHashTextFieldLabel.pack_forget()
+        self.inputHashTextField.pack_forget()
         self.selectAlgorithmLabel.pack_forget()
         self.md5RadioButton.pack_forget()
         self.sha1RadioButton.pack_forget()
+        self.sha224RadioButton.pack_forget()
+        self.sha256RadioButton.pack_forget()
+        self.sha512RadioButton.pack_forget()
+        self.startDictionaryCrackButton.pack_forget()
         self.initUI()
 
     def dictionaryCrackingMethodUI(self,mode):
         #mode is either 1 (network) or 0 (single)
-        currentMode= None #initialize variable
+        currentMode= "ERROR: Mode not selected" #initialize variable
+        selectedDictionaryFile= "No Dictionary file has been selected"
         selectedAlgorithm= "MD5" #set to md5 as the default
         try:
             if(mode == 0):
@@ -366,21 +378,48 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackDictionaryCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
+            if(currentMode is 'Single'):
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)")
+                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                 #TODO create call method to start the dictionary crack
+            elif(currentMode is 'Network'):
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)")
+                self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                 #TODO create call method to start the dictionary crack
+            else:
+                raise Exception("GUI ERROR: Invalid currentMode in startDictionaryCrackButton: '"+str(currentMode)+"'")
+
+
             self.dictionaryCrackingMethodLabel= Label(self, text="Dictionary Cracking Method")
             self.dictionaryCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel = Label(self,text="Current Mode: "+str(currentMode))
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            self.dictionaryFileLocationLabel= Label(self, text="Dictionary File to be used:")
+            self.dictionaryFileLocationLabel.pack(side=TOP, padx=5, pady=5)
+            self.selectedDictionaryFileLabel= Label(self, text=str(selectedDictionaryFile))
+            self.selectedDictionaryFileLabel.pack(side=TOP, padx=5, pady=5)
+            self.selectDictionaryFileButton= Button(self, text="Select Dictionary File", command=self.selectFileWindow)
+            self.selectDictionaryFileButton.pack(side=TOP, padx=5, pady=5)
+            self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
+            self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
+            self.inputHashTextField= Entry(self, bd=5)
+            self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
             self.selectAlgorithmLabel = Label(self, text="Select the Cracking Algorithm:")
             self.selectAlgorithmLabel.pack(side=TOP, padx=5, pady=5)
             self.md5RadioButton=  Radiobutton(self, text="MD5 (default)", variable= selectedAlgorithm, value="MD5" )
             self.md5RadioButton.pack(side=LEFT, padx=5, pady=5)
-            self.sha1RadioButton= Radiobutton(self, text="SHA1", variable= selectedAlgorithm, value="SHA1")
+            self.sha1RadioButton= Radiobutton(self, text="SHA 1", variable= selectedAlgorithm, value="SHA 1")
             self.sha1RadioButton.pack(side=LEFT, padx=5, pady=5)
-            #TODO insert dictionary settings here
+            self.sha224RadioButton= Radiobutton(self, text="SHA 224", variable= selectedAlgorithm, value="SHA 224")
+            self.sha224RadioButton.pack(side=LEFT, padx=5, pady=5)
+            self.sha256RadioButton= Radiobutton(self, text="SHA 256", variable= selectedAlgorithm, value="SHA 256")
+            self.sha256RadioButton.pack(side=LEFT, padx=5, pady=5)
+            self.sha512RadioButton= Radiobutton(self, text="SHA 512", variable= selectedAlgorithm, value="SHA 512")
+            self.sha512RadioButton.pack(side=LEFT, padx=5, pady=5)
 
         except Exception as inst:
             print "============================================================================================="
@@ -396,8 +435,11 @@ class guiDemo3(Frame):
     def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
         self.closeButton.pack_forget()
         self.returnToInitUIButton.pack_forget()
+        self.inputHashTextFieldLabel.pack_forget()
+        self.inputHashTextField.pack_forget()
         self.bruteForceCrackingMethodLabel.pack_forget()
         self.currentModeLabel.pack_forget()
+        self.startBruteForceCrackButton.pack_forget()
         self.initUI()
 
     def bruteForceCrackingMethodUI(self, mode):
@@ -418,15 +460,28 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackBruteForceCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
+            if(currentMode is 'Single'):
+                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)")
+                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                #TODO create call method to start the brute force crack
+            elif(currentMode is 'Network'):
+                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Network Mode)")
+                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                #TODO create call method to start the brute force crack
+            else:
+                raise Exception ("GUI ERROR: Invalid currentMode in startBruteForceCrackButton: '"+str(currentMode)+"'")
             self.bruteForceCrackingMethodLabel = Label(self, text="Brute-Force Cracking Method")
             self.bruteForceCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel= Label(self, text="Current Mode: "+str(currentMode))
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
-            #TODO insert brute force settings here
+            self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
+            self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
+            self.inputHashTextField= Entry(self, bd=5)
+            self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
 
         except Exception as inst:
             print "============================================================================================="
@@ -464,7 +519,7 @@ class guiDemo3(Frame):
             self.pack(fill=BOTH, expand=1)
 
             #load buttons and labels
-            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton= Button(self, text="Close Program", command=self.confirmExit)
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackRainbowTableCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
@@ -484,6 +539,19 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+
+    def selectFileWindow(self):
+        filename= ""
+        filename= askopenfilename()
+        self.selectedDictionaryFileLabel.config(text=str(filename))
+
+
+    def confirmExit(self):
+        result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)')
+        if result == True:
+            self.onExit()
+        #if no is selected, then the window just closes
+
 
     def onExit(self):
         self.quit()
