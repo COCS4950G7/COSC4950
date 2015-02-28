@@ -390,9 +390,9 @@ class guiDemo3(Frame):
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
                  #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)")
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServerDictionaryCrack("Dictionary"))
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                 #TODO create call method to start the dictionary crack
+
             else:
                 raise Exception("GUI ERROR: Invalid currentMode in startDictionaryCrackButton: '"+str(currentMode)+"'")
 
@@ -435,7 +435,9 @@ class guiDemo3(Frame):
             print inst
             print "============================================================================================="
 
-
+    def startNetworkServer(self, crackingMethod):
+        self.networkServer= Process(target=Server, args=())
+        self.networkServer.start()
 
     def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
         self.closeButton.pack_forget()
