@@ -3,7 +3,7 @@ __author__ = 'Chris Hamm'
 
 try: #importing libraries try block
     from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
-    from ttk import Frame, Button, Style
+    from ttk import Frame, Button, Style, Radiobutton
     from NetworkServer_r15 import Server
     from NetworkClient_r15 import Client
     from multiprocessing import Process
@@ -342,11 +342,15 @@ class guiDemo3(Frame):
         self.returnToInitUIButton.pack_forget()
         self.dictionaryCrackingMethodLabel.pack_forget()
         self.currentModeLabel.pack_forget()
+        self.selectAlgorithmLabel.pack_forget()
+        self.md5RadioButton.pack_forget()
+        self.sha1RadioButton.pack_forget()
         self.initUI()
 
     def dictionaryCrackingMethodUI(self,mode):
         #mode is either 1 (network) or 0 (single)
         currentMode= None #initialize variable
+        selectedAlgorithm= "MD5" #set to md5 as the default
         try:
             if(mode == 0):
                 currentMode= "Single"
@@ -370,6 +374,12 @@ class guiDemo3(Frame):
             self.dictionaryCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel = Label(self,text="Current Mode: "+str(currentMode))
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            self.selectAlgorithmLabel = Label(self, text="Select the Cracking Algorithm:")
+            self.selectAlgorithmLabel.pack(side=TOP, padx=5, pady=5)
+            self.md5RadioButton=  Radiobutton(self, text="MD5 (default)", variable= selectedAlgorithm, value="MD5" )
+            self.md5RadioButton.pack(side=LEFT, padx=5, pady=5)
+            self.sha1RadioButton= Radiobutton(self, text="SHA1", variable= selectedAlgorithm, value="SHA1")
+            self.sha1RadioButton.pack(side=LEFT, padx=5, pady=5)
             #TODO insert dictionary settings here
 
         except Exception as inst:
