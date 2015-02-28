@@ -14,15 +14,14 @@ class Client():
     IP = "127.0.0.1" #default is pingback
     PORTNUM = 22536
     AUTHKEY = "Popcorn is awesome!!!"
-    cracking_mode = 'bf'
-
+    cracking_mode = 'dic'
+    #TODO: add shared variable for setting cracking mode
     def __init__(self, ip):
         #self.get_ip()
         self.IP = ip
         self.run_client()
         self.start_time = 0
         self.end_time = 0
-        self.run_client()
 
     #===================================================================================================================
     #FUNCTIONS
@@ -39,6 +38,7 @@ class Client():
             job_queue = manager.get_job_q()
             result_queue = manager.get_result_q()
             shutdown = manager.get_shutdown()
+            print self.cracking_mode
 
             if self.cracking_mode == "dic":
                 dictionary = Dictionary.Dictionary()
