@@ -89,7 +89,7 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.dictionaryCrackingMethodUI("single")
+        self.dictionaryCrackingMethodUI(0)
 
     def unpackSingleModeUI_LoadSingleBruteForceUI(self):
         self.closeButton.pack_forget()
@@ -99,7 +99,7 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.bruteForceCrackingMethodUI("single")
+        self.bruteForceCrackingMethodUI(0)
 
     def unpackSingleModeUI_LoadSingleRainbowTableUI(self):
         self.closeButton.pack_forget()
@@ -109,7 +109,7 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.rainbowTableCrackingMethodUI("single")
+        self.rainbowTableCrackingMethodUI(0)
 
     def singleModeUI(self):
         try:
@@ -315,7 +315,7 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.dictionaryCrackingMethodUI("network")
+        self.dictionaryCrackingMethodUI(1)
 
     def unpackNetwrokServerUI_LoadNetworkBruteForceUI(self):
         self.closeButton.pack_forget()
@@ -325,7 +325,7 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.bruteForceCrackingMethodUI("network")
+        self.bruteForceCrackingMethodUI(1)
 
     def unpackNetworkServerUI_LoadNetworkRainbowTableUI(self):
         self.closeButton.pack_forget()
@@ -335,16 +335,43 @@ class guiDemo3(Frame):
         self.dictionaryCrackingMethodButton.pack_forget()
         self.bruteForceCrackingMethodButton.pack_forget()
         self.rainbowTableCrackingMethodButton.pack_forget()
-        self.rainbowTableCrackingMethodUI("network")
+        self.rainbowTableCrackingMethodUI(1)
+
+    def unpackDictionaryCrackingMethodUI_LoadInitUI(self):
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.dictionaryCrackingMethodLabel.pack_forget()
+        self.currentModeLabel.pack_forget()
+        self.initUI()
 
     def dictionaryCrackingMethodUI(self,mode):
-        #mode is either network or single
+        #mode is either 1 (network) or 0 (single)
+        currentMode= None #initialize variable
         try:
-           # if(mode is not "network" or "single"):
-           #     raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
-            #TODO fix the check above
-            #TODO create the dictionary cracking method window
-            fakeVar=True
+            if(mode == 0):
+                currentMode= "Single"
+            elif(mode == 1):
+                currentMode= "Network"
+            else:
+                raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+
+            self.parent.title("Mighty Cracker")
+            self.style = Style()
+            self.style.theme_use("default")
+
+            self.pack(fill=BOTH, expand=1)
+
+            #load buttons and labels
+            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackDictionaryCrackingMethodUI_LoadInitUI)
+            self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.dictionaryCrackingMethodLabel= Label(self, text="Dictionary Cracking Method")
+            self.dictionaryCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
+            self.currentModeLabel = Label(self,text="Current Mode: "+str(currentMode))
+            self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            #TODO insert dictionary settings here
+
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in dictionaryCrackingMethodUI definition Try block"
@@ -356,14 +383,41 @@ class guiDemo3(Frame):
             print inst
             print "============================================================================================="
 
+    def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.bruteForceCrackingMethodLabel.pack_forget()
+        self.currentModeLabel.pack_forget()
+        self.initUI()
+
     def bruteForceCrackingMethodUI(self, mode):
-        #mode is either network or single
+        #mode is either 1 (network) or 0 (single)
+        currentMode= None
         try:
-           # if(mode is not "network" or "single"):
-           #     raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
-           #TODO fix the check above
-            #TODO create the brute force cracking method window
-            fakeVar=True
+            if(mode==0):
+                currentMode= "Single"
+            elif(mode ==1):
+                currentMode= "Network"
+            else:
+                raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+
+            self.parent.title("Mighty Cracker")
+            self.style = Style()
+            self.style.theme_use("default")
+
+            self.pack(fill=BOTH, expand=1)
+
+            #load buttons and labels
+            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackBruteForceCrackingMethodUI_LoadInitUI)
+            self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.bruteForceCrackingMethodLabel = Label(self, text="Brute-Force Cracking Method")
+            self.bruteForceCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
+            self.currentModeLabel= Label(self, text="Current Mode: "+str(currentMode))
+            self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            #TODO insert brute force settings here
+
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in bruteForceCrackingMethodUI definition Try block"
@@ -375,14 +429,41 @@ class guiDemo3(Frame):
             print inst
             print "============================================================================================="
 
+    def unpackRainbowTableCrackingMethodUI_LoadInitUI(self):
+        self.closeButton.pack_forget()
+        self.returnToInitUIButton.pack_forget()
+        self.rainbowTableCrackingMethodLabel.pack_forget()
+        self.currentModeLabel.pack_forget()
+        self.initUI()
+
     def rainbowTableCrackingMethodUI(self, mode):
-        #mode is either network or single
+        #mode is either 1 (network) or 0 (single)
+        currentMode= None
         try:
-            #if(mode is not "network" or "single"):
-             #   raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
-            #TODO fix the check above
-            #TODO create the rainbow table cracking method window
-            fakeVar=True
+            if(mode == 0):
+                currentMode = "Single"
+            elif(mode == 1):
+                currentMode = "Network"
+            else:
+               raise Exception("ERROR: Invalid mode parameter: '"+str(mode)+"'")
+
+            self.parent.title("Mighty Cracker")
+            self.style = Style()
+            self.style.theme_use("default")
+
+            self.pack(fill=BOTH, expand=1)
+
+            #load buttons and labels
+            self.closeButton= Button(self, text="Close Program", command=self.onExit)
+            self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackRainbowTableCrackingMethodUI_LoadInitUI)
+            self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
+            self.rainbowTableCrackingMethodLabel= Label(self, text="Rainbow Table Cracking Method")
+            self.rainbowTableCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
+            self.currentModeLabel= Label(self,text="Current Mode: "+str(currentMode))
+            self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            #TODO insert Rainbow table settings here
+
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in rainbowTableCrackingMethodUI definition Try block"
