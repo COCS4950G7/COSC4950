@@ -260,9 +260,14 @@ class guiDemo3(Frame):
             if(len(inputIP) < 1):
                 showwarning("Network Client Start Warning: NO IP","No IP address has been entered!")
             else:
-                print "GUI BEDUG: '"+str(inputIP)+"'"
-                self.networkClient= Process(target=Client, args=(inputIP,))
-                self.networkClient.start()
+                #print "GUI BEDUG: '"+str(inputIP)+"'"
+                import socket
+                try:
+                    socket.inet_aton(inputIP) #if sucsessful, then it is legal
+                    self.networkClient= Process(target=Client, args=(inputIP,))
+                    self.networkClient.start()
+                except socket.error:
+                    showwarning("Invalid IP Address", "The IP address you entered is not valid.")
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in startClient definition Try block"
@@ -572,7 +577,6 @@ class guiDemo3(Frame):
         if result == True:
             self.onExit()
         #if no is selected, then the window just closes
-
 
     def onExit(self):
         self.quit()
