@@ -253,7 +253,7 @@ class guiDemo3(Frame):
     def startClient(self,inputIP):
         try:
             if(len(inputIP) < 1):
-                fakeVar=False
+                showwarning("Network Client Start Warning: NO IP","No IP address has been entered!")
             else:
                 self.networkClient= Process(target=Client, args=(inputIP,))
                 self.networkClient.start()
