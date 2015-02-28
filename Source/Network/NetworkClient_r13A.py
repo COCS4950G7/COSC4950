@@ -4,9 +4,7 @@ __author__ = 'chris hamm'
 
 #Designed to run with NetworkClient_r13A
 
-#BUG: Windows crashes
-
-#WARD CLAIMS THAT THERE IS A SEVERE FLAW IN THIS DESIGN
+#BUG: If node does not find solution, the node does not always receive the done command fro the server
 
 
 #REVISION NOTES:
@@ -18,7 +16,7 @@ __author__ = 'chris hamm'
     #Optimized for speed (see below)
 
     #Speed Optimization changes:
-        #[currently running at 0.25] socket timeouts have been set to 0.000001 seconds (tried using 0.0000001, but it caused a crash)
+        #socket timeouts have been set to 0.0001 seconds
         #commented out almost all print statements
 
 
@@ -398,15 +396,12 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         receivedPieceOfChunk = ""
         #print "Receiving Piece of CHunk From The Server By Length\n"
        # print "Length of PieceOfChunk: "+str(lengthOfChunkComponent)+"\n"
-        networkSocket.settimeout(0.25)
+        #networkSocket.settimeout(0.25)
         #networkSocket.settimeout(0.1)
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        #networkSocket.settimeout(0.0001)
-        #networkSocket.settimeout(0.00001)
-        #networkSocket.settimeout(0.000001)
-        #networkSocket.settimeout(0.0000001)
+        networkSocket.settimeout(0.0001)
         import sys
         while(len(receivedPieceOfChunk) < int(lengthOfChunkComponent)):
             try:
@@ -446,15 +441,12 @@ def receivePieceOfChunkFromServerByLength(self, lengthOfChunkComponent, networkS
         print "===================================================================\n"
         addCommandToListOfIOCommands(self, "ERROR in receivePieceOfChunkFromServerByLength", "Server", "Inbound")
     finally:
-        networkSocket.settimeout(0.25)
+        #networkSocket.settimeout(0.25)
         #networkSocket.settimeout(0.1)
         #networkSocket.settimeout(0.05)
         #networkSocket.settimeout(0.01)
         #networkSocket.settimeout(0.001)
-        #networkSocket.settimeout(0.0001)
-        #networkSocket.settimeout(0.00001)
-        #networkSocket.settimeout(0.000001)
-        #networkSocket.settimeout(0.0000001)
+        networkSocket.settimeout(0.0001)
         #print "Socket timeout was reset back to default\n"
         return receivedPieceOfChunk
 
@@ -684,9 +676,6 @@ class NetworkClient():
             #clientSocket.settimeout(0.01)
             #clientSocket.settimeout(0.001)
             #clientSocket.settimeout(0.0001)
-            #clientSocket.settimeout(0.00001)
-            #clientSocket.settimeout(0.000001)
-            #clientSocket.settimeout(0.0000001)
             while True: #primary client while loop
                 inboundCommandFromServer = "" #initialize the var
                 #CHECK FOR INBOUND SERVER COMMANDS SECTION=============================================================
