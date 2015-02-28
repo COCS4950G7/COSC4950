@@ -29,7 +29,7 @@ class guiDemo3(Frame):
         Frame.__init__(self,parent)
 
         self.parent = parent
-
+        self.dict = {} #temporary
         self.initUI() #start up the main menu
 
     def initUI(self):
@@ -363,6 +363,7 @@ class guiDemo3(Frame):
         self.selectDictionaryFileButton.pack_forget()
         self.inputHashTextFieldLabel.pack_forget()
         self.inputHashTextField.pack_forget()
+        self.enterHashButton.pack_forget()
         self.selectAlgorithmLabel.pack_forget()
         self.md5RadioButton.pack_forget()
         self.sha1RadioButton.pack_forget()
@@ -416,6 +417,8 @@ class guiDemo3(Frame):
             self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
             self.inputHashTextField= Entry(self, bd=5)
             self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
+            self.enterHashButton= Button(self, text="Enter Hash", command=lambda: self.setDictHash(self.inputHashTextField.get()))
+            self.enterHashButton.pack(side=TOP, padx=5, pady=5)
             self.selectAlgorithmLabel = Label(self, text="Select the Cracking Algorithm:")
             self.selectAlgorithmLabel.pack(side=TOP, padx=5, pady=5)
             self.md5RadioButton=  Radiobutton(self, text="MD5 (default)", variable= selectedAlgorithm, value="MD5" )
@@ -434,11 +437,13 @@ class guiDemo3(Frame):
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
                  #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
+                print "GUI DEBUG: Inside elif(currentMode is 'Network)"
                 if(len(str(self.inputHashTextField)) < 1):
                     showwarning("Empty hash text field", "The hash text field is empty")
                 else:
-                    dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': self.inputHashTextField.get()}
-                    self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(dict))
+                    print "GUI DEBUG: '"+str(self.inputHashTextField.get())+"'"
+                    self.dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': str(self.inputHashTextField.get())}
+                    self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(self.dict))
                     self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
             else:
@@ -455,7 +460,12 @@ class guiDemo3(Frame):
             print inst
             print "============================================================================================="
 
+    def setDictHash(self,newHash):
+        print "GUI DEBUG: hash is: '"+str(newHash)+"'"
+        self.dict['hash']= str(newHash)
+
     def startNetworkServer(self, crackingMethod):
+        print "GUI DEBUG: hash is: '"+str(crackingMethod['hash'])+"'"
         self.networkServer= Process(target=Server, args=(crackingMethod,))
         self.networkServer.start()
 
