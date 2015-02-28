@@ -237,7 +237,7 @@ class guiDemo3(Frame):
             self.insertServerIPLabel.pack(side=TOP, padx=5, pady=5)
             self.insertServerIPTextfield= Entry(self, bd=5)
             self.insertServerIPTextfield.pack(side=TOP, padx=5, pady=5)
-            self.startClientButton= Button(self, text="Start Client", command=self.startClient(str(self.insertServerIPTextfield)))
+            self.startClientButton= Button(self, text="Start Client", command=lambda:self.startClient(str(self.insertServerIPTextfield)))
             self.startClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
@@ -252,8 +252,11 @@ class guiDemo3(Frame):
 
     def startClient(self,inputIP):
         try:
-            self.networkClient= Process(target=Client, args=(inputIP,))
-            self.networkClient.start()
+            if(len(inputIP) < 1):
+                fakeVar=False
+            else:
+                self.networkClient= Process(target=Client, args=(inputIP,))
+                self.networkClient.start()
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in startClient definition Try block"
@@ -431,6 +434,8 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+
+
 
     def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
         self.closeButton.pack_forget()
