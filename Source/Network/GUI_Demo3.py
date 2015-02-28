@@ -7,7 +7,7 @@ try: #importing libraries try block
     from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
     from tkFileDialog import askopenfilename #used for creating an open file dialog
     from NetworkServer_r15 import Server
-    from NetworkClient_r15 import Client
+    from NetworkClient_r15a import Client
     from multiprocessing import Process
 except Exception as inst:
     print "============================================================================================="
