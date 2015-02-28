@@ -391,7 +391,7 @@ class guiDemo3(Frame):
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
                  #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServerDictionaryCrack("Dictionary"))
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer("Dictionary"))
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
             else:
@@ -479,7 +479,7 @@ class guiDemo3(Frame):
             elif(currentMode is 'Network'):
                 self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Network Mode)")
                 self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                #TODO create call method to start the brute force crack
+                #TODO create call method to start the network brute force crack
             else:
                 raise Exception ("GUI ERROR: Invalid currentMode in startBruteForceCrackButton: '"+str(currentMode)+"'")
             self.bruteForceCrackingMethodLabel = Label(self, text="Brute-Force Cracking Method")
