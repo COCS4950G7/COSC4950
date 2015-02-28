@@ -241,7 +241,7 @@ class guiDemo3(Frame):
             self.insertServerIPTextfield= Entry(self, bd=5)
             self.insertServerIPTextfield.pack(side=TOP, padx=5, pady=5)
             #TODO allow right click for pasting into box
-            self.startClientButton= Button(self, text="Start Client", command=lambda:self.startClient(str(self.insertServerIPTextfield.get())))
+            self.startClientButton= Button(self, text="Start Client", command=lambda: self.startClient(str(self.insertServerIPTextfield.get())))
             #TODO pass values in by a dictionary, see server_r15a to dictionary chunk manager for reference
             self.startClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
@@ -264,6 +264,7 @@ class guiDemo3(Frame):
                 import socket
                 try:
                     socket.inet_aton(inputIP) #if sucsessful, then it is legal
+                    #TODO not cross platform , remove
                     self.networkClient= Process(target=Client, args=(inputIP,))
                     self.networkClient.start()
                 except socket.error:
