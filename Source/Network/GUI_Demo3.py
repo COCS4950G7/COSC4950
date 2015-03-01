@@ -7,7 +7,7 @@ __author__ = 'Chris Hamm'
 #reference www.pyton-course.eu/tkinter_entry_widgets.php for more sophisticated gui layouts
 
 try: #importing libraries try block
-    from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
+    from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry, OptionMenu, StringVar, IntVar
     from ttk import Frame, Button, Style, Radiobutton
     from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
     from tkFileDialog import askopenfilename #used for creating an open file dialog
@@ -29,7 +29,6 @@ class guiDemo3(Frame):
 
     def __init__(self,parent):
         Frame.__init__(self,parent)
-
         self.parent = parent
         self.dict = {} #temporary
         self.initUI() #start up the main menu
@@ -362,7 +361,6 @@ class guiDemo3(Frame):
         self.selectDictionaryFileButton.pack_forget()
         self.inputHashTextFieldLabel.pack_forget()
         self.inputHashTextField.pack_forget()
-        self.enterHashButton.pack_forget()
         self.selectAlgorithmLabel.pack_forget()
         self.md5RadioButton.pack_forget()
         self.sha1RadioButton.pack_forget()
@@ -377,6 +375,8 @@ class guiDemo3(Frame):
         currentMode= "ERROR: Mode not selected" #initialize variable
         selectedDictionaryFile= "No Dictionary file has been selected"
         selectedAlgorithm= "MD5" #set to md5 as the default
+        inputHash= StringVar()
+        inputHash.set("")
         try:
             if(mode == 0):
                 currentMode= "Single"
@@ -396,9 +396,6 @@ class guiDemo3(Frame):
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackDictionaryCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
-
-
-
             self.dictionaryCrackingMethodLabel= Label(self, text="Dictionary Cracking Method")
             self.dictionaryCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel = Label(self,text="Current Mode: "+str(currentMode))
@@ -409,15 +406,14 @@ class guiDemo3(Frame):
             self.selectedDictionaryFileLabel.pack(side=TOP, padx=5, pady=5)
             self.selectDictionaryFileButton= Button(self, text="Select Dictionary File", command=self.selectFileWindow)
             self.selectDictionaryFileButton.pack(side=TOP, padx=5, pady=5)
+            #TODO modify the dictionary file so that when a file is selected, that filepath is passed onto server
             #TODO check for dictionary file existance before handling (and file extensions for windows)
             #TODO insert option to crack a file of hashes (pass file to the server/single)
             #TODO check for file existance before handling (and file extensions for windows)
             self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
             self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
-            self.inputHashTextField= Entry(self, bd=5)
+            self.inputHashTextField= Entry(self, bd=5, textvariable= inputHash)
             self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
-            self.enterHashButton= Button(self, text="Enter Hash", command=lambda: self.setDictHash(self.inputHashTextField.get()))
-            self.enterHashButton.pack(side=TOP, padx=5, pady=5)
             self.selectAlgorithmLabel = Label(self, text="Select the Cracking Algorithm:")
             self.selectAlgorithmLabel.pack(side=TOP, padx=5, pady=5)
             self.md5RadioButton=  Radiobutton(self, text="MD5 (default)", variable= selectedAlgorithm, value="MD5" )
@@ -441,7 +437,7 @@ class guiDemo3(Frame):
                     showwarning("Empty hash text field", "The hash text field is empty")
                 else:
                     print "GUI DEBUG: '"+str(self.inputHashTextField.get())+"'"
-                    self.dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': str(self.inputHashTextField.get())}
+                    self.dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get())}
                     self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(self.dict))
                     self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
@@ -478,6 +474,14 @@ class guiDemo3(Frame):
         self.bruteForceCrackingMethodLabel.pack_forget()
         self.currentModeLabel.pack_forget()
         self.startBruteForceCrackButton.pack_forget()
+        self.algorithmSelectionLabel.pack_forget()
+        self.algorithmOptionMenu.pack_forget()
+        self.alphabetSelectionLabel.pack_forget()
+        self.alphabetOptionMenu.pack_forget()
+        self.minKeyLengthLabel.pack_forget()
+        self.minKeyLengthTextField.pack_forget()
+        self.maxKeyLengthLabel.pack_forget()
+        self.maxKeyLengthTextField.pack_forget()
         self.outputHashTextFieldLabel.pack_forget()
         self.outputHashTextField.pack_forget()
         self.initUI()
@@ -485,6 +489,16 @@ class guiDemo3(Frame):
     def bruteForceCrackingMethodUI(self, mode):
         #mode is either 1 (network) or 0 (single)
         currentMode= None
+        selectedAlgorithm= StringVar()
+        selectedAlgorithm.set("MD5")
+        selectedAlphabet= StringVar()
+        selectedAlphabet.set("All")
+        minKeyLength= IntVar()
+        minKeyLength.set(5)
+        maxKeyLength= IntVar()
+        maxKeyLength.set(15)
+        inputHash= StringVar()
+        inputHash.set("")
         try:
             if(mode==0):
                 currentMode= "Single"
@@ -504,27 +518,51 @@ class guiDemo3(Frame):
             self.closeButton.pack(side=BOTTOM, padx=5, pady=5)
             self.returnToInitUIButton= Button(self, text="Return to Main Menu", command=self.unpackBruteForceCrackingMethodUI_LoadInitUI)
             self.returnToInitUIButton.pack(side=BOTTOM, padx=5, pady=5)
-            if(currentMode is 'Single'):
-                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)")
-                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                #TODO create call method to start the brute force crack
-            elif(currentMode is 'Network'):
-                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Network Mode)")
-                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                #TODO create call method to start the network brute force crack
-            else:
-                raise Exception ("GUI ERROR: Invalid currentMode in startBruteForceCrackButton: '"+str(currentMode)+"'")
             self.bruteForceCrackingMethodLabel = Label(self, text="Brute-Force Cracking Method")
             self.bruteForceCrackingMethodLabel.pack(side=TOP, padx=5, pady=5)
             self.currentModeLabel= Label(self, text="Current Mode: "+str(currentMode))
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
+            self.algorithmSelectionLabel= Label(self, text="Select which algorithm you want to use:")
+            self.algorithmSelectionLabel.pack(side=TOP, padx=5, pady=5)
+            self.algorithmOptionMenu= OptionMenu(self, selectedAlgorithm, "MD5", "SHA 1", "SHA 224", "SHA 256", "SHA 512")
+            self.algorithmOptionMenu.pack(side=TOP, padx=5, pady=5)
+            self.alphabetSelectionLabel= Label(self, text="Select which alphabet you want to use:")
+            self.alphabetSelectionLabel.pack(side=TOP, padx=5, pady=5)
+            self.alphabetOptionMenu= OptionMenu(self, selectedAlphabet, "All", "ASCII_Uppercase", "ASCII_Lowercase", "Digits", "Special_Symbols")
+            self.alphabetOptionMenu.pack(side=TOP, padx=5, pady=5)
+            self.minKeyLengthLabel= Label(self, text="Select the minimum key length: (Default is 5)")
+            self.minKeyLengthLabel.pack(side=TOP, padx=5, pady=5)
+            self.minKeyLengthTextField= Entry(self, bd=5, textvariable= minKeyLength)
+            self.minKeyLengthTextField.pack(side=TOP, padx=5, pady=5)
+            self.maxKeyLengthLabel= Label(self, text="Select the maximum key length:  (Default is 15)")
+            self.maxKeyLengthLabel.pack(side=TOP, padx=5, pady=5)
+            self.maxKeyLengthTextField= Entry(self, bd=5, textvariable= maxKeyLength)
+            self.maxKeyLengthTextField.pack(side=TOP, padx=5, pady=5)
+            #TODO add support for combination of alphabets
             #TODO insert option to hash a file of hashes (pass the file to server/single)
             #TODO check for file existance before handling (and file extensions for windows)
             self.inputHashTextFieldLabel= Label(self, text="The hash to be cracked:")
             self.inputHashTextFieldLabel.pack(side=TOP, padx=5, pady=5)
-            self.inputHashTextField= Entry(self, bd=5)
+            self.inputHashTextField= Entry(self, bd=5, textvariable= inputHash)
             self.inputHashTextField.pack(side=TOP, padx=5, pady=5)
             #TODO display results is a copiable textview
+
+            if(currentMode is 'Single'):
+                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)")
+                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+                #TODO create call method to start the dictionary crack
+            elif(currentMode is 'Network'):
+               # print "GUI DEBUG: Inside elif(currentMode is 'Network)"
+                #if(len(str(inputHash.get())) < 1):
+                 #   showwarning("Empty hash text field", "The hash text field is empty")
+                #else:
+                print "GUI DEBUG: '"+str(self.inputHashTextField.get())+"'"
+                self.dict = {'cracking method': "bf", 'hash': str(inputHash.get()), 'algorithm':str(selectedAlgorithm.get()),
+                             'alphabet':str(selectedAlphabet.get()), 'min key length':int(minKeyLength.get()), 'max key length':int(maxKeyLength.get())}
+                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Network Mode)", command=lambda: self.startNetworkServer(self.dict))
+                self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
+            else:
+                raise Exception("ERROR: Invalid mode parameter in Brute-Force CrackingUI: '"+str(mode)+"'")
 
             #This will display the results, could set to show up after the program is run.
             self.outputHashTextFieldLabel= Label(self, text="Results")
@@ -605,11 +643,13 @@ class guiDemo3(Frame):
         #if no is selected, then the window just closes
 
     def onExit(self):
-        self.quit()
+        self.parent.destroy()
+        #self.quit()
+        #TODO NEED TO TELL ALL CHILD PROCESSES TO STOP, THEY WONT STOP EVEN IF THIS PROCESS IS STOPPED
 
 def main():
     root = Tk()
-    root.geometry("640x480+300+300")
+    root.geometry("1024x768+300+300")
     app = guiDemo3(root)
     root.mainloop()
 
