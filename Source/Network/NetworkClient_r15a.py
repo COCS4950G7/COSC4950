@@ -1,10 +1,17 @@
+# NetworkClient_r15a.py
+
+# 3/1/2015
+
+# Now runs three instances of Dictionary concurrently, the result is consistent near 100% processor usage over
+# long term runs (>20 chunks). Previously, usage was 40-60%. Also, removed function to request server ip from user as
+# this is no longer used.
+
+
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process
 import Queue
 import Chunk
 import time
-import string
-import platform
 import Dictionary
 import Brute_Force
 import RainbowUser
@@ -15,6 +22,7 @@ class Client():
     PORTNUM = 22536
     AUTHKEY = "Popcorn is awesome!!!"
     cracking_mode = 'dic'
+
     #TODO: add shared variable for setting cracking mode
     def __init__(self, ip):
         #self.get_ip()
@@ -38,31 +46,37 @@ class Client():
             job_queue = manager.get_job_q()
             result_queue = manager.get_result_q()
             shutdown = manager.get_shutdown()
-            print self.cracking_mode
-
+            chunk_runner = []
             if self.cracking_mode == "dic":
+                print "Starting dictionary cracking."
                 dictionary = Dictionary.Dictionary()
-
-                chunk_runner = Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown))
+                chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
+                chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
+                chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
             else:
                 if self.cracking_mode == "bf":
+                    print "Starting brute force cracking."
                     bf = Brute_Force.Brute_Force()
 
-                    chunk_runner = Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown))
+                    chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown)))
                 else:
                     if self.cracking_mode == "rain":
+                        print "Starting rainbow table cracking."
                         return  # haven't figured out how to set this up yet
                     else:
                         if self.cracking_mode == "rainmaker":
+                            print "Starting rainbow table generator."
                             return  # haven't figured out how to set this up yet
                         else:
                             return "wtf?"
-
-            chunk_runner.start()
-            chunk_runner.join()
+            for process in chunk_runner:
+                process.start()
+            for process in chunk_runner:
+                process.join()
             if shutdown.is_set():
                 print "received shutdown notice from server."
-                chunk_runner.terminate()
+                for process in chunk_runner:
+                    process.terminate()
             return
         except Exception as inst:
             print "============================================================================================="
@@ -119,21 +133,6 @@ class Client():
     #--------------------------------------------------------------------------------------------------
     #End of make_client_manager function
     #--------------------------------------------------------------------------------------------------
-
-    def get_ip(self):
-        try:
-            user_input = raw_input("Enter the Server's IP Address:")  #NOTE: needs to be made more tolerant of input errors
-            self.IP = user_input
-        except Exception as inst:
-            print "============================================================================================="
-            print "ERROR: An exception was thrown in get_ip definition try block"
-            #the exception instance
-            print type(inst)
-            #srguments stored in .args
-            print inst.args
-            #_str_ allows args tto be printed directly
-            print inst
-            print "============================================================================================="
 
     def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
         try:
@@ -203,16 +202,15 @@ class Client():
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
         #NEEDS ERROR HANDLING!!!!!!!!!!!!!!!!!!
         return
-
-    #=====================================================================================================================
+    #===================================================================================================================
     #END OF FUNCTIONS
-    #=====================================================================================================================
+    #===================================================================================================================
 
-    #=====================================================================================================================
+    #===================================================================================================================
     #Auxillery CLASSES
-    #=====================================================================================================================
+    #===================================================================================================================
     class ServerQueueManager(SyncManager):
         pass
-    #=====================================================================================================================
+    #===================================================================================================================
     #End of Auxillery Classes
-    #=====================================================================================================================
+    #===================================================================================================================
