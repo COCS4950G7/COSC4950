@@ -637,20 +637,41 @@ class guiDemo3(Frame):
 
 
     def confirmExit(self):
-        result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)\n NOTICE CHILD PROCESSES WILL NOT BE STOPPED BY CLOSING THE GUI')
+        result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)')
         if result == True:
             self.onExit()
         #if no is selected, then the window just closes
 
     def onExit(self):
-        self.networkServer.join()
-        self.networkServer.terminate()
-        self.networkClient.join()
-        self.networkClient.terminate()
+       # self.networkServer.join()
+        try:
+            self.networkServer.terminate()
+        except Exception as inst:
+            print "============================================================================================="
+            print "GUI ERROR: An exception was thrown in onExit terminate networkserver process Try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
+        #self.networkClient.join()
+        try:
+            self.networkClient.terminate()
+        except Exception as inst:
+            print "============================================================================================="
+            print "GUI ERROR: An exception was thrown in onExit terminate networkclient process Try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
         self.parent.destroy()
         #self.quit()
-        #TODO NEED TO TELL ALL CHILD PROCESSES TO STOP, THEY WONT STOP EVEN IF THIS PROCESS IS STOPPED
 
 def main():
     root = Tk()
