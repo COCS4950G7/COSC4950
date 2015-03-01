@@ -1,8 +1,10 @@
 __author__ = 'Chris Hamm'
 #GUI_Demo3
-#TODO thought, have a event trigger a wake up in GUI, to indicate that something changed in the status
+#TODO thought, have a event trigger a wake up in GUI, to indicate that something changed in the status (maybe)
 #TODO condense the unpack methods into one function that adapts based on which screen you where using
-#TODO reference www.pyton-course.eu/tkinter_entry_widgets.php for more sophisticated gui layouts
+    #TODO an unpacking manager
+#TODO have global master set of predefined buttons and labals
+#reference www.pyton-course.eu/tkinter_entry_widgets.php for more sophisticated gui layouts
 
 try: #importing libraries try block
     from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry
@@ -150,7 +152,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
-
+    #End of single mode
 
     def unpackNetworkModeUI_LoadInitUI(self):
         self.closeButton.pack_forget()
@@ -193,6 +195,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of networkModeUI
 
     def unpackNetworkModeUI_LoadNetworkServerUI(self):
         self.closeButton.pack_forget()
@@ -242,7 +245,6 @@ class guiDemo3(Frame):
             self.insertServerIPTextfield.pack(side=TOP, padx=5, pady=5)
             #TODO allow right click for pasting into box
             self.startClientButton= Button(self, text="Start Client", command=lambda: self.startClient(str(self.insertServerIPTextfield.get())))
-            #TODO pass values in by a dictionary, see server_r15a to dictionary chunk manager for reference
             self.startClientButton.pack(side=TOP, padx=5, pady=5)
         except Exception as inst:
             print "============================================================================================="
@@ -254,21 +256,16 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of networkclient UI
 
     def startClient(self,inputIP):
         try:
             if(len(inputIP) < 1):
                 showwarning("Network Client Start Warning: NO IP","No IP address has been entered!")
             else:
-                #print "GUI BEDUG: '"+str(inputIP)+"'"
-                import socket
-                try:
-                    socket.inet_aton(inputIP) #if sucsessful, then it is legal
-                    #TODO not cross platform , remove
-                    self.networkClient= Process(target=Client, args=(inputIP,))
-                    self.networkClient.start()
-                except socket.error:
-                    showwarning("Invalid IP Address", "The IP address you entered is not valid.")
+                self.networkClient= Process(target=Client, args=(inputIP,))
+                self.networkClient.start()
+                #TODO idea, create client window that shows the status
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in startClient definition Try block"
@@ -323,6 +320,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of networkServerUI
 
     def unpackNetworkServerUI_LoadNetworkDictionaryUI(self):
         self.closeButton.pack_forget()
@@ -460,6 +458,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of dictionary cracking methodUI
 
     def setDictHash(self,newHash):
         print "GUI DEBUG: hash is: '"+str(newHash)+"'"
@@ -469,6 +468,7 @@ class guiDemo3(Frame):
         print "GUI DEBUG: hash is: '"+str(crackingMethod['hash'])+"'"
         self.networkServer= Process(target=Server, args=(crackingMethod,))
         self.networkServer.start()
+        #TODO idea: create a server is running window, with the stats
 
     def unpackBruteForceCrackingMethodUI_LoadInitUI(self):
         self.closeButton.pack_forget()
@@ -533,8 +533,6 @@ class guiDemo3(Frame):
             self.outputHashTextField.insert(0, "Test")
             self.outputHashTextField.pack(side=TOP,padx=5, pady=5)
 
-
-
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in bruteForceCrackingMethodUI definition Try block"
@@ -545,6 +543,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of brute force cracking UI
 
     def unpackRainbowTableCrackingMethodUI_LoadInitUI(self):
         self.closeButton.pack_forget()
@@ -591,6 +590,7 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+    #end of rainbow table cracking UI
 
     def selectFileWindow(self):
         filename= ""
