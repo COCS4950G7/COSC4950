@@ -643,6 +643,9 @@ class guiDemo3(Frame):
         #if no is selected, then the window just closes
 
     def onExit(self):
+        self.networkServer.join()
+        self.networkClient.join()
+
         self.parent.destroy()
         #self.quit()
         #TODO NEED TO TELL ALL CHILD PROCESSES TO STOP, THEY WONT STOP EVEN IF THIS PROCESS IS STOPPED
