@@ -644,7 +644,9 @@ class guiDemo3(Frame):
 
     def onExit(self):
         self.networkServer.join()
+        self.networkServer.terminate()
         self.networkClient.join()
+        self.networkClient.terminate()
 
         self.parent.destroy()
         #self.quit()
