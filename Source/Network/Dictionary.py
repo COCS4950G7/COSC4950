@@ -58,6 +58,8 @@ class Dictionary():
     listOfHashes = []
     doneList = []
     singleHash = True
+    maxLines = 1000000
+
 
     #Constructor
     def __init__(self):
@@ -468,7 +470,7 @@ class Dictionary():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 100000:
+            if lineCounter >= self.maxLines:
 
                 line = ""
 
@@ -553,7 +555,7 @@ class Dictionary():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 100000:
+            if lineCounter >= self.maxLines:
 
                 line = ""
 
