@@ -637,7 +637,7 @@ class guiDemo3(Frame):
 
 
     def confirmExit(self):
-        result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)')
+        result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)\n NOTICE CHILD PROCESSES WILL NOT BE STOPPED BY CLOSING THE GUI')
         if result == True:
             self.onExit()
         #if no is selected, then the window just closes
