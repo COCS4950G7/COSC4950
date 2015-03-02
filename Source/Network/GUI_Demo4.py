@@ -18,6 +18,7 @@ try:
     from GUI_Demo4_WindowClass import Window
     from GUI_Demo4_WindowClass import drawableObject
     from multiprocessing import Process
+    from functools import partial
 except Exception as inst:
     print "============================================================================================="
     print "GUI ERROR: An exception was thrown in importing libraries try block"
@@ -56,11 +57,14 @@ class guiDemo4(Frame):
             NetworkingModeButton.setObjectType('Button')
             NetworkingModeButton.setText("Networking Mode")
             mainMenuWindow.addDrawableObjectToList(NetworkingModeButton)
+
             CloseButton= drawableObject()
             CloseButton.setObjectType('Button')
             CloseButton.setText("Close Program")
             CloseButton.setSide('BOTTOM') #not using the default TOP value, so I must specify what I want
-            CloseButton.setCommand(self.onExit())
+            #CloseButtonLambdaCommand= partial(drawableObject, buttonCalls= self.onExit())
+            CloseButton.setLambdaCommand(self.onExit)
+
             #NOTE: COMMENT OUT THE LINE BELOW TO REMOVE THE CLOSE BUTTON
             mainMenuWindow.addDrawableObjectToList(CloseButton)
             #NOTE: COMMENT OUT THE ABOVE LINE TO REMOVE THE CLOSE BUTTON
@@ -68,8 +72,10 @@ class guiDemo4(Frame):
 
         def onExit(self):
             for i in range(0, len(self.listOfWindows)):
+                print "inside on exit loop"
                 self.listOfWindows[i].destroy()
             self.parent.destroy()
+            print "parent destroyed"
 
 
     except Exception as inst:
@@ -88,6 +94,7 @@ def main():
     root.geometry("1024x768+300+300")
     app = guiDemo4(root)
     root.mainloop()
+
 
 if __name__ == '__main__':
     main()

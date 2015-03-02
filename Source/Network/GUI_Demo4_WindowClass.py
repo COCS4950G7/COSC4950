@@ -10,6 +10,8 @@ try:
     from ttk import Frame, Button, Style, Radiobutton
     from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
     from tkFileDialog import askopenfilename #used for creating an open file dialog
+    from functools import partial
+
 except Exception as inst:
     print "============================================================================================="
     print "GUI ERROR (WINDOW CLASS): An exception was thrown in importing libraries try block"
@@ -17,7 +19,7 @@ except Exception as inst:
     print type(inst)
     #srguments stored in .args
     print inst.args
-    #_str_ allows args tto be printed directly
+    #_str_ allows args to be printed directly
     print inst
     print "============================================================================================="
 
@@ -28,7 +30,6 @@ class Window(Frame):
         def __init__(self):
             Frame.__init__(self )
             self.drawOnScreenList= [] #list that contains what needs to be draw to the screen, and in what order based on what is first in the list
-
             self.pack(fill=BOTH, expand=1)
 
 
@@ -53,7 +54,7 @@ class Window(Frame):
                     tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
                 #end of if button
                 elif(objectType is 'Label'):
-                    tempName= str(self.drawOnScreenList[index].getName())
+ #                   tempName= str(self.drawOnScreenList[index].getName())
                     tempName= Label(self, text=str(self.drawOnScreenList[index].getText()))
                     tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
                 #end of if label
