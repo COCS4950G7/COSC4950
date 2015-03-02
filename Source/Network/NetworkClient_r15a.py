@@ -6,6 +6,10 @@
 # long term runs (>20 chunks). Previously, usage was 40-60%. Also, removed function to request server ip from user as
 # this is no longer used.
 
+# 3/2/2015
+
+# Added automatic setting of client cracking mode.
+
 
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process
@@ -25,7 +29,6 @@ class Client():
 
     #TODO: add shared variable for setting cracking mode
     def __init__(self, ip):
-        #self.get_ip()
         self.IP = ip
         self.run_client()
         self.start_time = 0
@@ -46,6 +49,7 @@ class Client():
             job_queue = manager.get_job_q()
             result_queue = manager.get_result_q()
             shutdown = manager.get_shutdown()
+            self.set_cracking_mode(manager)
             chunk_runner = []
             if self.cracking_mode == "dic":
                 print "Starting dictionary cracking."
@@ -77,7 +81,7 @@ class Client():
                 print "received shutdown notice from server."
                 for process in chunk_runner:
                     process.terminate()
-            return
+
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in runclient definition try block"
@@ -98,6 +102,19 @@ class Client():
     #End of runclient function
     #--------------------------------------------------------------------------------------------------
 
+    def set_cracking_mode(self, manager):
+        bit_1 = manager.get_mode_bit_1()
+        bit_2 = manager.get_mode_bit_2()
+
+        if bit_1.is_set() and bit_2.is_set():
+            self.cracking_mode = 'dic'
+        elif bit_1.is_set() and not bit_2.is_set():
+            self.cracking_mode = 'bf'
+        elif not bit_1.is_set() and bit_2.is_set():
+            self.cracking_mode = 'rain'
+        elif not bit_1.is_set() and not bit_2.is_set():
+            self.cracking_mode = 'rainmaker'
+
     #--------------------------------------------------------------------------------------------------
     #make_client_manager function
     #--------------------------------------------------------------------------------------------------
@@ -112,6 +129,8 @@ class Client():
             self.ServerQueueManager.register('get_job_q')
             self.ServerQueueManager.register('get_result_q')
             self.ServerQueueManager.register('get_shutdown')
+            self.ServerQueueManager.register('get_mode_bit_1')
+            self.ServerQueueManager.register('get_mode_bit_2')
 
             manager = self.ServerQueueManager(address=(ip, port), authkey=authkey)
             manager.connect()
