@@ -4,6 +4,73 @@ __author__ = 'chris Hamm'
 
 #Designed to replace GUI_Demo3
 
-#IDEA: each window will have a constructor using the globally defined buttons, etc that makes the buttons for the window.
-#IDEA: a unpack method that will unpack a window based on what window it is
-#IDEA: have a window or a screen object that holds some of these properties
+#USES WINDOW OBJECTS!!!!
+
+try:
+    from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry, OptionMenu, StringVar, IntVar
+    from ttk import Frame, Button, Style, Radiobutton
+    from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
+    from tkFileDialog import askopenfilename #used for creating an open file dialog
+    from NetworkServer_r15a import Server
+    from NetworkClient_r15a import Client
+    from GUI_Demo4_WindowClass import Window
+    from GUI_Demo4_WindowClass import drawableObject
+    from multiprocessing import Process
+except Exception as inst:
+    print "============================================================================================="
+    print "GUI ERROR: An exception was thrown in importing libraries try block"
+    #the exception instance
+    print type(inst)
+    #srguments stored in .args
+    print inst.args
+    #_str_ allows args tto be printed directly
+    print inst
+    print "============================================================================================="
+
+
+class guiDemo4(Frame):
+    try:
+        def __init__(self,parent):
+            Frame.__init__(self,parent)
+            self.parent = parent
+            self.outBoundDict = {} #dictionary object that holds the parameters to be sent to server/client
+            self.initGUI()
+
+        def initGUI(self):
+            mainMenuWindow= Window()
+            self.parent.title("Mighty Cracker")
+            #Window.setWindowTitle("Mighty Cracker")
+            mainMenuLabel= drawableObject()
+            mainMenuLabel.setObjectType('Label')
+            mainMenuLabel.setText("Main Menu")
+            mainMenuWindow.addDrawableObjectToList(mainMenuLabel)
+            SingleComputerModeButton = drawableObject()
+            SingleComputerModeButton.setObjectType('Button')
+            SingleComputerModeButton.setText("Single Computer Mode")
+            mainMenuWindow.addDrawableObjectToList(SingleComputerModeButton)
+            NetworkingModeButton= drawableObject()
+            NetworkingModeButton.setObjectType('Button')
+            NetworkingModeButton.setText("Networking Mode")
+            mainMenuWindow.addDrawableObjectToList(NetworkingModeButton)
+            mainMenuWindow.drawScreen()
+
+
+    except Exception as inst:
+        print "============================================================================================="
+        print "GUI ERROR: An exception was thrown in guiDemo4 Master try block"
+        #the exception instance
+        print type(inst)
+        #srguments stored in .args
+        print inst.args
+        #_str_ allows args tto be printed directly
+        print inst
+        print "============================================================================================="
+
+def main():
+    root = Tk()
+    root.geometry("1024x768+300+300")
+    app = guiDemo4(root)
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()
