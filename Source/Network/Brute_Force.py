@@ -17,11 +17,10 @@
 #   efficiency of parallel processing with the new network client functionality by minimizing downtime and overhead.
 
 import hashlib
-import os
+import math
 import itertools
 import string
 from multiprocessing import cpu_count, Process, Queue, Value
-import Chunk
 
 from time import time, sleep
 
@@ -93,6 +92,9 @@ class Brute_Force():
 
     def set_result_queue(self, result_queue):
         self.result_queue = result_queue
+
+    def get_total_chunks(self):
+        return self.total_work_units
 
     def start_processes(self):
         if not self.processes_running:
@@ -200,7 +202,7 @@ class Brute_Force():
                 self.charactersToCheck -= 1
                 iterations /= self.alphabet.__len__()
                 break
-        print "Checking ", self.charactersToCheck, "characters per chunk."
+        #print "Checking ", self.charactersToCheck, "characters per chunk."
         self.chunk_size = iterations
         for i in range(self.minKeyLength, self.maxKeyLength):
             self.total_work_units += ((self.alphabet.__len__() ^ i)/self.chunk_size)
@@ -233,15 +235,16 @@ class Brute_Force():
         self.minKeyLength = int(settings_list[4])
         self.maxKeyLength = int(settings_list[5])
         prefix = settings_list[6]
+        if self.first_unit:
+            self.set_chars_to_check()
 
         alphabet = self.alphabet
         if prefix == "-99999999999999999999999999999999999":
             prefix = ''
         if prefix == '' and self.first_unit:
-            self.first_unit = False
+
             self.check_short_keys()
         else:
-
             if self.done.value:
                 return True
             else:
@@ -249,6 +252,7 @@ class Brute_Force():
 
                 self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet))
 
+        self.first_unit = False
         if self.done:
             return True
         else:
