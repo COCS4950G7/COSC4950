@@ -548,9 +548,11 @@ class guiDemo3(Frame):
             #TODO display results is a copiable textview
 
             if(currentMode is 'Single'):
-                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)")
+                self.dict = {'cracking method': "bf", 'hash': str(inputHash.get()), 'algorithm':str(selectedAlgorithm.get()),
+                             'alphabet':str(selectedAlphabet.get()), 'min key length':int(minKeyLength.get()), 'max key length':int(maxKeyLength.get()), 'single':True}
+                self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)", command=lambda: self.startNetworkServer(self.dict))
                 self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                #TODO create call method to start the dictionary crack
+
             elif(currentMode is 'Network'):
                # print "GUI DEBUG: Inside elif(currentMode is 'Network)"
                 #if(len(str(inputHash.get())) < 1):
