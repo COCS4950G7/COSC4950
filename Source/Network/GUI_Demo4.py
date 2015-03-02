@@ -34,10 +34,13 @@ class guiDemo4(Frame):
             Frame.__init__(self,parent)
             self.parent = parent
             self.outBoundDict = {} #dictionary object that holds the parameters to be sent to server/client
+            self.listOfWindows= []
             self.initGUI()
+
 
         def initGUI(self):
             mainMenuWindow= Window()
+            self.listOfWindows.append(mainMenuWindow)
             self.parent.title("Mighty Cracker")
             #Window.setWindowTitle("Mighty Cracker")
             mainMenuLabel= drawableObject()
@@ -52,7 +55,18 @@ class guiDemo4(Frame):
             NetworkingModeButton.setObjectType('Button')
             NetworkingModeButton.setText("Networking Mode")
             mainMenuWindow.addDrawableObjectToList(NetworkingModeButton)
+            CloseButton= drawableObject()
+            CloseButton.setObjectType('Button')
+            CloseButton.setText("Close Program")
+            CloseButton.setSide('BOTTOM')
+            CloseButton.setCommand(self.onExit())
+            mainMenuWindow.addDrawableObjectToList(CloseButton)
             mainMenuWindow.drawScreen()
+
+        def onExit(self):
+            for i in range(0, len(self.listOfWindows)):
+                self.listOfWindows[i].destroy()
+            self.parent.destroy()
 
 
     except Exception as inst:

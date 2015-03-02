@@ -31,6 +31,7 @@ class Window(Frame):
 
             self.pack(fill=BOTH, expand=1)
 
+
         def drawScreen(self): #function draws objects to the screen
 
             for index in range(0, len(self.drawOnScreenList)):
@@ -43,10 +44,10 @@ class Window(Frame):
                         tempName= Button(self, text=str(self.drawOnScreenList[index].getText()) )
                     #elif lambda command is not none but command is none
                     elif((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is not None)):
-                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=lambda: str(self.drawOnScreenList[index].getLambdaCommand()))
+                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=lambda: self.drawOnScreenList[index].getLambdaCommand())
                     #elif command is not None and lambda is none
                     elif((self.drawOnScreenList[index].getCommand() is not None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
-                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=str(self.drawOnScreenList[index].getLambdaCommand()))
+                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getLambdaCommand())
                     else:
                         raise Exception("drawScreen error: command and lambda command are both not None!")
                     tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
@@ -127,13 +128,13 @@ class drawableObject():
 
         def setSide(self,inputSide):
             if(inputSide is 'TOP'):
-                self.side="TOP"
+                self.side= TOP
             elif(inputSide is 'RIGHT'):
-                self.side= "RIGHT"
+                self.side= RIGHT
             elif(inputSide is "LEFT"):
-                self.side="LEFT"
+                self.side= LEFT
             elif(inputSide is "BOTTOM"):
-                self.side= "BOTTOM"
+                self.side= BOTTOM
             else:
                 raise Exception("ERROR: unknown onbject side: '"+str(inputSide)+"'")
 
@@ -193,6 +194,8 @@ class drawableObject():
 
         def getValue(self):
             return self.value
+
+
 
     except Exception as inst:
         print "============================================================================================="
