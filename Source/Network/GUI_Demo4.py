@@ -1,10 +1,12 @@
 __author__ = 'chris Hamm'
 #GUI_Demo4
-#Created: 2/28/2015
+#Created: 3/1/2015
 
-#Designed to replace GUI_Demo3
+#Designed to replace GUI_Demo3 (Not ready to do this yet)
 
 #USES WINDOW OBJECTS!!!!
+
+#USES DRAWABLE OBJECTS which are stored in the window objects. When a drawable object is added to the drawOnScreenList, it is then drawn by the drawScreen function within the window.
 
 try:
     from Tkinter import Tk, RIGHT, TOP, LEFT, BOTTOM, BOTH, Menu, Label, Entry, OptionMenu, StringVar, IntVar
@@ -34,15 +36,14 @@ class guiDemo4(Frame):
             Frame.__init__(self,parent)
             self.parent = parent
             self.outBoundDict = {} #dictionary object that holds the parameters to be sent to server/client
-            self.listOfWindows= []
-            self.initGUI()
+            self.listOfWindows= [] #holds all of the windows that have been made
+            self.initGUI() #calls the function to open the main menu
 
 
         def initGUI(self):
             mainMenuWindow= Window()
             self.listOfWindows.append(mainMenuWindow)
-            self.parent.title("Mighty Cracker")
-            #Window.setWindowTitle("Mighty Cracker")
+            self.parent.title("Mighty Cracker") #this changes the title of the screen
             mainMenuLabel= drawableObject()
             mainMenuLabel.setObjectType('Label')
             mainMenuLabel.setText("Main Menu")
@@ -58,12 +59,12 @@ class guiDemo4(Frame):
             CloseButton= drawableObject()
             CloseButton.setObjectType('Button')
             CloseButton.setText("Close Program")
-            CloseButton.setSide('BOTTOM')
+            CloseButton.setSide('BOTTOM') #not using the default TOP value, so I must specify what I want
             CloseButton.setCommand(self.onExit())
             #NOTE: COMMENT OUT THE LINE BELOW TO REMOVE THE CLOSE BUTTON
             mainMenuWindow.addDrawableObjectToList(CloseButton)
             #NOTE: COMMENT OUT THE ABOVE LINE TO REMOVE THE CLOSE BUTTON
-            mainMenuWindow.drawScreen()
+            mainMenuWindow.drawScreen() #Draws all of the drawable objects to the screen
 
         def onExit(self):
             for i in range(0, len(self.listOfWindows)):
