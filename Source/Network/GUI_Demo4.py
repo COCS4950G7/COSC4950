@@ -60,7 +60,9 @@ class guiDemo4(Frame):
             CloseButton.setText("Close Program")
             CloseButton.setSide('BOTTOM')
             CloseButton.setCommand(self.onExit())
+            #NOTE: COMMENT OUT THE LINE BELOW TO REMOVE THE CLOSE BUTTON
             mainMenuWindow.addDrawableObjectToList(CloseButton)
+            #NOTE: COMMENT OUT THE ABOVE LINE TO REMOVE THE CLOSE BUTTON
             mainMenuWindow.drawScreen()
 
         def onExit(self):
