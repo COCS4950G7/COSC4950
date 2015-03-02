@@ -27,7 +27,6 @@ class Client():
     AUTHKEY = "Popcorn is awesome!!!"
     cracking_mode = 'dic'
 
-    #TODO: add shared variable for setting cracking mode
     def __init__(self, ip):
         self.IP = ip
         self.run_client()
