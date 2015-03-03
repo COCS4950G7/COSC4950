@@ -12,7 +12,6 @@ try:
     from GUI_Demo6_WindowClass import Window
     from GUI_Demo6_WindowClass import drawableObject
     from multiprocessing import Process
-    from functools import partial
 except Exception as inst:
     print "============================================================================================="
     print "GUI ERROR: An exception was thrown in importing libraries try block"
@@ -44,7 +43,6 @@ class guiDemo6(Frame):
         SingleComputerModeButton = drawableObject(mainMenuWindow)
         SingleComputerModeButton.setObjectType('Button')
         SingleComputerModeButton.setName("SingleComputerModeButton")
-        SingleComputerModeButton.setCommand(0)
         mainMenuWindow.addCommandToDict(SingleComputerModeButton, self.onExit)
         SingleComputerModeButton.setText("Single Computer Mode")
         mainMenuWindow.addDrawableObjectToList(SingleComputerModeButton)
@@ -52,6 +50,12 @@ class guiDemo6(Frame):
         NetworkingModeButton.setObjectType('Button')
         NetworkingModeButton.setText("Networking Mode")
         mainMenuWindow.addDrawableObjectToList(NetworkingModeButton)
+        CloseButton= drawableObject(mainMenuWindow)
+        CloseButton.setObjectType('Button')
+        CloseButton.setText("Close Program")
+        CloseButton.setSide('BOTTOM') #not using the default TOP value, so I must specify what I want
+        CloseButton.setLambdaCommand(self.onExit)
+        mainMenuWindow.addDrawableObjectToList(CloseButton)
 
         mainMenuWindow.drawScreen() #Draws all of the drawable objects to the screen
 

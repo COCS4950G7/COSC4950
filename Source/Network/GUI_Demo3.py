@@ -264,7 +264,6 @@ class guiDemo3(Frame):
             else:
                 self.networkClient= Process(target=Client, args=(inputIP,))
                 self.networkClient.start()
-                #TODO idea, create client window that shows the status
                 self.networkClientStatusUI()
         except Exception as inst:
             print "============================================================================================="
@@ -281,8 +280,8 @@ class guiDemo3(Frame):
         self.networkClientStatusWindow= Tk()
         self.networkClientStatusWindow.geometry("640x480")
         self.networkClientStatusWindow.title("Network Client Status Window")
-        self.style = Style()
-        self.style.theme_use("default")
+        self.networkClientStatusWindow.style = Style()
+        self.networkClientStatusWindow.style.theme_use("default")
         self.networkClientStatusWindow.pack(fill=BOTH, expand=1)
         #TODO throws an attribute error on 'pack', thus nothing is drawn to the screen, fix this
         self.CloseButton= Button(self, text="Close Status Window", command=lambda: closeStatusWindow())
