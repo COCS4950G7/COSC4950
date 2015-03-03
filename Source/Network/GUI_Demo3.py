@@ -373,7 +373,7 @@ class guiDemo3(Frame):
     def dictionaryCrackingMethodUI(self,mode):
         #mode is either 1 (network) or 0 (single)
         currentMode= "ERROR: Mode not selected" #initialize variable
-        selectedDictionaryFile= "No Dictionary file has been selected"
+        self.selectedDictionaryFile= ""
         selectedAlgorithm= "MD5" #set to md5 as the default
         inputHash= StringVar()
         inputHash.set("")
@@ -402,9 +402,9 @@ class guiDemo3(Frame):
             self.currentModeLabel.pack(side=TOP, padx=5, pady=5)
             self.dictionaryFileLocationLabel= Label(self, text="Dictionary File to be used:")
             self.dictionaryFileLocationLabel.pack(side=TOP, padx=5, pady=5)
-            self.selectedDictionaryFileLabel= Label(self, text=str(selectedDictionaryFile))
+            self.selectedDictionaryFileLabel= Label(self, text=str(self.selectedDictionaryFile))
             self.selectedDictionaryFileLabel.pack(side=TOP, padx=5, pady=5)
-            self.selectDictionaryFileButton= Button(self, text="Select Dictionary File", command=self.selectFileWindow)
+            self.selectDictionaryFileButton= Button(self, text="Select Dictionary File", textvariable= str(self.selectedDictionaryFile), command=self.selectFileWindow) #
             self.selectDictionaryFileButton.pack(side=TOP, padx=5, pady=5)
             #TODO modify the dictionary file so that when a file is selected, that filepath is passed onto server
             #TODO check for dictionary file existance before handling (and file extensions for windows)
@@ -428,16 +428,16 @@ class guiDemo3(Frame):
             self.sha512RadioButton.pack(side=LEFT, padx=5, pady=5)
             #TODO display result in a noneditable text view
             if(currentMode is 'Single'):
-                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)")
+                self.dict = {'cracking method': "dic", 'file name': str(self.selectedDictionaryFile), 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get()), 'single':"True"}
+                self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)", command=lambda: self.startNetworkServer(self.dict))
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
-                 #TODO create call method to start the dictionary crack
             elif(currentMode is 'Network'):
                 print "GUI DEBUG: Inside elif(currentMode is 'Network)"
                 if(len(str(self.inputHashTextField)) < 1):
                     showwarning("Empty hash text field", "The hash text field is empty")
                 else:
                     print "GUI DEBUG: '"+str(self.inputHashTextField.get())+"'"
-                    self.dict = {'cracking method': "dic", 'file name': "dic", 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get())}
+                    self.dict = {'cracking method': "dic", 'file name': str(self.selectedDictionaryFile), 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get())}
                     self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Network Mode)", command=lambda: self.startNetworkServer(self.dict))
                     self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
@@ -549,7 +549,7 @@ class guiDemo3(Frame):
 
             if(currentMode is 'Single'):
                 self.dict = {'cracking method': "bf", 'hash': str(inputHash.get()), 'algorithm':str(selectedAlgorithm.get()),
-                             'alphabet':str(selectedAlphabet.get()), 'min key length':int(minKeyLength.get()), 'max key length':int(maxKeyLength.get()), 'single':True}
+                             'alphabet':str(selectedAlphabet.get()), 'min key length':int(minKeyLength.get()), 'max key length':int(maxKeyLength.get()), 'single':"True"}
                 self.startBruteForceCrackButton= Button(self, text="Start Brute-Force Crack (Single Mode)", command=lambda: self.startNetworkServer(self.dict))
                 self.startBruteForceCrackButton.pack(side=BOTTOM, padx=5, pady=5)
 
@@ -635,7 +635,37 @@ class guiDemo3(Frame):
     def selectFileWindow(self):
         filename= ""
         filename= askopenfilename()
+        #remove the file extension
+       # modifiedFileName= self.removeFileNameExtension(filename)
+        print "Modified fileName= '"+str(filename)+"'"
         self.selectedDictionaryFileLabel.config(text=str(filename))
+        self.selectedDictionaryFile= str(self.selectedDictionaryFileLabel.cget("text"))
+
+
+    def removeFileNameExtension(self, inputFileName):
+        outboundFileName= ""
+        lastForwardSlashPos=0
+        for i in range(0, len(inputFileName)):
+            if(inputFileName[i] == "."):
+                break
+            elif(inputFileName[i] == "/"):
+                lastForwardSlashPos= i
+                outboundFileName+= inputFileName[i]
+            else:
+                outboundFileName+= inputFileName[i]
+        print "FileName after extension is removed: '"+str(outboundFileName)+"'"
+        pathlessFileName= self.removeAbsoluteFilePath(outboundFileName, lastForwardSlashPos)
+        print "FileName after absolute filepath was removed: '"+str(pathlessFileName)+"'"
+        return pathlessFileName
+
+    def removeAbsoluteFilePath(self, inboundFilePath, lastForwardSlashPos):
+        relativeFilePath= ""
+        for i in range(lastForwardSlashPos+1, len(inboundFilePath)):
+            if(inboundFilePath[i] is not None):
+                relativeFilePath+= inboundFilePath[i]
+            else:
+                break
+        return relativeFilePath
 
 
     def confirmExit(self):
