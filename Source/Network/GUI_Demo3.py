@@ -265,6 +265,7 @@ class guiDemo3(Frame):
                 self.networkClient= Process(target=Client, args=(inputIP,))
                 self.networkClient.start()
                 #TODO idea, create client window that shows the status
+                self.networkClientStatusUI()
         except Exception as inst:
             print "============================================================================================="
             print "GUI ERROR: An exception was thrown in startClient definition Try block"
@@ -275,6 +276,21 @@ class guiDemo3(Frame):
             #_str_ allows args tto be printed directly
             print inst
             print "============================================================================================="
+
+    def networkClientStatusUI(self):
+        self.networkClientStatusWindow= Tk()
+        self.networkClientStatusWindow.geometry("640x480")
+        self.networkClientStatusWindow.title("Network Client Status Window")
+        self.style = Style()
+        self.style.theme_use("default")
+        self.networkClientStatusWindow.pack(fill=BOTH, expand=1)
+
+        self.CloseButton= Button(self, text="Close Status Window", command=lambda: closeStatusWindow())
+        self.CloseButton.pack(side=BOTTOM, padx=5, pady=5)
+
+        def closeStatusWindow(self):
+            self.networkClientStatusWindow.destroy()
+
 
     def unpackNetworkServerUI_LoadInitUI(self):
         self.closeButton.pack_forget()
@@ -641,7 +657,7 @@ class guiDemo3(Frame):
         self.selectedDictionaryFileLabel.config(text=str(filename))
         self.selectedDictionaryFile= str(self.selectedDictionaryFileLabel.cget("text"))
 
-
+    '''
     def removeFileNameExtension(self, inputFileName):
         outboundFileName= ""
         lastForwardSlashPos=0
@@ -666,7 +682,7 @@ class guiDemo3(Frame):
             else:
                 break
         return relativeFilePath
-
+    '''
 
     def confirmExit(self):
         result= askyesno('Exit Confirmation', 'Are you sure you want to quit this application? \n (WARNING: All server, client, and single computer processes will be terminated!!)')
