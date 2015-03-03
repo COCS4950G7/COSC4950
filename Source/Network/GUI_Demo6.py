@@ -43,12 +43,13 @@ class guiDemo6(Frame):
         SingleComputerModeButton = drawableObject(mainMenuWindow)
         SingleComputerModeButton.setObjectType('Button')
         SingleComputerModeButton.setName("SingleComputerModeButton")
-        mainMenuWindow.addCommandToDict(SingleComputerModeButton, self.onExit)
         SingleComputerModeButton.setText("Single Computer Mode")
+        SingleComputerModeButton.setLambdaCommand(lambda: self.changeWindow(mainMenuWindow, self.selectCrackingMethodGUI('Single')))
         mainMenuWindow.addDrawableObjectToList(SingleComputerModeButton)
         NetworkingModeButton= drawableObject(mainMenuWindow)
         NetworkingModeButton.setObjectType('Button')
         NetworkingModeButton.setText("Networking Mode")
+        NetworkingModeButton.setLambdaCommand(lambda: self.changeWindow(mainMenuWindow, self.selectNetworkModeGUI()))
         mainMenuWindow.addDrawableObjectToList(NetworkingModeButton)
         CloseButton= drawableObject(mainMenuWindow)
         CloseButton.setObjectType('Button')
@@ -58,6 +59,135 @@ class guiDemo6(Frame):
         mainMenuWindow.addDrawableObjectToList(CloseButton)
 
         mainMenuWindow.drawScreen() #Draws all of the drawable objects to the screen
+
+    def selectNetworkModeGUI(self):
+        selectNetworkModeWindow= Window(self.parent)
+        self.listOfWindows.append(selectNetworkModeWindow)
+        self.parent.title("Mighty Cracker")
+        selectNetworkModeLabel= drawableObject(selectNetworkModeWindow)
+        selectNetworkModeLabel.setObjectType('Label')
+        selectNetworkModeLabel.setText("Select Networking Mode for this Node")
+        selectNetworkModeWindow.addDrawableObjectToList(selectNetworkModeLabel)
+        networkServerModeButton= drawableObject(selectNetworkModeWindow)
+        networkServerModeButton.setObjectType('Button')
+        networkServerModeButton.setText("Network Server Mode")
+        networkServerModeButton.setLambdaCommand(lambda: self.changeWindow( selectNetworkModeWindow, self.selectCrackingMethodGUI('Network')))
+        selectNetworkModeWindow.addDrawableObjectToList((networkServerModeButton))
+        networkClientModeButton= drawableObject(selectNetworkModeWindow)
+        networkClientModeButton.setObjectType('Button')
+        networkClientModeButton.setText("Network Client Mode")
+        selectNetworkModeWindow.addDrawableObjectToList(networkClientModeButton)
+        closeButton= drawableObject(selectNetworkModeWindow)
+        closeButton.setObjectType('Button')
+        closeButton.setText("Close Program")
+        closeButton.setSide('BOTTOM')
+        closeButton.setLambdaCommand(self.onExit)
+        selectNetworkModeWindow.addDrawableObjectToList(closeButton)
+        backToMainMenuButton = drawableObject(selectNetworkModeWindow)
+        backToMainMenuButton.setObjectType('Button')
+        backToMainMenuButton.setText("Back to Main Menu")
+        backToMainMenuButton.setSide('BOTTOM')
+        backToMainMenuButton.setLambdaCommand(lambda: self.changeWindow(selectNetworkModeWindow, self.initGUI()))
+        selectNetworkModeWindow.addDrawableObjectToList(backToMainMenuButton)
+
+        selectNetworkModeWindow.drawScreen()
+
+    def selectCrackingMethodGUI(self, SorNMode):
+        #SorNMode means single or network mode
+        if(SorNMode is 'Single'):
+            self.SorNMode= SorNMode
+        elif(SorNMode is 'Network'):
+            self.SorNMode= SorNMode
+        else:
+            raise Exception("GUI ERROR: invalid SorNMode: '"+str(SorNMode)+"'")
+        selectCrackingMethodWindow= Window(self.parent)
+        self.listOfWindows.append(selectCrackingMethodWindow)
+        self.parent.title("Mighty Cracker")
+        selectCrackingMethodLabel= drawableObject(selectCrackingMethodWindow)
+        selectCrackingMethodLabel.setObjectType('Label')
+        selectCrackingMethodLabel.setText("=========================Select A Cracking Method=========================")
+        selectCrackingMethodWindow.addDrawableObjectToList(selectCrackingMethodLabel)
+        currentModeLabel= drawableObject(selectCrackingMethodWindow)
+        currentModeLabel.setObjectType('Label')
+        currentModeLabel.setText("Running in "+str(self.SorNMode)+" Mode")
+        selectCrackingMethodWindow.addDrawableObjectToList(currentModeLabel)
+        dictionaryCrackingMethodButton= drawableObject(selectCrackingMethodWindow)
+        dictionaryCrackingMethodButton.setObjectType('Button')
+        dictionaryCrackingMethodButton.setText("Dictionary")
+        dictionaryCrackingMethodButton.setLambdaCommand(lambda: self.changeWindow(selectCrackingMethodWindow, self.dictionaryCrackingMethodSettingsGUI(self.SorNMode)))
+        selectCrackingMethodWindow.addDrawableObjectToList(dictionaryCrackingMethodButton)
+        bruteForceCrackingMethodButton= drawableObject(selectCrackingMethodWindow)
+        bruteForceCrackingMethodButton.setObjectType('Button')
+        bruteForceCrackingMethodButton.setText("Brute-Force (Default)")
+        selectCrackingMethodWindow.addDrawableObjectToList(bruteForceCrackingMethodButton)
+        rainbowTableCrackingMethodButton= drawableObject(selectCrackingMethodWindow)
+        rainbowTableCrackingMethodButton.setObjectType('Button')
+        rainbowTableCrackingMethodButton.setText("Rainbow Table")
+        selectCrackingMethodWindow.addDrawableObjectToList(rainbowTableCrackingMethodButton)
+        closeButton= drawableObject(selectCrackingMethodWindow)
+        closeButton.setObjectType('Button')
+        closeButton.setText("Close Program")
+        closeButton.setSide("BOTTOM")
+        closeButton.setLambdaCommand(self.onExit)
+        selectCrackingMethodWindow.addDrawableObjectToList(closeButton)
+        backToMainMenuButton= drawableObject(selectCrackingMethodWindow)
+        backToMainMenuButton.setObjectType('Button')
+        backToMainMenuButton.setText("Back to Main Menu")
+        backToMainMenuButton.setSide("BOTTOM")
+        backToMainMenuButton.setLambdaCommand(lambda: self.changeWindow(selectCrackingMethodWindow, self.initGUI()))
+        selectCrackingMethodWindow.addDrawableObjectToList(backToMainMenuButton)
+
+        selectCrackingMethodWindow.drawScreen()
+
+    def dictionaryCrackingMethodSettingsGUI(self, SorNMode):
+        #SorNMode means single or network mode
+        if(SorNMode is 'Single'):
+            self.SorNMode= SorNMode
+        elif(SorNMode is 'Network'):
+            self.SorNMode= SorNMode
+        else:
+            raise Exception("GUI ERROR: invalid SorNMode: '"+str(SorNMode)+"'")
+        dictionaryCrackingMethodSettingsWindow= Window(self.parent)
+        self.listOfWindows.append(dictionaryCrackingMethodSettingsWindow)
+        self.parent.title("Mighty Cracker")
+        dictionaryCrackingMethodSettingsLabel= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        dictionaryCrackingMethodSettingsLabel.setObjectType('Label')
+        dictionaryCrackingMethodSettingsLabel.setText("=========================Dictionary Cracking Method Settings=========================")
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(dictionaryCrackingMethodSettingsLabel)
+        currentMode= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        currentMode.setObjectType('Label')
+        currentMode.setText("Running in "+str(SorNMode)+" Mode")
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(currentMode)
+        selectedDictionaryFileLabel= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        selectedDictionaryFileLabel.setObjectType('Label')
+        selectedDictionaryFileLabel.setTextVariable("No file has been Selected")
+        selectedDictionaryFileLabel.setText("Selected Dictionary File: "+str(selectedDictionaryFileLabel.getTextVariable()))
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectedDictionaryFileLabel)
+        closeButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        closeButton.setObjectType('Button')
+        closeButton.setText("Close Program")
+        closeButton.setSide("BOTTOM")
+        closeButton.setLambdaCommand(self.onExit)
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(closeButton)
+        backToMainMenuButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        backToMainMenuButton.setObjectType('Button')
+        backToMainMenuButton.setText("Back to Main Menu")
+        backToMainMenuButton.setSide("BOTTOM")
+        backToMainMenuButton.setLambdaCommand(lambda: self.changeWindow(dictionaryCrackingMethodSettingsWindow, self.initGUI()))
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(backToMainMenuButton)
+
+        dictionaryCrackingMethodSettingsWindow.drawScreen()
+
+    def changeWindow(self, windowToBeClosed, functionToStartNewWindow):
+        windowToBeClosed.pack_forget()
+        functionToStartNewWindow
+
+    def selectFileWindow(self):
+        filename= ""
+        filename= askopenfilename()
+        #TODO adapt this to run with dictionary cracking method settings
+        #self.selectedDictionaryFileLabel.config(text=str(filename))
+        #self.selectedDictionaryFile= str(self.selectedDictionaryFileLabel.cget("text"))
 
     def onExit(self):
         for i in range(0, len(self.listOfWindows)):

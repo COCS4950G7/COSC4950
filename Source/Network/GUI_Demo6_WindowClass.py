@@ -31,7 +31,6 @@ class Window(Frame):
             Frame.__init__(self , superParent) #superParent is the parent of guidemo6, aka root
             self.superParent= superParent
             self.drawOnScreenList= [] #list that contains what needs to be draw to the screen, and in what order based on what is first in the list
-            self.dictOfCommands= {} #dictionary of commands
             self.pack(fill=BOTH, expand=1)
 
         def drawScreen(self): #function draws objects to the screen
@@ -68,10 +67,6 @@ class Window(Frame):
                 else:
                     raise Exception("drawOnScreen ERROR: unrecognized objectType: '"+str(objectType)+"'")
 
-        def removeAllFromScreen(self): #unpacks all objects from the screen
-            for index in range(0, len(self.drawOnScreenList)):
-                self.drawOnScreenList[index].pack_forget()
-
         def setWindowTitle(self,newTitle):
             self.windowTitle= newTitle
 
@@ -80,12 +75,6 @@ class Window(Frame):
 
         def addDrawableObjectToList(self, inputDrawableObject):
             self.drawOnScreenList.append(inputDrawableObject)
-
-        def addCommandToDict(self, inputDrawableObject, inputCommand):
-            self.dictOfCommands[inputDrawableObject.getName()]= inputCommand
-
-        def getCommandFromDict(self, inputDrawableObjectName):
-            return self.dictOfCommands[inputDrawableObjectName]
 
     except Exception as inst:
         print "============================================================================================="
@@ -108,7 +97,7 @@ class drawableObject():
             self.side= TOP #what side to draw on, default TOP
             self.myPadx=5 #default 5
             self.myPady=5 #default 5
-            self.name = "" #objects name, used for dictOfCommands key
+            self.name = "" #objects name,
             self.text= "" #default text is blank
             self.command= None #command for when pressed
             self.lambdaCommand= None
@@ -199,7 +188,6 @@ class drawableObject():
 
         def getValue(self):
             return self.value
-
 
 
     except Exception as inst:
