@@ -162,13 +162,16 @@ class guiDemo6(Frame):
         selectedDictionaryFileLabel= drawableObject(dictionaryCrackingMethodSettingsWindow)
         selectedDictionaryFileLabel.setObjectType('Label')
         selectedDictionaryFileLabel.setName("selectedDictionaryFileLabel")
+        selectedDictionaryFileLabel.setStringVariable("No file has been selected")
+        selectedDictionaryFileLabel.linkStringVariableToTextVariable()
         selectedDictionaryFileLabel.setTextVariable("No file has been Selected")
         selectedDictionaryFileLabel.setText("Selected Dictionary File: "+str(selectedDictionaryFileLabel.getTextVariable()))
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectedDictionaryFileLabel)
         selectDictionaryFileButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
         selectDictionaryFileButton.setObjectType('Button')
         selectDictionaryFileButton.setText("Select Dictionary File")
-        selectDictionaryFileButton.setLambdaCommand(lambda: self.selectFileWindow(selectedDictionaryFileLabel, dictionaryCrackingMethodSettingsWindow))
+        #selectDictionaryFileButton.setTextVariable(selectedDictionaryFileLabel.getTextVariable())
+        selectDictionaryFileButton.setLambdaCommand(lambda: self.selectFileWindow())
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectDictionaryFileButton)
         closeButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
         closeButton.setObjectType('Button')
@@ -224,17 +227,11 @@ class guiDemo6(Frame):
         windowToBeClosed.pack_forget()
         functionToStartNewWindow
 
-    def selectFileWindow(self, inputFileLabel, currentWindow):
+    def selectFileWindow(self):
         filename= ""
         filename= askopenfilename()
-        #TODO adapt this to run with dictionary cracking method settings
-        inputFileLabel.setText("Selected Dictionary File: "+str(filename))
-        tempList= []
-        import copy
-        tempList= copy.deepcopy(currentWindow.getDrawOnScreenList())
-        currentWindow.pack_forget()
-        currentWindow.setDrawOnScreenList(tempList)
-        currentWindow.drawScreen()
+        #TODO adapt this to run with dictionary cracking method settings (Still does not refresh the label text)
+
 
     def onExit(self):
         for i in range(0, len(self.listOfWindows)):

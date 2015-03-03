@@ -443,7 +443,8 @@ class guiDemo3(Frame):
             self.sha512RadioButton.pack(side=LEFT, padx=5, pady=5)
             #TODO display result in a noneditable text view
             if(currentMode is 'Single'):
-                self.dict = {'cracking method': "dic", 'file name': str(self.selectedDictionaryFile), 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get()), 'single':"True"}
+                self.dict = {'cracking method': "dic", 'file name': str(self.selectedDictionaryFileLabel.cget("text")), 'algorithm': selectedAlgorithm, 'hash': str(inputHash.get()), 'single':"True"}
+                print "selectedDictionaryFileLabel text="+str(self.selectedDictionaryFileLabel.cget("text"))
                 self.startDictionaryCrackButton= Button(self, text="Start Dictionary Crack (Single Mode)", command=lambda: self.startNetworkServer(self.dict))
                 self.startDictionaryCrackButton.pack(side=BOTTOM, padx=5, pady=5)
             elif(currentMode is 'Network'):
