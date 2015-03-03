@@ -284,7 +284,7 @@ class guiDemo3(Frame):
         self.style = Style()
         self.style.theme_use("default")
         self.networkClientStatusWindow.pack(fill=BOTH, expand=1)
-
+        #TODO throws an attribute error on 'pack', thus nothing is drawn to the screen, fix this
         self.CloseButton= Button(self, text="Close Status Window", command=lambda: closeStatusWindow())
         self.CloseButton.pack(side=BOTTOM, padx=5, pady=5)
 
