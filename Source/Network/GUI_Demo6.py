@@ -161,9 +161,15 @@ class guiDemo6(Frame):
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(currentMode)
         selectedDictionaryFileLabel= drawableObject(dictionaryCrackingMethodSettingsWindow)
         selectedDictionaryFileLabel.setObjectType('Label')
+        selectedDictionaryFileLabel.setName("selectedDictionaryFileLabel")
         selectedDictionaryFileLabel.setTextVariable("No file has been Selected")
         selectedDictionaryFileLabel.setText("Selected Dictionary File: "+str(selectedDictionaryFileLabel.getTextVariable()))
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectedDictionaryFileLabel)
+        selectDictionaryFileButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
+        selectDictionaryFileButton.setObjectType('Button')
+        selectDictionaryFileButton.setText("Select Dictionary File")
+        selectDictionaryFileButton.setLambdaCommand(lambda: self.selectFileWindow(selectedDictionaryFileLabel, dictionaryCrackingMethodSettingsWindow))
+        dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectDictionaryFileButton)
         closeButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
         closeButton.setObjectType('Button')
         closeButton.setText("Close Program")
@@ -218,12 +224,17 @@ class guiDemo6(Frame):
         windowToBeClosed.pack_forget()
         functionToStartNewWindow
 
-    def selectFileWindow(self):
+    def selectFileWindow(self, inputFileLabel, currentWindow):
         filename= ""
         filename= askopenfilename()
         #TODO adapt this to run with dictionary cracking method settings
-        #self.selectedDictionaryFileLabel.config(text=str(filename))
-        #self.selectedDictionaryFile= str(self.selectedDictionaryFileLabel.cget("text"))
+        inputFileLabel.setText("Selected Dictionary File: "+str(filename))
+        tempList= []
+        import copy
+        tempList= copy.deepcopy(currentWindow.getDrawOnScreenList())
+        currentWindow.pack_forget()
+        currentWindow.setDrawOnScreenList(tempList)
+        currentWindow.drawScreen()
 
     def onExit(self):
         for i in range(0, len(self.listOfWindows)):

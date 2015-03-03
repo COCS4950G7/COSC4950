@@ -10,6 +10,7 @@ try:
     from ttk import Frame, Button, Style, Radiobutton
     from tkMessageBox import askyesno, showwarning, showinfo  #used for message boxes
     from tkFileDialog import askopenfilename #used for creating an open file dialog
+    import copy
    # from functools import partial
 
 except Exception as inst:
@@ -67,6 +68,37 @@ class Window(Frame):
                 else:
                     raise Exception("drawOnScreen ERROR: unrecognized objectType: '"+str(objectType)+"'")
 
+        def drawObject(self, index):
+            objectType = str(self.drawOnScreenList[index].getObjectType())
+            if(objectType is 'Button'):
+                #if both command and lambda command are None
+                if((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()) )
+                #elif lambda command is not none but command is none
+                elif((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is not None)):
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getLambdaCommand())
+                #elif command is not None and lambda is none
+                elif((self.drawOnScreenList[index].getCommand() is not None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getCommand( ))
+                else:
+                    raise Exception("drawScreen error: command and lambda command are both not None!")
+                tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
+            #end of if button
+            elif(objectType is 'Label'):
+                tempName= Label(self, text=str(self.drawOnScreenList[index].getText()))
+                tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
+            #end of if label
+            elif(objectType is 'Entry'):
+                tempName= Entry(self, bd=5, textvariable= self.drawOnScreenList[index].getTextVariable())
+                tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
+            #end of if Entry
+            elif(objectType is 'RadioButton'):
+                tempName= Radiobutton(self, text=str(self.drawOnScreenList[index].getText()), variable=self.drawOnScreenList[index].getVariable(), value=self.drawOnScreenList[index].getValue() )
+                tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
+            #end of if Radiobutton
+            else:
+                raise Exception("drawOnScreen ERROR: unrecognized objectType: '"+str(objectType)+"'")
+
         def setWindowTitle(self,newTitle):
             self.windowTitle= newTitle
 
@@ -75,6 +107,24 @@ class Window(Frame):
 
         def addDrawableObjectToList(self, inputDrawableObject):
             self.drawOnScreenList.append(inputDrawableObject)
+
+        def redrawDrawableObject(self, inputDrawableObject):
+            tempName= inputDrawableObject.getName()
+            objectIndex = None
+            for i in range(0, len(self.drawOnScreenList)):
+                if(self.drawOnScreenList[i].getName() is tempName):
+                    objectIndex= i
+                    break
+            if(objectIndex is not None):
+                self.drawObject(i)
+
+        def getDrawOnScreenList(self):
+            tempList= copy.deepcopy(self.drawOnScreenList)
+            return tempList
+
+        def setDrawOnScreenList(self, inputDrawOnScreenList):
+            self.drawOnScreenList= copy.deepcopy(inputDrawOnScreenList)
+
 
     except Exception as inst:
         print "============================================================================================="
