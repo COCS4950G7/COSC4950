@@ -119,6 +119,7 @@ class guiDemo6(Frame):
         bruteForceCrackingMethodButton= drawableObject(selectCrackingMethodWindow)
         bruteForceCrackingMethodButton.setObjectType('Button')
         bruteForceCrackingMethodButton.setText("Brute-Force (Default)")
+        bruteForceCrackingMethodButton.setLambdaCommand(lambda: self.changeWindow(selectCrackingMethodWindow, self.bruteForceCrackingMethodSettingsGUI(self.SorNMode)))
         selectCrackingMethodWindow.addDrawableObjectToList(bruteForceCrackingMethodButton)
         rainbowTableCrackingMethodButton= drawableObject(selectCrackingMethodWindow)
         rainbowTableCrackingMethodButton.setObjectType('Button')
@@ -178,6 +179,41 @@ class guiDemo6(Frame):
 
         dictionaryCrackingMethodSettingsWindow.drawScreen()
 
+    def bruteForceCrackingMethodSettingsGUI(self, SorNMode):
+        #SorNMode means single or network mode
+        if(SorNMode is 'Single'):
+            self.SorNMode= SorNMode
+        elif(SorNMode is 'Network'):
+            self.SorNMode= SorNMode
+        else:
+            raise Exception("GUI ERROR: invalid SorNMode: '"+str(SorNMode)+"'")
+        bruteForceCrackingMethodSettingsWindow= Window(self.parent)
+        self.listOfWindows.append(bruteForceCrackingMethodSettingsWindow)
+        self.parent.title("Mighty Cracker")
+        bruteForceCrackingMethodSettingsLabel= drawableObject(bruteForceCrackingMethodSettingsWindow)
+        bruteForceCrackingMethodSettingsLabel.setObjectType('Label')
+        bruteForceCrackingMethodSettingsLabel.setText("=========================Brute-Force Cracking Method Settings=========================")
+        bruteForceCrackingMethodSettingsWindow.addDrawableObjectToList(bruteForceCrackingMethodSettingsLabel)
+        currentMode= drawableObject(bruteForceCrackingMethodSettingsWindow)
+        currentMode.setObjectType('Label')
+        currentMode.setText("Running in "+str(SorNMode)+" Mode")
+        bruteForceCrackingMethodSettingsWindow.addDrawableObjectToList(currentMode)
+        closeButton= drawableObject(bruteForceCrackingMethodSettingsWindow)
+        closeButton.setObjectType('Button')
+        closeButton.setText("Close Program")
+        closeButton.setSide("BOTTOM")
+        closeButton.setLambdaCommand(self.onExit)
+        bruteForceCrackingMethodSettingsWindow.addDrawableObjectToList(closeButton)
+        backToMainMenuButton= drawableObject(bruteForceCrackingMethodSettingsWindow)
+        backToMainMenuButton.setObjectType('Button')
+        backToMainMenuButton.setText("Back to Main Menu")
+        backToMainMenuButton.setSide("BOTTOM")
+        backToMainMenuButton.setLambdaCommand(lambda: self.changeWindow(bruteForceCrackingMethodSettingsWindow, self.initGUI()))
+        bruteForceCrackingMethodSettingsWindow.addDrawableObjectToList(backToMainMenuButton)
+
+        bruteForceCrackingMethodSettingsWindow.drawScreen()
+
+
     def changeWindow(self, windowToBeClosed, functionToStartNewWindow):
         windowToBeClosed.pack_forget()
         functionToStartNewWindow
@@ -191,10 +227,9 @@ class guiDemo6(Frame):
 
     def onExit(self):
         for i in range(0, len(self.listOfWindows)):
-            print "inside on exit loop"
             self.listOfWindows[i].destroy()
         self.parent.destroy()
-        print "parent destroyed"
+        print "parent window has been destroyed"
 
 def main():
     root = Tk()
