@@ -14,8 +14,7 @@ class start():
                 #"hash": "b17a9909e09fda53653332431a599941",  # Karntnerstrasse-Rotenturmstrasse in md5
                 #"hash": "e7c0efb2dc699ede79983b8dfb5cb509ebf2bde9",  # Karntnerstrasse-Rotenturmstrasse in sha1
                 #"hash": "7ab5f3733019c9e594526c9beb70c0cc51517b91a6557f4b4306564b753232af",  # Karntnerstrasse-Rotenturmstrasse in sha256
-                #"hash": "86034bef1d027523698b6a0768bb024fafb11d9b23890cd1829592e12c5ef0fa83e6eee93adc4919296b4ffa957ce036139a39b2bd6301d4fdae03bdbeab96a3",  # Karntnerstrasse-Rotenturmstrasse in sha512
-                "hash": "f3780b0a16fdc32db07c0a6a6a557bd45fd7e8d95d82ea1a1761f25d481a9bdee54f06d865d3a8f308d173d680e90421f7b50e0564ded7980ad3a007107fdbfe",
+                "hash": "86034bef1d027523698b6a0768bb024fafb11d9b23890cd1829592e12c5ef0fa83e6eee93adc4919296b4ffa957ce036139a39b2bd6301d4fdae03bdbeab96a3",  # Karntnerstrasse-Rotenturmstrasse in sha512
                 "file name": "realuniq",                    # last word in dic.txt
                 "single": "False"})                    # (long runtime on realuniq dictionary ~755M lines)
 
