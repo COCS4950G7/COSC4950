@@ -86,7 +86,7 @@ class Server():
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
 
-                # Spawn processes to feed the queue and monitor the result queue
+                # Spawn processes to feed the job queue and monitor the result queue
                 if self.cracking_mode == "dic":
                     if not self.single_user_mode:
                         mode_bit_1.set()
@@ -476,7 +476,7 @@ class Server():
                     dictionary = Dictionary.Dictionary()
                     chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                     chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
-                    #chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
+                    chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                 else:
                     if self.cracking_mode == "bf":
                         print "Starting brute force cracking."
@@ -546,14 +546,16 @@ class Server():
         def run_brute_force(self, bf, job_queue, result_queue, shutdown):
             try:
                 bf.result_queue = result_queue
-                bf.start_processes()
+
 
                 while not shutdown.is_set():
                     try:
                         chunk = job_queue.get()
                     except Qqueue.Empty:
                         continue
+
                     bf.run_chunk(chunk)
+                    bf.start_processes()
 
             except Exception as inst:
                 print "============================================================================================="
