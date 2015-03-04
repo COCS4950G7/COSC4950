@@ -58,6 +58,8 @@ class Dictionary():
     listOfHashes = []
     doneList = []
     singleHash = True
+    maxLines = 1000000
+
 
     #Constructor
     def __init__(self):
@@ -72,7 +74,7 @@ class Dictionary():
     #Sets the dictionary file's name
     def setFileName(self, fileName):
 
-        self.fileName = str(fileName) + ".txt"
+        self.fileName = str(fileName)  + ".txt"
 
         #Checks for filenotfound and returns code to caller class
         try:
@@ -283,7 +285,6 @@ class Dictionary():
 
     #The sub-process function
     def subProcess(self, pipe, lock):
-
         lock.acquire()
 
         chunkList = pipe.recv()
@@ -468,7 +469,7 @@ class Dictionary():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 100000:
+            if lineCounter >= self.maxLines:
 
                 line = ""
 
@@ -485,7 +486,7 @@ class Dictionary():
 
         chunk.data = data
 
-        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 "
+        chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(self.fileLocation) + " 0 0 " + str(eof)
 
         return chunk
 
@@ -553,7 +554,7 @@ class Dictionary():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 10000:
+            if lineCounter >= self.maxLines:
 
                 line = ""
 
