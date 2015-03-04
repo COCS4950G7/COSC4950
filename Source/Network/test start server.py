@@ -10,16 +10,19 @@ class start():
     server = Process()
     settings = []
     settings.append({"cracking method": "dic",
-                "algorithm": "md5",
-                "hash": "b17a9909e09fda53653332431a599941",  # Karntnerstrasse-Rotenturmstrasse
-                "file name": "realuniq",
-                "single": "True"})                    # (long runtime on realuniq dictionary ~755M lines)
+                "algorithm": "SHA512",
+                #"hash": "b17a9909e09fda53653332431a599941",  # Karntnerstrasse-Rotenturmstrasse in md5
+                #"hash": "e7c0efb2dc699ede79983b8dfb5cb509ebf2bde9",  # Karntnerstrasse-Rotenturmstrasse in sha1
+                #"hash": "7ab5f3733019c9e594526c9beb70c0cc51517b91a6557f4b4306564b753232af",  # Karntnerstrasse-Rotenturmstrasse in sha256
+                "hash": "86034bef1d027523698b6a0768bb024fafb11d9b23890cd1829592e12c5ef0fa83e6eee93adc4919296b4ffa957ce036139a39b2bd6301d4fdae03bdbeab96a3",  # Karntnerstrasse-Rotenturmstrasse in sha512
+                "file name": "dic",                    # last word in dic.txt
+                "single": "False"})                    # (long runtime on realuniq dictionary ~755M lines)
 
     settings.append({"cracking method": "dic",
-                 "algorithm": "md5",
+                 "algorithm": "sha1",
                  "hash": "33da7a40473c1637f1a2e142f4925194",  # popcorn
-                 "file name": "realuniq",
-                 "single": "False"})                    # (short run time on realuniq dictionary ~18M lines)
+                 "file name": "dic",                   # very short runtime in dic.txt
+                 "single": "True"})                    # (short run time on realuniq dictionary ~18M lines)
 
     settings.append( {"cracking method": "dic",
                  "algorithm": "md5",
@@ -28,12 +31,15 @@ class start():
                  })                   # (longest run time on realuniq dictionary ~1.2B lines)
 
     settings.append( {"cracking method": "bf",
-                 "algorithm": "md5",
-                 "hash": "12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999
-                 "min key length": 6,
+                 "algorithm": "sha512",
+                 #"hash": "12c8de03d4562ba9f810e7e1e7c6fc15"  # aa9999 in md5
+                 #"hash": "96f36b618b63f4c7f22a34b6cd2245467465b355",  # aa9999 in sha1
+                 #"hash": "dd9f980ae062d651ba2bf65053273dd25eafaa0ab3086909e3d0934320a66ad1",  # aa9999 in sha256
+                 "hash": "57178f9de330d80155a1f5feca08569cede59da3e5d59b3e3a861c93e37b44cdda355023bc74cb10c495f53413981373a78e9926bf249d3b862c795f23ee1d9c",  # aa9999 in sha512
+                 "min key length": 6,                         # short runtime
                  "max key length": 16,
                  "alphabet": string.ascii_letters+string.digits+string.punctuation,
-                 "single": "False"})
+                 "single": "True"})
 
     def __init__(self):
         #self.start_server()
