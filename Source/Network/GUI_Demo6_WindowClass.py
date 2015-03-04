@@ -43,16 +43,16 @@ class Window(Frame):
                         tempName= Button(self, text=str(self.drawOnScreenList[index].getText()) )
                     #elif lambda command is not none but command is none
                     elif((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is not None)):
-                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getLambdaCommand())
+                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()),  textvariable=self.drawOnScreenList[index].getStringVariable(),command=self.drawOnScreenList[index].getLambdaCommand())
                     #elif command is not None and lambda is none
                     elif((self.drawOnScreenList[index].getCommand() is not None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
-                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getCommand( ))
+                        tempName= Button(self, text=str(self.drawOnScreenList[index].getText()),  textvariable=self.drawOnScreenList[index].getStringVariable(),command=self.drawOnScreenList[index].getCommand( ))
                     else:
                         raise Exception("drawScreen error: command and lambda command are both not None!")
                     tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
                 #end of if button
                 elif(objectType is 'Label'):
-                    tempName= Label(self, text=str(self.drawOnScreenList[index].getText()))
+                    tempName= Label(self, text=str(self.drawOnScreenList[index].getText()),  textvariable=self.drawOnScreenList[index].getStringVariable())
                     tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
                 #end of if label
                 elif(objectType is 'Entry'):
@@ -71,19 +71,19 @@ class Window(Frame):
             if(objectType is 'Button'):
                 #if both command and lambda command are None
                 if((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
-                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()) )
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), textvariable=self.drawOnScreenList[index].getStringVariable() )
                 #elif lambda command is not none but command is none
                 elif((self.drawOnScreenList[index].getCommand() is None) and (self.drawOnScreenList[index].getLambdaCommand() is not None)):
-                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getLambdaCommand())
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), textvariable=self.drawOnScreenList[index].getStringVariable(), command=self.drawOnScreenList[index].getLambdaCommand())
                 #elif command is not None and lambda is none
                 elif((self.drawOnScreenList[index].getCommand() is not None) and (self.drawOnScreenList[index].getLambdaCommand() is None)):
-                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()), command=self.drawOnScreenList[index].getCommand( ))
+                    tempName= Button(self, text=str(self.drawOnScreenList[index].getText()),  textvariable=self.drawOnScreenList[index].getStringVariable(),command=self.drawOnScreenList[index].getCommand( ))
                 else:
                     raise Exception("drawScreen error: command and lambda command are both not None!")
                 tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
             #end of if button
             elif(objectType is 'Label'):
-                tempName= Label(self, text=str(self.drawOnScreenList[index].getText()))
+                tempName= Label(self, text=str(self.drawOnScreenList[index].getText()), textvariable= self.drawOnScreenList[index].getStringVariable())
                 tempName.pack(side=str(self.drawOnScreenList[index].getSide()), padx=int(self.drawOnScreenList[index].getPadx()), pady=int(self.drawOnScreenList[index].getPady()))
             #end of if label
             elif(objectType is 'Entry'):
@@ -210,10 +210,10 @@ class drawableObject():
             return self.variable
 
         def setTextVariable(self,inputVar):
-            self.textVariable.set( inputVar)
+            self.textVariable= inputVar
 
         def getTextVariable(self):
-            return self.textVariable.get()
+            return self.textVariable
 
         def setValue(self,inputValue):
             self.value= inputValue
@@ -225,7 +225,7 @@ class drawableObject():
             self.stringVariable.set(inputText)
 
         def getStringVariable(self):
-            return self.stringVariable
+            return self.stringVariable.get()
 
 
     except Exception as inst:

@@ -142,6 +142,7 @@ class guiDemo6(Frame):
 
     def dictionaryCrackingMethodSettingsGUI(self, SorNMode):
         #SorNMode means single or network mode
+        self.selectedDictionaryFile=""
         if(SorNMode is 'Single'):
             self.SorNMode= SorNMode
         elif(SorNMode is 'Network'):
@@ -162,16 +163,14 @@ class guiDemo6(Frame):
         selectedDictionaryFileLabel= drawableObject(dictionaryCrackingMethodSettingsWindow)
         selectedDictionaryFileLabel.setObjectType('Label')
         selectedDictionaryFileLabel.setName("selectedDictionaryFileLabel")
-        selectedDictionaryFileLabel.setStringVariable("No file has been selected")
-        selectedDictionaryFileLabel.linkStringVariableToTextVariable()
-        selectedDictionaryFileLabel.setTextVariable("No file has been Selected")
-        selectedDictionaryFileLabel.setText("Selected Dictionary File: "+str(selectedDictionaryFileLabel.getTextVariable()))
+        selectedDictionaryFileLabel.setStringVariable(self.selectedDictionaryFile)
+        selectedDictionaryFileLabel.setText("Selected Dictionary File: "+str(self.selectedDictionaryFile))
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectedDictionaryFileLabel)
         selectDictionaryFileButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
         selectDictionaryFileButton.setObjectType('Button')
         selectDictionaryFileButton.setText("Select Dictionary File")
-        #selectDictionaryFileButton.setTextVariable(selectedDictionaryFileLabel.getTextVariable())
-        selectDictionaryFileButton.setLambdaCommand(lambda: self.selectFileWindow())
+        selectDictionaryFileButton.setStringVariable(self.selectedDictionaryFile)
+        selectDictionaryFileButton.setLambdaCommand(lambda: self.selectFileWindow(self.selectedDictionaryFile, selectedDictionaryFileLabel))
         dictionaryCrackingMethodSettingsWindow.addDrawableObjectToList(selectDictionaryFileButton)
         closeButton= drawableObject(dictionaryCrackingMethodSettingsWindow)
         closeButton.setObjectType('Button')
@@ -227,10 +226,22 @@ class guiDemo6(Frame):
         windowToBeClosed.pack_forget()
         functionToStartNewWindow
 
-    def selectFileWindow(self):
+    def selectFileWindow(self, inputFileString, inputSelectedFileLabel):
         filename= ""
         filename= askopenfilename()
+        print "selected file: '"+str(filename)+"'"
+        print "inputFileString before copy: '"+str(inputFileString)+"'"
+        print "inputSelectedFileLabel text before copy: '"+str(inputSelectedFileLabel.getText())+"'"
+        print "inputSelectedFileLabel stringVariable before copy: '"+str(inputSelectedFileLabel.getStringVariable())+"'"
+        inputSelectedFileLabel.setText(inputSelectedFileLabel.getText()+" "+filename)
+        inputSelectedFileLabel.setStringVariable(inputFileString)
+        inputFileString= filename
+        self.parent.update_idletasks()
+        print "inputFileString after copy: '"+str(inputFileString)+"'"
+        print "inputSelectedFileLabel text after copy: '"+str(inputSelectedFileLabel.getText())+"'"
+        print "inputSelectedFileLabel stringVariable after copy: '"+str(inputSelectedFileLabel.getStringVariable())+"'"
         #TODO adapt this to run with dictionary cracking method settings (Still does not refresh the label text)
+
 
 
     def onExit(self):
