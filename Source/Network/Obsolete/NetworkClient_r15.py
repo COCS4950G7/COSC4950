@@ -22,10 +22,11 @@ class Client():
     IP = "127.0.0.1" #default is pingback
     PORTNUM = 22536
     AUTHKEY = "Popcorn is awesome!!!"
-    cracking_mode = 'dic'
+    cracking_mode = 'bf'
 
     def __init__(self):
         self.get_ip()
+        self.IP = ip
         self.run_client()
         self.start_time = 0
         self.end_time = 0

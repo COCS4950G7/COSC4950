@@ -12,6 +12,7 @@
 #=====================================================================================================================
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, Value, Event
+import os
 import platform
 import Queue
 import time
@@ -31,10 +32,12 @@ class Server():
     PORTNUM = 22536
     AUTHKEY = "Popcorn is awesome!!!"
 
-    cracking_mode = "dic"  # possible values are dic, bf, rain, rainmaker
+    cracking_mode = "bf"  # possible values are dic, bf, rain, rainmaker
     sent_chunks = []  # list of chunks added to queue, added with timestamp to keep track of missing pieces
     found_solution = Value('b', False)  # synchronized found solution variable
     variables = []
+    total_chunks = 0
+
     def __init__(self):
         self.get_ip()
     #=====================================================================================================================
@@ -72,6 +75,7 @@ class Server():
                                   origHash="12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999
                                   min_key_length=6,
                                   max_key_length=16)
+                    self.total_chunks = bf.get_total_chunks()
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, manager, shared_job_q))
                 else:
                     if self.cracking_mode == "rain":
@@ -164,6 +168,7 @@ class Server():
     # monitor results queue
     #--------------------------------------------------------------------------------------------------
     def check_results(self, results_queue, shutdown):
+        completed_chunks = 0
         try:
             while not self.found_solution.value:
                 result = results_queue.get() #get chunk from shared result queue
@@ -182,7 +187,10 @@ class Server():
                     shutdown.set()
                     break
                 else: #solution has not been found
-                    print "Chunk finished with params: %s" %result[1]
+                    completed_chunks += 1
+                    #print "Chunk finished with params: %s" %result[1]
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print "%d chunks completed." % completed_chunks
                     # go through the sent chunks list and remove the finished chunk
                     for chunk in self.sent_chunks:
                         if chunk[0] == result[1]:
@@ -246,7 +254,6 @@ class Server():
     #--------------------------------------------------------------------------------------------------
     def chunk_brute_force(self, bf, manager, job_queue):
         try:
-
             # Had strange difficulties with the internal chunking method, so extracted the funtional bits here
             for prefix in bf.get_prefix():
                 if prefix == '':
