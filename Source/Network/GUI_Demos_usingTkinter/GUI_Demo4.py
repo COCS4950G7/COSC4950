@@ -15,8 +15,8 @@ try:
     from tkFileDialog import askopenfilename #used for creating an open file dialog
     from NetworkServer_r15a import Server
     from NetworkClient_r15a import Client
-    from GUI_Demo4_WindowClass import Window
-    from GUI_Demo4_WindowClass import drawableObject
+    from Source.Network.GUI_Demos_usingTkinter.GUI_Demo4_WindowClass import Window
+    from Source.Network.GUI_Demos_usingTkinter.GUI_Demo4_WindowClass import drawableObject
     from multiprocessing import Process
     from functools import partial
 except Exception as inst:
