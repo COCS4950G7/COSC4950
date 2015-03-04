@@ -11,11 +11,17 @@ __author__ = 'chris hamm'
 #IMPORTS
 #=====================================================================================================================
 from multiprocessing.managers import SyncManager
-import Dictionary
+from multiprocessing import Process
 import Queue
 import Chunk
 import time
+import string
 import platform
+import Dictionary
+import Brute_Force
+import RainbowUser
+import RainbowMaker
+
 #=====================================================================================================================
 #END OF IMPORTS
 #=====================================================================================================================
@@ -29,33 +35,30 @@ import platform
 def runclient(): #Client Primary loop
     try: #runclient definition try block
         manager = make_client_manager(IP, PORTNUM, AUTHKEY)
-        job_q = manager.get_job_q()
-        result_q = manager.get_result_q()
+        job_queue = manager.get_job_q()
+        result_queue = manager.get_result_q()
         shutdown = manager.get_shutdown()
-        dictionary = Dictionary.Dictionary()
 
+        if cracking_mode == "dic":
+            dictionary = Dictionary.Dictionary()
 
-        while not shutdown.is_set():
+            chunk_runner = Process(target=run_dictionary, args=(dictionary, job_queue, result_queue, shutdown))
+        else:
+            if cracking_mode == "bf":
+                bf = Brute_Force.Brute_Force()
 
-            job = job_q.get()
-            if job.value['halt']:
-                return
-            chunk = Chunk.Chunk()
-            chunk.params = job.value['params']
-            chunk.data = job.value['data']
-            print chunk.params
-            dictionary.find(chunk)
-            result = dictionary.isFound()
-            if result:
-                print "Hooray!"
-                print "key is: " + dictionary.showKey()
-                key = dictionary.showKey()
-                result_q.put(("w", key))
-               # result_q.put(("c", key))
-
+                chunk_runner = Process(target=run_brute_force, args=(bf, job_queue, result_queue, shutdown))
             else:
-                result_q.put(("f", chunk.params))
-                    #result_q.put(("c", chunk.params)) #unction has never been tested, requires the ability to know when server says stop
+                if cracking_mode == "rain":
+                    return  # haven't figured out how to set this up yet
+                else:
+                    if cracking_mode == "rainmaker":
+                        return  # haven't figured out how to set this up yet
+                    else:
+                        return "wtf?"
+
+        chunk_runner.start()
+
         if shutdown.is_set():
             print "received shutdown notice from server."
 
@@ -69,7 +72,7 @@ def runclient(): #Client Primary loop
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-        result_q.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TESted
+        #result_queue.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TESted
         print "Sent crash message to server"
 #--------------------------------------------------------------------------------------------------
 #End of runclient function
@@ -109,6 +112,56 @@ def make_client_manager(ip, port, authkey):
 #--------------------------------------------------------------------------------------------------
 #End of make_client_manager function
 #--------------------------------------------------------------------------------------------------
+
+
+def run_dictionary(dictionary, job_queue, result_queue, shutdown):
+
+    while not shutdown.is_set():
+        job = job_queue.get()
+        chunk = Chunk.Chunk()
+        chunk.params = job.value['params']
+        chunk.data = job.value['data']
+        print chunk.params
+        dictionary.find(chunk)
+        result = dictionary.isFound()
+        if result:
+            print "Hooray!"
+            print "key is: " + dictionary.showKey()
+            key = dictionary.showKey()
+            result_queue.put(("w", key))
+            time.sleep(1)
+           # result_queue.put(("c", key))
+
+        else:
+            result_queue.put(("f", chunk.params))
+                #result_q.put(("c", chunk.params)) #unction has never been tested
+
+
+def run_brute_force(bf, job_queue, result_queue, shutdown):
+
+    while not shutdown.is_set():
+        job = job_queue.get()
+        chunk = Chunk.Chunk()
+        chunk.params = job.value['params']
+        chunk.data = job.value['data']
+        print chunk.params
+        bf.result_queue = result_queue
+        bf.start_processes()
+        bf.run_chunk(chunk)
+
+
+    return
+
+
+def run_rain_user(rain, job_queue, result_queue, shutdown):
+
+    return
+
+
+def run_rain_maker(maker, job_queue, result_queue, shutdown):
+
+    return
+
 #=====================================================================================================================
 #END OF FUNCTIONS
 #=====================================================================================================================
@@ -126,6 +179,7 @@ class ServerQueueManager(SyncManager):
 IP = "127.0.0.1" #default is pingback
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
+cracking_mode = 'bf'
 
 #=====================================================================================================================
 #START OF MAIN

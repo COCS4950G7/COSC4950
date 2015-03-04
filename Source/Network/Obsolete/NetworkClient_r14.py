@@ -20,7 +20,7 @@ def runclient():
         job_q = manager.get_job_q()
         result_q = manager.get_result_q()
         dictionary = Dictionary.Dictionary()
-
+        children = []
         while True:
             try:
                 job = job_q.get_nowait()
@@ -28,10 +28,8 @@ def runclient():
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']
                 print chunk.params
-                time.sleep(.01)
                 dictionary.find(chunk)
                 result = dictionary.isFound()
-                time.sleep(0.00)
                 if result:
                     print "Hooray!"
                     print "key is: " + dictionary.showKey()

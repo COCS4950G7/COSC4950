@@ -7,19 +7,17 @@ from multiprocessing.managers import SyncManager
 
 import time
 import Queue
-import socket
 
 import Dictionary
 
-#IP = "192.168.1.119"
-# This is platform independent to get IP address, requires "import socket".
-IP = socket.gethostbyname(socket.gethostname())
+IP = "10.121.14.225"
 PORTNUM = 22536
 AUTHKEY = "Popcorn is awesome!!!"
 
 dictionary = Dictionary.Dictionary()
 
 def runserver():
+    done = False
     try: #runserver definition try block
         # Start a shared manager server and access its queues
         manager = make_server_manager(PORTNUM, AUTHKEY) #Make a new manager
@@ -28,21 +26,23 @@ def runserver():
         dictionary.setAlgorithm('md5')
         dictionary.setFileName("dic")
         dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+        #dictionary.setHash("2a3ec66488847e798c29e6b500a1bcc6")
 
         while not dictionary.isEof():
-
+            if done:
+                break
             #chunk is a Chunk object
             chunk = dictionary.getNextChunk() #get next chunk from dictionary
             newChunk = manager.Value(dict, {'params': chunk.params, 'data': chunk.data})
             shared_job_q.put(newChunk) #put next chunk on the job queue
 
-        while True:
+        while not done:
             result = shared_result_q.get() #get chunk from shared result queue
             if result[0] == "w": #check to see if solution was found
                 print "The solution was found!"
                 key = result[1]
                 print "Key is: %s" % key
-                break
+                done = True
             elif(result[0] == "c"):  #check to see if client has crashed
                 print "A client has crashed!"
             else: #solution has not been found
@@ -92,6 +92,7 @@ def make_server_manager(port, authkey):
             print inst
             print "============================================================================================="
 
+        # For Unix systems, the IP address field here can be left as '', but Windows requires the machine's real IP
         manager = JobQueueManager(address=(IP, port), authkey=authkey)
         manager.start()
         print 'Server started at port %s' % port

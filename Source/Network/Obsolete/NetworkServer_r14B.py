@@ -1,27 +1,14 @@
 __author__ = 'chris hamm'
-#NetworkServer_r14A
-#Created: 2/21/2015
+#NetworkServer_r14B
+#Created: 2/24/2015
 
-#Designed to run with NetworkClient_r14A
+#Designed to run with NetworkClient_r14B
 
-#Things that have changed in this revision (compared to the original rev14)
-    #(Implemented) Added additional comments and section dividers
-    #(Implemented) Reorganized code to fit section dividers better
-    #(Implemented) Added OS detection at the beginning of server startup, also prints what OS you are using
-    #(Implemented) Added in IP detection. It will automatically detect your ip for you, and set the IP variable to that IP address
+#Changes made in this revision:
 
-#NOTES:
-    #The dictionary class is directly connected to the server, This is Nick's area of expertese
-
-#   2/23/2015
-
-#   No longer exclusively tied to dictionary, added preliminary support for setting cracking modes. Added brute force
-#   chunking compatible with latest streamlined brute force setup. Added skeleton code for rainbow maker/user.
-#   Brute force should work networked as soon as client is updated to remove dictionary hardcoding and replace it with
-#   new mode detection based code.
-
-
-#IMPORTS===============================================================================================================
+#=====================================================================================================================
+#IMPORTS
+#=====================================================================================================================
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, Value, Event
 import platform
@@ -32,10 +19,16 @@ import Dictionary
 import Brute_Force
 import RainbowMaker
 import RainbowUser
-#END OF IMPORTS=======================================================================================================
+#=====================================================================================================================
+#END OF IMPORTS
+#=====================================================================================================================
 
-#FUNCTIONS============================================================================================================
-#runserver function--------------------------------------------------------------------------------
+#=====================================================================================================================
+#FUNCTIONS
+#=====================================================================================================================
+#--------------------------------------------------------------------------------------------------
+#runserver function
+#--------------------------------------------------------------------------------------------------
 def runserver():  #the primary server loop
     try: #runserver definition try block
         # Start a shared manager server and access its queues
@@ -49,9 +42,9 @@ def runserver():  #the primary server loop
             dictionary = Dictionary.Dictionary()
             # this will be replaced by input from the user once controller is reworked
             dictionary.setAlgorithm('md5')
-            dictionary.setFileName("dic")
-            #dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
-            dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
+            dictionary.setFileName("realuniq") #reset this value to dic if you dont have this file
+            dictionary.setHash("33da7a40473c1637f1a2e142f4925194") # popcorn
+            #dictionary.setHash("b17a9909e09fda53653332431a599941") #Karntnerstrasse-Rotenturmstrasse (LONGER HASH)
             found_solution.value = False
             chunk_maker = Process(target=chunk_dictionary, args=(dictionary, manager, shared_job_q))
         else:
@@ -96,8 +89,13 @@ def runserver():  #the primary server loop
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-#End of runserver function------------------------------------------------------------------------------------
-#make_server_manager function---------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#End of runserver function
+#--------------------------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------------------------
+#make_server_manager function
+#--------------------------------------------------------------------------------------------------
 def make_server_manager(port, authkey):
     """ Create a manager for the server, listening on the given port.
         Return a manager object with get_job_q and get_result_q methods.
@@ -137,9 +135,13 @@ def make_server_manager(port, authkey):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
-#End of make_server_manager function-------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
+#End of make_server_manager function
+#--------------------------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------------------------
 # monitor results queue
+#--------------------------------------------------------------------------------------------------
 def check_results(results_queue, shutdown):
     try:
         while not found_solution.value:
@@ -170,8 +172,13 @@ def check_results(results_queue, shutdown):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#--------------------------------------------------------------------------------------------------
+#end of monitor results queue
+#--------------------------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------------------------
 # feed dictionary chunks to job queue
+#--------------------------------------------------------------------------------------------------
 def chunk_dictionary(dictionary, manager, job_queue):
     try:
 
@@ -202,8 +209,13 @@ def chunk_dictionary(dictionary, manager, job_queue):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#--------------------------------------------------------------------------------------------------
+#end of feed dictionary chunks to job queue
+#--------------------------------------------------------------------------------------------------
 
-# placeholder for brute force integration
+#--------------------------------------------------------------------------------------------------
+# Chunk for brute force function
+#--------------------------------------------------------------------------------------------------
 def chunk_brute_force(bf, manager, job_queue):
     try:
 
@@ -239,8 +251,13 @@ def chunk_brute_force(bf, manager, job_queue):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#--------------------------------------------------------------------------------------------------
+#end of chunk for brute force function
+#--------------------------------------------------------------------------------------------------
 
-# placeholder for rainbow table integration
+#--------------------------------------------------------------------------------------------------
+# Chunks for rainbow function
+#--------------------------------------------------------------------------------------------------
 def chunk_rainbow(rainbow, job_queue):
     try:
         #INSERT CODE HERE
@@ -255,8 +272,13 @@ def chunk_rainbow(rainbow, job_queue):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#--------------------------------------------------------------------------------------------------
+#end of chunks for rainbow function
+#--------------------------------------------------------------------------------------------------
 
-# placeholder for rainbow maker integration
+#--------------------------------------------------------------------------------------------------
+# chunks for rainbow maker function
+#--------------------------------------------------------------------------------------------------
 def chunk_rainbow_maker(rainmaker, job_queue):
     try:
         #INSERT CODE HERE
@@ -271,10 +293,17 @@ def chunk_rainbow_maker(rainmaker, job_queue):
         #_str_ allows args tto be printed directly
         print inst
         print "============================================================================================="
+#--------------------------------------------------------------------------------------------------
+#end of chunks for rainbow maker function
+#--------------------------------------------------------------------------------------------------
 
-#END OF FUNCTIONS======================================================================================================
+#=====================================================================================================================
+#END OF FUNCTIONS
+#=====================================================================================================================
 
-#AUXILLERY CLASSES===============================================================================================================
+#=====================================================================================================================
+#AUXILLERY CLASSES
+#=====================================================================================================================
 
  # This is based on the examples in the official docs of multiprocessing.
     # get_{job|result}_q return synchronized proxies for the actual Queue
@@ -283,9 +312,9 @@ class JobQueueManager(SyncManager):
     pass
 
 
-
-#END OF AUXILLERY CLASSES========================================================================================================
-
+#=====================================================================================================================
+#END OF AUXILLERY CLASSES
+#=====================================================================================================================
 
 IP = "127.0.0.1" #defaults to the pingback
 PORTNUM = 22536
@@ -295,7 +324,9 @@ cracking_mode = "dic" # possible values are dic, bf, rain, rainmaker
 sent_chunks = []  # list of chunks added to queue, added with timestamp to keep track of missing pieces
 found_solution = Value('b', False)  # synchronized found solution variable
 
-
+#=====================================================================================================================
+#Start of MAIN
+#=====================================================================================================================
 if __name__ == '__main__': #Equivalent to Main
     try: #Main
         #setup timer to record how long the server ran for
@@ -398,4 +429,6 @@ if __name__ == '__main__': #Equivalent to Main
         end_time= time.time() - start_time
         print "Server ran for "+str(end_time)+" seconds"
 
-
+#=====================================================================================================================
+#END OF MAIN
+#=====================================================================================================================
