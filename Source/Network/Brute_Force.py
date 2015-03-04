@@ -36,8 +36,8 @@ class Brute_Force():
     minKeyLength = 6
     maxKeyLength = 16
     alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
-    algorithm = "md5"
-    origHash = '12c8de03d4562ba9f810e7e1e7c6fc15'
+    algorithm = ""
+    origHash = ''
     key = ''
     rec = None
     charactersToCheck = 3
@@ -68,8 +68,8 @@ class Brute_Force():
         self.minKeyLength = 1
         self.maxKeyLength = 16
         self.alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
-        self.algorithm = "sha256"
-        self.origHash = '12c8de03d4562ba9f810e7e1e7c6fc15'
+        self.algorithm = ""
+        self.origHash = ''
         self.key = ''
         self.rec = None
         self.charactersToCheck = 3

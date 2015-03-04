@@ -162,7 +162,6 @@ class Client():
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']
-                print chunk.params
                 dictionary.find(chunk)
                 result = dictionary.isFound()
                 params = chunk.params.split()
