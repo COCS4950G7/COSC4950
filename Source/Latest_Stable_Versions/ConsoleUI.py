@@ -1,66 +1,64 @@
-#   Controller.py
+#   Console_UI.py
 
-#   This is the main class that 'controls'
-#   the other classes by acting as a go-between
-#   with the GUI and the actual worker classes
+#   This is a text-based UI class that connects
+#   with the network server and client classes
 
 #   Chris Bugg
 #   10/7/14
 
-#   Update - 10/11/14 (Latest_Stable_Versions)
-#               -> Main layout is complete, just needs more actual methods
-#               ->  from supporting classes.
+#   What should work:
+#   - Single -> Dictionary
+#   - Server -> Dictionary
+#   - Node Mode
 
-#   NOTE: Diagrams of the layout (approximate names) are at bottom of file
-
-#   Update - 10/30/14 (Latest_Stable_Versions)
-#               -> Works in Console-only mode with Dictionary class (single-user only)
-#                   -> use "-c" argument to activate console-only mode
-#               -> More friendly UI, W/TIMER, AND STATUS BAR!!!!!
-
-#   ############################ W I P ###########################
 
 #Imports
-#from time import time
 import time
-import sys
 import os
-from multiprocessing import Process, Pipe, Value, Array
+from multiprocessing import Process, Value, Array
 import string
 
-#import GUI
-
-from Chunk import Chunk
 from Dictionary import Dictionary
 from Brute_Force import Brute_Force
-from NetworkClient_r13C import NetworkClient
-from NetworkServer_r13C import NetworkServer
+from NetworkClient import Client
+from NetworkServer import Server
 from RainbowMaker import RainbowMaker
 from RainbowUser import RainbowUser
 
 
-class Controller():
+class ConsoleUI():
 
     #Class variables
     settings = dict()
     done = False
-    rainbowMaker = RainbowMaker()
-    rainbowUser = RainbowUser()
+    rainbow_Maker = RainbowMaker()
+    rainbow_User = RainbowUser()
     dictionary = Dictionary()
     brute_force = Brute_Force()
 
     #Magical shared variables with server
-    magic_is_done = Value('b', False)
-    magic_is_found = Value('b', False)
-    magic_key = Array('c', 128)
-    magic_is_connected = Value('b', False)
-    magic_doing_stuff = Value('b', False)
 
-    controllerPipe, networkPipe = Pipe()
+    #Create a list of size __ with "0" as the elements (empty list)
+    list_of_shared_variables = [0] * 5
+
+    magic_is_done = Value('b', False)
+    list_of_shared_variables[0] = magic_is_done
+
+    magic_is_found = Value('b', False)
+    list_of_shared_variables[1] = magic_is_found
+
+    magic_key = Array('c', 128)
+    list_of_shared_variables[2] = magic_key
+
+    magic_is_connected = Value('b', False)
+    list_of_shared_variables[3] = magic_is_connected
+
+    magic_doing_stuff = Value('b', False)
+    list_of_shared_variables[4] = magic_doing_stuff
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=NetworkServer, args=(settings, magic_is_done, magic_is_found, magic_key, magic_is_connected, magic_doing_stuff,))
-    networkClient = Process(target=NetworkClient, args=(networkPipe,))
+    networkServer = Process(target=Server, args=(settings, list_of_shared_variables,))
+    networkClient = Process(target=Client, args=(settings, list_of_shared_variables,))
 
     #Initializing variable to a default value
     serverIP = "127.0.1.1"
@@ -69,11 +67,8 @@ class Controller():
     state = "startScreen"
 
     clock = 0
-    colidingClock = 0
-    colidingClock2 = 0
-
-    #Fast Lane
-    aLane = False
+    colliding_Clock = 0
+    colliding_Clock2 = 0
 
     #Constructor
     def __init__(self):
@@ -81,18 +76,6 @@ class Controller():
         if not __name__ == '__main__':
 
             return
-
-        args = sys.argv
-
-        #If we didn't get the argument "-c" in command-line
-        #if not args.pop() == "-c":
-
-            #x=2 #Placeholder
-            #run in standard GUI mode
-            #GUI.GUI()
-
-        #if we did get the argument "-c" in command-line
-        #else:
 
         #Loop till we're done
         while not self.done:
@@ -131,36 +114,37 @@ class Controller():
                 print "About Page (about)"
                 print
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Node", "node", "n", "Server", "server", "ser", "Single", "single", "sin", "About", "about", "Exit", "exit", "a"}
-                while not userInput in goodNames:
+                good_names = {"Node", "node", "n", "Server", "server", "ser", "Single", "single", "sin", "About",
+                              "about", "Exit", "exit", "a"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
                 #If user picks Node, tell GUI to go to Node start screen
-                if userInput in ("Node", "node", "n"):
+                if user_input in ("Node", "node", "n"):
 
                     self.state = "nodeStartScreen"
 
-                elif userInput in ("Server", "server", "ser"):
+                elif user_input in ("Server", "server", "ser"):
 
                     self.state = "serverStartScreen"
 
-                elif userInput in ("single", "Single", "sin"):
+                elif user_input in ("single", "Single", "sin"):
 
                     self.state = "singleStartScreen"
 
-                elif userInput in ("a"):
+                elif user_input in "a":
 
                     self.aLane = True
 
                     self.state = "serverStartScreen"
 
-                elif userInput in ("About", "about"):
+                elif user_input in ("About", "about"):
 
                     self.state = "aboutScreen"
 
@@ -222,17 +206,17 @@ class Controller():
 
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"back", "Back", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"back", "Back", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back"):
+                if user_input in ("Back", "back"):
 
                     self.state = "startScreen"
 
@@ -240,7 +224,6 @@ class Controller():
 
                     #We're done
                     self.done = True
-
 
             ##################################################################################
             ###################################### NODE ######################################
@@ -264,21 +247,21 @@ class Controller():
                 print "Node (n)"
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Node", "node", "n", "back", "Back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Node", "node", "n", "back", "Back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Node", "node", "n"):
+                if user_input in ("Node", "node", "n"):
 
                     self.state = "nodeConnectingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "startScreen"
 
@@ -292,52 +275,36 @@ class Controller():
             #if we're at the node connecting... state (Screen)
             elif state == "nodeConnectingScreen":
 
-                #Start up the networkServer class (as sub-process in the background)
-                #self.networkClient = Process(target=NetworkClient.NetworkClient(self.networkPipe))
-
                 #In the form of: "single" or "server" or "client"
                 self.settings['network mode'] = "client"
                 self.settings['server ip'] = self.serverIP
 
                 self.networkClient.start()
 
-                #What did the user pick? (Be a Node, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "Start -> Node -> Connecting..."
                 print
 
-                #userInput = raw_input("Choice: ")
-
-                #wait for server connection
-                #then switch to nodeConnectedToScreen
-
-                #Send the server IP over the pipe to network class
-                #self.controllerPipe.send(self.serverIP)
-
-                #Get response from network class, (looking for "connected")
-                #rec = self.controllerPipe.recv()
-
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While not connected, print a "connecting" bar
-                while not self.magic_is_connected:
+                while not self.list_of_shared_variables[3].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Connecting--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Connecting--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
                     time.sleep(1)
 
@@ -350,138 +317,35 @@ class Controller():
             elif state == "nodeConnectedToScreen":
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While not connected, print a "connecting" bar
-                while self.magic_is_connected and not self.magic_doing_stuff:
+                while self.list_of_shared_variables[3].value and not self.list_of_shared_variables[4].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Connected--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Connected--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
                     time.sleep(1)
 
-                if not self.magic_is_connected:
+                if not self.list_of_shared_variables[3].value:
 
                     self.state = "nodeConnectingScreen"
 
-                elif self.magic_doing_stuff:
+                elif self.list_of_shared_variables[4].value:
 
                     self.state = "nodeDoingStuffScreen"
-
-
-                '''
-
-                #First command that requests
-                #self.controllerPipe.send("requestNextChunk")
-
-                #done = False
-
-                #While the current job is not done
-                while not done:
-
-                    #Receive the next (or first) command
-                    rec = self.controllerPipe.recv()
-
-                    #If the server says we're done
-                    if rec == "done":
-
-                        self.controllerPipe.send("done")
-
-                        #Exit our loop and go to next screen
-                        done = True
-
-                    #If the server says we're connected (or still connected)
-                    elif rec == "connected":
-
-                        self.controllerPipe.send("connected")
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print "============="
-                        print "Start -> Node -> Connected..."
-
-                    #If the server says we're doing stuff
-                    elif rec == "doingStuff":
-
-                        self.controllerPipe.send("doingStuff")
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print "============="
-                        print "Start -> Node -> Working..."
-
-                        #'chunk' is an object that has attributes 'params' and 'data' (both are strings for network passing)
-
-                        #Receive our chunk object
-                        chunk = self.controllerPipe.recv()
-
-                        #Get the params as a list from chunk object
-                        paramsList = chunk.params.split()
-
-                        ##### add other types later
-                        if paramsList[0] == "dictionary":
-
-                            #This is the client's dictionary class,
-                            #   and this is where it searches (will be unresponsive during search)
-                            self.dictionary.find(chunk)
-
-                            #If it's found something
-                            if self.dictionary.isFound():
-
-                                #get the key from local dictionary class
-                                key = self.dictionary.showKey()
-
-                                #send "found" over pipe to networkClient
-                                self.controllerPipe.send("foundSolution")
-
-                                #send the key we found to networkClient
-                                self.controllerPipe.send(key)
-
-                                #stop searching and get done
-                                done = True
-
-                            else:
-
-                                #if it didn't find anything (but is done)
-                                #get next command (which might be chunk or done or something else)
-                                self.controllerPipe.send("requestNextChunk")
-
-                        elif paramsList[0] == "rainbowmaker":
-                            print "BROKE"
-                            #This line will be unreponsive during creation
-                            chunkOfDone = self.rainbowMaker.create(chunk)
-
-                            #Tell the server we're done, and here's a chunk
-                            self.controllerPipe.send("doneChunk")
-
-                            #Send the server the chunk of done
-                            self.controllerPipe.send(chunkOfDone)
-
-                            #Ask the server for another chunk
-                            self.controllerPipe.send("requestNextChunk")
-
-                    '''
-
-
-
-                #self.networkClient.join()
-                #self.networkClient.terminate()
-
-                #Go back to the nodeStart screen since we're done here
-                #self.state = "nodeStartScreen"
-
 
             #############################################
             #############################################
@@ -489,36 +353,35 @@ class Controller():
             elif state == "nodeDoingStuffScreen":
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While not connected, print a "connecting" bar
-                while self.magic_is_connected and self.magic_doing_stuff:
+                while self.list_of_shared_variables[3].value and self.list_of_shared_variables[4].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Working--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Working--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
                     time.sleep(1)
 
-                if not self.magic_is_connected:
+                if not self.list_of_shared_variables[3].value:
 
                     self.state = "nodeConnectingScreen"
 
-                elif not self.magic_doing_stuff:
+                elif not self.list_of_shared_variables[4].value:
 
                     self.state = "nodeConnectedScreen"
-
 
             ####################################################################################
             ###################################### SERVER ######################################
@@ -541,40 +404,41 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
                 #userInput = raw_input("Choice: ")
-                if self.aLane == True:
+                if self.aLane:
 
-                    userInput = "d"
+                    user_input = "d"
                     print "Choice: d"
 
                 else:
 
-                    userInput = raw_input("Choice: ")
+                    user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"bruteForce", "brute", "bf", "b", "rainbowMake", "make", "rainbowUser", "use", "dictionary", "dic", "d", "back", "Back", "b" "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"bruteForce", "brute", "bf", "b", "rainbowMake", "make", "rainbowUser", "use",
+                              "dictionary", "dic", "d", "back", "Back", "b" "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("bruteForce", "brute", "bf", "b"):
+                if user_input in ("bruteForce", "brute", "bf", "b"):
 
                     self.state = "serverBruteForceScreen"
 
-                elif userInput in ("rainbowMake", "make"):
+                elif user_input in ("rainbowMake", "make"):
 
                     self.state = "serverRainMakerScreen"
 
-                elif userInput in ("rainbowUser", "use"):
+                elif user_input in ("rainbowUser", "use"):
 
                     self.state = "serverRainUserScreen"
 
-                elif userInput in ("dictionary", "dic", "d"):
+                elif user_input in ("dictionary", "dic", "d"):
 
                     self.state = "serverDictionaryScreen"
 
-                elif userInput in ("back", "Back", "b"):
+                elif user_input in ("back", "Back", "b"):
 
                     self.state = "startScreen"
 
@@ -594,13 +458,13 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 #userInput = GUI.getInput()
 
-                if userInput == "crackIt":
+                if user_input == "crackIt":
 
                     #GUI.setState("serverBruteSearchingScreen")
                     x=1
                     #get info from GUI and pass to Brute_Force class
 
-                elif userInput == "back":
+                elif user_input == "back":
                     x=1
                     #GUI.setState("serverForceScreen")
 
@@ -620,7 +484,7 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 #userInput = GUI.getInput()
 
-                if userInput == "back":
+                if user_input == "back":
                     x=1
                     #GUI.setState("serverBruteForceScreen")
 
@@ -640,7 +504,7 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 #userInput = GUI.getInput()
 
-                if userInput == "back":
+                if user_input == "back":
                     x=1
                     #GUI.setState("serverBruteForceScreen")
 
@@ -660,7 +524,7 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 #userInput = GUI.getInput()
 
-                if userInput == "back":
+                if user_input == "back":
                     x=1
                     #GUI.setState("serverBruteForceScreen")
 
@@ -684,16 +548,16 @@ class Controller():
                 print "(crackIt)"
                 print "(back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
-                if userInput == "crackIt":
+                if user_input == "crackIt":
 
                     ###GUI.setState("serverRainUserSearchingScreen")
                     self.state = "serverRainUserSearchingScreen"
 
                     #get info from GUI and pass to Brute_Force class
 
-                elif userInput == "back":
+                elif user_input == "back":
 
                     ###GUI.setState("serverStartScreen")
                     self.state = "serverStartScreen"
@@ -717,9 +581,9 @@ class Controller():
                 print
                 print "(back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
-                if userInput == "back":
+                if user_input == "back":
 
                     ###GUI.setState("serverRainUserScreen")
                     self.state = "serverRainUserScreen"
@@ -743,9 +607,9 @@ class Controller():
                 print
                 print "(back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
-                if userInput == "back":
+                if user_input == "back":
 
                     ###GUI.setState("serverRainUserScreen")
                     self.state = "serverRainUserScreen"
@@ -769,9 +633,9 @@ class Controller():
                 print
                 print "(back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
-                if userInput == "back":
+                if user_input == "back":
 
                     ###GUI.setState("serverRainUserScreen")
                     self.state = "serverRainUserScreen"
@@ -799,29 +663,29 @@ class Controller():
                 print "(sha256)"
                 print "(sha512)"
                 print
-                algo = raw_input("Choice: ")
+                algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"md5", "sha1", "sha256", "sha512"}
-                while not algo in goodNames:
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
                     print "Input Error!"
 
-                    algo = raw_input("Try Again: ")
+                    algorithm = raw_input("Try Again: ")
 
-                #Set algorithm of RainbowMaker to user input of 'algo'
-                self.rainbowMaker.setAlgorithm(algo)
+                #Set algorithm of RainbowMaker to user input of 'algorithm'
+                self.rainbow_Maker.setAlgorithm(algorithm)
 
                 #Get the Number of chars of key
                 print
-                numChars = raw_input("How many characters will the key be? ")
-                while not self.isInt(numChars):
+                num_chars = raw_input("How many characters will the key be? ")
+                while not self.is_int(num_chars):
 
                     print "Input Error, Not an Integer!"
 
-                    numChars = raw_input("Try Again: ")
+                    num_chars = raw_input("Try Again: ")
 
-                self.rainbowMaker.setNumChars(numChars)
+                self.rainbow_Maker.setNumChars(num_chars)
 
                 #Get the alphabet to be used
                 print
@@ -835,37 +699,37 @@ class Controller():
                 alphabet = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"d", "a", "A", "m", "M"}
-                while not alphabet in goodNames:
+                good_names = {"d", "a", "A", "m", "M"}
+                while not alphabet in good_names:
 
                     print "Input Error!"
 
                     alphabet = raw_input("Try Again: ")
-                self.rainbowMaker.setAlphabet(alphabet)
+                self.rainbow_Maker.setAlphabet(alphabet)
 
                 #Get dimensions
                 print
-                chainLength = raw_input("How long will the chains be? ")
-                while not self.isInt(chainLength):
+                chain_length = raw_input("How long will the chains be? ")
+                while not self.is_int(chain_length):
 
                     print "Input Error, Not an Integer!"
 
-                    chainLength = raw_input("Try Again: ")
+                    chain_length = raw_input("Try Again: ")
 
                 print
-                numRows = raw_input("How many rows will there be? ")
-                while not self.isInt(numRows):
+                num_rows = raw_input("How many rows will there be? ")
+                while not self.is_int(num_rows):
 
                     print "Input Error, Not an Integer!"
 
-                    numRows = raw_input("Try Again: ")
+                    num_rows = raw_input("Try Again: ")
 
-                self.rainbowMaker.setDimensions(chainLength, numRows)
+                self.rainbow_Maker.setDimensions(chain_length, num_rows)
 
                 #Get the file name
                 print
-                fileName = raw_input("What's the file name: ")
-                self.rainbowMaker.setFileName(fileName)
+                file_name = raw_input("What's the file name: ")
+                self.rainbow_Maker.setFileName(file_name)
 
                 #Get the go-ahead
                 print
@@ -875,21 +739,21 @@ class Controller():
                 print
                 print "(Back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Create", "create", "Back", "back", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Create", "create", "Back", "back", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Create", "create"):
+                if user_input in ("Create", "create"):
 
                     self.state = "serverRainMakerSearchingScreen"
 
-                elif userInput in ("Back", "back"):
+                elif user_input in ("Back", "back"):
 
                     self.state = "serverStartScreen"
 
@@ -918,16 +782,16 @@ class Controller():
 
                 #Give new rainbowMaker (node) info it needs through a string (sent over network)
                 #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
-                paramsChunk = self.rainbowMaker.makeParamsChunk()
+                #paramsChunk = self.rainbow_Maker.makeParamsChunk()
 
                 #Get the file ready (put info in first line)
-                self.rainbowMaker.setupFile()
+                #self.rainbow_Maker.setupFile()
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
-
+                #star_counter = 0
+                #white_l = ""
+                #white_r = "            "
+                '''
                 #While we haven't gotten all through the file or found the key...
                 while not self.rainbowMaker.isDone():
 
@@ -994,12 +858,12 @@ class Controller():
 
                     #Then give the result back to the server
                     #self.rainbowMaker.putChunkInFile(chunkOfDone)
-
+                '''
                 #elapsed = (time() - self.clock)
                 #self.clock = elapsed
 
                 #Let the network  class know to be done
-                self.controllerPipe.send("done")
+                #self.controllerPipe.send("done")
 
                 #Done, next screen
                 self.state = "serverRainMakerDoneScreen"
@@ -1014,25 +878,25 @@ class Controller():
                 print "Start -> Server -> Rainbow Maker -> Done!"
                 print
 
-                print "We just made ", self.rainbowMaker.getFileName()
-                print "With chain length of ", self.rainbowMaker.getLength()
-                print "And ", self.rainbowMaker.numRows(), "rows."
+                print "We just made ", self.rainbow_Maker.getFileName()
+                print "With chain length of ", self.rainbow_Maker.getLength()
+                print "And ", self.rainbow_Maker.numRows(), "rows."
                 print "And it took", self.clock, "seconds."
 
                 print "(Back)"
                 print "(Exit)"
-                self.rainbowMaker.reset()
-                userInput = raw_input("Choice: ")
+                self.rainbow_Maker.reset()
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back"):
+                if user_input in ("Back", "back"):
 
                     self.state = "serverRainMakerScreen"
 
@@ -1048,61 +912,35 @@ class Controller():
             #if we're at the serverDictionaryScreen state (Screen)
             elif state == "serverDictionaryScreen":
 
-                #Start up the networkServer class (as sub-process in the background)
-                #self.networkServer.start()
-
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
-                print "Start -> Server -> Dictionary"
+                print "Start -> Single-User Mode -> Dictionary"
                 print
 
                 #Get the algorithm
-
                 print "What's the algorithm: "
-                print
                 print "(md5)"
                 print "(sha1)"
                 print "(sha256)"
                 print "(sha512)"
                 print
-                #algo = raw_input("Choice: ")
-                if self.aLane == True:
-
-                    algo = "md5"
-                    print "Choice: md5"
-
-                else:
-
-                    algo = raw_input("Choice: ")
+                algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"md5", "sha1", "sha256", "sha512"}
-                while not algo in goodNames:
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
                     print "Input Error!"
 
-                    algo = raw_input("Try Again: ")
-
-                #Set algorithm of dictionary to user input of 'algo'
-                self.dictionary.setAlgorithm(algo)
+                    algorithm = raw_input("Try Again: ")
 
                 #Get the file name
                 print
-                #fileName = raw_input("What's the file name (___.txt): ")
-                if self.aLane == True:
-
-                    fileName = "dic"
-                    print "What's the file name (___.txt): dic"
-
-
-                else:
-
-                    fileName = raw_input("What's the file name (___.txt): ")
-
-                while not self.dictionary.setFileName(fileName) == "Good":
+                file_name = raw_input("What's the file name (___.txt): ")
+                while not self.does_file_exist(file_name):
 
                     print "File not found..."
-                    fileName = raw_input("What's the file name (___.txt): ")
+                    file_name = raw_input("What's the file name (___.txt): ")
 
                 #Get the hash
                 print
@@ -1111,60 +949,43 @@ class Controller():
                 print "Single Hash (s)"
                 print "From a File (f)"
                 print
-                #userInput = raw_input("Choice: ")
-                if self.aLane == True:
-
-                    userInput = "s"
-                    print "Choice: s"
-
-                else:
-
-                    userInput = raw_input("Choice: ")
+                single_or_file = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"single", "s", "file", "f", "Single", "File"}
-                while not userInput in goodNames:
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    single_or_file = raw_input("Try Again: ")
 
-                if userInput in ("single", "s", "Single"):
+                if single_or_file in ("single", "s", "Single"):
 
                     #Get the hash
                     print
-                    #hash = raw_input("What's the hash we're searching for: ")
-                    if self.aLane == True:
+                    temp_hash = raw_input("What's the hash we're searching for: ")
 
-                        hash = "b6e01cfff96a2233919e4f3c54b01130"
-                        print "What's the hash we're searching for: b6e01cfff96a2233919e4f3c54b01130"
-
-                    else:
-
-                        hash = raw_input("What's the hash we're searching for: ")
-
-                    self.dictionary.setHash(hash)
-                    self.dictionary.singleHash = True
-
-                elif userInput in ("file", "f", "File"):
+                elif single_or_file in ("file", "f", "File"):
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's the hash file name: ")
-                    while not self.dictionary.setHashFileName(fileName) == "Good":
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
 
                         print "File not found..."
-                        fileName = raw_input("What's the hash file name: ")
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
 
                     #Get the file name
                     print
-                    fileName = raw_input("What's file name that we'll put the results: ")
-                    self.dictionary.setDoneFileName(fileName)
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
 
-                    self.dictionary.singleHash = False
+                self.settings['algorithm'] = algorithm
+                self.settings['file name'] = file_name
+                self.settings['hash'] = temp_hash
+                #In the form of: "single" or "server" or "client"
+                self.settings['network mode'] = "server"
 
                 #Get the go-ahead
-
                 print
                 print "Ready to go?"
                 print
@@ -1172,23 +993,23 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Crack", "crack", "c"):
+                if user_input in ("Crack", "crack", "c"):
 
                     self.state = "serverDictionarySearchingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
-                    self.state = "serverStartScreen"
+                    self.state = "startStartScreen"
 
                 else:
 
@@ -1207,202 +1028,36 @@ class Controller():
 
                 #Start up the networkServer class (as sub-process in the background)
                 self.networkServer.start()
-                #time = time()
-                #self.clock = time()
-
-                #Have another dictionary (ie server-size) that chunks the data
-                #   So you don't have to send the whole file to every node
-                #dictionary2 = Dictionary.Dictionary()
-
-                #Give new dictionary (node) info it needs through a string (sent over network)
-                #dictionary2.setVariables(self.dictionary.serverString())
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
-                isFound = False
+                while not self.list_of_shared_variables[0].value:
 
-                isEof = False
-
-                ################ Single Hash #########################
-                if self.dictionary.singleHash == True:
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not (isEof or isFound):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #What's the server saying:
-                        rec = self.controllerPipe.recv()
-
-                        #If the server needs a chunk, give one. (this should be the first thing server says)
-                        if rec == "nextChunk":
-
-                            if not self.dictionary.isEof():
-
-                                #chunk is a Chunk object
-                                chunk = self.dictionary.getNextChunk()
-
-                                self.controllerPipe.send("nextChunk")
-
-                                self.controllerPipe.send(chunk)
-
-                            else:
-
-                                isEof = True
-
-                        #If the server needs a chunk again
-                        elif rec == "chunkAgain":
-
-                            #Get the parameters of the chunk
-                            params = self.controllerPipe.recv()
-
-                            #Get the chunk again (again a Chunk object)
-                            chunk = self.dictionary.getThisChunk(params)
-
-                            self.controllerPipe.send("chunkAgain")
-
-                            #Send the chunk again
-                            self.controllerPipe.send(chunk)
-
-                        #if the server is waiting for nodes to finish
-                        elif rec == "waiting":
-
-                            self.controllerPipe.send("waiting")
-
-                            #Placeholder
-                            chrisHamm = True
-
-                        #If the server has a key
-                        elif rec == "done":
-
-                            self.controllerPipe.send("done")
-
-                            #Get the key
-                            key = self.controllerPipe.recv()
-
-                            #This will help for error checking later, though for now not so much
-                            #isFound = self.dictionary.isKey(key)
-
-                            self.dictionary.setKey(key)
-
-                            isFound = True #added in by chris hamm
-
-                    #elapsed = (time() - self.clock)
-                    #self.clock = elapsed
-
-                    #Let the network  class know to be done
-                    self.controllerPipe.send("done")
-
-                    #if the key has been found
-                    if isFound:
-
-                        self.state = "serverDictionaryFoundScreen"
-
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
-                        self.state = "serverDictionaryNotFoundScreen"
+                    time.sleep(1)
 
-            #################### Hash File #####################
+                if self.list_of_shared_variables[1].value:
+
+                    self.state = "serverDictionaryFoundScreen"
+
                 else:
 
-                    #While we haven't gotten all through the file or found the key...
-                    while not (isEof or isFound):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #What's the server saying:
-                        rec = self.controllerPipe.recv()
-
-                        #If the server needs a chunk, give one. (this should be the first thing server says)
-                        if rec == "nextChunk":
-
-                            if not self.dictionary.isEof():
-
-                                #chunk is a Chunk object
-                                chunk = self.dictionary.getNextChunk()
-
-                                self.controllerPipe.send("nextChunk")
-
-                                self.controllerPipe.send(chunk)
-
-                            else:
-
-                                isEof = True
-
-                        #If the server needs a chunk again
-                        elif rec == "chunkAgain":
-
-                            #Get the parameters of the chunk
-                            params = self.controllerPipe.recv()
-
-                            #Get the chunk again (again a Chunk object)
-                            chunk = self.dictionary.getThisChunk(params)
-
-                            self.controllerPipe.send("chunkAgain")
-
-                            #Send the chunk again
-                            self.controllerPipe.send(chunk)
-
-                        #if the server is waiting for nodes to finish
-                        elif rec == "waiting":
-
-                            self.controllerPipe.send("waiting")
-
-                            #Placeholder
-                            chrisHamm = True
-
-                        #If the server has a key
-                        elif rec == "found":
-
-                            self.controllerPipe.send("found")
-
-                            #Get the key
-                            key = self.controllerPipe.recv()
-
-                            #This will help for error checking later, though for now not so much
-                            #isFound = self.dictionary.isKey(key)
-
-                            self.dictionary.setKey(key)
-
-                    #elapsed = (time() - self.clock)
-                    #self.clock = elapsed
-
-                    #Let the network  class know to be done
-                    self.controllerPipe.send("done")
-
-                    #if the key has been found
-                    if isFound:
-
-                        self.state = "serverDictionaryFoundScreen"
-
-                    else:
-
-                        self.state = "serverDictionaryNotFoundScreen"
+                    self.state = "serverDictionaryNotFoundScreen"
 
             #############################################
             #############################################
@@ -1410,32 +1065,24 @@ class Controller():
             elif state == "serverDictionaryFoundScreen":
 
                 self.networkServer.join()
-                #self.networkServer.terminate()
 
-                #display results and wait for user interaction
-
-                #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Server -> Dictionary -> Found!"
-
-                print "Key is: ", self.dictionary.showKey()
-                print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
-                print "And it took", self.clock, "seconds."
-
+                print "Key is: ", self.list_of_shared_variables[2].value
                 print "Go Back (back)"
                 print "(Exit)"
-                self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                #self.dictionary.reset()
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "serverDictionaryScreen"
 
@@ -1449,13 +1096,6 @@ class Controller():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "serverDictionaryNotFoundScreen":
 
-                #Start up the networkServer class (as sub-process in the background)
-                self.networkServer.join()
-                #self.networkServer.terminate()
-
-                #display results and wait for user interaction
-
-                #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Server -> Dictionary -> Not Found"
                 print
@@ -1464,18 +1104,17 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "serverDictionaryScreen"
 
@@ -1504,33 +1143,33 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"BruteForce", "bruteforce", "Brute", "brute", "bf", "b", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "d", "Back", "back", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"BruteForce", "bruteforce", "Brute", "brute", "bf", "b", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "d", "Back", "back", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("BruteForce", "bruteforce", "Brute", "brute", "bf", "b"):
+                if user_input in ("BruteForce", "bruteforce", "Brute", "brute", "bf", "b"):
 
                     self.state = "singleBruteForceScreen"
 
-                elif userInput in ("RainbowMake", "rainbowmake", "rainmake", "make"):
+                elif user_input in ("RainbowMake", "rainbowmake", "rainmake", "make"):
 
                     self.state = "singleRainMakerScreen"
 
-                elif userInput in ("RainbowUse", "rainbowuse", "rainuse", "use"):
+                elif user_input in ("RainbowUse", "rainbowuse", "rainuse", "use"):
 
                     self.state = "singleRainUserScreen"
 
-                elif userInput in ("Dictionary", "dictionary", "dic", "d"):
+                elif user_input in ("Dictionary", "dictionary", "dic", "d"):
 
                     self.state = "singleDictionaryScreen"
 
-                elif userInput in ("Back", "back"):
+                elif user_input in ("Back", "back"):
 
                     self.state = "startScreen"
 
@@ -1550,30 +1189,24 @@ class Controller():
                 print "Start -> Single-User Mode -> Brute Force"
                 print
 
-
                 #Get the algorithm
-
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
                 print "(sha256)"
                 print "(sha512)"
                 print
-                algo = raw_input("Choice: ")
+                algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"md5", "sha1", "sha256", "sha512"}
-                while not algo in goodNames:
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
                     print "Input Error!"
 
-                    algo = raw_input("Try Again: ")
-                #Set algorithm of dictionary to user input of 'algo'
-                #self.brute_force.setAlgorithm(algo)
-
+                    algorithm = raw_input("Try Again: ")
 
                 #Get the alphabet to be used
-
                 print
                 print "What's the alphabet: "
                 print "0-9(d)"
@@ -1585,45 +1218,34 @@ class Controller():
                 alphabet = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"d", "a", "A", "m", "M"}
-                while not alphabet in goodNames:
+                good_names = {"d", "a", "A", "m", "M"}
+                while not alphabet in good_names:
 
                     print "Input Error!"
 
                     alphabet = raw_input("Try Again: ")
-                #self.brute_force.setAlphabet(alphabet)
-
 
                 #Get the min and max Number of chars of key
-
                 print
-                minKeyLength = raw_input("What's the minimum key length? ")
-                while not self.isInt(minKeyLength):
+                min_key_length = raw_input("What's the minimum key length? ")
+                while not self.is_int(min_key_length):
 
                     print "Input Error, Not an Integer!"
 
-                    minKeyLength = raw_input("Try Again: ")
+                    min_key_length = raw_input("Try Again: ")
                 print
-                maxKeyLength = raw_input("What's the maximum key length? ")
-                while not self.isInt(maxKeyLength):
+                max_key_length = raw_input("What's the maximum key length? ")
+                while not self.is_int(max_key_length):
 
                     print "Input Error, Not an Integer!"
 
-                    maxKeyLength = raw_input("Try Again: ")
-                #self.brute_force.setNumChars(numChars)
-
+                    max_key_length = raw_input("Try Again: ")
 
                 #Get the hash
-
                 print
-                hash = raw_input("What's the hash we're searching for: ")
-                #self.brute_force.setHash(hash)
-
-                #Sets variables in Brute Force class?
-                self.brute_force.from_controller(alphabet, algo, hash, minKeyLength, maxKeyLength)
+                temp_hash = raw_input("What's the hash we're searching for: ")
 
                 #Get the go-ahead
-
                 print
                 print "Ready to go?"
                 print
@@ -1631,21 +1253,21 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Crack", "crack", "c"):
+                if user_input in ("Crack", "crack", "c"):
 
                     self.state = "singleBruteSearchingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -1670,9 +1292,9 @@ class Controller():
                 brute_force2 = Brute_Force()
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While we haven't exhausted our search space or found an answer:
                 while not(self.brute_force.isDone() or brute_force2.isFound()):
@@ -1680,15 +1302,15 @@ class Controller():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l = white_l + " "
+                        white_r = white_r[:-1]
 
 
                      #Serve up the next chunk
@@ -1728,20 +1350,20 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
 
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
                 #Reset the variables
                 self.brute_force.reset()
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -1766,20 +1388,20 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
 
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
                 #Reset the variables
                 self.brute_force.reset()
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -1802,16 +1424,16 @@ class Controller():
 
                 #Get the file name
                 print
-                fileName = raw_input("What's the file name: ")
-                while not self.rainbowUser.setFileName(fileName) == "Good":
+                file_name = raw_input("What's the file name: ")
+                while not self.rainbowUser.setFileName(file_name) == "Good":
 
                     print "File not found..."
-                    fileName = raw_input("What's the file name: ")
+                    file_name = raw_input("What's the file name: ")
 
                 #Get the hash
                 print
-                hash = raw_input("What's the hash we're searching for: ")
-                self.rainbowUser.setHash(hash)
+                temp_hash = raw_input("What's the hash we're searching for: ")
+                self.rainbowUser.setHash(temp_hash)
 
                 #Get the go-ahead
 
@@ -1822,21 +1444,21 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Crack", "crack", "c"):
+                if user_input in ("Crack", "crack", "c"):
 
                     self.state = "singleRainUserSearchingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -1867,9 +1489,9 @@ class Controller():
                 #dictionary2.setVariables(self.dictionary.serverString())
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
                 while not (self.rainbowUser.isEof() or rainbowUser2.isFound()):
@@ -1877,15 +1499,15 @@ class Controller():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l = white_l + " "
+                        white_r = white_r[:-1]
 
                     #Serve up the next chunk
                     chunk = self.rainbowUser.getNextChunk()
@@ -1926,17 +1548,17 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
                 self.rainbowUser.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -1963,17 +1585,17 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
                 self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -2000,29 +1622,29 @@ class Controller():
                 print "(sha256)"
                 print "(sha512)"
                 print
-                algo = raw_input("Choice: ")
+                algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"md5", "sha1", "sha256", "sha512"}
-                while not algo in goodNames:
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
                     print "Input Error!"
 
-                    algo = raw_input("Try Again: ")
+                    algorithm = raw_input("Try Again: ")
 
-                #Set algorithm of RainbowMaker to user input of 'algo'
-                self.rainbowMaker.setAlgorithm(algo)
+                #Set algorithm of RainbowMaker to user input of 'algorithm'
+                #self.rainbowMaker.setAlgorithm(algorithm)
 
                 #Get the Number of chars of key
                 print
-                numChars = raw_input("How many characters will the key be? ")
-                while not self.isInt(numChars):
+                key_length = raw_input("How many characters will the key be? ")
+                while not self.is_int(key_length):
 
                     print "Input Error, Not an Integer!"
 
-                    numChars = raw_input("Try Again: ")
+                    key_length = raw_input("Try Again: ")
 
-                self.rainbowMaker.setNumChars(numChars)
+                #self.rainbowMaker.setNumChars(numChars)
 
                 #Get the alphabet to be used
                 print
@@ -2041,7 +1663,7 @@ class Controller():
                 alphabet = raw_input("Choice: ")
 
                 #Sterolize inputs
-                while not self.rainbowMaker.setAlphabet(alphabet):
+                while not self.is_valid_alphabet(alphabet):
 
                     print "Input Error!"
 
@@ -2049,27 +1671,36 @@ class Controller():
 
                 #Get dimensions
                 print
-                chainLength = raw_input("How long will the chains be? ")
-                while not self.isInt(chainLength):
+                chain_length = raw_input("How long will the chains be? ")
+                while not self.is_int(chain_length):
 
                     print "Input Error, Not an Integer!"
 
-                    chainLength = raw_input("Try Again: ")
+                    chain_length = raw_input("Try Again: ")
 
                 print
-                numRows = raw_input("How many rows will there be? ")
-                while not self.isInt(numRows):
+                num_rows = raw_input("How many rows will there be? ")
+                while not self.is_int(num_rows):
 
                     print "Input Error, Not an Integer!"
 
-                    numRows = raw_input("Try Again: ")
+                    num_rows = raw_input("Try Again: ")
 
-                self.rainbowMaker.setDimensions(chainLength, numRows)
+                #self.rainbowMaker.setDimensions(chain_length, num_rows)
 
                 #Get the file name
                 print
-                fileName = raw_input("What's the file name: ")
-                self.rainbowMaker.setFileName(fileName)
+                file_name = raw_input("What's the file name: ")
+                #self.rainbowMaker.setFileName(file_name)
+
+                self.settings['algorithm'] = algorithm
+                self.settings['file name'] = file_name
+                self.settings['key length'] = key_length
+                self.settings['alphabet'] = alphabet
+                self.settings['chain length'] = chain_length
+                self.settings['num rows'] = num_rows
+                #In the form of: "single" or "server" or "client"
+                self.settings['network mode'] = "single"
 
                 #Get the go-ahead
                 print
@@ -2079,21 +1710,21 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Create", "create", "c", "Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Create", "create", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Create", "create", "c"):
+                if user_input in ("Create", "create", "c"):
 
                     self.state = "singleRainMakerDoingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -2121,9 +1752,9 @@ class Controller():
                 self.rainbowMaker.setupFile()
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
                 while not self.rainbowMaker.isDone():
@@ -2131,15 +1762,15 @@ class Controller():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Creating--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Creating--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l = white_l + " "
+                        white_r = white_r[:-1]
 
 
                     chunkOfDone = rainbowMaker2.create(paramsChunk)
@@ -2195,17 +1826,17 @@ class Controller():
                         print "(no)"
                         print
 
-                        userInput = raw_input("Choice: ")
+                        user_input = raw_input("Choice: ")
 
                         #Sterolize inputs
-                        goodNames = {"Yes", "yes", "No", "no", "Y", "n"}
-                        while not userInput in goodNames:
+                        good_names = {"Yes", "yes", "No", "no", "Y", "n"}
+                        while not user_input in good_names:
 
                             print "Input Error!"
 
-                            userInput = raw_input("Try Again: ")
+                            user_input = raw_input("Try Again: ")
 
-                        if userInput in ("Yes", "yes", "Y"):
+                        if user_input in ("Yes", "yes", "Y"):
 
                             #self.colidingClock2 = time()
 
@@ -2214,16 +1845,16 @@ class Controller():
                                 #Clear the screen and re-draw
                                 os.system('cls' if os.name == 'nt' else 'clear')
                                 #Ohhh, pretty status pictures
-                                print "Fixing--> [" + whiteL + "*" + whiteR + "]"
+                                print "Fixing--> [" + white_l + "*" + white_r + "]"
                                 print "Collisions Still Detected: " + str(collisions)
-                                if starCounter > 11:
-                                    starCounter = 0
-                                    whiteL = ""
-                                    whiteR = "            "
+                                if star_counter > 11:
+                                    star_counter = 0
+                                    white_l = ""
+                                    white_r = "            "
                                 else:
-                                    starCounter += 1
-                                    whiteL = whiteL + " "
-                                    whiteR = whiteR[:-1]
+                                    star_counter += 1
+                                    white_l = white_l + " "
+                                    white_r = white_r[:-1]
 
                                 self.rainbowMaker.collisionFixer()
 
@@ -2258,17 +1889,17 @@ class Controller():
                 print "Go Back (back)"
                 print "(Exit)"
                 self.rainbowMaker.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -2284,43 +1915,34 @@ class Controller():
             #if we're at the singleDictionaryScreen state (Screen)
             elif state == "singleDictionaryScreen":
 
-                #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary"
                 print
 
-                #dictionaryyy = dict({'algo': "md5", 'hash': "ldkfjlk3"})
-
-                #self.settings = dict()
-
                 #Get the algorithm
-
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
                 print "(sha256)"
                 print "(sha512)"
                 print
-                algo = raw_input("Choice: ")
+                algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"md5", "sha1", "sha256", "sha512"}
-                while not algo in goodNames:
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
                     print "Input Error!"
 
-                    algo = raw_input("Try Again: ")
-
-                #Set algorithm of dictionary to user input of 'algo'
-                #self.dictionary.setAlgorithm(algo)
+                    algorithm = raw_input("Try Again: ")
 
                 #Get the file name
                 print
-                fileName = raw_input("What's the file name (___.txt): ")
-                while not self.does_file_exist(fileName):
+                file_name = raw_input("What's the file name (___.txt): ")
+                while not self.does_file_exist(file_name):
 
                     print "File not found..."
-                    fileName = raw_input("What's the file name (___.txt): ")
+                    file_name = raw_input("What's the file name (___.txt): ")
 
                 #Get the hash
                 print
@@ -2332,8 +1954,8 @@ class Controller():
                 single_or_file = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in goodNames:
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
 
                     print "Input Error!"
 
@@ -2343,9 +1965,7 @@ class Controller():
 
                     #Get the hash
                     print
-                    hash = raw_input("What's the hash we're searching for: ")
-                    #self.dictionary.setHash(hash)
-                    #self.dictionary.singleHash = True
+                    temp_hash = raw_input("What's the hash we're searching for: ")
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -2360,18 +1980,14 @@ class Controller():
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    #self.dictionary.setDoneFileName(fileName)
 
-                    #self.dictionary.singleHash = False
-
-                self.settings['algorithm'] = algo
-                self.settings['file name'] = fileName
-                self.settings['hash'] = hash
+                self.settings['algorithm'] = algorithm
+                self.settings['file name'] = file_name
+                self.settings['hash'] = temp_hash
                 #In the form of: "single" or "server" or "client"
                 self.settings['network mode'] = "single"
 
                 #Get the go-ahead
-
                 print
                 print "Ready to go?"
                 print
@@ -2379,21 +1995,21 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Crack", "crack", "c"):
+                if user_input in ("Crack", "crack", "c"):
 
                     self.state = "singleDictionarySearchingScreen"
 
-                elif userInput in ("Back", "back", "b"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "singleStartScreen"
 
@@ -2411,145 +2027,37 @@ class Controller():
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Searching..."
 
-                #self.clock = time()
-
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
 
-                while not self.magic_is_done.value:
+                while not self.list_of_shared_variables[0].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
-                    #time = time()
-                    #time.sleep()
-                    #timey = time.sleep()
                     time.sleep(1)
 
-                if self.magic_is_found.value:
+                if self.list_of_shared_variables[1].value:
 
                     self.state = "singleDictionaryFoundScreen"
 
                 else:
 
                     self.state = "singleDictionaryNotFoundScreen"
-
-
-
-
-
-                '''
-                #Have another dictionary (ie server-size) that chunks the data
-                #   So you don't have to send the whole file to every node
-                dictionary2 = Dictionary()
-
-                dictionary2.singleHash = self.dictionary.singleHash
-
-                #Stuff for those pretty status pictures stuff
-                starCounter = 0
-                whiteL = ""
-                whiteR = "            "
-
-                #### Single Hash #########################
-                if self.dictionary.singleHash == True:
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not (self.dictionary.isEof() or dictionary2.isFound()):
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #Serve up the next chunk
-                        chunk = self.dictionary.getNextChunk()
-
-                        #and process it using the node-side client
-                        dictionary2.find(chunk)
-
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #if a(the) node finds a key
-                    if dictionary2.isFound():
-
-                        #Let the server know what the key is
-                        self.dictionary.key = dictionary2.showKey()
-                        self.dictionary.hash = dictionary2.hash
-                        self.state = "singleDictionaryFoundScreen"
-
-                    else:
-
-                        self.state = "singleDictionaryNotFoundScreen"
-
-
-                #### Hash File #####################
-                else:
-
-                    doneList = []
-
-                    #While we haven't gotten all through the file or found the key...
-                    while not self.dictionary.isEof():
-
-                        #Clear the screen and re-draw
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        #Ohhh, pretty status pictures
-                        print "Searching--> [" + whiteL + "*" + whiteR + "]"
-                        if starCounter > 11:
-                            starCounter = 0
-                            whiteL = ""
-                            whiteR = "            "
-                        else:
-                            starCounter += 1
-                            whiteL = whiteL + " "
-                            whiteR = whiteR[:-1]
-
-                        #Serve up the next chunk
-                        chunk = self.dictionary.getNextChunk()
-
-                        #and process it using the node-side client
-                        doneList += dictionary2.find(chunk)
-
-                        dictionary2.doneList = []
-
-                    elapsed = (time() - self.clock)
-                    self.clock = elapsed
-
-                    #if a(the) node finds a key
-                    if dictionary2.isFound():
-
-                        #Let the server know what the key is
-                        self.dictionary.key = dictionary2.showKey()
-                        self.dictionary.hash = dictionary2.hash
-                        self.dictionary.makeDoneFile(doneList)
-                        self.state = "singleDictionaryFoundScreen"
-
-                    else:
-
-                        self.state = "singleDictionaryNotFoundScreen"
-                '''
 
             #############################################
             #############################################
@@ -2561,33 +2069,20 @@ class Controller():
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Found!"
-
-                print "Key is: ", self.magic_key.value
-
-                '''
-                if self.dictionary.singleHash == True:
-                    print "Key is: ", self.dictionary.showKey()
-                    print "Wish a", self.dictionary.algorithm, "hash of: ", self.dictionary.getHash()
-
-                else:
-                    print "Your File, (", self.dictionary.doneFileName, ") of hash/key pairs is ready."
-                print "And it took", self.clock, "seconds."
-                '''
-
+                print "Key is: ", self.list_of_shared_variables[2].value
                 print "Go Back (back)"
                 print "(Exit)"
-                #self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleDictionaryScreen"
 
@@ -2601,9 +2096,6 @@ class Controller():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "singleDictionaryNotFoundScreen":
 
-                #display results and wait for user interaction
-
-                #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Not Found"
                 print
@@ -2612,18 +2104,17 @@ class Controller():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                #self.dictionary.reset()
-                userInput = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                goodNames = {"Back", "back", "b", "Exit", "exit"}
-                while not userInput in goodNames:
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
                     print "Input Error!"
 
-                    userInput = raw_input("Try Again: ")
+                    user_input = raw_input("Try Again: ")
 
-                if userInput in ("Back", "back", "b"):
+                if user_input in ("Back", "back", "b"):
 
                     self.state = "singleDictionaryScreen"
 
@@ -2633,7 +2124,8 @@ class Controller():
                     self.done = True
 
     #returns true/false if value is int
-    def isInt(self, value):
+    @staticmethod
+    def is_int(value):
 
         try:
 
@@ -2645,113 +2137,34 @@ class Controller():
             return False
 
     #Checks to see if file exists
-    def does_file_exist(self, fileName):
+    @staticmethod
+    def does_file_exist(file_name):
 
-        file = str(fileName) + ".txt"
+        temp_file = str(file_name) + ".txt"
 
-        #Checks for filenotfound and returns code to caller class
+        #Checks for file not found and returns code to caller class
         try:
-            file = open(fileName, "r")
-            file.close()
+            temp_file = open(file_name, "r")
+            temp_file.close()
             return True
 
         except (OSError, IOError):
             return False
 
+    #Figure out if an alphabet choice is valid or not
+    @staticmethod
+    def is_valid_alphabet(alphabet_choice):
 
-Controller()
+        choices_list = list(alphabet_choice)
 
+        for choice in choices_list:
 
-''''
-Two versions of a diagram grouped differently--Latest_Stable_Versions
+            good_choices = {"a", "A", "p", "d"}
 
-startScreen
+            if not choice in good_choices:
 
-nodeStartScreen
-nodeConnectingScreen
-nodeConnectedToScreen
-nodeDoingStuffScreen
+                return False
 
-serverStartScreen
-serverBruteScreen
-serverBruteSearchingScreen
-serverBruteFoundScreen
-serverBruteNotFoundScreen
-serverRainScreen ---deleted, just use server main
-serverRainUserScreen
-serverRainUserSearchingScreen
-serverRainUserFoundScreen
-serverRainUserNotFoundScreen
-serverRainMakerScreen
-serverRainMakerDoingScreen
-serverRainMakerDoneScreen
-serverDictionaryScreen
-serverDictionarySearchingScreen
-serverDictionaryFoundScreen
-serverDictionaryNotFoundScreen
+        return True
 
-singleStartScreen
-singleBruteScreen
-singleBruteSearchingScreen
-singleBruteFoundScreen
-singleBruteNotFoundScreen
-singleRainScreen
-singleRainUserScreen
-singleRainUserSearchingScreen
-singleRainUserFoundScreen
-singleRainUserNotFoundScreen
-singleRainMakerScreen
-singleRainMakerDoingScreen
-singleRainMakerDoneScreen
-singleDictionaryScreen
-singleDictionarySearchingScreen
-singleDictionaryFoundScreen
-singleDictionaryNotFoundScreen
-
-
-Note: screen/state is used interchangeably.
-choice -> screen (attributes)
-
--> start
-    node -> node start screen (get server's ip adress from user)
-        be a node -> connecting... screen
-            -> connected to (server) screen (server's ip displayed)
-            -> doing stuff screen (server's ip displayed)
-    server -> server start screen
-        brute force -> server brute screen (get all info from user)
-            crack it -> server brute searching... screen (display info to user)
-                -> server brute found screen
-                -> server brute not found screen
-        rainbow tables -> server rain screen
-            use -> server rainuser screen (get all info from user)
-                crack it -> server rainuser searching... screen (display all info for user)
-                    -> server rainbowuser found screen
-                    -> server rainbowuser not found screen
-            create -> server rainmaker screen (get all info from user)
-                create table -> server rainmaker doing... screen
-                    ->server rainmaker done screen
-        dictionary -> server dictionary screen (get all info from user)
-            crack it -> server dictionary searching... screen (display info to user)
-                -> server dictionary found screen
-                -> server dictionary not found screen
-    single-user -> single start screen
-        brute force -> single brute screen (get all info from user)
-            crack it -> single brute searching... screen (display info to user)
-                -> single brute found screen
-                -> single brute not found screen
-        rainbow tables -> single rain screen
-            use -> single rainuser screen (get all info from user)
-                crack it -> single rainuser searching... screen (display all info for user)
-                    -> single rainbowuser found screen
-                    -> single rainbowuser not found screen
-            create -> single rainmaker screen (get all info from user)
-                create table -> single rainmaker doing... screen
-                    ->single rainmaker done screen
-        dictionary -> single dictionary screen (get all info from user)
-            crack it -> single dictionary searching... screen (display info to user)
-                -> single dictionary found screen
-                -> single dictionary not found screen
-    exit -> exit!
-
-
-'''''
+ConsoleUI()
