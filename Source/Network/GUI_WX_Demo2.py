@@ -39,11 +39,11 @@ class guiWXDemo2(wx.Frame):
         CloseButton= wx.Button(panel, label="Close", size=(200,20))
 
         #add buttons to the grid
-        gsizer.AddMany([(SingleModeButton, 0, wx.EXPAND|wx.TOP, 9),
-            (NetworkModeButton,0, wx.EXPAND|wx.CENTER, 9),
-            (CloseButton,0, wx.EXPAND|wx.BOTTOM, 9)])
+        gsizer.AddMany([(SingleModeButton, 0, 9),
+            (NetworkModeButton,0, 9),
+            (CloseButton,0, 9)])
 
-        hbox.Add(gsizer, 0, wx.ALL,15)
+        hbox.Add(gsizer, wx.ALIGN_CENTER_HORIZONTAL)
         panel.SetSizer(hbox)
 
         #Bind the buttons to events
@@ -55,7 +55,10 @@ class guiWXDemo2(wx.Frame):
         self.SetTitle('Mighty Cracker')
         self.Centre()
         self.Show(True)
+    #end of InitUI()
 
+
+    #defined functions
     def ShowNotFinishedMessage1(self, event):
         dial= wx.MessageDialog(None, 'This function has not been completed yet', 'Notice:', wx.OK)
         dial.ShowModal()
