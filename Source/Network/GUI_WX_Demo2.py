@@ -30,7 +30,7 @@ class guiWXDemo2(wx.Frame):
     def InitUI(self):
         panel= wx.Panel(self)
 
-        hbox= wx.BoxSizer()
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(4,1,2,2)
 
         #defone the buttons
@@ -39,11 +39,11 @@ class guiWXDemo2(wx.Frame):
         CloseButton= wx.Button(panel, label="Close", size=(200,20))
 
         #add buttons to the grid
-        gsizer.AddMany([(SingleModeButton, 0, 9),
-            (NetworkModeButton,0, 9),
-            (CloseButton,0, 9)])
+        gsizer.AddMany([(SingleModeButton, 0,wx.ALIGN_CENTER, 9),
+            (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
+            (CloseButton,0,wx.ALIGN_CENTER, 9)])
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER_HORIZONTAL)
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
         panel.SetSizer(hbox)
 
         #Bind the buttons to events
