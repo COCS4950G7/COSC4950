@@ -29,14 +29,17 @@ class guiWXDemo2(wx.Frame):
 
     def InitUI(self):
         panel= wx.Panel(self)
-
+        listOfWidgets= []
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(4,1,2,2)
 
         #defone the buttons
         SingleModeButton= wx.Button(panel, label="Single Mode", size=(200,20))
+        listOfWidgets.append(SingleModeButton)
         NetworkModeButton= wx.Button(panel, label="Network Mode", size=(200,20))
+        listOfWidgets.append(NetworkModeButton)
         CloseButton= wx.Button(panel, label="Close", size=(200,20))
+        listOfWidgets.append(CloseButton)
 
         #add buttons to the grid
         gsizer.AddMany([(SingleModeButton, 0,wx.ALIGN_CENTER, 9),
@@ -47,7 +50,7 @@ class guiWXDemo2(wx.Frame):
         panel.SetSizer(hbox)
 
         #Bind the buttons to events
-        SingleModeButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
+        SingleModeButton.Bind(wx.EVT_BUTTON, lambda event: self.changeScreen(panel, listOfWidgets, self.selectCrackingMethodUI))
         NetworkModeButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, self.OnClose)
 
@@ -56,6 +59,52 @@ class guiWXDemo2(wx.Frame):
         self.Centre()
         self.Show(True)
     #end of InitUI()
+
+    def selectCrackingMethodUI(self):
+        panel= wx.Panel(self)
+        listOfWidgets= []
+        hbox= wx.BixSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(5,1,2,2)
+
+        #define the buttons and widgets
+        screenHeader= wx.StaticText(panel, label="Select Cracking Method", size=(400,40))
+        listOfWidgets.append(screenHeader)
+        DictionaryMethodButton= wx.Button(panel, label="Dictionary", size=(200,20))
+        listOfWidgets.append(DictionaryMethodButton)
+        BruteForceMethodButton= wx.Button(panel, label="Brute Force (default)", size=(200,20))
+        listOfWidgets.append(BruteForceMethodButton)
+        RainbowTableMethodButton= wx.Button(panel, label="Rainbow Table", size=(200,20))
+        listOfWidgets.append(RainbowTableMethodButton)
+        CloseButton= wx.Button(panel, label="Close", size=(200,20))
+        listOfWidgets.append(CloseButton)
+
+        #add buttons to the grid
+        gsizer.AddMany([(screenHeader,0, wx.ALIGN_CENTER, 9),
+            (DictionaryMethodButton,0, wx.ALIGN_CENTER,9),
+            (BruteForceMethodButton,0, wx.ALIGN_CENTER, 9),
+            (RainbowTableMethodButton,0, wx.ALIGN_CENTER,9),
+            (CloseButton,0, wx.ALIGN_CENTER,9)])
+
+        hbox.Add(gsizer,wx.ALIGN_CENTER)
+        panel.SetSizer(hbox)
+
+        #Bind the buttons to events
+        DictionaryMethodButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
+        BruteForceMethodButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
+        RainbowTableMethodButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
+        CloseButton.Bind(wx.EVT_BUTTON, self.OnClose)
+
+        self.SetSize((640,480))
+        self.SetTitle('Mighty Cracker')
+        self.Centre()
+        self.Show(True)
+    #end of selectCrackingMethodUI
+
+    def changeScreen(self, closingScreensPanel, inputListOfWidgets, screenToLoad):
+        if(closingScreensPanel.GetChildren()):
+            for i in range(0, len(inputListOfWidgets)):
+                closingScreensPanel.Hide()
+        screenToLoad
 
 
     #defined functions
