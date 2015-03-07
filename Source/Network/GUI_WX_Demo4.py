@@ -37,7 +37,7 @@ class PanelTwo(wx.Panel):
         wx.Panel.__init__(self, parent=parent)
         listOfWidgets= []
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(5,1,2,2)
+        gsizer= wx.GridSizer(6,1,2,2)
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Select Cracking Method", size=(200,40))
@@ -48,6 +48,8 @@ class PanelTwo(wx.Panel):
         listOfWidgets.append(BruteForceMethodButton)
         RainbowTableMethodButton= wx.Button(self, label="Rainbow Table", size=(200,40))
         listOfWidgets.append(RainbowTableMethodButton)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40))
+        listOfWidgets.append(BackToMainMenuButton)
         CloseButton= wx.Button(self, label="Close", size=(200,40))
         listOfWidgets.append(CloseButton)
 
@@ -56,6 +58,7 @@ class PanelTwo(wx.Panel):
             (DictionaryMethodButton,0, wx.ALIGN_CENTER,9),
             (BruteForceMethodButton,0, wx.ALIGN_CENTER, 9),
             (RainbowTableMethodButton,0, wx.ALIGN_CENTER,9),
+            (BackToMainMenuButton,0, wx.ALIGN_CENTER,9),
             (CloseButton,0, wx.ALIGN_CENTER,9)])
 
         hbox.Add(gsizer,wx.ALIGN_CENTER)
@@ -65,11 +68,12 @@ class PanelTwo(wx.Panel):
         DictionaryMethodButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         BruteForceMethodButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         RainbowTableMethodButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.onSwitchPanels)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class myFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Panel Switch Demo")
+        wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker")
 
         self.panel_one= PanelOne(self)
         self.panel_two= PanelTwo(self)
@@ -81,13 +85,12 @@ class myFrame(wx.Frame):
         self.SetSizer(self.sizer)
 
     def onSwitchPanels(self, event):
-        print "in onSwitchPanels "
         if(self.panel_one.IsShown()):
             self.SetTitle("SHowing Panel 2")
             self.panel_one.Hide()
             self.panel_two.Show()
         else:
-            self.SetTile("PAnel one showing")
+            self.SetTitle("PAnel one showing")
             self.panel_one.Show()
             self.panel_two.Hide()
         self.Layout()
