@@ -45,6 +45,7 @@ class Server():
         total_chunks = 0
         settings = dict()
         single_user_mode = False
+        rainmaker = RainbowMaker.RainbowMaker()
 
         def __init__(self, settings):
             self.settings = settings
@@ -55,6 +56,8 @@ class Server():
                     self.single_user_mode = True
                 else:
                     self.single_user_mode = False
+            if self.cracking_mode == "rainmaker":
+                self.rainmaker = RainbowMaker.RainbowMaker()
             self.run_server()
         #=====================================================================================================================
         #FUNCTIONS
@@ -70,7 +73,7 @@ class Server():
                     print "Single User Mode"
                     shutdown = Event()
                     shutdown.clear()
-                    shared_job_q = Queue(10)
+                    shared_job_q = Queue(100)
                     shared_result_q = Queue()
                     single = Process(target=self.start_single_user, args=(shared_job_q, shared_result_q, shutdown))
                     single.start()
@@ -115,10 +118,20 @@ class Server():
                         mode_bit_2.set()
                     return  # haven't figured out how to set this up yet
                 elif self.cracking_mode == "rainmaker":
+                    rainmaker = self.rainmaker
+
+                    rainmaker.setAlgorithm(self.settings['algorithm'])
+                    rainmaker.setNumChars(self.settings['key length'])
+                    rainmaker.setAlphabet(self.settings['alphabet'])
+                    rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
+                    rainmaker.setFileName(self.settings['file name'])
+                    rainmaker.setupFile()
+
+                    chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, shared_job_q, shutdown))
+
                     if not self.single_user_mode:
                         mode_bit_1.clear()
                         mode_bit_2.clear()
-                    return  # haven't figured out how to set this up yet
                 else:
                     return "wtf?"
 
@@ -239,6 +252,16 @@ class Server():
                         for chunk in self.sent_chunks:
                             if chunk[0] == result[1]:
                                 self.sent_chunks.remove(chunk)
+                        if self.cracking_mode == "rainmaker":
+                            rainChunk = result[1]
+                            #rainChunk.params = result[1]
+                            #rainChunk.data = result[2]
+                            self.rainmaker.putChunkInFile(rainChunk)
+                            if self.rainmaker.isDone():
+                                print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
+                                shutdown.set()
+
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in check_results definition Try block"
@@ -367,10 +390,14 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # chunks for rainbow maker function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow_maker(self, rainmaker, job_queue):
+        def chunk_rainbow_maker(self, rainmaker, job_queue, shutdown):
             try:
-                #INSERT CODE HERE
-                return
+                while not shutdown.is_set():
+                    paramsChunk = rainmaker.makeParamsChunk()
+                    new_chunk = {"params": paramsChunk.params,
+                                 "data": paramsChunk.data}
+                    job_queue.put(new_chunk)
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
@@ -490,7 +517,14 @@ class Server():
                         else:
                             if self.cracking_mode == "rainmaker":
                                 print "Starting rainbow table generator."
-                                return  # haven't figured out how to set this up yet
+
+                                rainmaker = RainbowMaker.RainbowMaker()
+                                rainmaker.setAlgorithm(self.settings['algorithm'])
+                                rainmaker.setNumChars(self.settings['key length'])
+                                rainmaker.setAlphabet(self.settings['alphabet'])
+                                rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
+                                rainmaker.setFileName(self.settings['file name'])
+                                chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
                             else:
                                 return "wtf?"
                 for process in chunk_runner:
@@ -547,7 +581,6 @@ class Server():
             try:
                 bf.result_queue = result_queue
 
-
                 while not shutdown.is_set():
                     try:
                         chunk = job_queue.get()
@@ -571,12 +604,21 @@ class Server():
                 bf.terminate_processes()
 
         def run_rain_user(self, rain, job_queue, result_queue, shutdown):
-            #NEEDS ERROR HANDLING!!!!!!!!!!
+
             return
 
         def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-            #NEEDS ERROR HANDLING!!!!!!!!!!!!!!!!!!
-            return
+            while not shutdown.is_set():
+                paramsChunk = Chunk.Chunk()
+                try:
+                    job = job_queue.get(block=True, timeout=.25)
+                except Qqueue.Empty:
+                    continue
+                paramsChunk.params = job["params"]
+                chunkOfDone = maker.create(paramsChunk)
+                result_queue.put(('f', chunkOfDone))
+
+
         #=======================================4==============================================================================
         #END OF FUNCTIONS
         #=====================================================================================================================

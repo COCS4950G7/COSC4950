@@ -68,8 +68,9 @@ class Client():
                         return  # haven't figured out how to set this up yet
                     else:
                         if self.cracking_mode == "rainmaker":
+                            rainmaker = RainbowMaker.RainbowMaker()
                             print "Starting rainbow table generator."
-                            return  # haven't figured out how to set this up yet
+                            chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
                         else:
                             return "wtf?"
             for process in chunk_runner:
@@ -217,8 +218,15 @@ class Client():
         return
 
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-        #NEEDS ERROR HANDLING!!!!!!!!!!!!!!!!!!
-        return
+        while not shutdown.is_set():
+            paramsChunk = Chunk.Chunk()
+            try:
+                job = job_queue.get(block=True, timeout=.25)
+            except Qqueue.Empty:
+                continue
+            paramsChunk.params = job["params"]
+            chunkOfDone = maker.create(paramsChunk)
+            result_queue.put(('f', chunkOfDone))
     #===================================================================================================================
     #END OF FUNCTIONS
     #===================================================================================================================
