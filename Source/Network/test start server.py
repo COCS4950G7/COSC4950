@@ -9,7 +9,7 @@ class start():
     client = Process()
     server = Process()
     settings = []
-    settings.append({"cracking method": "dic",
+    settings.append({"cracking method": "dic",  # settings[0]
                 "algorithm": "SHA512",
                 #"hash": "b17a9909e09fda53653332431a599941",  # Karntnerstrasse-Rotenturmstrasse in md5
                 #"hash": "e7c0efb2dc699ede79983b8dfb5cb509ebf2bde9",  # Karntnerstrasse-Rotenturmstrasse in sha1
@@ -18,19 +18,19 @@ class start():
                 "file name": "realuniq",                    # last word in dic.txt
                 "single": "False"})                    # (long runtime on realuniq dictionary ~755M lines)
 
-    settings.append({"cracking method": "dic",
+    settings.append({"cracking method": "dic",  # settings[1]
                  "algorithm": "sha1",
                  "hash": "33da7a40473c1637f1a2e142f4925194",  # popcorn
                  "file name": "dic",                   # very short runtime in dic.txt
                  "single": "True"})                    # (short run time on realuniq dictionary ~18M lines)
 
-    settings.append( {"cracking method": "dic",
+    settings.append( {"cracking method": "dic",  # settings[2]
                  "algorithm": "md5",
                  "hash": "9d86c2b0caad030430c093530b77ba63",  # Sixth line from the bottom, non-ascii characters
                  "file name": "realuniq",
                  })                   # (longest run time on realuniq dictionary ~1.2B lines)
 
-    settings.append( {"cracking method": "bf",
+    settings.append( {"cracking method": "bf",  # settings[3]
                  "algorithm": "sha1",
                  #"hash": "12c8de03d4562ba9f810e7e1e7c6fc15"  # aa9999 in md5  -short runtime
                  #"hash": "96f36b618b63f4c7f22a34b6cd2245467465b355",  # aa9999 in sha1
@@ -42,12 +42,30 @@ class start():
                  "alphabet": string.ascii_letters+string.digits+string.punctuation,
                  "single": "True"})
 
+    settings.append({"cracking method": "rainmaker",  # settings[4]
+                     "algorithm": "md5",
+                     "key length": 10,
+                     "alphabet": string.ascii_letters+string.digits+string.punctuation,
+                     "chain length": 10000,
+                     "num rows": 1000,
+                     "file name": "rain.txt",
+                     "single": "True"})
+
+    settings.append({"cracking method": "rainmaker",  # settings[4]
+                     "algorithm": "md5",
+                     "key length": 10,
+                     "alphabet": string.ascii_letters+string.digits+string.punctuation,
+                     "chain length": 10000,
+                     "num rows": 1000,
+                     "file name": "raintable.txt",
+                     "single": "False"})
+
     def __init__(self):
         #self.start_server()
         return
 
     def start_server(self):
-        self.server = Process(target=Server, args=(self.settings[0],))
+        self.server = Process(target=Server, args=(self.settings[5],))
         self.server.start()
         self.server.join()
         self.server.terminate()
