@@ -276,7 +276,7 @@ class ConsoleUI():
             elif state == "nodeConnectingScreen":
 
                 #In the form of: "single" or "server" or "client"
-                self.settings['network mode'] = "client"
+                self.settings['single'] = "False"
                 self.settings['server ip'] = self.serverIP
 
                 self.networkClient.start()
@@ -983,7 +983,7 @@ class ConsoleUI():
                 self.settings['file name'] = file_name
                 self.settings['hash'] = temp_hash
                 #In the form of: "single" or "server" or "client"
-                self.settings['network mode'] = "server"
+                self.settings['single'] = "False"
 
                 #Get the go-ahead
                 print
@@ -1700,7 +1700,7 @@ class ConsoleUI():
                 self.settings['chain length'] = chain_length
                 self.settings['num rows'] = num_rows
                 #In the form of: "single" or "server" or "client"
-                self.settings['network mode'] = "single"
+                self.settings['single'] = "True"
 
                 #Get the go-ahead
                 print
@@ -1985,7 +1985,7 @@ class ConsoleUI():
                 self.settings['file name'] = file_name
                 self.settings['hash'] = temp_hash
                 #In the form of: "single" or "server" or "client"
-                self.settings['network mode'] = "single"
+                self.settings['single'] = "True"
 
                 #Get the go-ahead
                 print
