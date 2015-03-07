@@ -28,17 +28,17 @@ class guiWXDemo2(wx.Frame):
         self.InitUI()
 
     def InitUI(self):
-        panel= wx.Panel(self)
+        self.panel= wx.Panel(self)
         listOfWidgets= []
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(4,1,2,2)
 
         #defone the buttons
-        SingleModeButton= wx.Button(panel, label="Single Mode", size=(200,20))
+        SingleModeButton= wx.Button(self.panel, label="Single Mode", size=(200,20))
         listOfWidgets.append(SingleModeButton)
-        NetworkModeButton= wx.Button(panel, label="Network Mode", size=(200,20))
+        NetworkModeButton= wx.Button(self.panel, label="Network Mode", size=(200,20))
         listOfWidgets.append(NetworkModeButton)
-        CloseButton= wx.Button(panel, label="Close", size=(200,20))
+        CloseButton= wx.Button(self.panel, label="Close", size=(200,20))
         listOfWidgets.append(CloseButton)
 
         #add buttons to the grid
@@ -47,10 +47,10 @@ class guiWXDemo2(wx.Frame):
             (CloseButton,0,wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
-        panel.SetSizer(hbox)
+        self.panel.SetSizer(hbox)
 
         #Bind the buttons to events
-        SingleModeButton.Bind(wx.EVT_BUTTON, lambda event: self.changeScreen(panel, listOfWidgets, self.selectCrackingMethodUI))
+        SingleModeButton.Bind(wx.EVT_BUTTON, lambda event: self.changeScreen(self.panel, listOfWidgets, self.selectCrackingMethodUI))
         NetworkModeButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, self.OnClose)
 
@@ -61,21 +61,22 @@ class guiWXDemo2(wx.Frame):
     #end of InitUI()
 
     def selectCrackingMethodUI(self):
-        panel= wx.Panel(self)
+        self.panel2= wx.Panel(self)
+        #panel2.Show(True)
         listOfWidgets= []
         hbox= wx.BixSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(5,1,2,2)
 
         #define the buttons and widgets
-        screenHeader= wx.StaticText(panel, label="Select Cracking Method", size=(400,40))
+        screenHeader= wx.StaticText(self.panel2, label="Select Cracking Method", size=(400,40))
         listOfWidgets.append(screenHeader)
-        DictionaryMethodButton= wx.Button(panel, label="Dictionary", size=(200,20))
+        DictionaryMethodButton= wx.Button(self.panel2, label="Dictionary", size=(200,20))
         listOfWidgets.append(DictionaryMethodButton)
-        BruteForceMethodButton= wx.Button(panel, label="Brute Force (default)", size=(200,20))
+        BruteForceMethodButton= wx.Button(self.panel2, label="Brute Force (default)", size=(200,20))
         listOfWidgets.append(BruteForceMethodButton)
-        RainbowTableMethodButton= wx.Button(panel, label="Rainbow Table", size=(200,20))
+        RainbowTableMethodButton= wx.Button(self.panel2, label="Rainbow Table", size=(200,20))
         listOfWidgets.append(RainbowTableMethodButton)
-        CloseButton= wx.Button(panel, label="Close", size=(200,20))
+        CloseButton= wx.Button(self.panel2, label="Close", size=(200,20))
         listOfWidgets.append(CloseButton)
 
         #add buttons to the grid
@@ -86,7 +87,7 @@ class guiWXDemo2(wx.Frame):
             (CloseButton,0, wx.ALIGN_CENTER,9)])
 
         hbox.Add(gsizer,wx.ALIGN_CENTER)
-        panel.SetSizer(hbox)
+        self.panel2.SetSizer(hbox)
 
         #Bind the buttons to events
         DictionaryMethodButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
@@ -94,16 +95,17 @@ class guiWXDemo2(wx.Frame):
         RainbowTableMethodButton.Bind(wx.EVT_BUTTON, self.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, self.OnClose)
 
-        self.SetSize((640,480))
+        self.panel2.SetSize((640,480))
         self.SetTitle('Mighty Cracker')
-        self.Centre()
-        self.Show(True)
+        self.panel2.Centre()
+        self.panel2.Show(True)
     #end of selectCrackingMethodUI
 
     def changeScreen(self, closingScreensPanel, inputListOfWidgets, screenToLoad):
         if(closingScreensPanel.GetChildren()):
             for i in range(0, len(inputListOfWidgets)):
-                closingScreensPanel.Hide()
+                inputListOfWidgets[i].Hide()
+        closingScreensPanel.Hide()
         screenToLoad
 
 
