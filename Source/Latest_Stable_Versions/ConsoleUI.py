@@ -8,7 +8,13 @@
 
 #   What should work:
 #   - Single -> Dictionary
+#            -> Brute Force
+#            ->
+#            ->
 #   - Server -> Dictionary
+#            -> Brute Force
+#            ->
+#            ->
 #   - Node Mode
 
 
@@ -36,6 +42,9 @@ class ConsoleUI():
     dictionary = Dictionary()
     brute_force = Brute_Force()
 
+    #Initializing variable to a default value
+    serverIP = "127.0.1.1"
+
     #Magical shared variables with server
 
     #Create a list of size __ with "0" as the elements (empty list)
@@ -58,10 +67,7 @@ class ConsoleUI():
 
     #Defining network sub-processes as class variables that are instances of the network objects
     networkServer = Process(target=Server, args=(settings, list_of_shared_variables,))
-    networkClient = Process(target=Client, args=(settings, list_of_shared_variables,))
-
-    #Initializing variable to a default value
-    serverIP = "127.0.1.1"
+    networkClient = Process(target=Client, args=(serverIP,))
 
     #tempGUI Variables
     state = "startScreen"
@@ -275,10 +281,6 @@ class ConsoleUI():
             #if we're at the node connecting... state (Screen)
             elif state == "nodeConnectingScreen":
 
-                #In the form of: "single" or "server" or "client"
-                self.settings['single'] = "False"
-                self.settings['server ip'] = self.serverIP
-
                 self.networkClient.start()
 
                 print "============="
@@ -452,21 +454,138 @@ class ConsoleUI():
             #############################################
             #############################################
             #if we're at the serverBruteForceScreen state (Screen)
-            elif state == "Start -> Server -> Brute Force":
-                print "BROKE"
+            elif state == "serverBruteForceScreen":
 
                 #What did the user pick? (Crack it!, Back, Exit)
-                #userInput = GUI.getInput()
+                print "============="
+                print "Start -> Server Mode -> Brute Force"
+                print
 
-                if user_input == "crackIt":
+                #Get the algorithm
+                print "What's the algorithm: "
+                print "(md5)"
+                print "(sha1)"
+                print "(sha256)"
+                print "(sha512)"
+                print
+                algorithm = raw_input("Choice: ")
 
-                    #GUI.setState("serverBruteSearchingScreen")
-                    x=1
-                    #get info from GUI and pass to Brute_Force class
+                #Sterolize inputs
+                good_names = {"md5", "sha1", "sha256", "sha512"}
+                while not algorithm in good_names:
 
-                elif user_input == "back":
-                    x=1
-                    #GUI.setState("serverForceScreen")
+                    print "Input Error!"
+
+                    algorithm = raw_input("Try Again: ")
+
+                #Get the alphabet to be used
+                print
+                print "Choose your alphabet: "
+                print "0-9(d)"
+                print "a-z(a)"
+                print "A-Z(A)"
+                print "!-~(p)"
+                print
+                print "Add letters together to add"
+                print " multiple alphabets together."
+                print "IE: dap = 0-9 & a-z & !-~"
+                print
+
+                alphabet = raw_input("Choice: ")
+
+                #Sterolize inputs
+                while not self.is_valid_alphabet(alphabet):
+
+                    print "Input Error!"
+
+                    alphabet = raw_input("Try Again: ")
+
+                alphabet = self.convert_to_string(alphabet)
+
+                #Get min key length
+                print
+                min_key_length = raw_input("What's the minimum key length? ")
+                while not self.is_int(min_key_length):
+
+                    print "Input Error, Not an Integer!"
+
+                    min_key_length = raw_input("Try Again: ")
+
+                #Get max key length
+                print
+                max_key_length = raw_input("What's the maximum key length?")
+                while not self.is_int(max_key_length):
+
+                    print "Input Error, Not an Integer!"
+
+                    max_key_length = raw_input("Try Again: ")
+
+                #Get the hash
+                print
+                print "Are we searching for a single hash, or from a file of hashes?"
+                print
+                print "Single Hash (s)"
+                print "From a File (f)"
+                print
+                single_or_file = raw_input("Choice: ")
+
+                #Sterolize inputs
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
+
+                    print "Input Error!"
+
+                    single_or_file = raw_input("Try Again: ")
+
+                if single_or_file in ("single", "s", "Single"):
+
+                    #Get the hash
+                    print
+                    temp_hash = raw_input("What's the hash we're searching for: ")
+
+                elif single_or_file in ("file", "f", "File"):
+
+                    #Get the file name
+                    print
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
+
+                        print "File not found..."
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
+
+                self.settings['algorithm'] = algorithm
+                self.settings['hash'] = temp_hash
+                self.settings['alphabet'] = alphabet
+                self.settings['min key length'] = min_key_length
+                self.settings['max key length'] = max_key_length
+                #In the form of: "single" or "server" or "client"
+                self.settings['single'] = "False"
+
+                #Get the go-ahead
+                print
+                print "Ready to go?"
+                print
+                print "Crack That Hash! (c)"
+                print
+                print "Go Back (back)"
+                print "(Exit)"
+                user_input = raw_input("Choice: ")
+
+                #Sterolize inputs
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
+
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Crack", "crack", "c"):
+
+                    self.state = "serverDictionarySearchingScreen"
+
+                elif user_input in ("Back", "back", "b"):
+
+                    self.state = "startStartScreen"
 
                 else:
 
@@ -476,57 +595,100 @@ class ConsoleUI():
             #############################################
             #############################################
             #if we're at the serverBruteSearchingScreen state (Screen)
-            elif state == "Start -> Server -> Brute Force -> Searching...":
-                print "BROKE"
+            elif state == "serverBruteSearchingScreen":
 
                 #display results and wait for user interaction
+                print "============="
+                print "Start -> Server Mode -> Brute Force -> Searching..."
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                #userInput = GUI.getInput()
+                self.networkServer.start()
 
-                if user_input == "back":
-                    x=1
-                    #GUI.setState("serverBruteForceScreen")
+                #Stuff for those pretty status pictures stuff
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
+
+                while not self.list_of_shared_variables[0].value:
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
+                    else:
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
+
+                    time.sleep(1)
+
+                if self.list_of_shared_variables[1].value:
+
+                    self.state = "serverBruteFoundScreen"
 
                 else:
 
-                    #We're done
-                    self.done = True
+                    self.state = "serverBruteNotFoundScreen"
 
             #############################################
             #############################################
             #if we're at the serverBruteFoundScreen state (Screen)
-            elif state == "Start -> Server -> Brute Force -> Found":
-                print "BROKE"
+            elif state == "serverBruteFoundScreen":
 
-                #display results and wait for user interaction
+                print "============="
+                print "Start -> Server -> Brute Force -> Found!"
+                print "Key is: ", self.list_of_shared_variables[2].value
+                print "Go Back (back)"
+                print "(Exit)"
+                user_input = raw_input("Choice: ")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                #userInput = GUI.getInput()
+                #Sterolize inputs
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
-                if user_input == "back":
-                    x=1
-                    #GUI.setState("serverBruteForceScreen")
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Back", "back", "b"):
+
+                    self.state = "serverBruteForceScreen"
 
                 else:
 
                     #We're done
                     self.done = True
 
+
             #############################################
             #############################################
             #if we're at the serverBruteNotFoundScreen state (Screen)
-            elif state == "Start -> Server -> Brute Force -> Not Found":
-                print "BROKE"
+            elif state == "serverBruteNotFoundScreen":
 
-                #display results and wait for user interaction
+                print "============="
+                print "Start -> Server -> Brute Force -> Not Found"
+                print
+                print "Sorry, we didn't find it."
+                print "Just FYI though, that took", self.clock, "seconds."
+                print
+                print "Go Back (back)"
+                print "(Exit)"
+                user_input = raw_input("Choice: ")
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                #userInput = GUI.getInput()
+                #Sterolize inputs
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
-                if user_input == "back":
-                    x=1
-                    #GUI.setState("serverBruteForceScreen")
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Back", "back", "b"):
+
+                    self.state = "serverBruteForceScreen"
 
                 else:
 
@@ -1071,7 +1233,6 @@ class ConsoleUI():
                 print "Key is: ", self.list_of_shared_variables[2].value
                 print "Go Back (back)"
                 print "(Exit)"
-                #self.dictionary.reset()
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -1208,24 +1369,29 @@ class ConsoleUI():
 
                 #Get the alphabet to be used
                 print
-                print "What's the alphabet: "
+                print "Choose your alphabet: "
                 print "0-9(d)"
                 print "a-z(a)"
                 print "A-Z(A)"
-                print "a-z&A-Z(m)"
-                print "a-z&A-Z&0-9(M)"
+                print "!-~(p)"
                 print
+                print "Add letters together to add"
+                print " multiple alphabets together."
+                print "IE: dap = 0-9 & a-z & !-~"
+                print
+
                 alphabet = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"d", "a", "A", "m", "M"}
-                while not alphabet in good_names:
+                while not self.is_valid_alphabet(alphabet):
 
                     print "Input Error!"
 
                     alphabet = raw_input("Try Again: ")
 
-                #Get the min and max Number of chars of key
+                alphabet = self.convert_to_string(alphabet)
+
+                #Get min key length
                 print
                 min_key_length = raw_input("What's the minimum key length? ")
                 while not self.is_int(min_key_length):
@@ -1233,8 +1399,10 @@ class ConsoleUI():
                     print "Input Error, Not an Integer!"
 
                     min_key_length = raw_input("Try Again: ")
+
+                #Get max key length
                 print
-                max_key_length = raw_input("What's the maximum key length? ")
+                max_key_length = raw_input("What's the maximum key length?")
                 while not self.is_int(max_key_length):
 
                     print "Input Error, Not an Integer!"
@@ -1243,7 +1411,44 @@ class ConsoleUI():
 
                 #Get the hash
                 print
-                temp_hash = raw_input("What's the hash we're searching for: ")
+                print "Are we searching for a single hash, or from a file of hashes?"
+                print
+                print "Single Hash (s)"
+                print "From a File (f)"
+                print
+                single_or_file = raw_input("Choice: ")
+
+                #Sterolize inputs
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
+
+                    print "Input Error!"
+
+                    single_or_file = raw_input("Try Again: ")
+
+                if single_or_file in ("single", "s", "Single"):
+
+                    #Get the hash
+                    print
+                    temp_hash = raw_input("What's the hash we're searching for: ")
+
+                elif single_or_file in ("file", "f", "File"):
+
+                    #Get the file name
+                    print
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
+
+                        print "File not found..."
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
+
+                self.settings['algorithm'] = algorithm
+                self.settings['hash'] = temp_hash
+                self.settings['alphabet'] = alphabet
+                self.settings['min key length'] = min_key_length
+                self.settings['max key length'] = max_key_length
+                #In the form of: "single" or "server" or "client"
+                self.settings['single'] = "True"
 
                 #Get the go-ahead
                 print
@@ -1284,20 +1489,14 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Searching..."
 
-                #self.clock = time()
-
-                #Splitting the work up to simulate network functionality.
-                #self.brute_force will be our server instance and
-                #brute_force2 will be our node (client) instance
-                brute_force2 = Brute_Force()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
                 white_l = ""
                 white_r = "            "
 
-                #While we haven't exhausted our search space or found an answer:
-                while not(self.brute_force.isDone() or brute_force2.isFound()):
+                while not self.list_of_shared_variables[0].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1309,24 +1508,13 @@ class ConsoleUI():
                         white_r = "            "
                     else:
                         star_counter += 1
-                        white_l = white_l + " "
+                        white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
 
-                     #Serve up the next chunk
-                    chunk = self.brute_force.get_chunk()
+                if self.list_of_shared_variables[1].value:
 
-                    #and process it using the node-side instance
-                    brute_force2.run_chunk(chunk)
-
-                #elapsed = (time() - self.clock)
-                #self.clock = elapsed
-
-                #if a(the) node finds a key
-                if brute_force2.isFound():
-
-                    #Let the server know what the key is
-                    self.brute_force.key = brute_force2.getKey()
                     self.state = "singleBruteFoundScreen"
 
                 else:
@@ -1343,8 +1531,7 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Found!"
                 print
-                print "Key is: ", self.brute_force.getKey()
-                print "Wish a", self.brute_force.algorithm, "hash of: ", self.brute_force.origHash
+                print "Key is: ", self.list_of_shared_variables[2].value
                 print "And it took", self.clock, "seconds."
 
                 print "Go Back (back)"
@@ -1359,9 +1546,6 @@ class ConsoleUI():
                     print "Input Error!"
 
                     user_input = raw_input("Try Again: ")
-
-                #Reset the variables
-                self.brute_force.reset()
 
                 if user_input in ("Back", "back", "b"):
 
@@ -1397,9 +1581,6 @@ class ConsoleUI():
                     print "Input Error!"
 
                     user_input = raw_input("Try Again: ")
-
-                #Reset the variables
-                self.brute_force.reset()
 
                 if user_input in ("Back", "back", "b"):
 
@@ -1668,6 +1849,8 @@ class ConsoleUI():
                     print "Input Error!"
 
                     alphabet = raw_input("Try Again: ")
+
+                alphabet_string = self.convert_to_string(alphabet)
 
                 #Get dimensions
                 print
@@ -2166,5 +2349,43 @@ class ConsoleUI():
                 return False
 
         return True
+
+    #Convert an alphabet choice to an alphabet string
+    @staticmethod
+    def convert_to_string(alphabet_choice):
+
+        choices_list = list(alphabet_choice)
+
+        lower_alphabet = "abcdefghijklmnopqrstuvwxyz_"
+        upper_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+        digits = "0123456789_"
+        punctuation = string.punctuation + " "
+
+        lower_alphabet_list = list(lower_alphabet)
+        upper_alphabet_list = list(upper_alphabet)
+        digits_list = list(digits)
+        punctuation_list = list(punctuation)
+
+        alphabet_string = ""
+
+        for choice in choices_list:
+
+            if choice == "a":
+
+                alphabet_string += lower_alphabet_list
+
+            elif choice == "A":
+
+                alphabet_string += upper_alphabet_list
+
+            elif choice == "p":
+
+                alphabet_string += punctuation_list
+
+            elif choice == "d":
+
+                alphabet_string += digits_list
+
+        return alphabet_string
 
 ConsoleUI()
