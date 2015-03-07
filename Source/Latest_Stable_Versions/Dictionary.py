@@ -74,7 +74,7 @@ class Dictionary():
     #Sets the dictionary file's name
     def setFileName(self, fileName):
 
-        self.fileName = str(fileName)  + ".txt"
+        self.fileName = str(fileName)
 
         #Checks for filenotfound and returns code to caller class
         try:
