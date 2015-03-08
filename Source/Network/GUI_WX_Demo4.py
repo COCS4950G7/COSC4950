@@ -121,18 +121,49 @@ class PanelFour(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
+        gsizer= wx.GridSizer(15,1,2,2)
+        listOfAlgorithms= ['MD5', 'SHA 1', 'SHA 224', 'SHA 256', 'SHA 512']
+        listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        #TODO add support for custom combinations of alphabets
 
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        #settings needed for starting server
+        #---------cracking method
+        #---------algorithm
+        #--------hash
+        #----------min key length
+        #-----------max key length
+        #----------alphabet
+        #-----------single (yes/no)
+        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input", style=wx.ALIGN_CENTER_HORIZONTAL)
+        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5", style=wx.ALIGN_CENTER_HORIZONTAL)
+        changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15", style=wx.ALIGN_CENTER_HORIZONTAL)
+        changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet:", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL)
         BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (self.currentMode, 0, wx.ALIGN_CENTER, 9),
+                        (self.selectedAlgorithmHeader, 0, wx.ALIGN_CENTER, 9),
+                        (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
+                        (self.inputHashHeader, 0, wx.ALIGN_CENTER, 9),
+                        (inputHashButton, 0, wx.ALIGN_CENTER, 9),
+                        (self.minKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
+                        (changeMinKeyLengthButton,0, wx.ALIGN_CENTER, 9),
+                        (self.maxKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
+                        (changeMaxKeyLengthButton, 0, wx.ALIGN_CENTER, 9),
+                        (self.selectedAlphabetHeader, 0, wx.ALIGN_CENTER, 9),
+                        (self.selectedAlphabet,0, wx.ALIGN_CENTER, 9),
                         (self.StartConnectButton, 0 , wx.ALIGN_CENTER, 9),
                         (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
                         (CloseButton, 0, wx.ALIGN_CENTER, 9)])
@@ -141,7 +172,10 @@ class PanelFour(wx.Panel):
         self.SetSizer(hbox)
 
         #Bind the buttons to events
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
+        changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
+        changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -377,6 +411,12 @@ class myFrame(wx.Frame):
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
+    def setBruteForceHashToBeCracked(self, event):
+        dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked", "Input Hash", "", style=wx.OK)
+        dial.ShowModal()
+        self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
+        dial.Destroy()
+
     def selectDictFile(self, event):
         dial= wx.FileDialog(self, message="Choose a Dictionary File", defaultFile="",
                              style=wx.OPEN|wx.MULTIPLE|wx.CHANGE_DIR)
@@ -392,6 +432,20 @@ class myFrame(wx.Frame):
 
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
+
+    def setBFMinKeyLength(self, event):
+        dial = wx.TextEntryDialog(self, "Input the Min Key Length", "Input Min Key Length", "", style=wx.OK)
+        dial.ShowModal()
+        #TODO add check for valid input
+        self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(dial.GetValue()))
+        dial.Destroy()
+
+    def setBFMaxKeyLength(self, event):
+        dial= wx.TextEntryDialog(self, "Input the Max Key Length", "Input Max Key Length","", style=wx.OK)
+        dial.ShowModal()
+        #TODO add check for valid input
+        self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(dial.GetValue()))
+        dial.Destroy()
 
     def onSingleModeButtonClick(self, e):
         self.panel_two.currentMode.SetLabel("Current Mode: Single Mode")
@@ -411,18 +465,6 @@ class myFrame(wx.Frame):
         crackingMethodSetting= "dic"
         tempAlgorithmSetting= str(self.panel_three.selectedAlgorithm.GetValue())
         algorithmSetting= tempAlgorithmSetting
-     #   if(tempAlgorithmSetting is 'MD5'):
-      #      algorithmSetting= "MD5"
-      #  elif(tempAlgorithmSetting is 'SHA 1'):
-      #      algorithmSetting= "SHA1"
-      #  elif(tempAlgorithmSetting is 'SHA 224'):
-      #      algorithmSetting= "SHA224"
-      #  elif(tempAlgorithmSetting is 'SHA 256'):
-      #      algorithmSetting= "SHA256"
-      #  elif(tempAlgorithmSetting is 'SHA 512'):
-      #      algorithmSetting= "SHA512"
-      #  else:
-       #     raise Exception ("GUI ERROR: invalid tempAlgorithmSetting: '"+str(tempAlgorithmSetting)+"'")
         tempHashSetting= str(self.panel_three.inputHashHeader.GetLabel())
         hashSetting= ""
         for i in range(19, len(tempHashSetting)):
@@ -441,6 +483,40 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,))
+        self.NetworkServer.start()
+
+    def startBruteForceCrack(self, event):
+        crackingMethodSetting= "bf"
+        tempAlgorithmSetting= str(self.panel_four.selectedAlgorithm.GetValue())
+        algorithmSetting= tempAlgorithmSetting
+        tempHashSetting= str(self.panel_four.inputHashHeader.GetLabel())
+        hashSetting=""
+        for i in range(19, len(tempHashSetting)):
+            hashSetting+= tempHashSetting[i]
+        tempMinKeyLength= str(self.panel_four.minKeyLengthHeader.GetLabel())
+        minKeyLengthSetting=""
+        for i in range(15, len(tempMinKeyLength)):
+            minKeyLengthSetting+= tempMinKeyLength[i]
+        finalMinKeyLengthSetting= int(minKeyLengthSetting)
+        tempMaxKeyLength= str(self.panel_four.maxKeyLengthHeader.GetLabel())
+        maxKeyLengthSetting=""
+        for i in range(15, len(tempMaxKeyLength)):
+            maxKeyLengthSetting+= tempMaxKeyLength[i]
+        finalMaxKeyLengthSetting= int(maxKeyLengthSetting)
+        tempAlphabetSetting= str(self.panel_four.selectedAlphabet.GetValue())
+        alphabetSetting= tempAlphabetSetting
+        tempSingleSetting= str(self.panel_four.currentMode.GetLabel())
+        tempSingleSetting2=""
+        for i in range(14, len(tempSingleSetting)):
+            tempSingleSetting2+= tempSingleSetting[i]
+        singleSetting=""
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+            singleSetting="True"
+        else:
+            singleSetting="False"
+        crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
+                           "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
         self.NetworkServer.start()
 

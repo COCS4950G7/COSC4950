@@ -51,11 +51,20 @@ class Server():
             self.settings = settings
             self.get_ip()
             self.cracking_mode = settings["cracking method"]
-            print "DEBUG: cracking method= "+str(settings["cracking method"])
-            print "DEBUG: algorithm= "+str(settings["algorithm"])
-            print "DEBUG: hash= "+str(settings["hash"])
-            print "DEBUG: file name= "+str(settings["file name"])
-            print "DEBUG: single= "+str(settings["single"])
+            #Dictionary settings check
+            #print "DEBUG: cracking method= "+str(settings["cracking method"])
+            #print "DEBUG: algorithm= "+str(settings["algorithm"])
+            #print "DEBUG: hash= "+str(settings["hash"])
+            #print "DEBUG: file name= "+str(settings["file name"])
+            #print "DEBUG: single= "+str(settings["single"])
+            #Brute Force settings Check
+            #print "DEBUG: cracking method= "+str(settings["cracking method"])
+            #print "DEBUG: algorithm= "+str(settings["algorithm"])
+            #print "DEBUG: hash= "+str(settings["hash"])
+            #print "DEBUG: min key length= "+str(settings["min key length"])
+            #print "DEBUG: max key length= "+str(settings["max key length"])
+            #print "DEBUG: alphabet= "+str(settings["alphabet"])
+            #print "DEBUG: single= "+str(settings["single"])
             if "single" in settings:
                 if settings["single"] == "True":
                     self.single_user_mode = True
