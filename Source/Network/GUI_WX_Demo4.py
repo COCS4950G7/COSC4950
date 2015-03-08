@@ -425,7 +425,7 @@ class myFrame(wx.Frame):
        #     raise Exception ("GUI ERROR: invalid tempAlgorithmSetting: '"+str(tempAlgorithmSetting)+"'")
         tempHashSetting= str(self.panel_three.inputHashHeader.GetLabel())
         hashSetting= ""
-        for i in range(19, len(tempAlgorithmSetting)):
+        for i in range(19, len(tempHashSetting)):
             hashSetting+= tempHashSetting[i]
         tempFileName= str(self.panel_three.inputDictFileHeader.GetLabel())
         FileName= ""
