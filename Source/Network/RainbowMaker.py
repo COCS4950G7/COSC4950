@@ -349,7 +349,7 @@ class RainbowMaker():
         #big list containing all the lines from the nodes
         bigChunk = ""
 
-        subChunkSize = 10
+        subChunkSize = 100
 
         #Create lock
         lock = Lock()

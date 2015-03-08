@@ -116,8 +116,18 @@ class Server():
                     if not self.single_user_mode:
                         mode_bit_1.clear()
                         mode_bit_2.set()
-                    return  # haven't figured out how to set this up yet
+
+                    rain = RainbowUser.RainbowUser()
+                    rain.setFileName(self.settings["file name"])
+                    rain.setHash(self.settings["hash"])
+                    rain.gatherInfo()
+
+                    chunk_maker = Process(target=self.chunk_rainbow, args=(rain, manager, shared_job_q, shutdown))
+
                 elif self.cracking_mode == "rainmaker":
+                    if not self.single_user_mode:
+                        mode_bit_1.clear()
+                        mode_bit_2.clear()
                     rainmaker = self.rainmaker
 
                     rainmaker.setAlgorithm(self.settings['algorithm'])
@@ -129,9 +139,6 @@ class Server():
 
                     chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, shared_job_q, shutdown))
 
-                    if not self.single_user_mode:
-                        mode_bit_1.clear()
-                        mode_bit_2.clear()
                 else:
                     return "wtf?"
 
@@ -147,7 +154,8 @@ class Server():
                 # Sleep a bit before shutting down the server - to give clients time to
                 # realize the job queue is empty and exit in an orderly way.
                 time.sleep(2)
-                manager.shutdown()
+                if not self.single_user_mode:
+                    manager.shutdown()
 
                 return
             except Exception as inst:
@@ -369,10 +377,27 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunks for rainbow function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow(self, rainbow, job_queue):
+        def chunk_rainbow(self, rainbow, manager, job_queue, shutdown):
             try:
-                #INSERT CODE HERE
-                return
+                while not rainbow.isEof() and not shutdown.is_set():
+                    chunk = rainbow.getNextChunk()
+                    if self.single_user_mode:
+                        job_queue.put(chunk)
+                    else:
+                        new_chunk = manager.Value(dict, {'params': chunk.params,
+                                                         'data': chunk.data,
+                                                         'timestamp': time.time()})
+                        job_queue.put(new_chunk)
+                        self.sent_chunks.append((chunk.params, time.time()))
+                    if shutdown.is_set():
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                return
+                            finally:
+                                return
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow definition Try block"
@@ -397,7 +422,14 @@ class Server():
                     new_chunk = {"params": paramsChunk.params,
                                  "data": paramsChunk.data}
                     job_queue.put(new_chunk)
-
+                    if shutdown.is_set():
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                return
+                            finally:
+                                return
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
@@ -501,6 +533,7 @@ class Server():
                 if self.cracking_mode == "dic":
                     print "Starting dictionary cracking."
                     dictionary = Dictionary.Dictionary()
+
                     chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                     chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                     chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
@@ -513,17 +546,14 @@ class Server():
                     else:
                         if self.cracking_mode == "rain":
                             print "Starting rainbow table cracking."
-                            return  # haven't figured out how to set this up yet
+                            rainbow = RainbowUser.RainbowUser()
+
+                            chunk_runner.append(Process(target=self.run_rain_user(rainbow, job_queue, result_queue, shutdown)))
                         else:
                             if self.cracking_mode == "rainmaker":
                                 print "Starting rainbow table generator."
-
                                 rainmaker = RainbowMaker.RainbowMaker()
-                                rainmaker.setAlgorithm(self.settings['algorithm'])
-                                rainmaker.setNumChars(self.settings['key length'])
-                                rainmaker.setAlphabet(self.settings['alphabet'])
-                                rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
-                                rainmaker.setFileName(self.settings['file name'])
+
                                 chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
                             else:
                                 return "wtf?"
@@ -604,8 +634,19 @@ class Server():
                 bf.terminate_processes()
 
         def run_rain_user(self, rain, job_queue, result_queue, shutdown):
+            while not shutdown.is_set():
+                try:
+                    chunk = job_queue.get(block=True, timeout=.25)
+                except Qqueue.Empty:
+                    continue
+                rain.find(chunk)
+                if rain.isFound():
+                    result_queue.put(("w", rain.getKey()))
+                elif chunk.params.split()[10] == "True":
+                    result_queue.put(("e", chunk.params))
+                else:
+                    result_queue.put(("f", chunk.params))
 
-            return
 
         def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
             while not shutdown.is_set():

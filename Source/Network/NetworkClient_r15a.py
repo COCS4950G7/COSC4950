@@ -64,12 +64,15 @@ class Client():
                     chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown)))
                 else:
                     if self.cracking_mode == "rain":
+                        rainbow = RainbowUser.RainbowUser()
                         print "Starting rainbow table cracking."
-                        return  # haven't figured out how to set this up yet
+
+                        chunk_runner.append(Process(target=self.run_rain_user(rainbow, job_queue, result_queue, shutdown)))
                     else:
                         if self.cracking_mode == "rainmaker":
                             rainmaker = RainbowMaker.RainbowMaker()
                             print "Starting rainbow table generator."
+
                             chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
                         else:
                             return "wtf?"
@@ -214,15 +217,39 @@ class Client():
             bf.terminate_processes()
 
     def run_rain_user(self, rain, job_queue, result_queue, shutdown):
-        #NEEDS ERROR HANDLING!!!!!!!!!!
-        return
+        try:
+            while not shutdown.is_set():
+                try:
+                    job = job_queue.get(block=True, timeout=.25)
+                except Queue.Empty:
+                    continue
+                chunk = Chunk.Chunk()
+                chunk.params = job.value["params"]
+                chunk.data = job.value["data"]
+                rain.find(chunk)
+                if rain.isFound():
+                    result_queue.put(("w", rain.getKey()))
+                elif chunk.params.split()[10] == "True":
+                    result_queue.put(("e", chunk.params))
+                else:
+                    result_queue.put(("f", chunk.params))
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in run_rain_user definition try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
 
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
         while not shutdown.is_set():
             paramsChunk = Chunk.Chunk()
             try:
                 job = job_queue.get(block=True, timeout=.25)
-            except Qqueue.Empty:
+            except Queue.Empty:
                 continue
             paramsChunk.params = job["params"]
             chunkOfDone = maker.create(paramsChunk)
