@@ -292,7 +292,7 @@ class RainbowUser():
         chunk.data = data
 
         chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabetChoice)
-        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 "
+        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 " + str(eof)
 
         return chunk
 
