@@ -251,7 +251,7 @@ class Client():
                 job = job_queue.get(block=True, timeout=.25)
             except Queue.Empty:
                 continue
-            paramsChunk.params = job.value["params"]
+            paramsChunk.params = job["params"]
             chunkOfDone = maker.create(paramsChunk)
             result_queue.put(('f', chunkOfDone))
     #===================================================================================================================
