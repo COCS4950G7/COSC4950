@@ -46,8 +46,8 @@ class start():
                      "algorithm": "md5",
                      "key length": 10,
                      "alphabet": string.ascii_letters+string.digits+string.punctuation,
-                     "chain length": 10000,
-                     "num rows": 1000,
+                     "chain length": 100000,
+                     "num rows": 1000000,
                      "file name": "rain.txt",
                      "single": "True"})
 
@@ -55,19 +55,19 @@ class start():
                      "algorithm": "md5",
                      "key length": 10,
                      "alphabet": string.ascii_letters+string.digits+string.punctuation,
-                     "chain length": 10000,
-                     "num rows": 1000,
-                     "file name": "raintable.txt",
+                     "chain length": 100000,
+                     "num rows": 1000000,
+                     "file name": "rain.txt",
                      "single": "False"})
 
     settings.append({"cracking method": "rain",  # settings[6]
-                     "file name": "raintable.txt",
+                     "file name": "rain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
                      "hash": "a636dca45158e4b5e1b06f17b06b2276",
                      "single": "True"})
 
     settings.append({"cracking method": "rain",  # settings[7]
-                     "file name": "raintable.txt",
+                     "file name": "rain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
                      "hash": "a636dca45158e4b5e1b06f17b06b2276",
                      "single": "False"})
@@ -77,7 +77,7 @@ class start():
         return
 
     def start_server(self):
-        self.server = Process(target=Server, args=(self.settings[7],))
+        self.server = Process(target=Server, args=(self.settings[6],))
         self.server.start()
         self.server.join()
         self.server.terminate()
