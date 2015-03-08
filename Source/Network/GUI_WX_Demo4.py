@@ -429,7 +429,7 @@ class myFrame(wx.Frame):
             hashSetting+= tempHashSetting[i]
         tempFileName= str(self.panel_three.inputDictFileHeader.GetLabel())
         FileName= ""
-        for i in range(25, len(tempFileName)):
+        for i in range(26, len(tempFileName)):
             FileName+= tempFileName[i]
         tempSingleSetting= str(self.panel_three.currentMode.GetLabel())
         tempSingleSetting2=""
