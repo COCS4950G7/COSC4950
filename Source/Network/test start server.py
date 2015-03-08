@@ -15,19 +15,19 @@ class start():
                 #"hash": "e7c0efb2dc699ede79983b8dfb5cb509ebf2bde9",  # Karntnerstrasse-Rotenturmstrasse in sha1
                 #"hash": "7ab5f3733019c9e594526c9beb70c0cc51517b91a6557f4b4306564b753232af",  # Karntnerstrasse-Rotenturmstrasse in sha256
                 "hash": "86034bef1d027523698b6a0768bb024fafb11d9b23890cd1829592e12c5ef0fa83e6eee93adc4919296b4ffa957ce036139a39b2bd6301d4fdae03bdbeab96a3",  # Karntnerstrasse-Rotenturmstrasse in sha512
-                "file name": "realuniq",                    # last word in dic.txt
-                "single": "False"})                    # (long runtime on realuniq dictionary ~755M lines)
+                "file name": "realuniq.txt",                    # last word in dic.txt
+                "single": "True"})                    # (long runtime on realuniq dictionary ~755M lines)
 
     settings.append({"cracking method": "dic",  # settings[1]
                  "algorithm": "sha1",
                  "hash": "33da7a40473c1637f1a2e142f4925194",  # popcorn
-                 "file name": "dic",                   # very short runtime in dic.txt
+                 "file name": "dic.txt",                   # very short runtime in dic.txt
                  "single": "True"})                    # (short run time on realuniq dictionary ~18M lines)
 
     settings.append( {"cracking method": "dic",  # settings[2]
                  "algorithm": "md5",
                  "hash": "9d86c2b0caad030430c093530b77ba63",  # Sixth line from the bottom, non-ascii characters
-                 "file name": "realuniq",
+                 "file name": "realuniq.txt",
                  })                   # (longest run time on realuniq dictionary ~1.2B lines)
 
     settings.append( {"cracking method": "bf",  # settings[3]
@@ -39,7 +39,7 @@ class start():
                  #"hash": "57178f9de330d80155a1f5feca08569cede59da3e5d59b3e3a861c93e37b44cdda355023bc74cb10c495f53413981373a78e9926bf249d3b862c795f23ee1d9c",  # aa9999 in sha512
                  "min key length": 6,                         # short runtime
                  "max key length": 16,
-                 "alphabet": string.ascii_letters+string.digits+string.punctuation,
+                 "alphabet": string.ascii_letters+string.digits+string.punctuation+' ',
                  "single": "True"})
 
     settings.append({"cracking method": "rainmaker",  # settings[4]
@@ -69,7 +69,7 @@ class start():
     settings.append({"cracking method": "rain",  # settings[7]
                      "file name": "rain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
-                     "hash": "a636dca45158e4b5e1b06f17b06b2276",
+                     "hash": "8feb4168837017c880fd9c79f602af82",
                      "single": "False"})
 
     def __init__(self):
@@ -77,7 +77,7 @@ class start():
         return
 
     def start_server(self):
-        self.server = Process(target=Server, args=(self.settings[6],))
+        self.server = Process(target=Server, args=(self.settings[0],))
         self.server.start()
         self.server.join()
         self.server.terminate()
