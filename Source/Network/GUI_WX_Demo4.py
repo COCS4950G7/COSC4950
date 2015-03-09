@@ -319,6 +319,32 @@ class PanelNine(wx.Panel):
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
+class PanelTen(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
+
+        #define the buttons and widgets
+        screenHeader= wx.StaticText(self, label="Single Mode Status Screen", style= wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style= wx.ALIGN_CENTER_HORIZONTAL)
+        quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
+
+        #add buttons to the grid
+        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
+            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
+            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+
+        #Bind the buttons to events
+        quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+
+
 class myFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(800, 600))
@@ -332,6 +358,7 @@ class myFrame(wx.Frame):
         self.panel_seven= PanelSeven(self)
         self.panel_eight= PanelEight(self)
         self.panel_nine= PanelNine(self)
+        self.panel_ten= PanelTen(self)
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
@@ -340,6 +367,7 @@ class myFrame(wx.Frame):
         self.panel_seven.Hide()
         self.panel_eight.Hide()
         self.panel_nine.Hide()
+        self.panel_ten.Hide()
 
         self.sizer= wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.panel_one, 1, wx.EXPAND)
@@ -351,6 +379,7 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_seven, 1, wx.EXPAND)
         self.sizer.Add(self.panel_eight, 1, wx.EXPAND)
         self.sizer.Add(self.panel_nine, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_ten, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
     #---------switch from Panel 1
@@ -411,6 +440,12 @@ class myFrame(wx.Frame):
         self.panel_three.Hide()
         self.panel_nine.Show()
         self.Layout()
+
+    def switchFromPanel3ToPanel10(self):
+        self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_three.Hide()
+        self.panel_ten.Show()
+        self.Layout()
     #----------end switch from panel 3
 
     #--------switch from panel 4
@@ -424,6 +459,12 @@ class myFrame(wx.Frame):
         self.SetTitle("Mighty Cracker: Network Server Status Screen")
         self.panel_four.Hide()
         self.panel_nine.Show()
+        self.Layout()
+
+    def switchFromPanel4ToPanel10(self):
+        self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_four.Hide()
+        self.panel_ten.Show()
         self.Layout()
     #---------end switch from panel 4
 
@@ -486,7 +527,11 @@ class myFrame(wx.Frame):
     #-----------end of switch from panel 9
 
     #-----------switch from panel 10
-
+    def switchFromPanel10ToPanel1(self):
+        self.SetTitle("Mighty Cracker")
+        self.panel_ten.Hide()
+        self.panel_one.Show()
+        self.Layout()
     #------------end of switch from panel 10
 
     #defined functions
@@ -611,8 +656,7 @@ class myFrame(wx.Frame):
         if(singleSetting is 'False'):
             self.switchFromPanel3ToPanel9()
         else:
-            #TODO call single mode screen
-            fakevar=False
+            self.switchFromPanel3ToPanel10()
 
 
     def startBruteForceCrack(self, event):
@@ -651,8 +695,7 @@ class myFrame(wx.Frame):
         if(singleSetting is 'False'):
             self.switchFromPanel4ToPanel9()
         else:
-            #TODO call single mode screen
-            fakeVar= False
+            self.switchFromPanel4ToPanel10()
 
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
