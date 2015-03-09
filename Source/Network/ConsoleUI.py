@@ -26,8 +26,8 @@ import string
 
 from Dictionary import Dictionary
 from Brute_Force import Brute_Force
-from NetworkClient import Client
-from NetworkServer import Server
+from NetworkClient_r15a import Client
+from NetworkServer_r15a import Server
 from RainbowMaker import RainbowMaker
 from RainbowUser import RainbowUser
 

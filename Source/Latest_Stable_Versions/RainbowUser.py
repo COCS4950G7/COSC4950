@@ -66,8 +66,11 @@ class RainbowUser():
 
 
     #Get the alphabet and direction to be searched
-    def setAlphabet(self, alphabetChoice):
+    def setAlphabet(self, alphabet):
 
+        self.alphabet = list(alphabet)
+
+        '''
         choicesList = list(alphabetChoice)
 
         self.alphabetChoice = ""
@@ -111,6 +114,7 @@ class RainbowUser():
                 return False
 
         return True
+    '''
 
 
     #Get file name
@@ -196,7 +200,7 @@ class RainbowUser():
         self.algorithm = 1
         self.numChars = 1
         self.alphabet = 1
-        self.alphabetChoice = 1
+        #self.alphabetChoice = 1
         self.fileName = "1"
         self.file = 1
         self.width = 1
@@ -215,9 +219,9 @@ class RainbowUser():
 
         self.hash = paramsList[2]
 
-        self.alphabetChoice = paramsList[3]
+        self.alphabet = paramsList[3]
 
-        self.setAlphabet(self.alphabetChoice)
+        self.setAlphabet(self.alphabet)
 
         self.numChars = int(paramsList[4])
 
@@ -274,7 +278,7 @@ class RainbowUser():
             lineCounter += 1
 
             #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 100:
+            if lineCounter >= 1000:
 
                 line = ""
 
@@ -291,8 +295,8 @@ class RainbowUser():
 
         chunk.data = data
 
-        chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabetChoice)
-        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 "
+        chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabet)
+        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 " + str(eof)
 
         return chunk
 
@@ -512,7 +516,9 @@ class RainbowUser():
 
         self.numChars = int(varsList[1])
 
-        self.alphabetChoice = varsList[2]
+        self.alphabet = varsList[2]
+
+        self.alphabet = self.setAlphabet(self.alphabet)
 
         self.width = int(varsList[3])
         #print self.width
