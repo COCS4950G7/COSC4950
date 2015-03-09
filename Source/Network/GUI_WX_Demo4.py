@@ -263,10 +263,61 @@ class PanelSeven(wx.Panel):
 
         #Bind the buttons to events
         InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
-        ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.connectToServer)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel7ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
+class PanelEight(wx.Panel):
+    def __init__(self,parent):
+        wx.Panel.__init__(self, parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
+
+        #define buttons and widgets
+        screenHeader= wx.StaticText(self, label="Network Client Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.connectedToIP= wx.StaticText(self, label="Connected To: Not Connected to any Server", style=wx.ALIGN_CENTER_HORIZONTAL)
+        disconnectClientButton= wx.Button(self, label="Disconnect From Server", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+
+        #add buttons to the grid
+        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
+            (self.connectedToIP, 0, wx.ALIGN_CENTER, 9),
+            (disconnectClientButton, 0, wx.ALIGN_CENTER, 9),
+            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+
+        #Bind the buttons to events
+        disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+
+class PanelNine(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
+
+        #define the buttons and widgets
+        screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
+        forceQuitServerButton= wx.Button(self, label="Close the server", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+
+        #add buttons the the grid
+        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+                        (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
+                        (forceQuitServerButton, 0, wx.ALIGN_CENTER, 9),
+                        (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+
+        #Bind the buttons to events
+        forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class myFrame(wx.Frame):
     def __init__(self):
@@ -279,12 +330,16 @@ class myFrame(wx.Frame):
         self.panel_five= PanelFive(self)
         self.panel_six= PanelSix(self)
         self.panel_seven= PanelSeven(self)
+        self.panel_eight= PanelEight(self)
+        self.panel_nine= PanelNine(self)
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
         self.panel_five.Hide()
         self.panel_six.Hide()
         self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_nine.Hide()
 
         self.sizer= wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.panel_one, 1, wx.EXPAND)
@@ -294,6 +349,8 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_five, 1, wx.EXPAND)
         self.sizer.Add(self.panel_six, 1, wx.EXPAND)
         self.sizer.Add(self.panel_seven, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_eight, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_nine, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
     #---------switch from Panel 1
@@ -348,6 +405,12 @@ class myFrame(wx.Frame):
         self.panel_three.Hide()
         self.panel_one.Show()
         self.Layout()
+
+    def switchFromPanel3ToPanel9(self):
+        self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_three.Hide()
+        self.panel_nine.Show()
+        self.Layout()
     #----------end switch from panel 3
 
     #--------switch from panel 4
@@ -355,6 +418,12 @@ class myFrame(wx.Frame):
         self.SetTitle("Mighty Cracker")
         self.panel_four.Hide()
         self.panel_one.Show()
+        self.Layout()
+
+    def switchFromPanel4ToPanel9(self):
+        self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_four.Hide()
+        self.panel_nine.Show()
         self.Layout()
     #---------end switch from panel 4
 
@@ -392,7 +461,33 @@ class myFrame(wx.Frame):
         self.panel_seven.Hide()
         self.panel_one.Show()
         self.Layout()
+
+    def switchFromPanel7ToPanel8(self):
+        self.SetTitle("Mighty Cracker: Client Status")
+        self.panel_seven.Hide()
+        self.panel_eight.Show()
+        self.Layout()
     #--------------end of switch from panel 7
+
+    #---------switch from panel 8
+    def switchFromPanel8ToPanel1(self):
+        self.SetTitle("Mighty Cracker")
+        self.panel_eight.Hide()
+        self.panel_one.Show()
+        self.Layout()
+    #---------end of switch from panel 8
+
+    #---------switch from panel 9
+    def switchFromPanel9ToPanel1(self):
+        self.SetTitle("Mighty Cracker")
+        self.panel_nine.Hide()
+        self.panel_one.Show()
+        self.Layout()
+    #-----------end of switch from panel 9
+
+    #-----------switch from panel 10
+
+    #------------end of switch from panel 10
 
     #defined functions
     def ShowNotFinishedMessage1(self, event):
@@ -430,6 +525,20 @@ class myFrame(wx.Frame):
         if dial == wx.YES:
             self.Close()
 
+    def disconnectClient(self, event):
+        dial= wx.MessageBox('Are you sure you want to disconnect from the server? Disconnecting before the search is finished could cause errors',
+                            'Disconnect from Server?', wx.YES_NO|wx.NO_DEFAULT, self)
+        if dial == wx.YES:
+            self.NetworkClient.terminate()
+            self.switchFromPanel8ToPanel1()
+
+    def forceCloseServer(self, event):
+        dial= wx.MessageBox('Are you sure you want to close the server? Closing the server will forcifully disconnect all clients.',
+                            'Close the Server?', wx.YES_NO|wx.NO_DEFAULT, self)
+        if(dial == wx.YES):
+            self.NetworkServer.terminate()
+            self.switchFromPanel9ToPanel1()
+
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
 
@@ -461,6 +570,20 @@ class myFrame(wx.Frame):
         self.panel_five.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
         self.switchFromPanel6ToPanel2()
 
+    def connectToServer(self, event):
+        tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
+        #TODO need error checking to make sure that the server ip has been entered
+        #remove the prefix to th eip address
+        serverIP=""
+        for i in range(21, len(tempServerIP)):
+            serverIP+= tempServerIP[i]
+        print "GUI DEBUG: started Network Client"
+        print "GUI DEBUG: server IP: '"+str(serverIP)+"'"
+        self.NetworkClient= Process(target=Client, args=(serverIP,))
+        self.NetworkClient.start()
+        self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
+        self.switchFromPanel7ToPanel8()
+
     def startDictionaryCrack(self, event):
         crackingMethodSetting= "dic"
         tempAlgorithmSetting= str(self.panel_three.selectedAlgorithm.GetValue())
@@ -485,6 +608,12 @@ class myFrame(wx.Frame):
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
         self.NetworkServer.start()
+        if(singleSetting is 'False'):
+            self.switchFromPanel3ToPanel9()
+        else:
+            #TODO call single mode screen
+            fakevar=False
+
 
     def startBruteForceCrack(self, event):
         crackingMethodSetting= "bf"
@@ -519,6 +648,11 @@ class myFrame(wx.Frame):
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
         self.NetworkServer.start()
+        if(singleSetting is 'False'):
+            self.switchFromPanel4ToPanel9()
+        else:
+            #TODO call single mode screen
+            fakeVar= False
 
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
