@@ -5,6 +5,7 @@ import wx
 from multiprocessing import Process
 from NetworkServer_r15a import Server
 from NetworkClient_r15a import Client
+import sys
 
 class PanelOne(wx.Panel):
     def __init__(self, parent):
@@ -272,6 +273,7 @@ class PanelEight(wx.Panel):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
+        print "GUI DEBUG: connected to the server"
 
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Client Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -303,17 +305,23 @@ class PanelNine(wx.Panel):
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
+        consoleOutputLog= wx.TextCtrl(self, size=(300,100),style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
         forceQuitServerButton= wx.Button(self, label="Close the server", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons the the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
+                        (consoleOutputLog, 0, wx.ALIGN_CENTER, 9),
                         (forceQuitServerButton, 0, wx.ALIGN_CENTER, 9),
                         (CloseButton, 0, wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
+
+        #redirect console text
+        redir= RedirectText(consoleOutputLog)
+        sys.stdout=redir
 
         #Bind the buttons to events
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
@@ -344,6 +352,15 @@ class PanelTen(wx.Panel):
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
+class RedirectText:
+    def __init__(self,aWxTextCtrl):
+        self.out=aWxTextCtrl
+
+    def write(self,string):
+        self.out.WriteText(string)
+
+    def flush(self):
+        pass
 
 class myFrame(wx.Frame):
     def __init__(self):
@@ -652,7 +669,11 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
+        print "GUI DEBUG: before daemon set true"
+        self.NetworkServer.daemon = True
+        print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
+        print "GUI DEBUG: after process has started"
         if(singleSetting is 'False'):
             self.switchFromPanel3ToPanel9()
         else:
@@ -697,6 +718,8 @@ class myFrame(wx.Frame):
         else:
             self.switchFromPanel4ToPanel10()
 
+
+
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
             posA = startA
@@ -719,7 +742,7 @@ class myFrame(wx.Frame):
 
 
 if __name__ == '__main__':
-    app= wx.App(False)
+    app= wx.App(0)
     frame= myFrame()
     frame.Show()
     app.MainLoop()
