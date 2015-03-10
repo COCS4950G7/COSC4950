@@ -6,17 +6,6 @@
 #   Chris Bugg
 #   10/7/14
 
-#   What should work:
-#   - Single -> Dictionary
-#            -> Brute Force
-#            ->
-#            ->
-#   - Server -> Dictionary
-#            -> Brute Force
-#            ->
-#            ->
-#   - Node Mode
-
 
 #Imports
 import time
@@ -24,12 +13,8 @@ import os
 from multiprocessing import Process, Value, Array
 import string
 
-from Dictionary import Dictionary
-from Brute_Force import Brute_Force
-from NetworkClient import Client
-from NetworkServer import Server
-from RainbowMaker import RainbowMaker
-from RainbowUser import RainbowUser
+from NetworkClient_r15a import Client
+from NetworkServer_r15a import Server
 
 
 class ConsoleUI():
@@ -37,10 +22,6 @@ class ConsoleUI():
     #Class variables
     settings = dict()
     done = False
-    rainbow_Maker = RainbowMaker()
-    rainbow_User = RainbowUser()
-    dictionary = Dictionary()
-    brute_force = Brute_Force()
 
     #Initializing variable to a default value
     serverIP = "127.0.1.1"
@@ -67,7 +48,7 @@ class ConsoleUI():
 
     #Defining network sub-processes as class variables that are instances of the network objects
     networkServer = Process(target=Server, args=(settings, list_of_shared_variables,))
-    networkClient = Process(target=Client, args=(serverIP,))
+    networkClient = Process(target=Client, args=(serverIP, list_of_shared_variables,))
 
     #tempGUI Variables
     state = "startScreen"
@@ -405,15 +386,7 @@ class ConsoleUI():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                #userInput = raw_input("Choice: ")
-                if self.aLane:
-
-                    user_input = "d"
-                    print "Choice: d"
-
-                else:
-
-                    user_input = raw_input("Choice: ")
+                user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
                 good_names = {"bruteForce", "brute", "bf", "b", "rainbowMake", "make", "rainbowUser", "use",
@@ -553,12 +526,12 @@ class ConsoleUI():
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
 
+                self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
                 self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
                 self.settings['min key length'] = min_key_length
                 self.settings['max key length'] = max_key_length
-                #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -662,7 +635,6 @@ class ConsoleUI():
                     #We're done
                     self.done = True
 
-
             #############################################
             #############################################
             #if we're at the serverBruteNotFoundScreen state (Screen)
@@ -701,27 +673,53 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainUserScreen state (Screen)
             elif state == "serverRainUserScreen":
-                print "BROKE"
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
+
                 print "============="
                 print "Start -> Server -> Rainbow User"
                 print
-                print "(crackIt)"
-                print "(back)"
+
+                #Get the file name
+                print
+                file_name = raw_input("What's the file name (___.txt): ")
+                while not self.does_file_exist(file_name):
+
+                    print "File not found..."
+                    file_name = raw_input("What's the file name (___.txt): ")
+
+                #Get the hash
+                print
+                temp_hash = raw_input("What's the hash we're searching for: ")
+
+                self.settings['cracking method'] = "rain"
+                self.settings['hash'] = temp_hash
+                self.settings['file name'] = file_name + ".txt"
+                self.settings['single'] = "False"
+
+                #Get the go-ahead
+
+                print
+                print "Ready to go?"
+                print
+                print "Crack That Hash! (c)"
+                print
+                print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
 
-                if user_input == "crackIt":
+                #Sterolize inputs
+                good_names = {"Crack", "crack", "c", "Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
-                    ###GUI.setState("serverRainUserSearchingScreen")
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Crack", "crack", "c"):
+
                     self.state = "serverRainUserSearchingScreen"
 
-                    #get info from GUI and pass to Brute_Force class
+                elif user_input in ("Back", "back", "b"):
 
-                elif user_input == "back":
-
-                    ###GUI.setState("serverStartScreen")
                     self.state = "serverStartScreen"
 
                 else:
@@ -733,48 +731,70 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainUserSearchingScreen state (Screen)
             elif state == "serverRainUserSearchingScreen":
-                print "BROKE"
-                #display results and wait for user interaction
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "Start -> Server -> Rainbow User -> Searching..."
-                print
-                print "(back)"
-                print "(Exit)"
-                user_input = raw_input("Choice: ")
 
-                if user_input == "back":
+                self.networkServer.start()
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                #Stuff for those pretty status pictures stuff
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
+
+                #While we haven't gotten all through the file or found the key...
+                while not self.list_of_shared_variables[0].value:
+
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    #Ohhh, pretty status pictures
+                    print "Searching--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
+                    else:
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
+
+                    time.sleep(1)
+
+                if self.list_of_shared_variables[1].value:
+
+                    self.state = "serverRainUserFoundScreen"
 
                 else:
 
-                    #We're done
-                    self.done = True
+                    self.state = "serverRainUserNotFoundScreen"
 
             #############################################
             #############################################
             #if we're at the serverRainUserFoundScreen state (Screen)
             elif state == "serverRainUserFoundScreen":
-                print "BROKE"
-                #display results and wait for user interaction
 
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "Start -> Server -> Rainbow User -> Found!"
                 print
+                print "Key is: ", self.list_of_shared_variables[2].value
+                print "And it took", self.clock, "seconds."
+
                 print "(back)"
                 print "(Exit)"
+
                 user_input = raw_input("Choice: ")
 
-                if user_input == "back":
+                #Sterolize inputs
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Back", "back", "b"):
+
+                    self.state = "serverStartScreen"
 
                 else:
 
@@ -785,22 +805,29 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainUserNotFoundScreen state (Screen)
             elif state == "serverRainUserNotFoundScreen":
-                print "BROKE"
-                #display results and wait for user interaction
-
-                #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
-                print "Start -> Server -> Rainbow User -> Not Found"
+                print "Start -> Server -> Rainbow User -> Found!"
                 print
+                print "Sorry, we didn't find anything."
+                print "Just FYI though, that took", self.clock, "seconds."
+                print
+
                 print "(back)"
                 print "(Exit)"
+
                 user_input = raw_input("Choice: ")
 
-                if user_input == "back":
+                #Sterolize inputs
+                good_names = {"Back", "back", "b", "Exit", "exit"}
+                while not user_input in good_names:
 
-                    ###GUI.setState("serverRainUserScreen")
-                    self.state = "serverRainUserScreen"
+                    print "Input Error!"
+
+                    user_input = raw_input("Try Again: ")
+
+                if user_input in ("Back", "back", "b"):
+
+                    self.state = "serverStartScreen"
 
                 else:
 
@@ -813,7 +840,7 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainMakerScreen state (Screen)
             elif state == "serverRainMakerScreen":
-                print "BROKE"
+
                 print "============="
                 print "Start -> Server -> Rainbow Maker"
                 print
@@ -835,39 +862,38 @@ class ConsoleUI():
 
                     algorithm = raw_input("Try Again: ")
 
-                #Set algorithm of RainbowMaker to user input of 'algorithm'
-                self.rainbow_Maker.setAlgorithm(algorithm)
-
                 #Get the Number of chars of key
                 print
-                num_chars = raw_input("How many characters will the key be? ")
-                while not self.is_int(num_chars):
+                key_length = raw_input("How many characters will the key be? ")
+                while not self.is_int(key_length):
 
                     print "Input Error, Not an Integer!"
 
-                    num_chars = raw_input("Try Again: ")
-
-                self.rainbow_Maker.setNumChars(num_chars)
+                    key_length = raw_input("Try Again: ")
 
                 #Get the alphabet to be used
                 print
-                print "What's the alphabet: "
+                print "Choose your alphabet: "
                 print "0-9(d)"
                 print "a-z(a)"
                 print "A-Z(A)"
-                print "a-z&A-Z(m)"
-                print "a-z&A-Z&0-9(M)"
+                print "!-~(p)"
                 print
+                print "Add letters together to add"
+                print " multiple alphabets together."
+                print "IE: dap = 0-9 & a-z & !-~"
+                print
+
                 alphabet = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"d", "a", "A", "m", "M"}
-                while not alphabet in good_names:
+                while not self.is_valid_alphabet(alphabet):
 
                     print "Input Error!"
 
                     alphabet = raw_input("Try Again: ")
-                self.rainbow_Maker.setAlphabet(alphabet)
+
+                alphabet_string = self.convert_to_string(alphabet)
 
                 #Get dimensions
                 print
@@ -886,36 +912,42 @@ class ConsoleUI():
 
                     num_rows = raw_input("Try Again: ")
 
-                self.rainbow_Maker.setDimensions(chain_length, num_rows)
-
                 #Get the file name
                 print
                 file_name = raw_input("What's the file name: ")
-                self.rainbow_Maker.setFileName(file_name)
+
+                self.settings['cracking method'] = "rainmaker"
+                self.settings['algorithm'] = algorithm
+                self.settings['file name'] = file_name
+                self.settings['key length'] = key_length
+                self.settings['alphabet'] = alphabet_string
+                self.settings['chain length'] = chain_length
+                self.settings['num rows'] = num_rows
+                self.settings['single'] = "False"
 
                 #Get the go-ahead
                 print
                 print "Ready to go?"
                 print
-                print "(Create)"
+                print "Create the Table! (c)"
                 print
-                print "(Back)"
+                print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"Create", "create", "Back", "back", "Exit", "exit"}
+                good_names = {"Create", "create", "c", "Back", "back", "b", "Exit", "exit"}
                 while not user_input in good_names:
 
                     print "Input Error!"
 
                     user_input = raw_input("Try Again: ")
 
-                if user_input in ("Create", "create"):
+                if user_input in ("Create", "create", "c"):
 
-                    self.state = "serverRainMakerSearchingScreen"
+                    self.state = "serverRainMakerDoingScreen"
 
-                elif user_input in ("Back", "back"):
+                elif user_input in ("Back", "back", "b"):
 
                     self.state = "serverStartScreen"
 
@@ -926,106 +958,122 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverRainMakerSearchingScreen state (Screen)
-            elif state == "serverRainMakerSearchingScreen":
-                print "BROKE"
-                #display results and wait for user interaction
+            #if we're at the serverRainMakerDoingScreen state (Screen)
+            elif state == "serverRainMakerDoingScreen":
+
                 print "============="
                 print "Start -> Server -> Rainbow Maker -> Searching..."
                 print
 
-                #Start up the networkServer class (as sub-process in the background)
                 self.networkServer.start()
 
-                #self.clock = time()
-
-
-                #rainbowMaker2 = RainbowMaker()
-
-                #Give new rainbowMaker (node) info it needs through a string (sent over network)
-                #rainbowMaker2.setVariables(self.rainbowMaker.serverString())
-                #paramsChunk = self.rainbow_Maker.makeParamsChunk()
-
-                #Get the file ready (put info in first line)
-                #self.rainbow_Maker.setupFile()
-
                 #Stuff for those pretty status pictures stuff
-                #star_counter = 0
-                #white_l = ""
-                #white_r = "            "
-                '''
+                star_counter = 0
+                white_l = ""
+                white_r = "            "
+
                 #While we haven't gotten all through the file or found the key...
-                while not self.rainbowMaker.isDone():
+                while not self.list_of_shared_variables[0].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
-                    print "Creating--> [" + whiteL + "*" + whiteR + "]"
-                    if starCounter > 11:
-                        starCounter = 0
-                        whiteL = ""
-                        whiteR = "            "
+                    print "Creating--> [" + white_l + "*" + white_r + "]"
+                    if star_counter > 11:
+                        star_counter = 0
+                        white_l = ""
+                        white_r = "            "
                     else:
-                        starCounter += 1
-                        whiteL = whiteL + " "
-                        whiteR = whiteR[:-1]
+                        star_counter += 1
+                        white_l += " "
+                        white_r = white_r[:-1]
 
+                    time.sleep(1)
 
-                    #What's the server saying:
-                    rec = self.controllerPipe.recv()
-
-                    #If the server needs a chunk, give one. (this should be the first thing server says)
-                    if rec == "nextChunk":
-
-                        self.controllerPipe.send("nextChunk")
-
-                        self.controllerPipe.send(paramsChunk)
-
-                    #If the server needs a chunk again
-                    elif rec == "chunkAgain":
-
-                        #Get the parameters of the chunk (non-function for rainbowmaker)
-                        params = self.controllerPipe.recv()
-
-                        self.controllerPipe.send("chunkAgain")
-
-                        self.controllerPipe.send(paramsChunk)
-
-                    #if the server is waiting for nodes to finish
-                    elif rec == "waiting":
-
-                        self.controllerPipe.send("waiting")
-
-                        #Placeholder
-                        chrisHamm = True
-
-                    #If the server has a done Chunk
-                    elif rec == "doneChunk":
-
-                        chunkOfDone = self.controllerPipe.recv()
-
-                        self.controllerPipe.send("doneChunk")
-
-                        self.rainbowMaker.putChunkInFile(chunkOfDone)
-
-                    #Serve up the next chunk from the server-side dictionary class
-                    #chunkList = self.rainbowMaker.getNextChunk()
-
-                    #Size of chunks (number of rows to create) you want the nodes (node in this case) to do
-                    #IE: number of total rows user picked divided into __ different chunks
-                    #chunkSize = self.rainbowMaker.numRows()/100
-
-                    #and process it using the node-side client
-                    #chunkOfDone = rainbowMaker2.create(paramsChunk)
-
-                    #Then give the result back to the server
-                    #self.rainbowMaker.putChunkInFile(chunkOfDone)
                 '''
-                #elapsed = (time() - self.clock)
-                #self.clock = elapsed
+                #If there are 10,000 or less rows, run collision detection
+                if self.rainbowMaker.getHeight() <= 10000:
 
-                #Let the network  class know to be done
-                #self.controllerPipe.send("done")
+                    #Clear the screen and re-draw
+                    os.system('cls' if os.name == 'nt' else 'clear')
+
+                    print "Collision Detector Running..."
+                    print "(This should take less than a minute)"
+
+                    #self.colidingClock = time()
+
+                    collisions = self.rainbowMaker.collisionFinder()
+
+                    print "Collision Detector Complete"
+
+                    #elapsed = (time() - self.colidingClock)
+                    #self.colidingClock = elapsed
+                    print "And it took", self.colidingClock, "seconds."
+                    print
+
+                    if collisions > 0:
+
+                        percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
+
+                        print str(collisions) + " Collisions found."
+                        print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
+
+                        #Get the go-ahead
+                        print
+                        print "Did you want to run the Collision Fixer?"
+                        print
+                        print "This will take at lease twice as long as"
+                        print " the Collision Detector. It probably won't"
+                        print " finish if you have more than 50% collisions."
+                        print
+                        print "If more than 20% of your lines have collisions:"
+                        print " it's probably a problem with how you constructed"
+                        print " the table or how small your key-space is. If you"
+                        print " must use that keys-space, try shorter chains"
+                        print " (thin width) and a bigger file (tall height)"
+                        print " to reduce collisions"
+                        print
+                        print "(Yes)"
+                        print "(no)"
+                        print
+
+                        user_input = raw_input("Choice: ")
+
+                        #Sterolize inputs
+                        good_names = {"Yes", "yes", "No", "no", "Y", "n"}
+                        while not user_input in good_names:
+
+                            print "Input Error!"
+
+                            user_input = raw_input("Try Again: ")
+
+                        if user_input in ("Yes", "yes", "Y"):
+
+                            #self.colidingClock2 = time()
+
+                            while collisions > 0:
+
+                                #Clear the screen and re-draw
+                                os.system('cls' if os.name == 'nt' else 'clear')
+                                #Ohhh, pretty status pictures
+                                print "Fixing--> [" + white_l + "*" + white_r + "]"
+                                print "Collisions Still Detected: " + str(collisions)
+                                if star_counter > 11:
+                                    star_counter = 0
+                                    white_l = ""
+                                    white_r = "            "
+                                else:
+                                    star_counter += 1
+                                    white_l = white_l + " "
+                                    white_r = white_r[:-1]
+
+                                self.rainbowMaker.collisionFixer()
+
+                                collisions = self.rainbowMaker.collisionFinder()
+
+                           # elapsed = (time() - self.colidingClock2)
+                            #self.colidingClock2 = elapsed
+                '''
 
                 #Done, next screen
                 self.state = "serverRainMakerDoneScreen"
@@ -1040,27 +1088,26 @@ class ConsoleUI():
                 print "Start -> Server -> Rainbow Maker -> Done!"
                 print
 
-                print "We just made ", self.rainbow_Maker.getFileName()
-                print "With chain length of ", self.rainbow_Maker.getLength()
-                print "And ", self.rainbow_Maker.numRows(), "rows."
+                print "We just made a table"
                 print "And it took", self.clock, "seconds."
 
-                print "(Back)"
+                print
+                print "Go Back (back)"
                 print "(Exit)"
-                self.rainbow_Maker.reset()
+
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"Back", "back", "Exit", "exit"}
+                good_names = {"Back", "back", "b", "Exit", "exit"}
                 while not user_input in good_names:
 
                     print "Input Error!"
 
                     user_input = raw_input("Try Again: ")
 
-                if user_input in ("Back", "back"):
+                if user_input in ("Back", "back", "b"):
 
-                    self.state = "serverRainMakerScreen"
+                    self.state = "serverStartScreen"
 
                 else:
 
@@ -1141,9 +1188,11 @@ class ConsoleUI():
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
 
+                self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name
+                self.settings['file name'] = file_name + ".txt"
                 self.settings['hash'] = temp_hash
+                self.settings['results file'] = results_file + ".txt"
                 #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "False"
 
@@ -1307,7 +1356,9 @@ class ConsoleUI():
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"BruteForce", "bruteforce", "Brute", "brute", "bf", "b", "RainbowMake", "rainbowmake", "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary", "dictionary", "dic", "d", "Back", "back", "Exit", "exit"}
+                good_names = {"BruteForce", "bruteforce", "Brute", "brute", "bf", "b", "RainbowMake", "rainbowmake",
+                              "rainmake", "make", "RainbowUse", "rainbowuse", "rainuse", "use", "Dictionary",
+                              "dictionary", "dic", "d", "Back", "back", "Exit", "exit"}
                 while not user_input in good_names:
 
                     print "Input Error!"
@@ -1402,7 +1453,7 @@ class ConsoleUI():
 
                 #Get max key length
                 print
-                max_key_length = raw_input("What's the maximum key length?")
+                max_key_length = raw_input("What's the maximum key length? ")
                 while not self.is_int(max_key_length):
 
                     print "Input Error, Not an Integer!"
@@ -1442,12 +1493,12 @@ class ConsoleUI():
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
 
+                self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
                 self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
                 self.settings['min key length'] = min_key_length
                 self.settings['max key length'] = max_key_length
-                #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -1605,16 +1656,20 @@ class ConsoleUI():
 
                 #Get the file name
                 print
-                file_name = raw_input("What's the file name: ")
-                while not self.rainbowUser.setFileName(file_name) == "Good":
+                file_name = raw_input("What's the file name (___.txt): ")
+                while not self.does_file_exist(file_name):
 
                     print "File not found..."
-                    file_name = raw_input("What's the file name: ")
+                    file_name = raw_input("What's the file name (___.txt): ")
 
                 #Get the hash
                 print
                 temp_hash = raw_input("What's the hash we're searching for: ")
-                self.rainbowUser.setHash(temp_hash)
+
+                self.settings['cracking method'] = "rain"
+                self.settings['hash'] = temp_hash
+                self.settings['file name'] = file_name + ".txt"
+                self.settings['single'] = "True"
 
                 #Get the go-ahead
 
@@ -1657,17 +1712,7 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Searching..."
 
-                #self.clock = time()
-
-                #Gets and sets variables from file for setup
-                self.rainbowUser.gatherInfo()
-
-                #Have another dictionary (ie server-size) that chunks the data
-                #   So you don't have to send the whole file to every node
-                rainbowUser2 = RainbowUser()
-
-                #Give new dictionary (node) info it needs through a string (sent over network)
-                #dictionary2.setVariables(self.dictionary.serverString())
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -1675,7 +1720,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not (self.rainbowUser.isEof() or rainbowUser2.isFound()):
+                while not self.list_of_shared_variables[0].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1687,23 +1732,13 @@ class ConsoleUI():
                         white_r = "            "
                     else:
                         star_counter += 1
-                        white_l = white_l + " "
+                        white_l += " "
                         white_r = white_r[:-1]
 
-                    #Serve up the next chunk
-                    chunk = self.rainbowUser.getNextChunk()
+                    time.sleep(1)
 
-                    #and process it using the node-side client
-                    rainbowUser2.find(chunk)
+                if self.list_of_shared_variables[1].value:
 
-                #elapsed = (time() - self.clock)
-                #self.clock = elapsed
-
-                #if a(the) node finds a key
-                if rainbowUser2.isFound():
-
-                    #Let the server know what the key is
-                    self.rainbowUser.key = rainbowUser2.getKey()
                     self.state = "singleRainUserFoundScreen"
 
                 else:
@@ -1723,12 +1758,11 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Rainbow User -> Found!"
                 print
                 print "Key is: ", self.rainbowUser.getKey()
-                print "Wish a", self.rainbowUser.algorithm, "hash of: ", self.rainbowUser.getHash()
                 print "And it took", self.clock, "seconds."
 
                 print "Go Back (back)"
                 print "(Exit)"
-                self.rainbowUser.reset()
+
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -1765,7 +1799,7 @@ class ConsoleUI():
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                self.dictionary.reset()
+
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -1813,9 +1847,6 @@ class ConsoleUI():
 
                     algorithm = raw_input("Try Again: ")
 
-                #Set algorithm of RainbowMaker to user input of 'algorithm'
-                #self.rainbowMaker.setAlgorithm(algorithm)
-
                 #Get the Number of chars of key
                 print
                 key_length = raw_input("How many characters will the key be? ")
@@ -1825,11 +1856,8 @@ class ConsoleUI():
 
                     key_length = raw_input("Try Again: ")
 
-                #self.rainbowMaker.setNumChars(numChars)
-
                 #Get the alphabet to be used
                 print
-                #print "What's the alphabet: "
                 print "Choose your alphabet: "
                 print "0-9(d)"
                 print "a-z(a)"
@@ -1869,20 +1897,17 @@ class ConsoleUI():
 
                     num_rows = raw_input("Try Again: ")
 
-                #self.rainbowMaker.setDimensions(chain_length, num_rows)
-
                 #Get the file name
                 print
                 file_name = raw_input("What's the file name: ")
-                #self.rainbowMaker.setFileName(file_name)
 
+                self.settings['cracking method'] = "rainmaker"
                 self.settings['algorithm'] = algorithm
                 self.settings['file name'] = file_name
                 self.settings['key length'] = key_length
-                self.settings['alphabet'] = alphabet
+                self.settings['alphabet'] = alphabet_string
                 self.settings['chain length'] = chain_length
                 self.settings['num rows'] = num_rows
-                #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -1925,14 +1950,7 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow Maker -> Working..."
 
-                #self.clock = time()
-
-                rainbowMaker2 = RainbowMaker()
-
-                paramsChunk = self.rainbowMaker.makeParamsChunk()
-
-                #Get the file ready (put info in first line)
-                self.rainbowMaker.setupFile()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -1940,7 +1958,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not self.rainbowMaker.isDone():
+                while not self.list_of_shared_variables[0].value:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1952,17 +1970,12 @@ class ConsoleUI():
                         white_r = "            "
                     else:
                         star_counter += 1
-                        white_l = white_l + " "
+                        white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
 
-                    chunkOfDone = rainbowMaker2.create(paramsChunk)
-
-                    self.rainbowMaker.putChunkInFile(chunkOfDone)
-
-                #elapsed = (time() - self.clock)
-                #self.clock = elapsed
-
+                '''
                 #If there are 10,000 or less rows, run collision detection
                 if self.rainbowMaker.getHeight() <= 10000:
 
@@ -2045,6 +2058,7 @@ class ConsoleUI():
 
                            # elapsed = (time() - self.colidingClock2)
                             #self.colidingClock2 = elapsed
+                '''
 
                 #Done, next screen
                 self.state = "singleRainMakerDoneScreen"
@@ -2059,19 +2073,13 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Rainbow Maker -> Done!"
                 print
 
-                print "We just made ", self.rainbowMaker.getFileName()
-                print "Using the alphabet ", ''.join(self.rainbowMaker.alphabet)
-                print "With chain length of ", self.rainbowMaker.getLength()
-                print "And ", self.rainbowMaker.numRows(), "rows."
+                print "We just made a table"
                 print "And it took", self.clock, "seconds."
-                print
-                print "Plus ", self.colidingClock, " seconds for Collision Detection"
-                print "And ", self.colidingClock2, " seconds for Collision Repair"
 
                 print
                 print "Go Back (back)"
                 print "(Exit)"
-                self.rainbowMaker.reset()
+
                 user_input = raw_input("Choice: ")
 
                 #Sterolize inputs
@@ -2164,8 +2172,9 @@ class ConsoleUI():
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
 
+                self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name
+                self.settings['file name'] = file_name + ".txt"
                 self.settings['hash'] = temp_hash
                 #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "True"
@@ -2323,11 +2332,11 @@ class ConsoleUI():
     @staticmethod
     def does_file_exist(file_name):
 
-        temp_file = str(file_name) + ".txt"
+        #temp_file = str(file_name) + ".txt"
 
         #Checks for file not found and returns code to caller class
         try:
-            temp_file = open(file_name, "r")
+            temp_file = open(file_name + ".txt", "r")
             temp_file.close()
             return True
 
@@ -2359,12 +2368,7 @@ class ConsoleUI():
         lower_alphabet = "abcdefghijklmnopqrstuvwxyz_"
         upper_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
         digits = "0123456789_"
-        punctuation = string.punctuation + " "
-
-        lower_alphabet_list = list(lower_alphabet)
-        upper_alphabet_list = list(upper_alphabet)
-        digits_list = list(digits)
-        punctuation_list = list(punctuation)
+        punctuation = string.punctuation
 
         alphabet_string = ""
 
@@ -2372,19 +2376,19 @@ class ConsoleUI():
 
             if choice == "a":
 
-                alphabet_string += lower_alphabet_list
+                alphabet_string += lower_alphabet
 
             elif choice == "A":
 
-                alphabet_string += upper_alphabet_list
+                alphabet_string += upper_alphabet
 
             elif choice == "p":
 
-                alphabet_string += punctuation_list
+                alphabet_string += punctuation
 
             elif choice == "d":
 
-                alphabet_string += digits_list
+                alphabet_string += digits
 
         return alphabet_string
 

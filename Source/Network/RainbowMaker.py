@@ -24,7 +24,7 @@ class RainbowMaker():
     algorithm = 1
     numChars = 1
     alphabet = []
-    alphabetChoice = ""
+    #alphabetChoice = ""
     fileName = "1"
     file = 1
     width = 1
@@ -54,8 +54,11 @@ class RainbowMaker():
 
 
     #Get the alphabet and direction to be searched
-    def setAlphabet(self, alphabetChoice):
+    def setAlphabet(self, alphabet):
 
+        self.alphabet = alphabet
+
+        '''
         choicesList = list(alphabetChoice)
 
         self.alphabetChoice = ""
@@ -99,6 +102,7 @@ class RainbowMaker():
                 return False
 
         return True
+    '''
 
 
     #Get file name
@@ -298,7 +302,7 @@ class RainbowMaker():
         #Open the file for writing
         self.file = open(self.fileName, 'w')
 
-        self.file.write(self.algorithm + " " + str(self.numChars) + " " + self.alphabetChoice + " " + str(self.width) + "\n")
+        self.file.write(self.algorithm + " " + str(self.numChars) + " " + str(self.alphabet) + " " + str(self.width) + "\n")
 
         self.fileLocation = self.file.tell()
 
@@ -459,7 +463,7 @@ class RainbowMaker():
         self.algorithm = 1
         self.numChars = 1
         self.alphabet = 1
-        self.alphabetChoice = 1
+        #self.alphabetChoice = 1
         self.fileName = "1"
         self.file = 1
         self.width = 1
@@ -478,9 +482,9 @@ class RainbowMaker():
 
         self.algorithm = paramsList[1]
 
-        self.alphabetChoice = paramsList[3]
+        self.alphabet = paramsList[3]
 
-        self.setAlphabet(self.alphabetChoice)
+        self.setAlphabet(self.alphabet)
 
         self.numChars = int(paramsList[4])
 
@@ -494,7 +498,7 @@ class RainbowMaker():
 
         tempChunk = Chunk()
 
-        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabetChoice) + " " + str(self.numChars)
+        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabet) + " " + str(self.numChars)
         tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
 
         return tempChunk
