@@ -3,7 +3,7 @@ __author__ = 'chris hamm'
 
 import wx
 from multiprocessing import Process
-from NetworkServer_r15a import Server
+from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
 import sys
 
@@ -318,10 +318,6 @@ class PanelNine(wx.Panel):
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
-
-        #redirect console text
-        redir= RedirectText(consoleOutputLog)
-        sys.stdout=redir
 
         #Bind the buttons to events
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
@@ -668,9 +664,13 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,))
-        print "GUI DEBUG: before daemon set true"
-        self.NetworkServer.daemon = True
+        #shared variable array
+        #[0]shared dictionary, [1]shutdown, [2]update
+        listOfSharedVariables= []
+        listOfSharedVariables.append(crackingSettings)
+        listOfSharedVariables.append(0)
+        listOfSharedVariables.append(False)
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
         print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
         print "GUI DEBUG: after process has started"
@@ -711,6 +711,12 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
+        #shared variable array
+        #[0]shared dictionary, [1]shutdown, [2]update
+        listOfSharedVariables= []
+        listOfSharedVariables.append(crackingSettings)
+        listOfSharedVariables.append(0)
+        listOfSharedVariables.append(False)
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
