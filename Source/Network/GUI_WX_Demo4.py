@@ -187,16 +187,18 @@ class PanelFive(wx.Panel):
         gsizer= wx.GridSizer(6,1,2,2)
 
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
+        makeRainbowTableButton= wx.Button(self, label="Create A Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
         BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
             (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
+            (crackRainbowTableButton,0, wx.ALIGN_CENTER, 9),
+            (makeRainbowTableButton, 0, wx.ALIGN_CENTER, 9),
             (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton, 0 , wx.ALIGN_CENTER, 9)])
 
@@ -204,7 +206,8 @@ class PanelFive(wx.Panel):
         self.SetSizer(hbox)
 
         #Bind the buttons to events
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
+        makeRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel12)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -348,15 +351,53 @@ class PanelTen(wx.Panel):
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class RedirectText:
-    def __init__(self,aWxTextCtrl):
-        self.out=aWxTextCtrl
+class PanelEleven(wx.Panel):
+    def __init__ (self, parent):
+        wx.Panel.__init__(self,parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
 
-    def write(self,string):
-        self.out.WriteText(string)
+        #define the buttons and widgets
+        screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
-    def flush(self):
-        pass
+        #add buttons to thr grid
+        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
+            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
+            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+
+        #bind the buttons to events
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        quitSearchButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+
+class PanelTwelve(wx.Panel):
+    def __init__ (self,parent):
+        wx.Panel.__init__(self, parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
+
+        #define the buttons and widgets
+        screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
+        quitSearchButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
+
+        #add buttons to the gird
+        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
+            (CloseButton,0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+        #bind the buttons to events
+        quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class myFrame(wx.Frame):
     def __init__(self):
@@ -372,6 +413,8 @@ class myFrame(wx.Frame):
         self.panel_eight= PanelEight(self)
         self.panel_nine= PanelNine(self)
         self.panel_ten= PanelTen(self)
+        self.panel_eleven= PanelEleven(self)
+        self.panel_twelve= PanelTwelve(self)
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
@@ -381,6 +424,8 @@ class myFrame(wx.Frame):
         self.panel_eight.Hide()
         self.panel_nine.Hide()
         self.panel_ten.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
 
         self.sizer= wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.panel_one, 1, wx.EXPAND)
@@ -393,6 +438,8 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_eight, 1, wx.EXPAND)
         self.sizer.Add(self.panel_nine, 1, wx.EXPAND)
         self.sizer.Add(self.panel_ten, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_eleven, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_twelve, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
     #---------switch from Panel 1
@@ -487,6 +534,18 @@ class myFrame(wx.Frame):
         self.panel_five.Hide()
         self.panel_one.Show()
         self.Layout()
+
+    def switchFromPanel5ToPanel11(self, event):
+        self.SetTitle("Mighty Cracker: Rainbow Table Cracking Method")
+        self.panel_five.Hide()
+        self.panel_eleven.Show()
+        self.Layout()
+
+    def switchFromPanel5ToPanel12(self, event):
+        self.SetTitle("Mighty Cracker: Rainbow Table Maker")
+        self.panel_five.Hide()
+        self.panel_twelve.Show()
+        self.Layout()
     #---------end of switch from panel 5
 
     #------------switch from panel 6
@@ -524,7 +583,7 @@ class myFrame(wx.Frame):
     #--------------end of switch from panel 7
 
     #---------switch from panel 8
-    def switchFromPanel8ToPanel1(self):
+    def switchFromPanel8ToPanel1(self, event):
         self.SetTitle("Mighty Cracker")
         self.panel_eight.Hide()
         self.panel_one.Show()
@@ -532,7 +591,7 @@ class myFrame(wx.Frame):
     #---------end of switch from panel 8
 
     #---------switch from panel 9
-    def switchFromPanel9ToPanel1(self):
+    def switchFromPanel9ToPanel1(self, event):
         self.SetTitle("Mighty Cracker")
         self.panel_nine.Hide()
         self.panel_one.Show()
@@ -546,6 +605,23 @@ class myFrame(wx.Frame):
         self.panel_one.Show()
         self.Layout()
     #------------end of switch from panel 10
+
+    #----------switch from panel 11
+    def switchFromPanel11ToPanel1(self, event):
+        self.SetTitle("Mighty Cracker")
+        self.panel_eleven.Hide()
+        self.panel_one.Show()
+        self.Layout()
+    #-----------end of switch from panel 11
+
+    #------------switch from panel 12
+    def switchFromPanel12ToPanel1(self, event):
+        self.SetTitle("Mighty Cracker")
+        self.panel_twelve.Hide()
+        self.panel_one.Show()
+        self.Layout()
+    #-------------end of switch from panel 12
+
 
     #defined functions
     def ShowNotFinishedMessage1(self, event):
@@ -618,14 +694,14 @@ class myFrame(wx.Frame):
         self.panel_two.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_three.StartConnectButton.SetLabel("Start Dictionary Crack")
         self.panel_four.StartConnectButton.SetLabel("Start Brute Force Crack")
-        self.panel_five.StartConnectButton.SetLabel("Start Rainbow Crack")
+        self.panel_eleven.StartConnectButton.SetLabel("Start Rainbow Crack")
         self.switchFromPanel1ToPanel2()
 
     def onNetworkModeButtonClick(self, e):
         self.panel_two.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_three.StartConnectButton.SetLabel("Start Hosting Dictionary Crack")
         self.panel_four.StartConnectButton.SetLabel("Start Hosting Brute Force Crack")
-        self.panel_five.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
+        self.panel_eleven.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
         self.switchFromPanel6ToPanel2()
 
     def connectToServer(self, event):
