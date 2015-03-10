@@ -1187,13 +1187,12 @@ class ConsoleUI():
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file + ".txt"
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
                 self.settings['file name'] = file_name + ".txt"
                 self.settings['hash'] = temp_hash
-                self.settings['results file'] = results_file + ".txt"
-                #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
