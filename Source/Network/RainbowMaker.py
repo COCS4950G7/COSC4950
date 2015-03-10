@@ -56,7 +56,7 @@ class RainbowMaker():
     #Get the alphabet and direction to be searched
     def setAlphabet(self, alphabet):
 
-        self.alphabet = list(alphabet)
+        self.alphabet = alphabet
 
         '''
         choicesList = list(alphabetChoice)
