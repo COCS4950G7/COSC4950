@@ -57,8 +57,9 @@ class Server():
 
             self.shared_dict = shared_variables[0]
             self.shutdown = shared_variables[1] #TODO WHAT TYPE OF VARIABLE DO YOU WANT?? IT THROWS ATTRIBUTE ERROR IF I PASS IN AN INT OR A BOOL
-                                                #TODO SPECIFICALLY THE .CLEAR ATTRIBUTE
+                                                #TODO SPECIFICALLY ON THE .CLEAR ATTRIBUTE AT LINE 99
                                                 #TODO REFERENCE LINE 671 and LINE 718 in GUI_WX_Demo4 for corresponding call
+
             self.update = shared_variables[2]
             #Dictionary settings check
             #print "DEBUG: cracking method= "+str(settings["cracking method"])
