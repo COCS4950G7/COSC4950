@@ -265,6 +265,7 @@ class Server():
                     if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
                         shutdown.set()
+                        self.shutdown.set()
                         print "shutdown notice sent to clients"
                         key = result[1]
                         self.found_solution.value = True
@@ -278,6 +279,7 @@ class Server():
                     elif result[0] == "e":
                         print "Final chunk processed, no solution found."
                         shutdown.set()
+                        self.shutdown.set()
                         self.shared_dict["finished chunks"] += 1
                         break
                     else:  # solution has not been found
