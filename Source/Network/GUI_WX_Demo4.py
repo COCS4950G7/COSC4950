@@ -206,6 +206,7 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
         BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
 
+
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
             (self.currentMode, 0, wx.ALIGN_CENTER, 9),
