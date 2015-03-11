@@ -259,12 +259,12 @@ class Server():
             try:
                 while not self.found_solution.value:
                     try:
+                        self.update.set()
                         result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
                     except Qqueue.Empty:
                         continue
                     if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
-                        shutdown.set()
                         self.shutdown.set()
                         print "shutdown notice sent to clients"
                         key = result[1]
@@ -278,7 +278,6 @@ class Server():
                         print "A client has crashed!"  # THIS FUNCTION IS UNTESTED
                     elif result[0] == "e":
                         print "Final chunk processed, no solution found."
-                        shutdown.set()
                         self.shutdown.set()
                         self.shared_dict["finished chunks"] += 1
                         break
@@ -299,7 +298,7 @@ class Server():
                             self.rainmaker.putChunkInFile(rainChunk)
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
-                                shutdown.set()
+                                self.shutdown.set()
 
 
             except Exception as inst:
