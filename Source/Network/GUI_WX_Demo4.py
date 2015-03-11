@@ -2,28 +2,31 @@ __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
 import wx
-from multiprocessing import Process
+from multiprocessing import Process, Value, Array, Event
 from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
-import sys
+
 
 class PanelOne(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(4,1,2,2)
+        gsizer= wx.GridSizer(5,1,2,2)
 
         #defone the buttons
         screenHeader= wx.StaticText(self, label="Mighty Cracker", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         SingleModeButton= wx.Button(self, label="Single Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         NetworkModeButton= wx.Button(self, label="Network Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        bugNotice= wx.StaticText(self, label="NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
+                                             "\n Fix is still unknown.", style=(wx.ALIGN_CENTER_HORIZONTAL))
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (SingleModeButton, 0,wx.ALIGN_CENTER, 9),
                         (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
-                        (CloseButton,0,wx.ALIGN_CENTER, 9)])
+                        (CloseButton,0,wx.ALIGN_CENTER, 9),
+                        (bugNotice, 0, wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
@@ -399,6 +402,8 @@ class PanelTwelve(wx.Panel):
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
+
+
 class myFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(800, 600))
@@ -441,6 +446,15 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_eleven, 1, wx.EXPAND)
         self.sizer.Add(self.panel_twelve, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
+
+        #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
+        self.update = Event()
+        self.update.clear()
+
+        #shutdown is linked the the server/client shared shutdown command. setting this should should down server and client.
+        self.shutdown = Event()
+        self.shutdown.clear()
+
 
     #---------switch from Panel 1
     def switchFromPanel1ToPanel2(self):
@@ -591,7 +605,7 @@ class myFrame(wx.Frame):
     #---------end of switch from panel 8
 
     #---------switch from panel 9
-    def switchFromPanel9ToPanel1(self, event):
+    def switchFromPanel9ToPanel1(self):
         self.SetTitle("Mighty Cracker")
         self.panel_nine.Hide()
         self.panel_one.Show()
@@ -657,6 +671,7 @@ class myFrame(wx.Frame):
     def OnClose(self, event):
         dial = wx.MessageBox('Are you sure you want to quit?', 'Exit?', wx.YES_NO|wx.NO_DEFAULT, self)
         if dial == wx.YES:
+            self.shutdown.set()
             self.Close()
 
     def disconnectClient(self, event):
@@ -671,6 +686,7 @@ class myFrame(wx.Frame):
                             'Close the Server?', wx.YES_NO|wx.NO_DEFAULT, self)
         if(dial == wx.YES):
             self.NetworkServer.terminate()
+            self.shutdown.set()
             self.switchFromPanel9ToPanel1()
 
     def setCurrentMode(self, inputText):
@@ -740,12 +756,14 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
+
+
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
         listOfSharedVariables= []
         listOfSharedVariables.append(crackingSettings)
-        listOfSharedVariables.append(0)
-        listOfSharedVariables.append(False)
+        listOfSharedVariables.append(self.shutdown)
+        listOfSharedVariables.append(self.update)
         self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
         print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
@@ -787,12 +805,13 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
+
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
         listOfSharedVariables= []
         listOfSharedVariables.append(crackingSettings)
-        listOfSharedVariables.append(0)
-        listOfSharedVariables.append(False)
+        listOfSharedVariables.append(self.shutdown)
+        listOfSharedVariables.append(self.update)
         self.NetworkServer= Process(target=Server, args=(crackingSettings,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
