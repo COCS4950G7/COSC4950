@@ -11,22 +11,25 @@ class PanelOne(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(5,1,2,2)
+        gsizer= wx.GridSizer(6,1,2,2)
 
         #defone the buttons
         screenHeader= wx.StaticText(self, label="Mighty Cracker", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         SingleModeButton= wx.Button(self, label="Single Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         NetworkModeButton= wx.Button(self, label="Network Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        bugNotice= wx.StaticText(self, label="NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
+        bugNotice= wx.StaticText(self, label="BUG NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
                                              "\n Fix is still unknown.", style=(wx.ALIGN_CENTER_HORIZONTAL))
+        bugNotice2= wx.StaticText(self, label="BUG NOTICE: 2nd Bug with LINUX, \n Buttons incorrectly span vertically and horizontally. \n"
+                                              "Fix is still Unknown", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (SingleModeButton, 0,wx.ALIGN_CENTER, 9),
                         (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
                         (CloseButton,0,wx.ALIGN_CENTER, 9),
-                        (bugNotice, 0, wx.ALIGN_CENTER, 9)])
+                        (bugNotice, 0, wx.ALIGN_CENTER, 9),
+                        (bugNotice2, 0, wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
