@@ -7,7 +7,7 @@ from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
 
 
-class PanelOne(wx.Panel):
+class PanelOne(wx.Panel):           #========================Main Menu=====================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -41,7 +41,7 @@ class PanelOne(wx.Panel):
 
 
 
-class PanelTwo(wx.Panel):
+class PanelTwo(wx.Panel):             #====================Select Cracking Method=============================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -75,12 +75,12 @@ class PanelTwo(wx.Panel):
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelThree(wx.Panel):
+class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings=================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(11,1,2,2)
-        listOfAlgorithms= ['MD5', 'SHA 1', 'SHA 224', 'SHA 256', 'SHA 512']
+        gsizer= wx.GridSizer(12,1,2,2)
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -95,6 +95,7 @@ class PanelThree(wx.Panel):
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
         self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input", style=wx.ALIGN_CENTER_HORIZONTAL)
         inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
+        generateHashButton= wx.Button(self, label="Generate Hash Code", style= wx.ALIGN_CENTER_HORIZONTAL)
         self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected", style=wx.ALIGN_CENTER_HORIZONTAL)
         setDictFileButton= wx.Button(self, label="Select Dictionary File", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -108,6 +109,7 @@ class PanelThree(wx.Panel):
             (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
             (self.inputHashHeader, 0, wx.ALIGN_CENTER, 9),
             (inputHashButton, 0, wx.ALIGN_CENTER, 9),
+            (generateHashButton, 0, wx.ALIGN_CENTER, 9),
             (self.inputDictFileHeader, 0, wx.ALIGN_CENTER, 9),
             (setDictFileButton, 0, wx.ALIGN_CENTER, 9),
             (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
@@ -119,17 +121,18 @@ class PanelThree(wx.Panel):
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelFour(wx.Panel):
+class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(15,1,2,2)
-        listOfAlgorithms= ['MD5', 'SHA 1', 'SHA 224', 'SHA 256', 'SHA 512']
+        gsizer= wx.GridSizer(16,1,2,2)
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         #TODO add support for custom combinations of alphabets
 
@@ -149,6 +152,7 @@ class PanelFour(wx.Panel):
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input", style=wx.ALIGN_CENTER_HORIZONTAL)
         inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
+        generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5", style=wx.ALIGN_CENTER_HORIZONTAL)
         changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -165,6 +169,7 @@ class PanelFour(wx.Panel):
                         (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
                         (self.inputHashHeader, 0, wx.ALIGN_CENTER, 9),
                         (inputHashButton, 0, wx.ALIGN_CENTER, 9),
+                        (generateHashButton, 0, wx.ALIGN_CENTER, 9),
                         (self.minKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
                         (changeMinKeyLengthButton,0, wx.ALIGN_CENTER, 9),
                         (self.maxKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
@@ -180,13 +185,14 @@ class PanelFour(wx.Panel):
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
         changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelFive(wx.Panel):
+class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -196,7 +202,7 @@ class PanelFive(wx.Panel):
         screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
-        makeRainbowTableButton= wx.Button(self, label="Create A Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
+        makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
         BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -217,7 +223,7 @@ class PanelFive(wx.Panel):
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelSix(wx.Panel):
+class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -246,7 +252,7 @@ class PanelSix(wx.Panel):
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelSeven(wx.Panel):
+class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -277,7 +283,7 @@ class PanelSeven(wx.Panel):
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel7ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelEight(wx.Panel):
+class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -305,7 +311,7 @@ class PanelEight(wx.Panel):
         disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelNine(wx.Panel):
+class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -332,7 +338,7 @@ class PanelNine(wx.Panel):
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelTen(wx.Panel):
+class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -357,20 +363,24 @@ class PanelTen(wx.Panel):
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelEleven(wx.Panel):
+class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
+        gsizer= wx.GridSizer(7,1,2,2)
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
+        generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to thr grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
+            (generateHashButton, 0, wx.ALIGN_CENTER, 9),
             (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
             (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton, 0, wx.ALIGN_CENTER, 9)])
@@ -379,11 +389,12 @@ class PanelEleven(wx.Panel):
         self.SetSizer(hbox)
 
         #bind the buttons to events
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-class PanelTwelve(wx.Panel):
+class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
@@ -391,18 +402,19 @@ class PanelTwelve(wx.Panel):
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
-        quitSearchButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        backToMainMenuButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the gird
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
+            (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton,0, wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
+
         #bind the buttons to events
-        quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 
@@ -554,6 +566,8 @@ class myFrame(wx.Frame):
 
     def switchFromPanel5ToPanel11(self, event):
         self.SetTitle("Mighty Cracker: Rainbow Table Cracking Method")
+        tempCurrentMode= self.panel_five.currentMode.GetLabelText()
+        self.panel_eleven.currentMode.SetLabel(tempCurrentMode)
         self.panel_five.Hide()
         self.panel_eleven.Show()
         self.Layout()
