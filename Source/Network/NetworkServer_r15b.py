@@ -56,6 +56,7 @@ class Server():
             self.cracking_mode = settings["cracking method"]
 
             self.shared_dict = shared_variables[0]
+            self.shared_dict["server ip"] = self.IP
             self.shutdown = shared_variables[1] #TODO WHAT TYPE OF VARIABLE DO YOU WANT?? IT THROWS ATTRIBUTE ERROR IF I PASS IN AN INT OR A BOOL
                                                 #TODO SPECIFICALLY ON THE .CLEAR ATTRIBUTE AT LINE 99
                                                 #TODO REFERENCE LINE 671 and LINE 718 in GUI_WX_Demo4 for corresponding call
