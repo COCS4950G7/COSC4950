@@ -368,11 +368,15 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(7,1,2,2)
+        gsizer= wx.GridSizer(10,1,2,2)
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedFileHeader= wx.StaticText(self, label="Selected Rainbow Table File: No File has been Selected", style=wx.ALIGN_CENTER_HORIZONTAL)
+        selectFileButton= wx.Button(self, label="Select File", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.hashToBeCrackedHeader= wx.StaticText(self, label="Hash to be cracked: No Hash has been entered", style=wx.ALIGN_CENTER_HORIZONTAL)
+        setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
         generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -381,6 +385,10 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         #add buttons to thr grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
             (self.currentMode, 0, wx.ALIGN_CENTER, 9),
+            (self.selectedFileHeader, 0, wx.ALIGN_CENTER, 9),
+            (selectFileButton, 0, wx.ALIGN_CENTER, 9),
+            (self.hashToBeCrackedHeader, 0, wx.ALIGN_CENTER, 9),
+            (setHashCodeButton, 0, wx.ALIGN_CENTER, 9),
             (generateHashButton, 0, wx.ALIGN_CENTER, 9),
             (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
             (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
@@ -390,8 +398,10 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.SetSizer(hbox)
 
         #bind the buttons to events
+        selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
+        setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
         generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -399,7 +409,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(12,1,2,2)
+        gsizer= wx.GridSizer(16,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         #TODO add support for custom combinations of alphabets
@@ -415,6 +425,10 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
         self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 1000", style=wx.ALIGN_CENTER_HORIZONTAL)
         changeChainLengthButton= wx.Button(self, label="Set Table Chain Length", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 10000", style=wx.ALIGN_CENTER_HORIZONTAL)
+        setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt", style=wx.ALIGN_CENTER_HORIZONTAL)
+        changeFileNameButton= wx.Button(self, label="Change Saved File Name", style=wx.ALIGN_CENTER_HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -429,6 +443,10 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
             (self.selectedAlphabet, 0, wx.ALIGN_CENTER, 9),
             (self.chainLengthHeader, 0, wx.ALIGN_CENTER, 9),
             (changeChainLengthButton, 0, wx.ALIGN_CENTER, 9),
+            (self.numOfRowsHeader, 0, wx.ALIGN_CENTER, 9),
+            (setNumOfRowsButton, 0, wx.ALIGN_CENTER, 9),
+            (self.fileNameHeader, 0, wx.ALIGN_CENTER, 9),
+            (changeFileNameButton, 0, wx.ALIGN_CENTER, 9),
             (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton,0, wx.ALIGN_CENTER, 9)])
 
@@ -437,7 +455,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         #bind the buttons to events
         changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
-        changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.setRMChainLength)
+        setNumOfRowsButton.Bind(wx.EVT_BUTTON, parent.setRMNumOfRows)
+        changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -669,6 +689,18 @@ class myFrame(wx.Frame):
         self.panel_eleven.Hide()
         self.panel_one.Show()
         self.Layout()
+
+    def switchFromPanel11ToPanel9(self):
+        self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_eleven.Hide()
+        self.panel_nine.Show()
+        self.Layout()
+
+    def switchFromPanel11ToPanel10(self):
+        self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_eleven.Hide()
+        self.panel_ten.Show()
+        self.Layout()
     #-----------end of switch from panel 11
 
     #------------switch from panel 12
@@ -781,6 +813,67 @@ class myFrame(wx.Frame):
             dial2.ShowModal()
         else:
             self.panel_twelve.keyLengthHeader.SetLabel("Key Length: "+str(input))
+        dial.Destroy()
+
+    def setRMChainLength(self, event):
+        dial= wx.TextEntryDialog(self, "Input New Chain Length", "Input the new Chain Length", "", style=wx.OK)
+        dial.ShowModal()
+        input = str(dial.GetValue())
+        foundInvalidChar= False
+        for i in range(0, len(input)):
+            if input[i].isalpha():
+                foundInvalidChar= True
+        if(foundInvalidChar == True):
+            dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                          "Chain Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        else:
+            self.panel_twelve.chainLengthHeader.SetLabel("Table Chain Length: "+str(input))
+        dial.Destroy()
+
+    def setRMNumOfRows(self, event):
+        dial= wx.TextEntryDialog(self, "Input New Number of Rows", "Input the new Number of Rows", "", style=wx.OK)
+        dial.ShowModal()
+        input = str(dial.GetValue())
+        foundInvalidChar= False
+        for i in range(0, len(input)):
+            if input[i].isalpha():
+                foundInvalidChar= True
+        if(foundInvalidChar == True):
+            dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                          "Number of Rows was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        else:
+            self.panel_twelve.numOfRowsHeader.SetLabel("Number of Rows: "+str(input))
+        dial.Destroy()
+
+    def setRMFileName(self,event):
+        dial= wx.TextEntryDialog(self, "Input the name for this rainbow table file\n"
+                                       "(The file extension will automatically be added)", "Enter in the new name", "", style=wx.OK)
+        dial.ShowModal()
+        #TODO add check to make sure there is no file extension in the input box
+        #TODO ===================================check for illegal file name characters======================================
+            #TODO illegal for windows CMD: /, \(backslash), ?, *, :, |, ", . (other than for file extension), <, >,
+            #TODO illegal for OSX: /, :,
+            #TODO illegal for Linux: /, .(as the first character), \0 (null terminator),
+            #TODO special cases for Linux: \(backslash), ?,  *, |, <, >,
+            #TODO filename length restriction for most unix (including OS X) and for NTFS is 255 characters
+        #TODO =================================end of illegal file name characters==================================
+        self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
+        dial.Destroy()
+
+    def selectRUFileSelect(self, event):
+        import os
+        fileDial= wx.FileDialog(None, "Select a rainbow table file", os.getcwd(), "", "All files (*.*)|*.*", wx.OPEN)
+        if(fileDial.ShowModal() == wx.ID_OK):
+            input= str(fileDial.GetPath())
+            self.panel_eleven.selectedFileHeader.SetLabel("Selected Rainbow Table File: "+str(input))
+        fileDial.Destroy()
+
+    def setRUHashToBeCracked(self, event):
+        dial= wx.TextEntryDialog(self, "Insert the Hash Code to be cracked", "Insert the Hash Code to be cracked", "", style=wx.OK)
+        dial.ShowModal()
+        self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash to be cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
     def onSingleModeButtonClick(self, e):
@@ -896,7 +989,42 @@ class myFrame(wx.Frame):
         else:
             self.switchFromPanel4ToPanel10()
 
+    def startRainbowTableCrack(self, event):
+        crackingMethod= "rain"
+        tempFileName= self.panel_eleven.selectedFileHeader.GetLabelText()
+        #remove extra heading in from of the file path
+        fileName= ""
+        for i in range(28, len(tempFileName)):
+            fileName+= str(tempFileName[i])
+        tempHashToBeCracked= self.panel_eleven.hashToBeCrackedHeader.GetLabelText()
+        #remove extra heading from the front of the hash code
+        hashToBeCracked= ""
+        for i in range(19, len(tempHashToBeCracked)):
+            hashToBeCracked+= str(tempHashToBeCracked[i])
+        tempSingleSetting= self.panel_eleven.currentMode.GetLabelText()
+        #remove extra heading from current Mode
+        tempSingleSetting2= ""
+        for i in range (13, len(tempSingleSetting)):
+            tempSingleSetting2+= str(tempSingleSetting[i])
+        singleSetting = ""
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+            singleSetting="True"
+        else:
+            singleSetting="False"
+        crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
 
+        #shared variable array
+        #[0]shared dictionary, [1]shutdown, [2]update
+        listOfSharedVariables= []
+        listOfSharedVariables.append(crackingSettings)
+        listOfSharedVariables.append(self.shutdown)
+        listOfSharedVariables.append(self.update)
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,))
+        self.NetworkServer.start()
+        if(singleSetting is 'False'):
+            self.switchFromPanel11ToPanel9()
+        else:
+            self.switchFromPanel11ToPanel10()
 
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
