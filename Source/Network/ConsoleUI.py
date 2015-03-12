@@ -6,17 +6,14 @@
 #   Chris Bugg
 #   10/7/14
 
-#TODO:  Update the rest of the class to implement
-#TODO:      the new shared events
-
-#TODO:  Fix the clocks that I broke (all)
-
 #TODO:  Implement hashes from file
+
+#TODO:  Implement collision detection
 
 #Imports
 import time
 import os
-from multiprocessing import Process, Value, Array, Event, Manager
+from multiprocessing import Process, Event, Manager
 import string
 
 from NetworkClient_r15a import Client
@@ -43,7 +40,7 @@ class ConsoleUI():
     shutdown.clear()
 
     #Define the various events
-    #server signals update when something has occured (ie: chunk processed)
+    #server signals update when something has occurred (ie: chunk processed)
     update = Event()
     update.clear()
 
@@ -71,8 +68,8 @@ class ConsoleUI():
     state = "startScreen"
 
     clock = 0
-    colliding_Clock = 0
-    colliding_Clock2 = 0
+    #colliding_Clock = 0
+    #colliding_Clock2 = 0
 
     #Constructor
     def __init__(self):
@@ -291,7 +288,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While not connected, print a "connecting" bar
-                while not self.list_of_shared_variables[3].value:
+                while not self.is_connected:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -307,6 +304,8 @@ class ConsoleUI():
                         white_r = white_r[:-1]
 
                     time.sleep(1)
+                    #self.update.wait()
+                    #self.update.clear()
 
                 #Got connected, so switch screens
                 self.state = "nodeConnectedToScreen"
@@ -321,8 +320,8 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                #While not connected, print a "connecting" bar
-                while self.list_of_shared_variables[3].value and not self.list_of_shared_variables[4].value:
+                #While connected and not doing stuff
+                while self.is_connected and not self.is_doing_stuff:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -338,12 +337,14 @@ class ConsoleUI():
                         white_r = white_r[:-1]
 
                     time.sleep(1)
+                    #self.update.wait()
+                    #self.update.clear()
 
-                if not self.list_of_shared_variables[3].value:
+                if not self.is_connected:
 
                     self.state = "nodeConnectingScreen"
 
-                elif self.list_of_shared_variables[4].value:
+                elif self.is_doing_stuff:
 
                     self.state = "nodeDoingStuffScreen"
 
@@ -357,8 +358,8 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                #While not connected, print a "connecting" bar
-                while self.list_of_shared_variables[3].value and self.list_of_shared_variables[4].value:
+                #While connected and doing stuff
+                while self.is_connected and self.is_doing_stuff:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -373,13 +374,17 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    #time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if not self.list_of_shared_variables[3].value:
+                #if not connected, go to connecting screen
+                if not self.is_connected:
 
                     self.state = "nodeConnectingScreen"
 
-                elif not self.list_of_shared_variables[4].value:
+                #if connected but not doing stuff, go to connected screen
+                elif not self.is_doing_stuff:
 
                     self.state = "nodeConnectedScreen"
 
@@ -591,6 +596,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Server Mode -> Brute Force -> Searching..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -598,7 +605,7 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -613,9 +620,12 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                self.clock = time.time() - self.clock
+
+                if not self.dictionary["key"] == '':
 
                     self.state = "serverBruteFoundScreen"
 
@@ -628,9 +638,14 @@ class ConsoleUI():
             #if we're at the serverBruteFoundScreen state (Screen)
             elif state == "serverBruteFoundScreen":
 
+                self.networkServer.terminate()
+
                 print "============="
                 print "Start -> Server -> Brute Force -> Found!"
-                print "Key is: ", self.list_of_shared_variables[2].value
+                print
+                print "Key is: ", self.dictionary["key"]
+                print "And that took: ", self.clock, "seconds."
+                print
                 print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
@@ -656,6 +671,8 @@ class ConsoleUI():
             #############################################
             #if we're at the serverBruteNotFoundScreen state (Screen)
             elif state == "serverBruteNotFoundScreen":
+
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Server -> Brute Force -> Not Found"
@@ -752,6 +769,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Server -> Rainbow User -> Searching..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -760,7 +779,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -775,9 +794,12 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                self.clock = time.time() - self.clock
+
+                if not self.dictionary["key"] == '':
 
                     self.state = "serverRainUserFoundScreen"
 
@@ -790,10 +812,12 @@ class ConsoleUI():
             #if we're at the serverRainUserFoundScreen state (Screen)
             elif state == "serverRainUserFoundScreen":
 
+                self.networkServer.terminate()
+
                 print "============="
                 print "Start -> Server -> Rainbow User -> Found!"
                 print
-                print "Key is: ", self.list_of_shared_variables[2].value
+                print "Key is: ", self.dictionary["key"]
                 print "And it took", self.clock, "seconds."
 
                 print "(back)"
@@ -822,6 +846,9 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainUserNotFoundScreen state (Screen)
             elif state == "serverRainUserNotFoundScreen":
+
+                self.networkServer.terminate()
+
                 print "============="
                 print "Start -> Server -> Rainbow User -> Found!"
                 print
@@ -982,6 +1009,8 @@ class ConsoleUI():
                 print "Start -> Server -> Rainbow Maker -> Searching..."
                 print
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -990,7 +1019,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1005,7 +1034,10 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
+
+                self.clock = time.time() - self.clock
 
                 '''
                 #If there are 10,000 or less rows, run collision detection
@@ -1099,13 +1131,20 @@ class ConsoleUI():
             #############################################
             #if we're at the serverRainMakerDoneScreen state (Screen)
             elif state == "serverRainMakerDoneScreen":
-                print "BROKE"
+
+                self.networkServer.terminate()
+
                 #display results and wait for user interaction
                 print "============="
                 print "Start -> Server -> Rainbow Maker -> Done!"
                 print
 
-                print "We just made a table"
+                print "We just made ", self.settings['file name']
+                print "Using the alphabet ", self.settings['alphabet']
+                print "With a chain length of", self.settings['chain length']
+                print "And", self.settings['num rows'], "rows."
+                print "It utilizes the", self.settings['algorithm'], "algorithm"
+                print "With a key length of", self.settings['key length']
                 print "And it took", self.clock, "seconds."
 
                 print
@@ -1253,6 +1292,8 @@ class ConsoleUI():
                 print "Start -> Server -> Dictionary -> Searching..."
                 print
 
+                self.clock = time.time()
+
                 #Start up the networkServer class (as sub-process in the background)
                 self.networkServer.start()
 
@@ -1261,7 +1302,7 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1276,9 +1317,12 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                self.clock = time.time() - self.clock
+
+                if not self.dictionary["key"] == '':
 
                     self.state = "serverDictionaryFoundScreen"
 
@@ -1291,11 +1335,14 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "serverDictionaryFoundScreen":
 
-                self.networkServer.join()
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Server -> Dictionary -> Found!"
-                print "Key is: ", self.list_of_shared_variables[2].value
+                print
+                print "Key is: ", self.dictionary["key"]
+                print "And that took: ", self.clock, "seconds."
+                print
                 print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
@@ -1321,6 +1368,8 @@ class ConsoleUI():
             #############################################
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "serverDictionaryNotFoundScreen":
+
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Server -> Dictionary -> Not Found"
@@ -1513,8 +1562,8 @@ class ConsoleUI():
                 self.settings['algorithm'] = algorithm
                 self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
-                self.settings['min key length'] = min_key_length
-                self.settings['max key length'] = max_key_length
+                self.settings['min key length'] = int(min_key_length)
+                self.settings['max key length'] = int(max_key_length)
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -1556,6 +1605,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Searching..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -1563,7 +1614,7 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1578,9 +1629,12 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                self.clock = time.time() - self.clock
+
+                if not self.dictionary["key"] == '':
 
                     self.state = "singleBruteFoundScreen"
 
@@ -1593,12 +1647,12 @@ class ConsoleUI():
             #if we're at the singleBruteFoundScreen state (Screen)
             elif state == "singleBruteFoundScreen":
 
-                #display results and wait for user interaction
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Found!"
                 print
-                print "Key is: ", self.list_of_shared_variables[2].value
+                print "Key is: ", self.dictionary["key"]
                 print "And it took", self.clock, "seconds."
 
                 print "Go Back (back)"
@@ -1628,7 +1682,7 @@ class ConsoleUI():
             #if we're at the singleBruteNotFoundScreen state (Screen)
             elif state == "singleBruteNotFoundScreen":
 
-                #display results and wait for user interaction
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Not Found"
@@ -1728,6 +1782,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Searching..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -1736,7 +1792,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1751,9 +1807,12 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                self.clock = time.time() - self.clock
+
+                if not self.dictionary["key"] == '':
 
                     self.state = "singleRainUserFoundScreen"
 
@@ -1766,14 +1825,13 @@ class ConsoleUI():
             #if we're at the singleRainUserFoundScreen state (Screen)
             elif state == "singleRainUserFoundScreen":
 
-                #display results and wait for user interaction
+                self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Found!"
                 print
-                print "Key is: ", self.rainbowUser.getKey()
+                print "Key is: ", self.dictionary["key"]
                 print "And it took", self.clock, "seconds."
 
                 print "Go Back (back)"
@@ -1803,10 +1861,9 @@ class ConsoleUI():
             #if we're at the singleRainUserNotFoundScreen state (Screen)
             elif state == "singleRainUserNotFoundScreen":
 
-                #display results and wait for user interaction
+                self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
-                ###userInput = GUI.getInput()
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Not Found"
                 print
@@ -1966,6 +2023,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow Maker -> Working..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -1974,7 +2033,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While we haven't gotten all through the file or found the key...
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1989,7 +2048,10 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
+
+                self.clock = time.time() - self.clock
 
                 '''
                 #If there are 10,000 or less rows, run collision detection
@@ -2076,6 +2138,10 @@ class ConsoleUI():
                             #self.colidingClock2 = elapsed
                 '''
 
+                self.networkServer.terminate()
+
+                time.sleep(2)
+
                 #Done, next screen
                 self.state = "singleRainMakerDoneScreen"
 
@@ -2089,7 +2155,12 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Rainbow Maker -> Done!"
                 print
 
-                print "We just made a table"
+                print "We just made ", self.settings['file name']
+                print "Using the alphabet ", self.settings['alphabet']
+                print "With a chain length of", self.settings['chain length']
+                print "And", self.settings['num rows'], "rows."
+                print "It utilizes the", self.settings['algorithm'], "algorithm"
+                print "With a key length of", self.settings['key length']
                 print "And it took", self.clock, "seconds."
 
                 print
@@ -2187,6 +2258,7 @@ class ConsoleUI():
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
@@ -2235,6 +2307,8 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Searching..."
 
+                self.clock = time.time()
+
                 self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
@@ -2257,9 +2331,10 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
+
+                self.clock = time.time() - self.clock
 
                 if not self.dictionary["key"] == '':
 
@@ -2274,10 +2349,15 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "singleDictionaryFoundScreen":
 
+                self.networkServer.terminate()
+
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Found!"
+                print
                 print "Key is: ", self.dictionary["key"]
+                print "And that took: ", self.clock, "seconds."
+                print
                 print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
@@ -2303,6 +2383,8 @@ class ConsoleUI():
             #############################################
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "singleDictionaryNotFoundScreen":
+
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Not Found"

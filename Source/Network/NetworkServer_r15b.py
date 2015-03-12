@@ -299,6 +299,7 @@ class Server():
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
                                 self.shutdown.set()
+                                shutdown.set()
 
 
             except Exception as inst:
