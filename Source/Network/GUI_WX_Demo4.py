@@ -399,15 +399,36 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
+        gsizer= wx.GridSizer(12,1,2,2)
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        #TODO add support for custom combinations of alphabets
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
+        self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10", style=wx.ALIGN_CENTER_HORIZONTAL)
+        changeKeyLengthButton= wx.Button(self, label="Set Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
+        selectAlphabetHeader= wx.StaticText(self, label="Select Alphabet", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
+        self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 1000", style=wx.ALIGN_CENTER_HORIZONTAL)
+        changeChainLengthButton= wx.Button(self, label="Set Table Chain Length", style=wx.ALIGN_CENTER_HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the gird
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
+            (self.selectedAlgorithmHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
+            (self.keyLengthHeader, 0, wx.ALIGN_CENTER, 9),
+            (changeKeyLengthButton, 0, wx.ALIGN_CENTER, 9),
+            (selectAlphabetHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.selectedAlphabet, 0, wx.ALIGN_CENTER, 9),
+            (self.chainLengthHeader, 0, wx.ALIGN_CENTER, 9),
+            (changeChainLengthButton, 0, wx.ALIGN_CENTER, 9),
             (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton,0, wx.ALIGN_CENTER, 9)])
 
@@ -415,6 +436,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.SetSizer(hbox)
 
         #bind the buttons to events
+        changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
+        changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -575,6 +598,8 @@ class myFrame(wx.Frame):
 
     def switchFromPanel5ToPanel12(self, event):
         self.SetTitle("Mighty Cracker: Rainbow Table Maker")
+        tempCurrentMode= self.panel_five.currentMode.GetLabelText()
+        self.panel_twelve.currentMode.SetLabel(tempCurrentMode)
         self.panel_five.Hide()
         self.panel_twelve.Show()
         self.Layout()
@@ -723,7 +748,7 @@ class myFrame(wx.Frame):
                                           "Min Key Length Value was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
         else:
-            self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(dial.GetValue()))
+            self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(input))
         dial.Destroy()
 
     def setBFMaxKeyLength(self, event):
@@ -739,7 +764,23 @@ class myFrame(wx.Frame):
                                            "Max Key Length Value was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
         else:
-            self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(dial.GetValue()))
+            self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(input))
+        dial.Destroy()
+
+    def setRMKeyLength(self, event):
+        dial= wx.TextEntryDialog(self, "Input New Key Length", "Input the new Key Length", "", style=wx.OK)
+        dial.ShowModal()
+        input = str(dial.GetValue())
+        foundInvalidChar= False
+        for i in range(0, len(input)):
+            if input[i].isalpha():
+                foundInvalidChar= True
+        if(foundInvalidChar == True):
+            dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                          "Key Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        else:
+            self.panel_twelve.keyLengthHeader.SetLabel("Key Length: "+str(input))
         dial.Destroy()
 
     def onSingleModeButtonClick(self, e):
