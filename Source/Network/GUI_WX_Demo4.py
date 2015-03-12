@@ -713,15 +713,33 @@ class myFrame(wx.Frame):
     def setBFMinKeyLength(self, event):
         dial = wx.TextEntryDialog(self, "Input the Min Key Length", "Input Min Key Length", "", style=wx.OK)
         dial.ShowModal()
-        #TODO add check for valid input
-        self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(dial.GetValue()))
+        input= str(dial.GetValue())
+        foundInvalidChar= False
+        for i in range(0, len(input)):
+            if input[i].isalpha():
+                foundInvalidChar= True
+        if(foundInvalidChar==True):
+            dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                          "Min Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        else:
+            self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(dial.GetValue()))
         dial.Destroy()
 
     def setBFMaxKeyLength(self, event):
         dial= wx.TextEntryDialog(self, "Input the Max Key Length", "Input Max Key Length","", style=wx.OK)
         dial.ShowModal()
-        #TODO add check for valid input
-        self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(dial.GetValue()))
+        input= str(dial.GetValue())
+        foundInvalidChar= False
+        for i in range(0, len(input)):
+            if input[i].isalpha():
+                foundInvalidChar= True
+        if(foundInvalidChar == True):
+            dial2 = wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                           "Max Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        else:
+            self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(dial.GetValue()))
         dial.Destroy()
 
     def onSingleModeButtonClick(self, e):
