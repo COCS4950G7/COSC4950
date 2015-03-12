@@ -6,15 +6,21 @@
 #   Chris Bugg
 #   10/7/14
 
+#TODO:  Update the rest of the class to implement
+#TODO:      the new shared events
+
+#TODO:  Fix the clocks that I broke (all)
+
+#TODO:  Implement hashes from file
 
 #Imports
 import time
 import os
-from multiprocessing import Process, Value, Array
+from multiprocessing import Process, Value, Array, Event, Manager
 import string
 
 from NetworkClient_r15a import Client
-from NetworkServer_r15a import Server
+from NetworkServer_r15b import Server
 
 
 class ConsoleUI():
@@ -26,29 +32,40 @@ class ConsoleUI():
     #Initializing variable to a default value
     serverIP = "127.0.1.1"
 
-    #Magical shared variables with server
+    #Define the shared dictionary and it's values
+    manager = Manager()
+    dictionary = manager.dict()
+    dictionary["key"] = ''
+    dictionary["finished chunks"] = 0
 
-    #Create a list of size __ with "0" as the elements (empty list)
-    list_of_shared_variables = [0] * 5
+    #server/client/GUI signals shutdown when they're all done
+    shutdown = Event()
+    shutdown.clear()
 
-    magic_is_done = Value('b', False)
-    list_of_shared_variables[0] = magic_is_done
+    #Define the various events
+    #server signals update when something has occured (ie: chunk processed)
+    update = Event()
+    update.clear()
 
-    magic_is_found = Value('b', False)
-    list_of_shared_variables[1] = magic_is_found
+    #client signals if it's connected or not
+    is_connected = Event()
+    is_connected.clear()
 
-    magic_key = Array('c', 128)
-    list_of_shared_variables[2] = magic_key
+    #client signals if it's doing stuff or not
+    is_doing_stuff = Event()
+    is_doing_stuff.clear()
 
-    magic_is_connected = Value('b', False)
-    list_of_shared_variables[3] = magic_is_connected
-
-    magic_doing_stuff = Value('b', False)
-    list_of_shared_variables[4] = magic_doing_stuff
+    #Shared is a list of shared events
+    shared = []
+    shared.append(dictionary)
+    shared.append(shutdown)
+    shared.append(update)
+    shared.append(is_connected)
+    shared.append(is_doing_stuff)
 
     #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=Server, args=(settings, list_of_shared_variables,))
-    networkClient = Process(target=Client, args=(serverIP, list_of_shared_variables,))
+    networkServer = Process(target=Server, args=(settings, shared,))
+    networkClient = Process(target=Client, args=(serverIP, shared,))
 
     #tempGUI Variables
     state = "startScreen"
@@ -2225,7 +2242,7 @@ class ConsoleUI():
                 white_l = ""
                 white_r = "            "
 
-                while not self.list_of_shared_variables[0].value:
+                while not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -2241,8 +2258,10 @@ class ConsoleUI():
                         white_r = white_r[:-1]
 
                     time.sleep(1)
+                    self.update.wait()
+                    self.update.clear()
 
-                if self.list_of_shared_variables[1].value:
+                if not self.dictionary["key"] == '':
 
                     self.state = "singleDictionaryFoundScreen"
 
@@ -2255,12 +2274,10 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "singleDictionaryFoundScreen":
 
-                #display results and wait for user interaction
-
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Found!"
-                print "Key is: ", self.list_of_shared_variables[2].value
+                print "Key is: ", self.dictionary["key"]
                 print "Go Back (back)"
                 print "(Exit)"
                 user_input = raw_input("Choice: ")
