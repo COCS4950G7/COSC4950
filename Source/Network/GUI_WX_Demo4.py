@@ -982,7 +982,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel4ToPanel9()
@@ -1019,7 +1019,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel11ToPanel9()
