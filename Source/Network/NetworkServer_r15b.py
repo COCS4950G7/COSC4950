@@ -95,11 +95,9 @@ class Server():
             try:  # runserver definition try block
                 if self.single_user_mode:
                     print "Single User Mode"
-                    shutdown = Event()
-                    shutdown.clear()
                     shared_job_q = Queue(100)
                     shared_result_q = Queue()
-                    single = Process(target=self.start_single_user, args=(shared_job_q, shared_result_q, shutdown))
+                    single = Process(target=self.start_single_user, args=(shared_job_q, shared_result_q))
                     single.start()
                     manager = None
 
@@ -109,7 +107,6 @@ class Server():
                     manager = self.make_server_manager(self.PORTNUM, self.IP, self.AUTHKEY)  # Make a new manager
                     shared_job_q = manager.get_job_q()
                     shared_result_q = manager.get_result_q()  # Shared result queue
-                    shutdown = manager.get_shutdown()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
 
@@ -146,7 +143,7 @@ class Server():
                     rain.setHash(self.settings["hash"])
                     rain.gatherInfo()
 
-                    chunk_maker = Process(target=self.chunk_rainbow, args=(rain, manager, shared_job_q, shutdown))
+                    chunk_maker = Process(target=self.chunk_rainbow, args=(rain, manager, shared_job_q))
 
                 elif self.cracking_mode == "rainmaker":
                     if not self.single_user_mode:
@@ -161,20 +158,22 @@ class Server():
                     rainmaker.setFileName(self.settings['file name'])
                     rainmaker.setupFile()
 
-                    chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, shared_job_q, shutdown))
+                    chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, shared_job_q))
 
                 else:
                     return "wtf?"
 
                 chunk_maker.start()
 
-                result_monitor = Process(target=self.check_results, args=(shared_result_q, shutdown))
+                result_monitor = Process(target=self.check_results, args=(shared_result_q,))
                 result_monitor.start()
                 # block while there is no result, then terminate chunking and checking
                 result_monitor.join()
                 result_monitor.terminate()
+                print "result monitor terminated"
                 chunk_maker.join()
                 chunk_maker.terminate()
+                print "chunk maker terminated"
                 # Sleep a bit before shutting down the server - to give clients time to
                 # realize the job queue is empty and exit in an orderly way.
                 time.sleep(2)
@@ -254,10 +253,10 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # monitor results queue
         #--------------------------------------------------------------------------------------------------
-        def check_results(self, results_queue, shutdown):
+        def check_results(self, results_queue):
             completed_chunks = 0
             try:
-                while not self.found_solution.value:
+                while not self.shutdown.is_set():
                     try:
                         self.update.set()
                         result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
@@ -299,7 +298,7 @@ class Server():
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
                                 self.shutdown.set()
-                                shutdown.set()
+                                return
 
 
             except Exception as inst:
@@ -418,19 +417,25 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunks for rainbow function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow(self, rainbow, manager, job_queue, shutdown):
+        def chunk_rainbow(self, rainbow, manager, job_queue):
             try:
-                while not rainbow.isEof() and not shutdown.is_set():
+                while not rainbow.isEof() and not self.shutdown.is_set():
                     chunk = rainbow.getNextChunk()
                     if self.single_user_mode:
-                        job_queue.put(chunk)
+                        while True:
+                            try:
+                                job_queue.put(chunk, timeout=.1)
+                                break
+                            except Qqueue.Full:
+                                continue
                     else:
                         new_chunk = manager.Value(dict, {'params': chunk.params,
                                                          'data': chunk.data,
                                                          'timestamp': time.time()})
                         job_queue.put(new_chunk)
                         self.sent_chunks.append((chunk.params, time.time()))
-                    if shutdown.is_set():
+                    if self.shutdown.is_set():
+                        print "chunker trying to shut down"
                         while True:
                             try:
                                 job_queue.get_nowait()
@@ -456,14 +461,17 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # chunks for rainbow maker function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow_maker(self, rainmaker, job_queue, shutdown):
+        def chunk_rainbow_maker(self, rainmaker, job_queue):
             try:
-                while not shutdown.is_set():
+                while not self.shutdown.is_set():
                     params_chunk = rainmaker.makeParamsChunk()
                     new_chunk = {"params": params_chunk.params,
                                  "data": params_chunk.data}
-                    job_queue.put(new_chunk)
-                    if shutdown.is_set():
+                    try:
+                        job_queue.put(new_chunk, timeout=.1)
+                    except Qqueue.Full:
+                        continue
+                    if self.shutdown.is_set():
                         while True:
                             try:
                                 job_queue.get_nowait()
@@ -567,7 +575,7 @@ class Server():
                     print "========================================================================================"
                 #end of get the IP address
 
-        def start_single_user(self, job_queue, result_queue, shutdown):
+        def start_single_user(self, job_queue, result_queue):
             print "Single User Mode"
             try:  # start_single_user definition try block
 
@@ -577,7 +585,7 @@ class Server():
                     dictionary = Dictionary.Dictionary()
                     for i in range(0, 3):
                         chunk_runner.append(Process(target=self.run_dictionary,
-                                                    args=(dictionary, job_queue, result_queue, shutdown)))
+                                                    args=(dictionary, job_queue, result_queue)))
 
                 else:
                     if self.cracking_mode == "bf":
@@ -585,28 +593,28 @@ class Server():
                         bf = Brute_Force.Brute_Force()
 
                         chunk_runner.append(Process(target=self.run_brute_force,
-                                                    args=(bf, job_queue, result_queue, shutdown)))
+                                                    args=(bf, job_queue, result_queue)))
                     else:
                         if self.cracking_mode == "rain":
                             print "Starting rainbow table cracking."
                             rainbow = RainbowUser.RainbowUser()
 
                             chunk_runner.append(Process(target=self.run_rain_user,
-                                                        args=(rainbow, job_queue, result_queue, shutdown)))
+                                                        args=(rainbow, job_queue, result_queue)))
                         else:
                             if self.cracking_mode == "rainmaker":
                                 print "Starting rainbow table generator."
                                 rainmaker = RainbowMaker.RainbowMaker()
 
                                 chunk_runner.append(Process(target=self.run_rain_maker,
-                                                            args=(rainmaker, job_queue, result_queue, shutdown)))
+                                                            args=(rainmaker, job_queue, result_queue)))
                             else:
                                 return "wtf?"
                 for process in chunk_runner:
                     process.start()
                 for process in chunk_runner:
                     process.join()
-                if shutdown.is_set():
+                if self.shutdown.is_set():
                     print "received shutdown notice from server."
                     for process in chunk_runner:
                         process.terminate()
@@ -621,9 +629,9 @@ class Server():
                 print inst
                 print "============================================================================================="
 
-        def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
+        def run_dictionary(self, dictionary, job_queue, result_queue):
             try:
-                while not shutdown.is_set():
+                while not self.shutdown.is_set():
                     try:
                         chunk = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
                     except Qqueue.Empty:
@@ -652,11 +660,11 @@ class Server():
                 print inst
                 print "============================================================================================="
 
-        def run_brute_force(self, bf, job_queue, result_queue, shutdown):
+        def run_brute_force(self, bf, job_queue, result_queue):
             try:
                 bf.result_queue = result_queue
 
-                while not shutdown.is_set():
+                while not self.shutdown.is_set():
                     try:
                         chunk = job_queue.get()
                     except Qqueue.Empty:
@@ -678,8 +686,8 @@ class Server():
             finally:
                 bf.terminate_processes()
 
-        def run_rain_user(self, rain, job_queue, result_queue, shutdown):
-            while not shutdown.is_set():
+        def run_rain_user(self, rain, job_queue, result_queue):
+            while not self.shutdown.is_set():
                 try:
                     chunk = job_queue.get(block=True, timeout=.25)
                 except Qqueue.Empty:
@@ -692,8 +700,8 @@ class Server():
                 else:
                     result_queue.put(("f", chunk.params))
 
-        def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-            while not shutdown.is_set():
+        def run_rain_maker(self, maker, job_queue, result_queue):
+            while not self.shutdown.is_set():
                 params_chunk = Chunk.Chunk()
                 try:
                     job = job_queue.get(block=True, timeout=.25)
