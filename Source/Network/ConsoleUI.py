@@ -16,7 +16,7 @@ import os
 from multiprocessing import Process, Event, Manager
 import string
 
-from NetworkClient_r15a import Client
+from NetworkClient_r15b import Client
 from NetworkServer_r15b import Server
 
 
@@ -27,6 +27,7 @@ class ConsoleUI():
     done = False
 
     #Initializing variable to a default value
+    #serverIP = "192.168.1.3"
     serverIP = "127.0.1.1"
 
     #Define the shared dictionary and it's values
@@ -34,6 +35,7 @@ class ConsoleUI():
     dictionary = manager.dict()
     dictionary["key"] = ''
     dictionary["finished chunks"] = 0
+    dictionary["server ip"] = "127.1.1.1"
 
     #server/client/GUI signals shutdown when they're all done
     shutdown = Event()
@@ -64,7 +66,6 @@ class ConsoleUI():
     networkServer = Process(target=Server, args=(settings, shared,))
     networkClient = Process(target=Client, args=(serverIP, shared,))
 
-    #tempGUI Variables
     state = "startScreen"
 
     clock = 0
@@ -241,7 +242,7 @@ class ConsoleUI():
                 print
 
                 #Get the server's IP:
-                self.serverIP = raw_input("What's the server's IP: ")
+                self.dictionary["server ip"] = raw_input("What's the server's IP: ")
 
                 print "Ready to Become a Node?"
                 print
@@ -288,7 +289,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While not connected, print a "connecting" bar
-                while not self.is_connected:
+                while not self.is_connected.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -321,7 +322,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While connected and not doing stuff
-                while self.is_connected and not self.is_doing_stuff:
+                while self.is_connected.is_set() and not self.is_doing_stuff.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -337,14 +338,21 @@ class ConsoleUI():
                         white_r = white_r[:-1]
 
                     time.sleep(1)
-                    #self.update.wait()
-                    #self.update.clear()
 
-                if not self.is_connected:
+                #If client has been given the shutdown command, shutdown
+                if self.shutdown.is_set():
+
+                    self.state = "nodeStartScreen"
+                    time.sleep(2)
+                    self.networkClient.terminate()
+
+                #if client is no longer connected, go to connecting screen
+                elif not self.is_connected.is_set():
 
                     self.state = "nodeConnectingScreen"
 
-                elif self.is_doing_stuff:
+                #If client is doing stuff, the go to doing stuff screen
+                elif self.is_doing_stuff.is_set():
 
                     self.state = "nodeDoingStuffScreen"
 
@@ -359,7 +367,7 @@ class ConsoleUI():
                 white_r = "            "
 
                 #While connected and doing stuff
-                while self.is_connected and self.is_doing_stuff:
+                while self.is_connected.is_set() and self.is_doing_stuff.is_set() and not self.shutdown.is_set():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -374,17 +382,22 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
-                    #time.sleep(1)
-                    self.update.wait()
-                    self.update.clear()
+                    time.sleep(1)
+
+                #If client has been given the shutdown command, shutdown
+                if self.shutdown.is_set():
+
+                    self.state = "nodeStartScreen"
+                    time.sleep(2)
+                    self.networkClient.terminate()
 
                 #if not connected, go to connecting screen
-                if not self.is_connected:
+                elif not self.is_connected.is_set():
 
                     self.state = "nodeConnectingScreen"
 
                 #if connected but not doing stuff, go to connected screen
-                elif not self.is_doing_stuff:
+                elif not self.is_doing_stuff.is_set():
 
                     self.state = "nodeConnectedScreen"
 
@@ -552,8 +565,8 @@ class ConsoleUI():
                 self.settings['algorithm'] = algorithm
                 self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
-                self.settings['min key length'] = min_key_length
-                self.settings['max key length'] = max_key_length
+                self.settings['min key length'] = int(min_key_length)
+                self.settings['max key length'] = int(max_key_length)
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -576,11 +589,11 @@ class ConsoleUI():
 
                 if user_input in ("Crack", "crack", "c"):
 
-                    self.state = "serverDictionarySearchingScreen"
+                    self.state = "serverBruteSearchingScreen"
 
                 elif user_input in ("Back", "back", "b"):
 
-                    self.state = "startStartScreen"
+                    self.state = "startScreen"
 
                 else:
 
@@ -609,6 +622,7 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
+                    print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
@@ -620,6 +634,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -783,6 +798,7 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
+                    print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
@@ -794,6 +810,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -850,7 +867,7 @@ class ConsoleUI():
                 self.networkServer.terminate()
 
                 print "============="
-                print "Start -> Server -> Rainbow User -> Found!"
+                print "Start -> Server -> Rainbow User -> Not Found"
                 print
                 print "Sorry, we didn't find anything."
                 print "Just FYI though, that took", self.clock, "seconds."
@@ -1006,7 +1023,7 @@ class ConsoleUI():
             elif state == "serverRainMakerDoingScreen":
 
                 print "============="
-                print "Start -> Server -> Rainbow Maker -> Searching..."
+                print "Start -> Server -> Rainbow Maker -> Creating..."
                 print
 
                 self.clock = time.time()
@@ -1023,6 +1040,7 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
+                    print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Creating--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
@@ -1034,6 +1052,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -1179,7 +1198,7 @@ class ConsoleUI():
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
-                print "Start -> Single-User Mode -> Dictionary"
+                print "Start -> Server Mode -> Dictionary"
                 print
 
                 #Get the algorithm
@@ -1306,6 +1325,7 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
+                    print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
@@ -1317,6 +1337,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -1629,6 +1650,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -1807,6 +1829,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -2048,6 +2071,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
@@ -2331,6 +2355,7 @@ class ConsoleUI():
                         white_l += " "
                         white_r = white_r[:-1]
 
+                    time.sleep(1)
                     self.update.wait()
                     self.update.clear()
 
