@@ -66,7 +66,6 @@ class ConsoleUI():
     networkServer = Process(target=Server, args=(settings, shared,))
     networkClient = Process(target=Client, args=(serverIP, shared,))
 
-    #tempGUI Variables
     state = "startScreen"
 
     clock = 0
@@ -868,7 +867,7 @@ class ConsoleUI():
                 self.networkServer.terminate()
 
                 print "============="
-                print "Start -> Server -> Rainbow User -> Found!"
+                print "Start -> Server -> Rainbow User -> Not Found"
                 print
                 print "Sorry, we didn't find anything."
                 print "Just FYI though, that took", self.clock, "seconds."
@@ -1024,7 +1023,7 @@ class ConsoleUI():
             elif state == "serverRainMakerDoingScreen":
 
                 print "============="
-                print "Start -> Server -> Rainbow Maker -> Searching..."
+                print "Start -> Server -> Rainbow Maker -> Creating..."
                 print
 
                 self.clock = time.time()
@@ -1199,7 +1198,7 @@ class ConsoleUI():
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
-                print "Start -> Single-User Mode -> Dictionary"
+                print "Start -> Server Mode -> Dictionary"
                 print
 
                 #Get the algorithm
