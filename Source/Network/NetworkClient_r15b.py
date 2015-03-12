@@ -31,13 +31,17 @@ class Client():
     shutdown = None
 
     def __init__(self, ip, shared_variables):
-        #Uncomment if needed for legacy work
-        self.IP = ip
 
-        self.shared_dict = shared_variables[0]
+        #Allows ConsoleUI to use shared value and others to use parameter value
+        if not ip == "127.0.1.1":
 
-        #Comment out if needed for legacy work
-        self.IP = self.shared_dict["server ip"]
+            self.IP = ip
+
+        else:
+
+            self.shared_dict = shared_variables[0]
+
+            self.IP = self.shared_dict["server ip"]
 
         self.shutdown = shared_variables[1]
         self.is_connected = shared_variables[3]

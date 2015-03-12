@@ -566,8 +566,8 @@ class ConsoleUI():
                 self.settings['algorithm'] = algorithm
                 self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
-                self.settings['min key length'] = min_key_length
-                self.settings['max key length'] = max_key_length
+                self.settings['min key length'] = int(min_key_length)
+                self.settings['max key length'] = int(max_key_length)
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -590,11 +590,11 @@ class ConsoleUI():
 
                 if user_input in ("Crack", "crack", "c"):
 
-                    self.state = "serverDictionarySearchingScreen"
+                    self.state = "serverBruteSearchingScreen"
 
                 elif user_input in ("Back", "back", "b"):
 
-                    self.state = "startStartScreen"
+                    self.state = "startScreen"
 
                 else:
 
