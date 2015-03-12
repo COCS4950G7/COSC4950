@@ -1013,6 +1013,7 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
 
+
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
         listOfSharedVariables= []
