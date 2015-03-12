@@ -170,13 +170,11 @@ class Server():
                 # block while there is no result, then terminate chunking and checking
                 result_monitor.join()
                 result_monitor.terminate()
-                print "result monitor terminated"
                 chunk_maker.join()
                 chunk_maker.terminate()
-                print "chunk maker terminated"
                 # Sleep a bit before shutting down the server - to give clients time to
                 # realize the job queue is empty and exit in an orderly way.
-                time.sleep(2)
+                time.sleep(1)
                 self.update.set()
                 if not self.single_user_mode:
                     manager.shutdown()
@@ -292,8 +290,7 @@ class Server():
                                 self.sent_chunks.remove(chunk)
                         if self.cracking_mode == "rainmaker":
                             rainChunk = result[1]
-                            #rainChunk.params = result[1]
-                            #rainChunk.data = result[2]
+
                             self.rainmaker.putChunkInFile(rainChunk)
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
@@ -388,9 +385,13 @@ class Server():
                                                          'data': '',
                                                          'timestamp': time.time(),
                                                          'halt': False})
-                    job_queue.put(new_chunk)  # put next chunk on the job queue.
-
-                    self.sent_chunks.append((params, time.time()))
+                    while True:
+                        try:
+                            job_queue.put(new_chunk)  # put next chunk on the job queue.
+                            self.sent_chunks.append((params, time.time()))
+                            break
+                        except Qqueue.Full:
+                            continue
                     if self.found_solution.value:
                         while True:
                             try:
@@ -432,8 +433,13 @@ class Server():
                         new_chunk = manager.Value(dict, {'params': chunk.params,
                                                          'data': chunk.data,
                                                          'timestamp': time.time()})
-                        job_queue.put(new_chunk)
-                        self.sent_chunks.append((chunk.params, time.time()))
+                        while True:
+                            try:
+                                job_queue.put(new_chunk, timeout=.1)
+                                self.sent_chunks.append((chunk.params, time.time()))
+                                break
+                            except Qqueue.Full:
+                                continue
                     if self.shutdown.is_set():
                         print "chunker trying to shut down"
                         while True:
@@ -643,7 +649,6 @@ class Server():
                     if result:
                         key = dictionary.showKey()
                         result_queue.put(("w", key))
-                       # result_queue.put(("c", key))
                     elif params[10] == "True":
                         result_queue.put(("e", chunk.params))
                     else:
@@ -666,7 +671,7 @@ class Server():
 
                 while not self.shutdown.is_set():
                     try:
-                        chunk = job_queue.get()
+                        chunk = job_queue.get(timeout=.1)
                     except Qqueue.Empty:
                         continue
 
