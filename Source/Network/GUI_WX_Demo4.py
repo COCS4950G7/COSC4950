@@ -2,7 +2,7 @@ __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
 import wx
-from multiprocessing import Process, Value, Array, Event
+from multiprocessing import Process, Event
 from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
 
@@ -12,24 +12,22 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
-
+        #TODO add an About Us button
         #defone the buttons
         screenHeader= wx.StaticText(self, label="Mighty Cracker", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         SingleModeButton= wx.Button(self, label="Single Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         NetworkModeButton= wx.Button(self, label="Network Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        bugNotice= wx.StaticText(self, label="BUG NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
-                                             "\n Fix is still unknown.", style=(wx.ALIGN_CENTER_HORIZONTAL))
-        bugNotice2= wx.StaticText(self, label="BUG NOTICE: 2nd Bug with LINUX, \n Buttons incorrectly span vertically and horizontally. \n"
-                                              "Fix is still Unknown", style=wx.ALIGN_CENTER_HORIZONTAL)
+        #bugNotice= wx.StaticText(self, label="BUG NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
+         #                                    "\n Fix is still unknown.", style=(wx.ALIGN_CENTER_HORIZONTAL))
+        #bugNotice2= wx.StaticText(self, label="BUG NOTICE: 2nd Bug with LINUX, \n Buttons incorrectly span vertically and horizontally. \n"
+          #                                    "Fix is still Unknown", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (SingleModeButton, 0,wx.ALIGN_CENTER, 9),
                         (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
-                        (CloseButton,0,wx.ALIGN_CENTER, 9),
-                        (bugNotice, 0, wx.ALIGN_CENTER, 9),
-                        (bugNotice2, 0, wx.ALIGN_CENTER, 9)])
+                        (CloseButton,0,wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
         self.SetSizer(hbox)
@@ -82,6 +80,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         gsizer= wx.GridSizer(12,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
+#TODO add support for cracking a file of hash codes
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -134,8 +133,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         gsizer= wx.GridSizer(16,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
-        #TODO add support for custom combinations of alphabets
-
+        #TODO add support for custom combinations of alphabets - use checkboxes instead of combo boxes
+        #TODO add support for cracking a file of hashcodes
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -289,8 +288,9 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
-        print "GUI DEBUG: connected to the server"
+        #print "GUI DEBUG: connected to the server"
 
+#TODO add ouput for the client's ip address
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Client Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -317,6 +317,12 @@ class PanelNine(wx.Panel):                     #================Network Server S
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
+    #TODO add output for what cracking method you are using
+    #TODO add output for the server's ip address
+    #TODO add progress bar (if applicable ) to show search status
+        #TODO add output for how many clients are currently connected to the server (if possible)
+        #TODO add a side bar containing list of all clients and what the status of each client is (if possible)
+    #TODO add counter for how many clients have crashed
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -344,7 +350,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
-
+        #TODO add output to indicate what cracking method you are running
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Single Mode Status Screen", style= wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style= wx.ALIGN_CENTER_HORIZONTAL)
@@ -369,7 +375,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         wx.Panel.__init__(self,parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(10,1,2,2)
-
+        #TODO add support for cracking a file of hashcodes
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -413,7 +419,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         #TODO add support for custom combinations of alphabets
-
+        #TODO convert combo box to checkboxes for the alphabet select
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -1012,7 +1018,6 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
-
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
