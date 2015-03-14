@@ -312,9 +312,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
-    #TODO add output for what cracking method you are using
-    #TODO add output for the server's ip address
+        gsizer= wx.GridSizer(7,1,2,2)
     #TODO add progress bar (if applicable ) to show search status
         #TODO add output for how many clients are currently connected to the server (if possible)
         #TODO add a side bar containing list of all clients and what the status of each client is (if possible)
@@ -322,6 +320,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.serverIPAddress= wx.StaticText(self, label="Server IP Address: Not Set Yet", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
         consoleOutputLog= wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
         forceQuitServerButton= wx.Button(self, label="Close the server", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -329,6 +329,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         #add buttons the the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+                        (self.currentCrackingMode, 0, wx.ALIGN_CENTER, 9),
+                        (self.serverIPAddress, 0, wx.ALIGN_CENTER, 9),
                         (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
                         (consoleOutputLog, 0, wx.ALIGN_CENTER, 9),
                         (forceQuitServerButton, 0, wx.ALIGN_CENTER, 9),
@@ -346,15 +348,16 @@ class PanelTen(wx.Panel):                          #====================Single M
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
-        #TODO add output to indicate what cracking method you are running
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Single Mode Status Screen", style= wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified", style= wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style= wx.ALIGN_CENTER_HORIZONTAL)
         quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.currentCrackingMode, 0, wx.ALIGN_CENTER, 9),
             (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
             (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton, 0, wx.ALIGN_CENTER, 9)])
@@ -576,12 +579,16 @@ class myFrame(wx.Frame):
 
     def switchFromPanel3ToPanel9(self):
         self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
+        tempIP= self.get_ip()
+        self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_three.Hide()
         self.panel_nine.Show()
         self.Layout()
 
     def switchFromPanel3ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
         self.panel_three.Hide()
         self.panel_ten.Show()
         self.Layout()
@@ -596,12 +603,16 @@ class myFrame(wx.Frame):
 
     def switchFromPanel4ToPanel9(self):
         self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
+        tempIP= self.get_ip()
+        self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_four.Hide()
         self.panel_nine.Show()
         self.Layout()
 
     def switchFromPanel4ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
         self.panel_four.Hide()
         self.panel_ten.Show()
         self.Layout()
@@ -698,12 +709,16 @@ class myFrame(wx.Frame):
 
     def switchFromPanel11ToPanel9(self):
         self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
+        tempIP= self.get_ip()
+        self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
         self.Layout()
 
     def switchFromPanel11ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
         self.panel_eleven.Hide()
         self.panel_ten.Show()
         self.Layout()
@@ -718,12 +733,16 @@ class myFrame(wx.Frame):
 
     def switchFromPanel12ToPanel9(self):
         self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table Maker")
+        tempIP= self.get_ip()
+        self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_twelve.Hide()
         self.panel_nine.Show()
         self.Layout()
 
     def switchFromPanel12ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table Maker")
         self.panel_twelve.Hide()
         self.panel_ten.Show()
         self.Layout()
@@ -875,71 +894,20 @@ class myFrame(wx.Frame):
             #TODO illegal for OSX: /, :,
             #TODO illegal for Linux: /, .(as the first character), \0 (null terminator),
             #TODO special cases for Linux: \(backslash), ?,  *, |, <, >,
-            #TODO filename length restriction for most unix (including OS X) and for NTFS is 255 characters
         #TODO =================================end of illegal file name characters==================================
         if((self.checkForValidFileNameLength(dial.GetValue()) is True) and (self.checkForIllegalFileNameChar(dial.GetValue()) is False)):
                 self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
+        else:
+            dial2= wx.MessageDialog(None, "Illegal File Name Length. \n"
+                                          "The new filename was not set.", "File Name is longer than 255 characters", wx.OK)
+            dial2.ShowModal()
         dial.Destroy()
 
     def checkForValidFileNameLength(self, inputString):
         if(len(inputString) > 255):
-            dial2= wx.MessageDialog(None, "Illegal File Name Length. \n"
-                                          "The new filename was not set.", "File Name is longer than 255 characters", wx.OK)
-            dial2.ShowModal()
             return False
         else:
             return True
-
-    def checkForIllegalFileNameChar(self, inputString):
-        foundInvalidChar= False
-        theInvalidChar = ""
-        for i in range(0, len(inputString)):
-            analysisChar= inputString[i]
-            if(analysisChar is '/'):
-                foundInvalidChar= True
-                theInvalidChar= "/"
-                break
-            elif(analysisChar is '\\'):
-                foundInvalidChar= True
-                theInvalidChar= "\\"
-                break
-            elif(analysisChar is '?'):
-                foundInvalidChar= True
-                theInvalidChar= "?"
-                break
-            elif(analysisChar is '*'):
-                foundInvalidChar= True
-                theInvalidChar= "*"
-                break
-            elif(analysisChar is ':'):
-                foundInvalidChar= True
-                theInvalidChar= ":"
-                break
-            elif(analysisChar is ";"):
-                foundInvalidChar= True
-                theInvalidChar= ";"
-                break
-            elif(analysisChar is '|'):
-                foundInvalidChar= True
-                theInvalidChar= "|"
-                break
-            elif(analysisChar is '"'):
-                foundInvalidChar= True
-                theInvalidChar= '"'
-                break
-            elif(analysisChar is '.'):
-                foundInvalidChar= True
-                theInvalidChar= '.'
-                break
-            elif(analysisChar is '\0'):
-                foundInvalidChar= True
-                theInvalidChar= "Null Terminator"
-                break
-        if(len(theInvalidChar) > 0):
-            dial3= wx.MessageBox(None, "Illegal Character in Filename. \n"
-                                           "The new filename was not set.", "Character '"+str(theInvalidChar)+"' is not a valid filename character.", wx.OK)
-            dial3.ShowModal()
-        return foundInvalidChar
 
     def selectRUFileSelect(self, event):
         import os
@@ -1162,6 +1130,56 @@ class myFrame(wx.Frame):
             self.switchFromPanel12ToPanel9()
         else:
             self.switchFromPanel12ToPanel10()
+
+    def get_ip(self):
+        import platform
+        import socket
+            #detect the OS
+        try:  # getOS try block
+            if platform.system() == "Windows":  # Detecting Windows
+                self.IP= socket.gethostbyname(socket.gethostname())
+                return self.IP
+            elif platform.system() == "Linux":  # Detecting Linux
+                import fcntl
+                import struct
+                import os
+
+                def get_interface_ip(ifname):
+                    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915,
+                                                        struct.pack('256s', ifname[:15]))[20:24])
+
+                #end of def
+                def get_lan_ip():
+                    ip = socket.gethostbyname(socket.gethostname())
+                    if ip.startswith("127.") and os.name != "nt":
+                        interfaces = ["eth0", "eth1", "eth2", "wlan0", "wlan1", "wifi0", "ath0", "ath1", "ppp0"]
+                        for ifname in interfaces:
+                            try:
+                                ip = get_interface_ip(ifname)
+                                print "IP address was retrieved from the " + str(ifname) + " interface."
+                                break
+                            except IOError:
+                                pass
+                    return ip
+                #end of def
+                self.IP= get_lan_ip()
+                return self.IP
+            elif platform.system() == "Darwin":  # Detecting OSX
+                self.IP = socket.gethostbyname(socket.gethostname())
+                return self.IP
+            else:                           # Detecting an OS that is not listed
+                self.IP = socket.gethostbyname(socket.gethostname())
+                return self.IP
+
+        except Exception as inst:
+            print "========================================================================================"
+            print "ERROR: An exception was thrown in getOS try block"
+            print type(inst)  # the exception instance
+            print inst.args  # arguments stored in .args
+            print inst  # _str_ allows args tto be printed directly
+            print "========================================================================================"
+        #end of detect the OS
 
 
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
