@@ -503,7 +503,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
                                                    "\n"
                                                    "In the future we'd like to add on the ability to crack the LMT-family\n"
                                                    "of hashes (Windows) as well as add in GPU support for additional power.\n"
-                                                   "\n", style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
+                                                   "\n", size=(500,200),style=wx.CB_READONLY|wx.HSCROLL|wx.VSCROLL)
         #TODO fix the about us window, the textcntrl is cut off in so many directions, almost impossible to read!!!!
         backToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
