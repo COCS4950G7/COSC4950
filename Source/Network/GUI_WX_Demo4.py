@@ -14,14 +14,10 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         gsizer= wx.GridSizer(6,1,2,2)
         #TODO add an About Us button
         #defone the buttons
-        screenHeader= wx.StaticText(self, label="Mighty Cracker", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        SingleModeButton= wx.Button(self, label="Single Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkModeButton= wx.Button(self, label="Network Mode", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        #bugNotice= wx.StaticText(self, label="BUG NOTICE: Bug with LINUX,\n things are not aligned center horizontally like they \n are supposed to be."
-         #                                    "\n Fix is still unknown.", style=(wx.ALIGN_CENTER_HORIZONTAL))
-        #bugNotice2= wx.StaticText(self, label="BUG NOTICE: 2nd Bug with LINUX, \n Buttons incorrectly span vertically and horizontally. \n"
-          #                                    "Fix is still Unknown", style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Mighty Cracker", style=wx.ALIGN_CENTER_HORIZONTAL)
+        SingleModeButton= wx.Button(self, label="Single Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
+        NetworkModeButton= wx.Button(self, label="Network Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
@@ -46,13 +42,13 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
         gsizer= wx.GridSizer(7,1,2,2)
 
         #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Select Cracking Method", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: No yet specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        DictionaryMethodButton= wx.Button(self, label="Dictionary", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        BruteForceMethodButton= wx.Button(self, label="Brute Force (default)", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        RainbowTableMethodButton= wx.Button(self, label="Rainbow Table", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Select Cracking Method", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: No yet specified", style=wx.ALIGN_CENTER_HORIZONTAL)
+        DictionaryMethodButton= wx.Button(self, label="Dictionary", style=wx.ALIGN_CENTER_HORIZONTAL)
+        BruteForceMethodButton= wx.Button(self, label="Brute Force (default)", style=wx.ALIGN_CENTER_HORIZONTAL)
+        RainbowTableMethodButton= wx.Button(self, label="Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader,0, wx.ALIGN_CENTER, 9),
@@ -82,8 +78,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
 #TODO add support for cracking a file of hash codes
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
         #setting needed for starting server
         #----cracking method
         #----algorithm
@@ -97,9 +93,9 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         generateHashButton= wx.Button(self, label="Generate Hash Code", style= wx.ALIGN_CENTER_HORIZONTAL)
         self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected", style=wx.ALIGN_CENTER_HORIZONTAL)
         setDictFileButton= wx.Button(self, label="Select Dictionary File", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
@@ -136,8 +132,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         #TODO add support for custom combinations of alphabets - use checkboxes instead of combo boxes
         #TODO add support for cracking a file of hashcodes
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
         #settings needed for starting server
         #---------cracking method
         #---------algorithm
@@ -148,7 +144,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         #-----------single (yes/no)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input", style=wx.ALIGN_CENTER_HORIZONTAL)
         inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
         generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -158,8 +154,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet:", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
@@ -198,12 +194,12 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
         gsizer= wx.GridSizer(6,1,2,2)
 
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
         crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
         makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
 
         #add buttons to the grid
@@ -230,11 +226,11 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         gsizer= wx.GridSizer(5,1,2,2)
 
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Select Node Type", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkServerButton= wx.Button(self, label="Network Server", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkClientButton= wx.Button(self, label="Network Client", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Select Node Type", style=wx.ALIGN_CENTER_HORIZONTAL)
+        NetworkServerButton= wx.Button(self, label="Network Server", style=wx.ALIGN_CENTER_HORIZONTAL)
+        NetworkClientButton= wx.Button(self, label="Network Client", style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
@@ -259,12 +255,12 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
         gsizer= wx.GridSizer(6,1,2,2)
 
         #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Network Client Main Screen", size=(300,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.serverIPAddress= wx.StaticText(self, label="Server's IP Address: No IP Address Has been Input Yet", size=(400,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        InputServerIPButton= wx.Button(self, label="Input the Server IP", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        ConnectToServerButton= wx.Button(self, label="Connect To The Server", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", size=(200,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Network Client Main Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.serverIPAddress= wx.StaticText(self, label="Server's IP Address: No IP Address Has been Input Yet", style=wx.ALIGN_CENTER_HORIZONTAL)
+        InputServerIPButton= wx.Button(self, label="Input the Server IP", style=wx.ALIGN_CENTER_HORIZONTAL)
+        ConnectToServerButton= wx.Button(self, label="Connect To The Server", style=wx.ALIGN_CENTER_HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
@@ -327,7 +323,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
-        consoleOutputLog= wx.TextCtrl(self, size=(300,100),style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
+        consoleOutputLog= wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
         forceQuitServerButton= wx.Button(self, label="Close the server", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -384,7 +380,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.hashToBeCrackedHeader= wx.StaticText(self, label="Hash to be cracked: No Hash has been entered", style=wx.ALIGN_CENTER_HORIZONTAL)
         setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
         generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", size=(250,40), style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
         quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -881,18 +877,69 @@ class myFrame(wx.Frame):
             #TODO special cases for Linux: \(backslash), ?,  *, |, <, >,
             #TODO filename length restriction for most unix (including OS X) and for NTFS is 255 characters
         #TODO =================================end of illegal file name characters==================================
-        if(self.checkForValidFileNameLength(dial.GetValue()) is True):
-            self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
-        else:
-            dial2= wx.MessageDialog(None, "Illegal File Name Length", "File Name is longer than 255 characters", wx.OK)
-            dial2.ShowModal()
+        if((self.checkForValidFileNameLength(dial.GetValue()) is True) and (self.checkForIllegalFileNameChar(dial.GetValue()) is False)):
+                self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
         dial.Destroy()
 
     def checkForValidFileNameLength(self, inputString):
         if(len(inputString) > 255):
+            dial2= wx.MessageDialog(None, "Illegal File Name Length. \n"
+                                          "The new filename was not set.", "File Name is longer than 255 characters", wx.OK)
+            dial2.ShowModal()
             return False
         else:
             return True
+
+    def checkForIllegalFileNameChar(self, inputString):
+        foundInvalidChar= False
+        theInvalidChar = ""
+        for i in range(0, len(inputString)):
+            analysisChar= inputString[i]
+            if(analysisChar is '/'):
+                foundInvalidChar= True
+                theInvalidChar= "/"
+                break
+            elif(analysisChar is '\\'):
+                foundInvalidChar= True
+                theInvalidChar= "\\"
+                break
+            elif(analysisChar is '?'):
+                foundInvalidChar= True
+                theInvalidChar= "?"
+                break
+            elif(analysisChar is '*'):
+                foundInvalidChar= True
+                theInvalidChar= "*"
+                break
+            elif(analysisChar is ':'):
+                foundInvalidChar= True
+                theInvalidChar= ":"
+                break
+            elif(analysisChar is ";"):
+                foundInvalidChar= True
+                theInvalidChar= ";"
+                break
+            elif(analysisChar is '|'):
+                foundInvalidChar= True
+                theInvalidChar= "|"
+                break
+            elif(analysisChar is '"'):
+                foundInvalidChar= True
+                theInvalidChar= '"'
+                break
+            elif(analysisChar is '.'):
+                foundInvalidChar= True
+                theInvalidChar= '.'
+                break
+            elif(analysisChar is '\0'):
+                foundInvalidChar= True
+                theInvalidChar= "Null Terminator"
+                break
+        if(len(theInvalidChar) > 0):
+            dial3= wx.MessageBox(None, "Illegal Character in Filename. \n"
+                                           "The new filename was not set.", "Character '"+str(theInvalidChar)+"' is not a valid filename character.", wx.OK)
+            dial3.ShowModal()
+        return foundInvalidChar
 
     def selectRUFileSelect(self, event):
         import os
