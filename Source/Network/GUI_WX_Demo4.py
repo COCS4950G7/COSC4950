@@ -463,54 +463,91 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
+        gsizer= wx.GridSizer(44,1,2,2)
 
         #define buttons and widgets
         aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody= wx.TextCtrl(self, value="Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.\r\n"
-                                                   "\r\n"
-                                                   "Description: \r\n"
-                                                   "Our project, Mighty Cracker, is a program designed to crack hashed \r\n"
-                                                   "passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,\r\n"
-                                                   "and Windows 7+. It uses the power of multiprocessing to fully utilize\r\n"
-                                                   "every computer available, and can utilize a LAN to distribute the\r\n"
-                                                   "workload over up to 90 computers (nodes). For now, the algorithms\r\n"
-                                                   "that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,\r\n"
-                                                   "which cover a fair amount of the common hashing algorithms used.\r\n"
-                                                   "\r\n"
-                                                   "We've implemented three common attack methods to find an original password.\r\n"
-                                                   " Dictionary takes a list of passwords, hashes them, and compares the \r\n"
-                                                   "     hashes to the original (user inputted) hash to find a match.\r\n"
-                                                   " Brute Force will iterate through any combination (up to 16 \r\n"
-                                                   "     characters) of letters, numbers, and symbols to brute-force\r\n"
-                                                   "     the password, returning an original if found.\r\n"
-                                                   " Rainbow Tables are pre-computed arrays of hashes, organized to to\r\n"
-                                                   "     provide a time-cost trade-off. The creator creates tables to\r\n"
-                                                   "     be used at a later time, and the user uses created tables.\r\n"
-                                                   "     This gives one a huge advantage if you know what the password\r\n"
-                                                   "     will consist of ahead of time.\r\n"
-                                                   "\r\n"
-                                                   "These three methods can all be used on either a single computer\r\n"
-                                                   "(single-user mode) or on a network of computers (similar to\r\n"
-                                                   "a Beowulf cluster). When using on headless systems, the program\r\n"
-                                                   "can run in terminal (text-only) mode with a -c command.\r\n"
-                                                   "\r\n"
-                                                   "Of the distributed, multi-process, simple GUI approach this program\r\n"
-                                                   "takes, it is potentially more powerful and more user-friendly than\r\n"
-                                                   "most other hash cracking software out there today, making it more\r\n"
-                                                   "accessible for more people. Simply open the executable and crack \r\n"
-                                                   "passwords.\r\n"
-                                                   "\r\n"
-                                                   "In the future we'd like to add on the ability to crack the LMT-family\r\n"
-                                                   "of hashes (Windows) as well as add in GPU support for additional power.\r\n"
-                                                   "\r\n", size=(500,200),style=wx.CB_READONLY|wx.HSCROLL|wx.VSCROLL)
-        #TODO fix the about us window, the textcntrl is cut off in so many directions, almost impossible to read!!!!
+        aboutUsTextBody1= wx.StaticText(self, label="Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody2= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody3= wx.StaticText(self, label="Description: ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody4= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody5= wx.StaticText(self, label="Our project, Mighty Cracker, is a program designed to crack hashed", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody6= wx.StaticText(self, label="passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody7= wx.StaticText(self, label="and Windows 7+. It uses the power of multiprocessing to fully utilize", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody8= wx.StaticText(self, label="every computer available, and can utilize a LAN to distribute the", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody9= wx.StaticText(self, label="workload over up to 90 computers (nodes). For now, the algorithms", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody10= wx.StaticText(self, label="that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody11= wx.StaticText(self, label="which cover a fair amount of the common hashing algorithms used.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody12= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody13= wx.StaticText(self, label="We've implemented three common attack methods to find an original password.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody14= wx.StaticText(self, label=" Dictionary takes a list of passwords, hashes them, and compares the", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody15= wx.StaticText(self, label="     hashes to the original (user inputted) hash to find a match.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody16= wx.StaticText(self, label=" Brute Force will iterate through any combination (up to 16 ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody17= wx.StaticText(self, label="     characters) of letters, numbers, and symbols to brute-force", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody18= wx.StaticText(self, label="     the password, returning an original if found.",style= wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody19= wx.StaticText(self, label=" Rainbow Tables are pre-computed arrays of hashes, organized to to", style= wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody20= wx.StaticText(self, label="     provide a time-cost trade-off. The creator creates tables to", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody21= wx.StaticText(self, label="     be used at a later time, and the user uses created tables.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody22= wx.StaticText(self, label="     This gives one a huge advantage if you know what the password", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody23= wx.StaticText(self, label="     will consist of ahead of time.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody24= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody25= wx.StaticText(self, label="These three methods can all be used on either a single computer", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody26= wx.StaticText(self, label="(single-user mode) or on a network of computers (similar to", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody27= wx.StaticText(self, label="a Beowulf cluster). When using on headless systems, the program", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody28= wx.StaticText(self, label="can run in terminal (text-only) mode with a -c command.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody29= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody30= wx.StaticText(self, label="Of the distributed, multi-process, simple GUI approach this program", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody31= wx.StaticText(self, label="takes, it is potentially more powerful and more user-friendly than", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody32= wx.StaticText(self, label="most other hash cracking software out there today, making it more", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody33= wx.StaticText(self, label="accessible for more people. Simply open the executable and crack ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody34= wx.StaticText(self, label="passwords.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody35= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody36= wx.StaticText(self, label="In the future we'd like to add on the ability to crack the LMT-family", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody37= wx.StaticText(self, label="of hashes (Windows) as well as add in GPU support for additional power.", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody38= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(aboutUsHeader, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody1, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody2, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody3, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody4, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody5, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody6, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody7, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody8, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody9, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody10, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody11, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody12, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody13, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody14, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody15, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody16, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody17, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody18, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody19, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody20, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody21, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody22, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody23, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody24, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody25, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody26, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody27, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody28, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody29, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody30, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody31, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody32, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody33, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody34, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody35, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody36, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody37, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody38, 0, wx.ALIGN_CENTER, 9),
             (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton, 0, wx.ALIGN_CENTER, 9)])
 
@@ -524,7 +561,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 
 class myFrame(wx.Frame):
     def __init__(self):
-        wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(800, 600))
+        wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
         self.panel_one= PanelOne(self)
         self.panel_two= PanelTwo(self)
