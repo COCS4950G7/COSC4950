@@ -11,18 +11,19 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
-        #TODO add an About Us button
+        gsizer= wx.GridSizer(7,1,2,2)
         #defone the buttons
         screenHeader= wx.StaticText(self, label="Mighty Cracker", style=wx.ALIGN_CENTER_HORIZONTAL)
         SingleModeButton= wx.Button(self, label="Single Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
         NetworkModeButton= wx.Button(self, label="Network Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsButton= wx.Button(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
                         (SingleModeButton, 0,wx.ALIGN_CENTER, 9),
                         (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
+                        (aboutUsButton, 0, wx.ALIGN_CENTER, 9),
                         (CloseButton,0,wx.ALIGN_CENTER, 9)])
 
         hbox.Add(gsizer, wx.ALIGN_CENTER)
@@ -31,6 +32,7 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         #Bind the buttons to events
         SingleModeButton.Bind(wx.EVT_BUTTON,  parent.onSingleModeButtonClick)
         NetworkModeButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel6)
+        aboutUsButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel13)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 
@@ -80,12 +82,6 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        #setting needed for starting server
-        #----cracking method
-        #----algorithm
-        #-----hash
-        #-----file name
-        #------single mode (yes/no)
         selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
         self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -134,14 +130,6 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        #settings needed for starting server
-        #---------cracking method
-        #---------algorithm
-        #--------hash
-        #----------min key length
-        #-----------max key length
-        #----------alphabet
-        #-----------single (yes/no)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -283,12 +271,12 @@ class PanelEight(wx.Panel):       #========================Network Client Status
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
+        gsizer= wx.GridSizer(7,1,2,2)
         #print "GUI DEBUG: connected to the server"
 
-#TODO add ouput for the client's ip address
         #define buttons and widgets
         screenHeader= wx.StaticText(self, label="Network Client Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.clientIPAddress= wx.StaticText(self, label="Client IP Address: Not Specified", style= wx.ALIGN_CENTER_HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.connectedToIP= wx.StaticText(self, label="Connected To: Not Connected to any Server", style=wx.ALIGN_CENTER_HORIZONTAL)
         disconnectClientButton= wx.Button(self, label="Disconnect From Server", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -296,6 +284,7 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         #add buttons to the grid
         gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
+            (self.clientIPAddress, 0, wx.ALIGN_CENTER, 9),
             (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
             (self.connectedToIP, 0, wx.ALIGN_CENTER, 9),
             (disconnectClientButton, 0, wx.ALIGN_CENTER, 9),
@@ -470,6 +459,67 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
+class PanelThirteen(wx.Panel):              #====================About Us Page===================================
+    def __init__(self,parent):
+        wx.Panel.__init__(self,parent)
+        hbox= wx.BoxSizer(wx.HORIZONTAL)
+        gsizer= wx.GridSizer(6,1,2,2)
+
+        #define buttons and widgets
+        aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsTextBody= wx.TextCtrl(self, value="Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.\n"
+                                                   "\n"
+                                                   "Description: \n"
+                                                   "Our project, Mighty Cracker, is a program designed to crack hashed \n"
+                                                   "passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,\n"
+                                                   "and Windows 7+. It uses the power of multiprocessing to fully utilize\n"
+                                                   "every computer available, and can utilize a LAN to distribute the\n"
+                                                   "workload over up to 90 computers (nodes). For now, the algorithms\n"
+                                                   "that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,\n"
+                                                   "which cover a fair amount of the common hashing algorithms used.\n"
+                                                   "\n"
+                                                   "We've implemented three common attack methods to find an original password.\n"
+                                                   " Dictionary takes a list of passwords, hashes them, and compares the \n"
+                                                   "     hashes to the original (user inputted) hash to find a match.\n"
+                                                   " Brute Force will iterate through any combination (up to 16 \n"
+                                                   "     characters) of letters, numbers, and symbols to brute-force\n"
+                                                   "     the password, returning an original if found.\n"
+                                                   " Rainbow Tables are pre-computed arrays of hashes, organized to to\n"
+                                                   "     provide a time-cost trade-off. The creator creates tables to\n"
+                                                   "     be used at a later time, and the user uses created tables.\n"
+                                                   "     This gives one a huge advantage if you know what the password\n"
+                                                   "     will consist of ahead of time.\n"
+                                                   "\n"
+                                                   "These three methods can all be used on either a single computer\n"
+                                                   "(single-user mode) or on a network of computers (similar to\n"
+                                                   "a Beowulf cluster). When using on headless systems, the program\n"
+                                                   "can run in terminal (text-only) mode with a -c command.\n"
+                                                   "\n"
+                                                   "Of the distributed, multi-process, simple GUI approach this program\n"
+                                                   "takes, it is potentially more powerful and more user-friendly than\n"
+                                                   "most other hash cracking software out there today, making it more\n"
+                                                   "accessible for more people. Simply open the executable and crack \n"
+                                                   "passwords.\n"
+                                                   "\n"
+                                                   "In the future we'd like to add on the ability to crack the LMT-family\n"
+                                                   "of hashes (Windows) as well as add in GPU support for additional power.\n"
+                                                   "\n", style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
+        #TODO fix the about us window, the textcntrl is cut off in so many directions, almost impossible to read!!!!
+        backToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+
+        #add buttons to the grid
+        gsizer.AddMany([(aboutUsHeader, 0, wx.ALIGN_CENTER, 9),
+            (aboutUsTextBody, 0, wx.ALIGN_CENTER, 9),
+            (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
+            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+
+        hbox.Add(gsizer, wx.ALIGN_CENTER)
+        self.SetSizer(hbox)
+
+        #bind the buttons to events
+        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
+        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 
 class myFrame(wx.Frame):
@@ -488,6 +538,7 @@ class myFrame(wx.Frame):
         self.panel_ten= PanelTen(self)
         self.panel_eleven= PanelEleven(self)
         self.panel_twelve= PanelTwelve(self)
+        self.panel_thirteen= PanelThirteen(self)
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
@@ -499,6 +550,7 @@ class myFrame(wx.Frame):
         self.panel_ten.Hide()
         self.panel_eleven.Hide()
         self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
 
         self.sizer= wx.BoxSizer(wx.VERTICAL)
         self.sizer.Add(self.panel_one, 1, wx.EXPAND)
@@ -513,6 +565,7 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_ten, 1, wx.EXPAND)
         self.sizer.Add(self.panel_eleven, 1, wx.EXPAND)
         self.sizer.Add(self.panel_twelve, 1, wx.EXPAND)
+        self.sizer.Add(self.panel_thirteen, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
         #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
@@ -535,6 +588,12 @@ class myFrame(wx.Frame):
         self.SetTitle("Mighty Cracker: Choose Node Type")
         self.panel_one.Hide()
         self.panel_six.Show()
+        self.Layout()
+
+    def switchFromPanel1ToPanel13(self, event):
+        self.SetTitle("Mighty Cracker: About Us")
+        self.panel_one.Hide()
+        self.panel_thirteen.Show()
         self.Layout()
     #---------end of switch from panel 1
 
@@ -671,6 +730,8 @@ class myFrame(wx.Frame):
 
     def switchFromPanel7ToPanel8(self):
         self.SetTitle("Mighty Cracker: Client Status")
+        tempIP= self.get_ip()
+        self.panel_eight.clientIPAddress.SetLabel("Client IP Address: "+str(tempIP))
         self.panel_seven.Hide()
         self.panel_eight.Show()
         self.Layout()
@@ -747,6 +808,14 @@ class myFrame(wx.Frame):
         self.panel_ten.Show()
         self.Layout()
     #-------------end of switch from panel 12
+
+    #--------------switch from panel 13
+    def switchFromPanel13ToPanel1(self, event):
+        self.SetTitle("Mighty Cracker")
+        self.panel_thirteen.Hide()
+        self.panel_one.Show()
+        self.Layout()
+    #------------end of switch from panel 13
 
 
     #defined functions
