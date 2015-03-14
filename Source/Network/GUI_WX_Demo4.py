@@ -415,11 +415,12 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
         hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(16,1,2,2)
+        gsizer= wx.GridSizer(17,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         #TODO add support for custom combinations of alphabets
         #TODO convert combo box to checkboxes for the alphabet select
+        #TODO check to see if file already exists, and ask if you want to override
         #define the buttons and widgets
         screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -435,6 +436,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows", style=wx.ALIGN_CENTER_HORIZONTAL)
         self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt", style=wx.ALIGN_CENTER_HORIZONTAL)
         changeFileNameButton= wx.Button(self, label="Change Saved File Name", style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.startConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
@@ -453,6 +455,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
             (setNumOfRowsButton, 0, wx.ALIGN_CENTER, 9),
             (self.fileNameHeader, 0, wx.ALIGN_CENTER, 9),
             (changeFileNameButton, 0, wx.ALIGN_CENTER, 9),
+            (self.startConnectButton, 0, wx.ALIGN_CENTER, 9),
             (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton,0, wx.ALIGN_CENTER, 9)])
 
@@ -464,6 +467,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.setRMChainLength)
         setNumOfRowsButton.Bind(wx.EVT_BUTTON, parent.setRMNumOfRows)
         changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
+        self.startConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCreationSession)
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -715,6 +719,18 @@ class myFrame(wx.Frame):
         self.panel_twelve.Hide()
         self.panel_one.Show()
         self.Layout()
+
+    def switchFromPanel12ToPanel9(self):
+        self.SetTitle("Mighty Cracker: Network Server Status Screen")
+        self.panel_twelve.Hide()
+        self.panel_nine.Show()
+        self.Layout()
+
+    def switchFromPanel12ToPanel10(self):
+        self.SetTitle("Mighty Cracker: Single Mode Status Screen")
+        self.panel_twelve.Hide()
+        self.panel_ten.Show()
+        self.Layout()
     #-------------end of switch from panel 12
 
 
@@ -865,8 +881,18 @@ class myFrame(wx.Frame):
             #TODO special cases for Linux: \(backslash), ?,  *, |, <, >,
             #TODO filename length restriction for most unix (including OS X) and for NTFS is 255 characters
         #TODO =================================end of illegal file name characters==================================
-        self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
+        if(self.checkForValidFileNameLength(dial.GetValue()) is True):
+            self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
+        else:
+            dial2= wx.MessageDialog(None, "Illegal File Name Length", "File Name is longer than 255 characters", wx.OK)
+            dial2.ShowModal()
         dial.Destroy()
+
+    def checkForValidFileNameLength(self, inputString):
+        if(len(inputString) > 255):
+            return False
+        else:
+            return True
 
     def selectRUFileSelect(self, event):
         import os
@@ -887,6 +913,7 @@ class myFrame(wx.Frame):
         self.panel_three.StartConnectButton.SetLabel("Start Dictionary Crack")
         self.panel_four.StartConnectButton.SetLabel("Start Brute Force Crack")
         self.panel_eleven.StartConnectButton.SetLabel("Start Rainbow Crack")
+        self.panel_twelve.startConnectButton.SetLabel("Make Rainbow Table")
         self.switchFromPanel1ToPanel2()
 
     def onNetworkModeButtonClick(self, e):
@@ -894,6 +921,7 @@ class myFrame(wx.Frame):
         self.panel_three.StartConnectButton.SetLabel("Start Hosting Dictionary Crack")
         self.panel_four.StartConnectButton.SetLabel("Start Hosting Brute Force Crack")
         self.panel_eleven.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
+        self.panel_twelve.startConnectButton.SetLabel("Start Hosting a Rainbow Table Creation Session")
         self.switchFromPanel6ToPanel2()
 
     def connectToServer(self, event):
@@ -1031,6 +1059,63 @@ class myFrame(wx.Frame):
             self.switchFromPanel11ToPanel9()
         else:
             self.switchFromPanel11ToPanel10()
+
+    def startRainbowTableCreationSession(self, event):
+        crackingMethod= "rainmaker"
+        tempAlgorithmSetting= str(self.panel_twelve.selectedAlgorithm.GetValue())
+        algorithmSetting= tempAlgorithmSetting
+        tempKeyLengthSetting= self.panel_twelve.keyLengthHeader.GetLabelText()
+        #remove extra header from string
+        tempKeyLengthSetting2= ""
+        for i in range(11, len(tempKeyLengthSetting)):
+            tempKeyLengthSetting2+= tempKeyLengthSetting[i]
+        keyLengthSetting= int(tempKeyLengthSetting2)
+        tempAlphabetSettings= str(self.panel_twelve.selectedAlphabet.GetValue())
+        alphabetSetting= tempAlphabetSettings
+        tempChainLengthSetting= str(self.panel_twelve.chainLengthHeader.GetLabelText())
+        #remove extra header info from the strings
+        tempChainLengthSetting2= ""
+        for i in range(19, len(tempChainLengthSetting)):
+            tempChainLengthSetting2 += tempChainLengthSetting[i]
+        chainLengthSetting= int(tempChainLengthSetting2)
+        tempNumberOfRows= self.panel_twelve.numOfRowsHeader.GetLabelText()
+        #remove extra stuff from string
+        tempNumberOfRows2= ""
+        for i in range(15, len(tempNumberOfRows)):
+            tempNumberOfRows2+= tempNumberOfRows[i]
+        numberOfRowsSetting= int(tempNumberOfRows2)
+        tempFileName= str(self.panel_twelve.fileNameHeader.GetLabelText())
+        #remove extra heading text from string
+        fileNameSetting= ""
+        for i in range(28, len(tempFileName)):
+            fileNameSetting+= tempFileName[i]
+        tempSingleSetting= self.panel_twelve.currentMode.GetLabelText()
+        #remove extra heading from current Mode
+        tempSingleSetting2= ""
+        for i in range (14, len(tempSingleSetting)):
+            tempSingleSetting2+= str(tempSingleSetting[i])
+        singleSetting = ""
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+            singleSetting="True"
+        else:
+            singleSetting="False"
+        crackingSettings = {"cracking method":crackingMethod, "algorithm":algorithmSetting, "key length":keyLengthSetting,
+                            "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
+                            "file name":fileNameSetting, "single":singleSetting}
+
+        #shared variable array
+        #[0]shared dictionary, [1]shutdown, [2]update
+        listOfSharedVariables= []
+        listOfSharedVariables.append(crackingSettings)
+        listOfSharedVariables.append(self.shutdown)
+        listOfSharedVariables.append(self.update)
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
+        self.NetworkServer.start()
+        if(singleSetting is 'False'):
+            self.switchFromPanel12ToPanel9()
+        else:
+            self.switchFromPanel12ToPanel10()
+
 
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
