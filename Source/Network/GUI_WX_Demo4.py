@@ -10,25 +10,43 @@ from NetworkClient_r15a import Client
 class PanelOne(wx.Panel):           #========================Main Menu=====================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(7,1,2,2)
-        #defone the buttons
-        screenHeader= wx.StaticText(self, label="Mighty Cracker", style=wx.ALIGN_CENTER_HORIZONTAL)
-        SingleModeButton= wx.Button(self, label="Single Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkModeButton= wx.Button(self, label="Network Mode", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsButton= wx.Button(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-                        (SingleModeButton, 0,wx.ALIGN_CENTER, 9),
-                        (NetworkModeButton,0,wx.ALIGN_CENTER, 9),
-                        (aboutUsButton, 0, wx.ALIGN_CENTER, 9),
-                        (CloseButton,0,wx.ALIGN_CENTER, 9)])
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Mighty Cracker")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
+
+        vbox.Add((-1, 25)) #add extra space between header and the first button
+
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        SingleModeButton= wx.Button(self, label="Single Mode")
+        hbox2.Add(SingleModeButton)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        NetworkModeButton= wx.Button(self, label="Network Mode")
+        hbox3.Add(NetworkModeButton)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        aboutUsButton= wx.Button(self, label="About Us")
+        hbox4.Add(aboutUsButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(CloseButton)
+        vbox.Add(hbox5, flag=wx.CENTER, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         SingleModeButton.Bind(wx.EVT_BUTTON,  parent.onSingleModeButtonClick)
@@ -41,30 +59,57 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 class PanelTwo(wx.Panel):             #====================Select Cracking Method=============================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(7,1,2,2)
 
-        #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Select Cracking Method", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: No yet specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        DictionaryMethodButton= wx.Button(self, label="Dictionary", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BruteForceMethodButton= wx.Button(self, label="Brute Force (default)", style=wx.ALIGN_CENTER_HORIZONTAL)
-        RainbowTableMethodButton= wx.Button(self, label="Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader,0, wx.ALIGN_CENTER, 9),
-            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (DictionaryMethodButton,0, wx.ALIGN_CENTER,9),
-            (BruteForceMethodButton,0, wx.ALIGN_CENTER, 9),
-            (RainbowTableMethodButton,0, wx.ALIGN_CENTER,9),
-            (BackToMainMenuButton,0, wx.ALIGN_CENTER,9),
-            (CloseButton,0, wx.ALIGN_CENTER,9)])
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Select Cracking Method")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
-        hbox.Add(gsizer,wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,25)) #spacer for adding space between header and the buttons
+
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not yet Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        DictionaryMethodButton= wx.Button(self, label="Dictionary")
+        hbox3.Add(DictionaryMethodButton)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        BruteForceMethodButton= wx.Button(self, label="Brute Force")
+        hbox4.Add(BruteForceMethodButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        RainbowTableMethodButton= wx.Button(self, label="Rainbow Table")
+        hbox5.Add(RainbowTableMethodButton)
+        vbox.Add(hbox5, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox6.Add(BackToMainMenuButton)
+        vbox.Add(hbox6, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close")
+        hbox7.Add(CloseButton)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         DictionaryMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel3)
@@ -76,42 +121,78 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings=================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(12,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
-#TODO add support for cracking a file of hash codes
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
-        self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input", style=wx.ALIGN_CENTER_HORIZONTAL)
-        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
-        generateHashButton= wx.Button(self, label="Generate Hash Code", style= wx.ALIGN_CENTER_HORIZONTAL)
-        self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected", style=wx.ALIGN_CENTER_HORIZONTAL)
-        setDictFileButton= wx.Button(self, label="Select Dictionary File", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (selectAlgorithmHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
-            (self.inputHashHeader, 0, wx.ALIGN_CENTER, 9),
-            (inputHashButton, 0, wx.ALIGN_CENTER, 9),
-            (generateHashButton, 0, wx.ALIGN_CENTER, 9),
-            (self.inputDictFileHeader, 0, wx.ALIGN_CENTER, 9),
-            (setDictFileButton, 0, wx.ALIGN_CENTER, 9),
-            (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
-            (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,10))
+
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
+        hbox3.Add(selectAlgorithmHeader)
+        self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.CB_READONLY)
+        hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
+        vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input")
+        hbox4.Add(self.inputHashHeader)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add(((-1,10)))
+
+        hbox5=wx.BoxSizer(wx.HORIZONTAL)
+        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox5.Add(inputHashButton)
+        generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox5.Add(generateHashButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected")
+        hbox6.Add(self.inputDictFileHeader)
+        vbox.Add(hbox6, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        setDictFileButton= wx.Button(self, label="Select Dictionary File")
+        hbox7.Add(setDictFileButton)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8= wx.BoxSizer(wx.HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        hbox8.Add(self.StartConnectButton)
+        vbox.Add(hbox8, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox9= wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox9.Add(BackToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox9.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox9, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
@@ -124,51 +205,93 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(16,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
-        #TODO add support for custom combinations of alphabets - use checkboxes instead of combo boxes
-        #TODO add support for cracking a file of hashcodes
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input", style=wx.ALIGN_CENTER_HORIZONTAL)
-        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
-        generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5", style=wx.ALIGN_CENTER_HORIZONTAL)
-        changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15", style=wx.ALIGN_CENTER_HORIZONTAL)
-        changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet:", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        #TODO if large number is insered, the button covers it up
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-                        (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-                        (self.selectedAlgorithmHeader, 0, wx.ALIGN_CENTER, 9),
-                        (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
-                        (self.inputHashHeader, 0, wx.ALIGN_CENTER, 9),
-                        (inputHashButton, 0, wx.ALIGN_CENTER, 9),
-                        (generateHashButton, 0, wx.ALIGN_CENTER, 9),
-                        (self.minKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
-                        (changeMinKeyLengthButton,0, wx.ALIGN_CENTER, 9),
-                        (self.maxKeyLengthHeader, 0, wx.ALIGN_CENTER, 9),
-                        (changeMaxKeyLengthButton, 0, wx.ALIGN_CENTER, 9),
-                        (self.selectedAlphabetHeader, 0, wx.ALIGN_CENTER, 9),
-                        (self.selectedAlphabet,0, wx.ALIGN_CENTER, 9),
-                        (self.StartConnectButton, 0 , wx.ALIGN_CENTER, 9),
-                        (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-                        (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:")
+        hbox3.Add(self.selectedAlgorithmHeader)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms)
+        hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
+        vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input")
+        hbox4.Add(self.inputHashHeader)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox5.Add(inputHashButton)
+        generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox5.Add(generateHashButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
+        hbox6.Add(self.minKeyLengthHeader)
+        changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
+        hbox6.Add(changeMinKeyLengthButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15")
+        hbox7.Add(self.maxKeyLengthHeader)
+        changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length")
+        hbox7.Add(changeMaxKeyLengthButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8= wx.BoxSizer(wx.HORIZONTAL)
+        self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet: ")
+        hbox8.Add(self.selectedAlphabetHeader)
+        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets)
+        hbox8.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox9= wx.BoxSizer(wx.HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        hbox9.Add(self.StartConnectButton)
+        vbox.Add(hbox9, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox10= wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox10.Add(BackToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox10.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox10, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
