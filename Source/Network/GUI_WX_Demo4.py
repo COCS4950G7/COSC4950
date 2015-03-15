@@ -10,6 +10,7 @@ from NetworkClient_r15a import Client
 class PanelOne(wx.Panel):           #========================Main Menu=====================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(7,1,2,2)
         #defone the buttons
@@ -40,6 +41,7 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 class PanelTwo(wx.Panel):             #====================Select Cracking Method=============================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(7,1,2,2)
 
@@ -74,6 +76,7 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings=================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(12,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
@@ -121,6 +124,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(16,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
@@ -178,6 +182,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
 
@@ -210,6 +215,7 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(5,1,2,2)
 
@@ -239,6 +245,7 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
 
@@ -270,6 +277,7 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(7,1,2,2)
         #print "GUI DEBUG: connected to the server"
@@ -300,6 +308,7 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+        #TODO REWRUTE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(7,1,2,2)
     #TODO add progress bar (if applicable ) to show search status
@@ -335,6 +344,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+        #TODO REWRITE USING NESTED BOX SIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(6,1,2,2)
         #define the buttons and widgets
@@ -361,6 +371,7 @@ class PanelTen(wx.Panel):                          #====================Single M
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
+        #TODO REWRITE USING NESTED BOXSIZERS
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(10,1,2,2)
         #TODO add support for cracking a file of hashcodes
@@ -402,6 +413,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
+        #TODO REWRITE USING NEW NESTED BOXSIZER
         hbox= wx.BoxSizer(wx.HORIZONTAL)
         gsizer= wx.GridSizer(17,1,2,2)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
@@ -462,9 +474,37 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(44,1,2,2)
 
+        vbox= wx.BoxSizer(wx.VERTICAL)
+
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
+        hbox1.Add(aboutUsHeader)
+        vbox.Add(hbox1, flag=wx.CENTER|wx.TOP, border=10)
+
+        vbox.Add((-1,10)) #add an extra spacer to give more room between the aboutUsHeader and the TextCtrl
+
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        textBox= wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.CB_READONLY|wx.HSCROLL)
+        hbox2.Add(textBox, proportion=1, flag=wx.EXPAND)
+        vbox.Add(hbox2, proportion=1, flag=wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
+
+        vbox.Add((-1, 25)) #add extra space between the textctrl and the buttons
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox3.Add(backToMainMenuButton)
+        closeButton= wx.Button(self, label="Close")
+        hbox3.Add(closeButton, flag=wx.LEFT|wx.BOTTOM, border=5)
+        vbox.Add(hbox3, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
+
+        #link the buttons up to events
+        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
+        closeButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+
+'''
         #define buttons and widgets
         aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
         aboutUsTextBody1= wx.StaticText(self, label="Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.", style=wx.ALIGN_CENTER_HORIZONTAL)
@@ -507,7 +547,8 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         aboutUsTextBody38= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
         CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
-
+'''
+'''
         #add buttons to the grid
         gsizer.AddMany([(aboutUsHeader, 0, wx.ALIGN_CENTER, 9),
             (aboutUsTextBody1, 0, wx.ALIGN_CENTER, 9),
@@ -550,13 +591,9 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
             (aboutUsTextBody38, 0, wx.ALIGN_CENTER, 9),
             (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
             (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        #TODO text and buttons are still offscreen in linux
+'''
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
-
-        #bind the buttons to events
-        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 
 class myFrame(wx.Frame):
