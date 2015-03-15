@@ -492,34 +492,45 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(7,1,2,2)
-    #TODO add progress bar (if applicable ) to show search status
-        #TODO add output for how many clients are currently connected to the server (if possible)
-        #TODO add a side bar containing list of all clients and what the status of each client is (if possible)
-    #TODO add counter for how many clients have crashed
 
-        #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Network Server Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.serverIPAddress= wx.StaticText(self, label="Server IP Address: Not Set Yet", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
-        consoleOutputLog= wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL)
-        forceQuitServerButton= wx.Button(self, label="Close the server", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons the the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-                        (self.currentCrackingMode, 0, wx.ALIGN_CENTER, 9),
-                        (self.serverIPAddress, 0, wx.ALIGN_CENTER, 9),
-                        (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
-                        (consoleOutputLog, 0, wx.ALIGN_CENTER, 9),
-                        (forceQuitServerButton, 0, wx.ALIGN_CENTER, 9),
-                        (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Network Server Status Screen")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
+        hbox2.Add(self.currentCrackingMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        self.serverIPAddress= wx.StaticText(self, label="Server IP Address: Not Set Yet")
+        hbox3.Add(self.serverIPAddress)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        hbox4.Add(self.currentStatus)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5=wx.BoxSizer(wx.HORIZONTAL)
+        forceQuitServerButton= wx.Button(self, label="Close the server")
+        hbox5.Add(forceQuitServerButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
@@ -528,25 +539,38 @@ class PanelNine(wx.Panel):                     #================Network Server S
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        #TODO REWRITE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
-        #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Single Mode Status Screen", style= wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified", style= wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style= wx.ALIGN_CENTER_HORIZONTAL)
-        quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.currentCrackingMode, 0, wx.ALIGN_CENTER, 9),
-            (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
-            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Single Mode Status Screen")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
+        hbox2.Add(self.currentCrackingMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        hbox3.Add(self.currentStatus)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        quitSearchButton= wx.Button(self, label="Quit Searching")
+        hbox4.Add(quitSearchButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox4.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
@@ -555,36 +579,68 @@ class PanelTen(wx.Panel):                          #====================Single M
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
-        #TODO REWRITE USING NESTED BOXSIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(10,1,2,2)
-        #TODO add support for cracking a file of hashcodes
-        #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedFileHeader= wx.StaticText(self, label="Selected Rainbow Table File: No File has been Selected", style=wx.ALIGN_CENTER_HORIZONTAL)
-        selectFileButton= wx.Button(self, label="Select File", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.hashToBeCrackedHeader= wx.StaticText(self, label="Hash to be cracked: No Hash has been entered", style=wx.ALIGN_CENTER_HORIZONTAL)
-        setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked", style=wx.ALIGN_CENTER_HORIZONTAL)
-        generateHashButton= wx.Button(self, label="Generate Hash Code", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.StartConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
-        quitSearchButton= wx.Button(self, label="Quit Searching", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
-        #add buttons to thr grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (self.selectedFileHeader, 0, wx.ALIGN_CENTER, 9),
-            (selectFileButton, 0, wx.ALIGN_CENTER, 9),
-            (self.hashToBeCrackedHeader, 0, wx.ALIGN_CENTER, 9),
-            (setHashCodeButton, 0, wx.ALIGN_CENTER, 9),
-            (generateHashButton, 0, wx.ALIGN_CENTER, 9),
-            (self.StartConnectButton, 0, wx.ALIGN_CENTER, 9),
-            (quitSearchButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox1=wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        self.selectedFileHeader= wx.StaticText(self, label="Selected Rainbow Table File: No File has been Selected")
+        hbox3.Add(self.selectedFileHeader)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        selectFileButton= wx.Button(self, label="Select File")
+        hbox4.Add(selectFileButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        self.hashToBeCrackedHeader= wx.StaticText(self, label="Hash to be cracked: No Hash has been entered")
+        hbox5.Add(self.hashToBeCrackedHeader)
+        vbox.Add(hbox5, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox6=wx.BoxSizer(wx.HORIZONTAL)
+        setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox6.Add(setHashCodeButton)
+        generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox6.Add(generateHashButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7=wx.BoxSizer(wx.HORIZONTAL)
+        self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        hbox7.Add(self.StartConnectButton)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8=wx.BoxSizer(wx.HORIZONTAL)
+        quitSearchButton= wx.Button(self, label="Quit Searching")
+        hbox8.Add(quitSearchButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox8.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #bind the buttons to events
         selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
@@ -597,54 +653,100 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
-        #TODO REWRITE USING NEW NESTED BOXSIZER
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(17,1,2,2)
+
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
-        #TODO add support for custom combinations of alphabets
-        #TODO convert combo box to checkboxes for the alphabet select
-        #TODO check to see if file already exists, and ask if you want to override
-        #define the buttons and widgets
-        screenHeader= wx.StaticText(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
-        self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10", style=wx.ALIGN_CENTER_HORIZONTAL)
-        changeKeyLengthButton= wx.Button(self, label="Set Key Length", style=wx.ALIGN_CENTER_HORIZONTAL)
-        selectAlphabetHeader= wx.StaticText(self, label="Select Alphabet", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.ALIGN_CENTER_HORIZONTAL|wx.CB_READONLY)
-        self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 1000", style=wx.ALIGN_CENTER_HORIZONTAL)
-        changeChainLengthButton= wx.Button(self, label="Set Table Chain Length", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 10000", style=wx.ALIGN_CENTER_HORIZONTAL)
-        setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt", style=wx.ALIGN_CENTER_HORIZONTAL)
-        changeFileNameButton= wx.Button(self, label="Change Saved File Name", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.startConnectButton= wx.Button(self, label="Start/Connect Button", style=wx.ALIGN_CENTER_HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back to Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style= wx.ALIGN_CENTER_HORIZONTAL)
 
-        #add buttons to the gird
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (self.selectedAlgorithmHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.selectedAlgorithm, 0, wx.ALIGN_CENTER, 9),
-            (self.keyLengthHeader, 0, wx.ALIGN_CENTER, 9),
-            (changeKeyLengthButton, 0, wx.ALIGN_CENTER, 9),
-            (selectAlphabetHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.selectedAlphabet, 0, wx.ALIGN_CENTER, 9),
-            (self.chainLengthHeader, 0, wx.ALIGN_CENTER, 9),
-            (changeChainLengthButton, 0, wx.ALIGN_CENTER, 9),
-            (self.numOfRowsHeader, 0, wx.ALIGN_CENTER, 9),
-            (setNumOfRowsButton, 0, wx.ALIGN_CENTER, 9),
-            (self.fileNameHeader, 0, wx.ALIGN_CENTER, 9),
-            (changeFileNameButton, 0, wx.ALIGN_CENTER, 9),
-            (self.startConnectButton, 0, wx.ALIGN_CENTER, 9),
-            (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton,0, wx.ALIGN_CENTER, 9)])
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox1=wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Rainbow Table Maker")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
+        hbox3.Add(self.selectedAlgorithmHeader)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
+        hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
+        vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
+        hbox4.Add(self.keyLengthHeader)
+        changeKeyLengthButton= wx.Button(self, label="Set Key Length")
+        hbox4.Add(changeKeyLengthButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5=wx.BoxSizer(wx.HORIZONTAL)
+        selectAlphabetHeader= wx.StaticText(self, label="Select Alphabet")
+        hbox5.Add(selectAlphabetHeader)
+        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
+        hbox5.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox6=wx.BoxSizer(wx.HORIZONTAL)
+        self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 1000")
+        hbox6.Add(self.chainLengthHeader)
+        changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
+        hbox6.Add(changeChainLengthButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7=wx.BoxSizer(wx.HORIZONTAL)
+        self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 10000")
+        hbox7.Add(self.numOfRowsHeader)
+        setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
+        hbox7.Add(setNumOfRowsButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8=wx.BoxSizer(wx.HORIZONTAL)
+        self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt")
+        hbox8.Add(self.fileNameHeader)
+        vbox.Add(hbox8, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox9=wx.BoxSizer(wx.HORIZONTAL)
+        changeFileNameButton= wx.Button(self, label="Change Saved File Name")
+        hbox9.Add(changeFileNameButton)
+        vbox.Add(hbox9, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox10=wx.BoxSizer(wx.HORIZONTAL)
+        self.startConnectButton= wx.Button(self, label="Start/Connect Button")
+        hbox10.Add(self.startConnectButton)
+        vbox.Add(hbox10, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox11=wx.BoxSizer(wx.HORIZONTAL)
+        backToMainMenuButton= wx.Button(self, label="Back to Main Menu")
+        hbox11.Add(backToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox11.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox11, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #bind the buttons to events
         changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
