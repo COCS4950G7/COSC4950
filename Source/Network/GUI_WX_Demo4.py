@@ -305,29 +305,45 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
 
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified", style=wx.ALIGN_CENTER_HORIZONTAL)
-        crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table", style=wx.ALIGN_CENTER_HORIZONTAL)
-        makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.currentMode, 0, wx.ALIGN_CENTER, 9),
-            (crackRainbowTableButton,0, wx.ALIGN_CENTER, 9),
-            (makeRainbowTableButton, 0, wx.ALIGN_CENTER, 9),
-            (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0 , wx.ALIGN_CENTER, 9)])
+        vbox.Add((-1,10))
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        hbox2= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        hbox2.Add(self.currentMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table")
+        hbox3.Add(crackRainbowTableButton)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4= wx.BoxSizer(wx.HORIZONTAL)
+        makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker")
+        hbox4.Add(makeRainbowTableButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox5.Add(BackToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
@@ -338,26 +354,38 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(5,1,2,2)
 
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Select Node Type", style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkServerButton= wx.Button(self, label="Network Server", style=wx.ALIGN_CENTER_HORIZONTAL)
-        NetworkClientButton= wx.Button(self, label="Network Client", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-                        (NetworkServerButton, 0, wx.ALIGN_CENTER, 9),
-                        (NetworkClientButton, 0, wx.ALIGN_CENTER, 9),
-                        (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-                        (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Select Node Type")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        NetworkServerButton= wx.Button(self, label="Network Server")
+        hbox2.Add(NetworkServerButton)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        NetworkClientButton= wx.Button(self, label="Network Client")
+        hbox3.Add(NetworkClientButton)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox4.Add(BackToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox4.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         NetworkServerButton.Bind(wx.EVT_BUTTON, parent.onNetworkModeButtonClick)
@@ -368,28 +396,45 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(6,1,2,2)
 
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Network Client Main Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.serverIPAddress= wx.StaticText(self, label="Server's IP Address: No IP Address Has been Input Yet", style=wx.ALIGN_CENTER_HORIZONTAL)
-        InputServerIPButton= wx.Button(self, label="Input the Server IP", style=wx.ALIGN_CENTER_HORIZONTAL)
-        ConnectToServerButton= wx.Button(self, label="Connect To The Server", style=wx.ALIGN_CENTER_HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-                        (self.serverIPAddress, 0, wx.ALIGN_CENTER, 9),
-                        (InputServerIPButton, 0, wx.ALIGN_CENTER, 9),
-                        (ConnectToServerButton, 0, wx.ALIGN_CENTER, 9),
-                        (BackToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-                        (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Network Client Main Screen")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.serverIPAddress= wx.StaticText(self, label="Server's IP Address: No IP Address Has been Input Yet")
+        hbox2.Add(self.serverIPAddress)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        InputServerIPButton= wx.Button(self, label="Input the Server IP")
+        hbox3.Add(InputServerIPButton)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        ConnectToServerButton= wx.Button(self, label="Connect To The Server")
+        hbox4.Add(ConnectToServerButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5=wx.BoxSizer(wx.HORIZONTAL)
+        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox5.Add(BackToMainMenuButton)
+        CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
@@ -400,29 +445,45 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
-        #TODO REWRUTE USING NESTED BOX SIZERS
-        hbox= wx.BoxSizer(wx.HORIZONTAL)
-        gsizer= wx.GridSizer(7,1,2,2)
-        #print "GUI DEBUG: connected to the server"
 
-        #define buttons and widgets
-        screenHeader= wx.StaticText(self, label="Network Client Status Screen", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.clientIPAddress= wx.StaticText(self, label="Client IP Address: Not Specified", style= wx.ALIGN_CENTER_HORIZONTAL)
-        self.currentStatus= wx.StaticText(self, label="Current Status: Running", style=wx.ALIGN_CENTER_HORIZONTAL)
-        self.connectedToIP= wx.StaticText(self, label="Connected To: Not Connected to any Server", style=wx.ALIGN_CENTER_HORIZONTAL)
-        disconnectClientButton= wx.Button(self, label="Disconnect From Server", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
+        vbox= wx.BoxSizer(wx.VERTICAL)
 
-        #add buttons to the grid
-        gsizer.AddMany([(screenHeader, 0, wx.ALIGN_CENTER, 9),
-            (self.clientIPAddress, 0, wx.ALIGN_CENTER, 9),
-            (self.currentStatus, 0, wx.ALIGN_CENTER, 9),
-            (self.connectedToIP, 0, wx.ALIGN_CENTER, 9),
-            (disconnectClientButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
+        hbox1=wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Network Client Status Screen")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
-        hbox.Add(gsizer, wx.ALIGN_CENTER)
-        self.SetSizer(hbox)
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.clientIPAddress= wx.StaticText(self, label="Client IP Address: Not Specified")
+        hbox2.Add(self.clientIPAddress)
+        self.connectedToIP= wx.StaticText(self, label="Connected To: Not Connected to any Server")
+        hbox2.Add(self.connectedToIP, flag=wx.LEFT, border=5)
+        vbox.Add(hbox2, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        hbox3.Add(self.currentStatus)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        disconnectClientButton= wx.Button(self, label="Disconnect From Server")
+        hbox4.Add(disconnectClientButton)
+        vbox.Add(hbox4, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox5=wx.BoxSizer(wx.HORIZONTAL)
+        CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(CloseButton)
+        vbox.Add(hbox5, flag=wx.CENTER, border=10)
+
+        self.SetSizer(vbox)
 
         #Bind the buttons to events
         disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
@@ -935,7 +996,7 @@ class myFrame(wx.Frame):
     #--------------end of switch from panel 7
 
     #---------switch from panel 8
-    def switchFromPanel8ToPanel1(self, event):
+    def switchFromPanel8ToPanel1(self):
         self.SetTitle("Mighty Cracker")
         self.panel_eight.Hide()
         self.panel_one.Show()
