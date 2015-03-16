@@ -2,9 +2,12 @@ __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
 import wx
+import hashlib
+import sys
 from multiprocessing import Process, Event
 from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
+from HashGenerator_RevHamm import hashGenerator
 
 
 class PanelOne(wx.Panel):           #========================Main Menu=====================
@@ -196,7 +199,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogDic)
         setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
@@ -295,7 +298,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogBF)
         changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
         changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
@@ -645,7 +648,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         #bind the buttons to events
         selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
         setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
         quitSearchButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -879,8 +882,6 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
             (CloseButton, 0, wx.ALIGN_CENTER, 9)])
         #TODO text and buttons are still offscreen in linux
 '''
-
-
 
 class myFrame(wx.Frame):
     def __init__(self):
@@ -1233,6 +1234,33 @@ class myFrame(wx.Frame):
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
 
+    def generateHashDialogDic(self, event):
+        dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
+        dial.ShowModal()
+        inputKey= str(dial.GetValue())
+        inputAlgorithm= self.panel_three.selectedAlgorithm.GetValue()
+        generatedHash= str(hashlib.new(str(inputAlgorithm), inputKey).hexdigest())
+        self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
+        dial.Destroy()
+
+    def generateHashDialogBF(self, event):
+        dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
+        dial.ShowModal()
+        inputKey= str(dial.GetValue())
+        inputAlgorithm= self.panel_four.selectedAlgorithm.GetValue()
+        generatedHash= str(hashlib.new(str(inputAlgorithm), inputKey).hexdigest())
+        self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
+        dial.Destroy()
+
+    def generateHashDialogRT(self, event):
+        dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
+        dial.ShowModal()
+        inputKey= str(dial.GetValue())
+        inputAlgorithm= self.panel_eleven.selectedAlgorithm.GetValue()
+        generatedHash= str(hashlib.new(str(inputAlgorithm), inputKey).hexdigest())
+        self.panel_eleven.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
+        dial.Destroy()
+
     def setBFMinKeyLength(self, event):
         dial = wx.TextEntryDialog(self, "Input the Min Key Length", "Input Min Key Length", "", style=wx.OK)
         dial.ShowModal()
@@ -1412,10 +1440,11 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
+        print "GUI DEBUG: Starting up Server Process"
         self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
-        print "GUI DEBUG: before process is started"
+        #print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
-        print "GUI DEBUG: after process has started"
+        #print "GUI DEBUG: after process has started"
         if(singleSetting is 'False'):
             self.switchFromPanel3ToPanel9()
         else:
