@@ -385,6 +385,10 @@ class RainbowUser():
 
                     self.done = True
 
+                elif rec == "collisionDetected":
+
+                    print "Collision Detected!"
+
                 count += 1
 
 
@@ -518,7 +522,7 @@ class RainbowUser():
 
         self.alphabet = varsList[2]
 
-        self.alphabet = self.setAlphabet(self.alphabet)
+        #self.alphabet = self.setAlphabet(self.alphabet)
 
         self.width = int(varsList[3])
         #print self.width
