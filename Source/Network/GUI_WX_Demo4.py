@@ -672,7 +672,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         wx.Panel.__init__(self, parent)
 
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
-        listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
+                          "Digits"]
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -1579,7 +1581,25 @@ class myFrame(wx.Frame):
             tempKeyLengthSetting2+= tempKeyLengthSetting[i]
         keyLengthSetting= int(tempKeyLengthSetting2)
         tempAlphabetSettings= str(self.panel_twelve.selectedAlphabet.GetValue())
-        alphabetSetting= tempAlphabetSettings
+        tempAlphabetSetting2=""
+        #check to see what alphabet was selected and convert to appropriate name
+        if(self.compareString(tempAlphabetSettings, "All",0,0,len("All"),len('All'))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits+string.punctuation
+        elif(self.compareString(tempAlphabetSettings, "Letters and Digits",0,0,len("Letters and Digits"), len("Letters and Digits"))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits
+        elif(self.compareString(tempAlphabetSettings, "Letters and Punctuation",0,0,len("Letters and Punctuation"),len("Letters and Punctuation" ))==True):
+            tempAlphabetSetting2=string.ascii_letters+string.punctuation
+        elif(self.compareString(tempAlphabetSettings, "Letters Only",0,0,len("Letters Only"), len("Letters Only"))==True):
+            tempAlphabetSetting2= string.ascii_letters
+        elif(self.compareString(tempAlphabetSettings, "Uppercase Letters",0,0, len("Uppercase Letters"), len("Uppercase Letters"))==True):
+            tempAlphabetSetting2= string.ascii_uppercase
+        elif(self.compareString(tempAlphabetSettings, "Lowercase Letters",0,0, len("Lowercase Letters"), len("Lowercase Letters"))==True):
+            tempAlphabetSetting2= string.ascii_lowercase
+        elif(self.compareString(tempAlphabetSettings, "Digits",0,0,len("Digits"), len("Digits"))==True):
+            tempAlphabetSetting2= string.digits
+        else:
+            print "GUI ERROR: alphabet not recognized: '"+str(tempAlphabetSettings)+"'"
+        alphabetSetting= tempAlphabetSetting2
         tempChainLengthSetting= str(self.panel_twelve.chainLengthHeader.GetLabelText())
         #remove extra header info from the strings
         tempChainLengthSetting2= ""
