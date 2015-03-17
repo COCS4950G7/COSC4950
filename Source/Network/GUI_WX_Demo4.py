@@ -1206,12 +1206,14 @@ class myFrame(wx.Frame):
 
     def setDictionaryHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked", "Input Hash", "", style=wx.OK)
+        #TODO need to inform the user than non-ascii characters are not allowed
         dial.ShowModal()
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
     def setBruteForceHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked", "Input Hash", "", style=wx.OK)
+        #TODO need to inform the user than non-ascii characters are not allowed
         dial.ShowModal()
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
