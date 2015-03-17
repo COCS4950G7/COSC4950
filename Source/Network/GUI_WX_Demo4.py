@@ -238,7 +238,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:")
         hbox3.Add(self.selectedAlgorithmHeader)
-        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
         vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
@@ -281,7 +281,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet: ")
         hbox8.Add(self.selectedAlphabetHeader)
-        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets)
+        self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
         hbox8.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
@@ -612,7 +612,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         hbox9=wx.BoxSizer(wx.HORIZONTAL)
         selectedAlgorithmHeader= wx.StaticText(self, label="Selected Algorithm: ")
         hbox9.Add(selectedAlgorithmHeader)
-        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox9.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
         vbox.Add(hbox9, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
