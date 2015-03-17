@@ -210,13 +210,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
-        listOfAlphabets= ["All (including whitespace)","All (excluding whitespace)","Letters and Digits (including whitespace)",
-                           "Letters and Digits (excluding whitespace)","Letters and Punctuation (including whitespace)",
-                           "Letters and Punctuation (excluding whitespace)","Letters Only (including whitespace)",
-                           "Letters Only (excluding whitespace)","Uppercase Letters (including whitespace)",
-                           "Uppercase Letters (excluding whitespace)","Lowercase Letters (including whitespace)",
-                           "Lowercase Letters (excluding whitespace)","Digits (including whitespace)",
-                           "Digits (excluding whitespace)"]
+        listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
+                          "Digits"]
         #TODO if large number is insered, the button covers it up
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -1492,33 +1487,19 @@ class myFrame(wx.Frame):
         tempAlphabetSetting= str(self.panel_four.selectedAlphabet.GetValue())
         tempAlphabetSetting2=""
         #check to see what alphabet was selected and convert to appropriate name
-        if(self.compareString(tempAlphabetSetting, "All (including whitespace)",0,0,len("All (including whitespace)"),len('All (including whitespace)'))==True):
-            tempAlphabetSetting2= string.ascii_letters+string.digits+string.whitespace+string.punctuation
-        elif(self.compareString(tempAlphabetSetting, "All (excluding whitespace)",0,0,len("All (excluding whitespace)"),len("All (excluding whitespace)"))==True):
+        if(self.compareString(tempAlphabetSetting, "All",0,0,len("All"),len('All'))==True):
             tempAlphabetSetting2= string.ascii_letters+string.digits+string.punctuation
-        elif(self.compareString(tempAlphabetSetting, "Letters and Digits (including whitespace)",0,0,len("Letters and Digits (including whitespace)"), len("Letters and Digits (including whitespace)"))==True):
-            tempAlphabetSetting2= string.ascii_letters+string.digits+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Letters and Digits (excluding whitespace)",0,0,len("Letters and Digits (excluding whitespace)"), len("Letters and Digits (excluding whitespace)"))==True):
+        elif(self.compareString(tempAlphabetSetting, "Letters and Digits",0,0,len("Letters and Digits"), len("Letters and Digits"))==True):
             tempAlphabetSetting2= string.ascii_letters+string.digits
-        elif(self.compareString(tempAlphabetSetting, "Letters and Punctuation (including whitespace)",0,0,len("Letters and Punctuation (including whitespace)"),len("Letters and Punctuation (including whitespace)" ))==True):
-            tempAlphabetSetting2=string.ascii_letters+string.punctuation+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Letters and Punctuation (excluding whitespace)",0,0,len("Letters and Punctuation (excluding whitespace)"),len("Letters and Punctuation (excluding whitespace)" ))==True):
+        elif(self.compareString(tempAlphabetSetting, "Letters and Punctuation",0,0,len("Letters and Punctuation"),len("Letters and Punctuation" ))==True):
             tempAlphabetSetting2=string.ascii_letters+string.punctuation
-        elif(self.compareString(tempAlphabetSetting, "Letters Only (including whitespace)",0,0,len("Letters Only (including whitespace)"), len("Letters Only (including whitespace)"))==True):
-            tempAlphabetSetting2= string.ascii_letters+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Letters Only (excluding whitespace)",0,0,len("Letters Only (excluding whitespace)"), len("Letters Only (excluding whitespace)"))==True):
+        elif(self.compareString(tempAlphabetSetting, "Letters Only",0,0,len("Letters Only"), len("Letters Only"))==True):
             tempAlphabetSetting2= string.ascii_letters
-        elif(self.compareString(tempAlphabetSetting, "Uppercase Letters (including whitespace)",0,0, len("Uppercase Letters (including whitespace)"), len("Uppercase Letters (including whitespace)"))==True):
-            tempAlphabetSetting2= string.ascii_uppercase+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Uppercase Letters (excluding whitespace)",0,0, len("Uppercase Letters (excluding whitespace)"), len("Uppercase Letters (excluding whitespace)"))==True):
+        elif(self.compareString(tempAlphabetSetting, "Uppercase Letters",0,0, len("Uppercase Letters"), len("Uppercase Letters"))==True):
             tempAlphabetSetting2= string.ascii_uppercase
-        elif(self.compareString(tempAlphabetSetting, "Lowercase Letters (including whitespace)",0,0, len("Lowercase Letters (including whitespace)"), len("Lowercase Letters (including whitespace)"))==True):
-            tempAlphabetSetting2= string.ascii_lowercase+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Lowercase Letters (excluding whitespace)",0,0, len("Lowercase Letters (excluding whitespace)"), len("Lowercase Letters (excluding whitespace)"))==True):
+        elif(self.compareString(tempAlphabetSetting, "Lowercase Letters",0,0, len("Lowercase Letters"), len("Lowercase Letters"))==True):
             tempAlphabetSetting2= string.ascii_lowercase
-        elif(self.compareString(tempAlphabetSetting, "Digits (including whitespace)",0,0,len("Digits (including whitespace)"), len("Digits (including whitespace)"))==True):
-            tempAlphabetSetting2= string.digits+string.whitespace
-        elif(self.compareString(tempAlphabetSetting, "Digits (excluding whitespace)",0,0,len("Digits (excluding whitespace)"), len("Digits (excluding whitespace)"))==True):
+        elif(self.compareString(tempAlphabetSetting, "Digits",0,0,len("Digits"), len("Digits"))==True):
             tempAlphabetSetting2= string.digits
         else:
             print "GUI ERROR: alphabet not recognized: '"+str(tempAlphabetSetting)+"'"
