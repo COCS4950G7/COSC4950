@@ -583,6 +583,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
 
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -596,6 +598,15 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox9=wx.BoxSizer(wx.HORIZONTAL)
+        selectedAlgorithmHeader= wx.StaticText(self, label="Selected Algorithm: ")
+        hbox9.Add(selectedAlgorithmHeader)
+        self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms)
+        hbox9.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
+        vbox.Add(hbox9, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
 
@@ -1258,7 +1269,7 @@ class myFrame(wx.Frame):
         inputKey= str(dial.GetValue())
         inputAlgorithm= self.panel_eleven.selectedAlgorithm.GetValue()
         generatedHash= str(hashlib.new(str(inputAlgorithm), inputKey).hexdigest())
-        self.panel_eleven.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
+        self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
 
     def setBFMinKeyLength(self, event):
