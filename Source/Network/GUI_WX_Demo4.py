@@ -271,11 +271,28 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         vbox.Add((-1,10))
 
+        '''
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet: ")
         hbox8.Add(self.selectedAlphabetHeader)
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets)
         hbox8.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+        '''
+
+        hbox8=wx.BoxSizer(wx.HORIZONTAL)
+        asciiUpperAlphabetCheckBox= wx.CheckBox(self, label="ASCII Uppercase")
+        asciiUpperAlphabetCheckBox.SetValue(True)
+        hbox8.Add(asciiUpperAlphabetCheckBox, flag=wx.LEFT, border=5)
+        asciiLowerAlphabetCheckBox= wx.CheckBox(self, label="ASCII Lowercase")
+        asciiLowerAlphabetCheckBox.SetValue(True)
+        hbox8.Add(asciiLowerAlphabetCheckBox, flag=wx.LEFT, border=5)
+        digitsAlphabetCheckBox= wx.CheckBox(self, label="Digits")
+        digitsAlphabetCheckBox.SetValue(True)
+        hbox8.Add(digitsAlphabetCheckBox, flag=wx.LEFT, border=5)
+        specialSymbolsAlphabetCheckBox= wx.CheckBox(self, label="Special Characters")
+        specialSymbolsAlphabetCheckBox.SetValue(True)
+        hbox8.Add(specialSymbolsAlphabetCheckBox, flag=wx.LEFT, border=5)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
