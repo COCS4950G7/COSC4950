@@ -2,12 +2,12 @@ __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
 import wx
+import string
 import hashlib
-import sys
 from multiprocessing import Process, Event
 from NetworkServer_r15b import Server
 from NetworkClient_r15a import Client
-from HashGenerator_RevHamm import hashGenerator
+
 
 
 class PanelOne(wx.Panel):           #========================Main Menu=====================
@@ -209,7 +209,14 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
-        listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
+        listOfAlphabets= ["All (including whitespace)","All (excluding whitespace)","Letters and Digits (including whitespace)",
+                           "Letters and Digits (excluding whitespace)","Letters and Punctuation (including whitespace)",
+                           "Letters and Punctuation (excluding whitespace)","Letters Only (including whitespace)",
+                           "Letters Only (excluding whitespace)","Uppercase Letters (including whitespace)",
+                           "Uppercase Letters (excluding whitespace)","Lowercase Letters (including whitespace)",
+                           "Lowercase Letters (excluding whitespace)","Digits (including whitespace)",
+                           "Digits (excluding whitespace)"]
         #TODO if large number is insered, the button covers it up
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -1255,6 +1262,7 @@ class myFrame(wx.Frame):
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
 
+
     def generateHashDialogBF(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
         dial.ShowModal()
@@ -1482,7 +1490,39 @@ class myFrame(wx.Frame):
             maxKeyLengthSetting+= tempMaxKeyLength[i]
         finalMaxKeyLengthSetting= int(maxKeyLengthSetting)
         tempAlphabetSetting= str(self.panel_four.selectedAlphabet.GetValue())
-        alphabetSetting= tempAlphabetSetting
+        tempAlphabetSetting2=""
+        #check to see what alphabet was selected and convert to appropriate name
+        if(self.compareString(tempAlphabetSetting, "All (including whitespace)",0,0,len("All (including whitespace)"),len('All (including whitespace)'))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits+string.whitespace+string.punctuation
+        elif(self.compareString(tempAlphabetSetting, "All (excluding whitespace)",0,0,len("All (excluding whitespace)"),len("All (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits+string.punctuation
+        elif(self.compareString(tempAlphabetSetting, "Letters and Digits (including whitespace)",0,0,len("Letters and Digits (including whitespace)"), len("Letters and Digits (including whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Letters and Digits (excluding whitespace)",0,0,len("Letters and Digits (excluding whitespace)"), len("Letters and Digits (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.digits
+        elif(self.compareString(tempAlphabetSetting, "Letters and Punctuation (including whitespace)",0,0,len("Letters and Punctuation (including whitespace)"),len("Letters and Punctuation (including whitespace)" ))==True):
+            tempAlphabetSetting2=string.ascii_letters+string.punctuation+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Letters and Punctuation (excluding whitespace)",0,0,len("Letters and Punctuation (excluding whitespace)"),len("Letters and Punctuation (excluding whitespace)" ))==True):
+            tempAlphabetSetting2=string.ascii_letters+string.punctuation
+        elif(self.compareString(tempAlphabetSetting, "Letters Only (including whitespace)",0,0,len("Letters Only (including whitespace)"), len("Letters Only (including whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_letters+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Letters Only (excluding whitespace)",0,0,len("Letters Only (excluding whitespace)"), len("Letters Only (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_letters
+        elif(self.compareString(tempAlphabetSetting, "Uppercase Letters (including whitespace)",0,0, len("Uppercase Letters (including whitespace)"), len("Uppercase Letters (including whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_uppercase+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Uppercase Letters (excluding whitespace)",0,0, len("Uppercase Letters (excluding whitespace)"), len("Uppercase Letters (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_uppercase
+        elif(self.compareString(tempAlphabetSetting, "Lowercase Letters (including whitespace)",0,0, len("Lowercase Letters (including whitespace)"), len("Lowercase Letters (including whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_lowercase+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Lowercase Letters (excluding whitespace)",0,0, len("Lowercase Letters (excluding whitespace)"), len("Lowercase Letters (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.ascii_lowercase
+        elif(self.compareString(tempAlphabetSetting, "Digits (including whitespace)",0,0,len("Digits (including whitespace)"), len("Digits (including whitespace)"))==True):
+            tempAlphabetSetting2= string.digits+string.whitespace
+        elif(self.compareString(tempAlphabetSetting, "Digits (excluding whitespace)",0,0,len("Digits (excluding whitespace)"), len("Digits (excluding whitespace)"))==True):
+            tempAlphabetSetting2= string.digits
+        else:
+            print "GUI ERROR: alphabet not recognized: '"+str(tempAlphabetSetting)+"'"
+        alphabetSetting= tempAlphabetSetting2
         tempSingleSetting= str(self.panel_four.currentMode.GetLabel())
         tempSingleSetting2=""
         for i in range(14, len(tempSingleSetting)):
