@@ -1661,7 +1661,7 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings = {"cracking method":crackingMethod, "algorithm":algorithmSetting, "key length":keyLengthSetting,
                             "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
-                            "file name":fileNameSetting, "single":singleSetting}
+                            "file name":fileNameSetting, "single":singleSetting, "finished chunks":0}
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
