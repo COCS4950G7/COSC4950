@@ -6,7 +6,7 @@ import string
 import hashlib
 from multiprocessing import Process, Event
 from NetworkServer_r15b import Server
-from NetworkClient_r15a import Client
+from NetworkClient_r15b import Client
 
 
 
@@ -24,41 +24,45 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         vbox.Add((-1, 25)) #add extra space between header and the first button
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
-        SingleModeButton= wx.Button(self, label="Single Mode")
-        hbox2.Add(SingleModeButton)
+        self.SingleModeButton= wx.Button(self, label="Single Mode")
+        hbox2.Add(self.SingleModeButton)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        NetworkModeButton= wx.Button(self, label="Network Mode")
-        hbox3.Add(NetworkModeButton)
+        self.NetworkModeButton= wx.Button(self, label="Network Mode")
+        hbox3.Add(self.NetworkModeButton)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
-        aboutUsButton= wx.Button(self, label="About Us")
+        self.aboutUsButton= wx.Button(self, label="About Us")
         #TODO need to insert text into the about us page (panel 13)
-        hbox4.Add(aboutUsButton)
+        hbox4.Add(self.aboutUsButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close")
-        hbox5.Add(CloseButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(self.CloseButton)
         vbox.Add(hbox5, flag=wx.CENTER, border=10)
 
         self.SetSizer(vbox)
 
+        #add tooltip
+        self.SingleModeButton.SetToolTip(wx.ToolTip('For if you are using only one computer.'))
+        self.NetworkModeButton.SetToolTip(wx.ToolTip('For when you are using a network of more than one computer.'))
+        self.aboutUsButton.SetToolTip(wx.ToolTip('About the creators of this software and the purpose of this software.'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close this Program.'))
+
         #Bind the buttons to events
-        SingleModeButton.Bind(wx.EVT_BUTTON,  parent.onSingleModeButtonClick)
-        SingleModeButton.Bind(wx.EVT_ENTER_WINDOW, parent.enterSingleModeButton)#testing status bar
-        SingleModeButton.Bind(wx.EVT_LEAVE_WINDOW, parent.leaveSingleModeButton)
-        NetworkModeButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel6)
-        aboutUsButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel13)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.SingleModeButton.Bind(wx.EVT_BUTTON,  parent.onSingleModeButtonClick)
+        self.NetworkModeButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel6)
+        self.aboutUsButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel13)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 
 
@@ -261,11 +265,9 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
-        #TODO specifiy what the minimum key length is
-        #TODO handle invalid key lengths
         hbox6.Add(self.minKeyLengthHeader)
         changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
-        hbox6.Add(changeMinKeyLengthButton, flag=wx.LEFT, border=5)
+        hbox6.Add(changeMinKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -274,7 +276,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15")
         hbox7.Add(self.maxKeyLengthHeader)
         changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length")
-        hbox7.Add(changeMaxKeyLengthButton, flag=wx.LEFT, border=5)
+        hbox7.Add(changeMaxKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -312,6 +314,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
         changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
+        #TODO check to make sure that min key is less than or equal to max key
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -582,8 +585,8 @@ class PanelTen(wx.Panel):                          #====================Single M
         vbox.Add((-1,10))
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
-        quitSearchButton= wx.Button(self, label="Quit Searching")
-        hbox4.Add(quitSearchButton)
+        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox4.Add(backToMainMenuButton)
         CloseButton= wx.Button(self, label="Close")
         hbox4.Add(CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
@@ -591,7 +594,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.SetSizer(vbox)
 
         #Bind the buttons to events
-        quitSearchButton.Bind(wx.EVT_BUTTON, parent.ShowNotFinishedMessage1)
+        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
@@ -664,8 +667,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         vbox.Add((-1,10))
 
         hbox8=wx.BoxSizer(wx.HORIZONTAL)
-        quitSearchButton= wx.Button(self, label="Quit Searching")
-        hbox8.Add(quitSearchButton)
+        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox8.Add(backToMainMenuButton)
         CloseButton= wx.Button(self, label="Close")
         hbox8.Add(CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
@@ -677,7 +680,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
         generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
-        quitSearchButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
+        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
@@ -716,11 +719,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
-        #TODO need to tell the user what the minimum key length is
-        #TODO need to handle invalid key lengths
         hbox4.Add(self.keyLengthHeader)
         changeKeyLengthButton= wx.Button(self, label="Set Key Length")
-        hbox4.Add(changeKeyLengthButton, flag=wx.LEFT, border=5)
+        hbox4.Add(changeKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -736,22 +737,18 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
         self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 100")
-        #TODO need to specifiy what the minimum chain length is
-        #TODO need to handle invalid chain lengths
         hbox6.Add(self.chainLengthHeader)
         changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
-        hbox6.Add(changeChainLengthButton, flag=wx.LEFT, border=5)
+        hbox6.Add(changeChainLengthButton, flag=wx.LEFT, border=125)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
 
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 100")
-        #TODO need to specify what the minimum number of rows is
-        #TODO need to handle invalid number of rows
         hbox7.Add(self.numOfRowsHeader)
         setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
-        hbox7.Add(setNumOfRowsButton, flag=wx.LEFT, border=5)
+        hbox7.Add(setNumOfRowsButton, flag=wx.LEFT, border=125)
         vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -965,8 +962,6 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_thirteen, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
-        self.statusBar= self.CreateStatusBar() #used for the status bar
-        self.statusBar.SetStatusText(' ')
 
         #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
         self.update = Event()
@@ -1257,6 +1252,13 @@ class myFrame(wx.Frame):
             self.shutdown.set()
             self.Close()
 
+    def quitSingleStatusBackToMainMenu(self, event):
+        dial = wx.MessageBox('Are you sure you want to stop cracking the hash \n'
+                             'and return to the Main Menu?', 'Stop Cracking and Return to Main Menu?', wx.YES_NO|wx.NO_DEFAULT, self)
+        if dial == wx.YES:
+            self.NetworkServer.terminate()
+            self.switchFromPanel10ToPanel1()
+
     def disconnectClient(self, event):
         dial= wx.MessageBox('Are you sure you want to disconnect from the server? Disconnecting before the search is finished could cause errors',
                             'Disconnect from Server?', wx.YES_NO|wx.NO_DEFAULT, self)
@@ -1275,14 +1277,7 @@ class myFrame(wx.Frame):
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
 
-    ###########################enter and leave mouse over events================
-    def enterSingleModeButton(self, event):
-        self.statusBar.SetStatusText('Single Mode')
-        event.Skip()
 
-    def leaveSingleModeButton(self, event):
-        self.statusBar.SetStatusText(' ')
-        event.Skip()
 
     def generateHashDialogDic(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
@@ -1313,7 +1308,9 @@ class myFrame(wx.Frame):
         dial.Destroy()
 
     def setBFMinKeyLength(self, event):
-        dial = wx.TextEntryDialog(self, "Input the Min Key Length", "Input Min Key Length", "", style=wx.OK)
+        dial = wx.TextEntryDialog(self, "Input the Min Key Length \n"
+                                        "Minimum: 3 \n"
+                                        "Maximum: 1000", "Input Min Key Length", "", style=wx.OK)
         dial.ShowModal()
         input= str(dial.GetValue())
         foundInvalidChar= False
@@ -1324,12 +1321,31 @@ class myFrame(wx.Frame):
             dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
                                           "Min Key Length Value was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
+        elif(int(input) < 3):
+            dial2= wx.MessageDialog(None, "Key Length is too short.\n"
+                                          "Must be 3 or more."
+                                          "Min Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) > 1000):
+            dial2= wx.MessageDialog(None, "Key Length is too long.\n"
+                                          "Must be 1000 or less."
+                                          "Min Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
         else:
             self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(input))
         dial.Destroy()
 
     def setBFMaxKeyLength(self, event):
-        dial= wx.TextEntryDialog(self, "Input the Max Key Length", "Input Max Key Length","", style=wx.OK)
+        #get min key length so min and max can be compared
+        bfMinKeyLength= ""
+        tempBFMinKeyLength2 =""
+        tempBFMinKeyLength= str(self.panel_four.minKeyLengthHeader.GetLabel())
+        for i in range(15, len(tempBFMinKeyLength)):
+            tempBFMinKeyLength2+= str(tempBFMinKeyLength[i])
+        bfMinKeyLength= int(tempBFMinKeyLength2)
+        dial= wx.TextEntryDialog(self, "Input the Max Key Length \n"
+                                       "Minimum: 3 \n"
+                                       "Maximum: 1000", "Input Max Key Length","", style=wx.OK)
         dial.ShowModal()
         input= str(dial.GetValue())
         foundInvalidChar= False
@@ -1339,6 +1355,21 @@ class myFrame(wx.Frame):
         if(foundInvalidChar == True):
             dial2 = wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
                                            "Max Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) < 3):
+            dial2= wx.MessageDialog(None, "Key Length is too short.\n"
+                                          "Must be 3 or more. \n"
+                                          "Max Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) > 1000):
+            dial2= wx.MessageDialog(None, "Key Length is too long.\n"
+                                          "Must be 1000 or less. \n"
+                                          "Max Key Length Value was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) < int(bfMinKeyLength)):
+            dial2= wx.MessageDialog(None, "Min key length is greater than Max key length.\n"
+                                          "Max key length must be greater than or equal to Min key length. \n"
+                                          "Max Key Length Value was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
         else:
             self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(input))
@@ -1356,11 +1387,23 @@ class myFrame(wx.Frame):
             dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
                                           "Key Length was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
+        elif(int(input) < 3):
+            dial2= wx.MessageDialog(None, "Key Length is too short.\n"
+                                          "Must be at least 3 \n"
+                                          "Key Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) > 1000):
+            dial2= wx.MessageDialog(None, "Key Length too long.\n"
+                                          "Must be 1000 or less.\n"
+                                          "Key Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
         else:
             self.panel_twelve.keyLengthHeader.SetLabel("Key Length: "+str(input))
         dial.Destroy()
 
     def setRMChainLength(self, event):
+        #min = 1, max = maxint
+        import sys
         dial= wx.TextEntryDialog(self, "Input New Chain Length", "Input the new Chain Length", "", style=wx.OK)
         dial.ShowModal()
         input = str(dial.GetValue())
@@ -1372,11 +1415,22 @@ class myFrame(wx.Frame):
             dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
                                           "Chain Length was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
+        elif(int(input) < 1):
+            dial2= wx.MessageDialog(None, "Chain Length is too short.\n"
+                                          "Must be at least 1.\n"
+                                          "Chain Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) > sys.maxint):
+            dial2= wx.MessageDialog(None, "Chain Length is too long.\n"
+                                          "Must be less than (2^63) -1 .\n"
+                                          "Chain Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
         else:
             self.panel_twelve.chainLengthHeader.SetLabel("Table Chain Length: "+str(input))
         dial.Destroy()
 
     def setRMNumOfRows(self, event):
+        import sys
         dial= wx.TextEntryDialog(self, "Input New Number of Rows", "Input the new Number of Rows", "", style=wx.OK)
         dial.ShowModal()
         input = str(dial.GetValue())
@@ -1386,6 +1440,16 @@ class myFrame(wx.Frame):
                 foundInvalidChar= True
         if(foundInvalidChar == True):
             dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
+                                          "Number of Rows was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) < 1):
+            dial2= wx.MessageDialog(None, "Number of Rows is too few.\n"
+                                          "Must be at least 1.\n"
+                                          "Number of Rows was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(int(input) > sys.maxint):
+            dial2= wx.MessageDialog(None, "Number of Rows is too many.\n"
+                                          "Must be less than (2^63) -1 .\n"
                                           "Number of Rows was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
         else:
@@ -1482,7 +1546,8 @@ class myFrame(wx.Frame):
             singleSetting="True"
         else:
             singleSetting="False"
-        crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting, "file name":FileName, "single": singleSetting}
+        crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting,
+                           "file name":FileName, "single": singleSetting, "finished chunks":0}
 
 
         #shared variable array
@@ -1550,7 +1615,8 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
-                           "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
+                           "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting
+                            , "finished chunks":0}
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -1587,7 +1653,8 @@ class myFrame(wx.Frame):
             singleSetting="True"
         else:
             singleSetting="False"
-        crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
+        crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting
+                            , "finished chunks":0}
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
