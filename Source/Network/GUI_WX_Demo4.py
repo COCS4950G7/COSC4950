@@ -87,22 +87,22 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
         vbox.Add((-1,10))
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        DictionaryMethodButton= wx.Button(self, label="Dictionary")
-        hbox3.Add(DictionaryMethodButton)
+        self.DictionaryMethodButton= wx.Button(self, label="Dictionary")
+        hbox3.Add(self.DictionaryMethodButton)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
-        BruteForceMethodButton= wx.Button(self, label="Brute Force")
-        hbox4.Add(BruteForceMethodButton)
+        self.BruteForceMethodButton= wx.Button(self, label="Brute Force")
+        hbox4.Add(self.BruteForceMethodButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
-        RainbowTableMethodButton= wx.Button(self, label="Rainbow Table")
-        hbox5.Add(RainbowTableMethodButton)
+        self.RainbowTableMethodButton= wx.Button(self, label="Rainbow Table")
+        hbox5.Add(self.RainbowTableMethodButton)
         vbox.Add(hbox5, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -121,10 +121,15 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 
         self.SetSizer(vbox)
 
+        #add tooltip
+        self.DictionaryMethodButton.SetToolTip(wx.ToolTip('Crack a hash code using a dictionary file for a reference.'))
+        self.BruteForceMethodButton.SetToolTip(wx.ToolTip('Crack a hash code by trying every possible combination.'))
+        self.RainbowTableMethodButton.SetToolTip(wx.ToolTip('Crack a hash code using a rainbow table as a reference.'))
+
         #Bind the buttons to events
-        DictionaryMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel3)
-        BruteForceMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel4)
-        RainbowTableMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel5)
+        self.DictionaryMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel3)
+        self.BruteForceMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel4)
+        self.RainbowTableMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel5)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -150,8 +155,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         vbox.Add((-1,10))
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
-        hbox3.Add(selectAlgorithmHeader)
+        self.selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
+        hbox3.Add(self.selectAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
         vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
@@ -166,10 +171,10 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         vbox.Add(((-1,10)))
 
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
-        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
-        hbox5.Add(inputHashButton)
-        generateHashButton= wx.Button(self, label="Generate Hash Code")
-        hbox5.Add(generateHashButton, flag=wx.LEFT, border=5)
+        self.inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox5.Add(self.inputHashButton)
+        self.generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox5.Add(self.generateHashButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -182,8 +187,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         vbox.Add((-1,10))
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
-        setDictFileButton= wx.Button(self, label="Select Dictionary File")
-        hbox7.Add(setDictFileButton)
+        self.setDictFileButton= wx.Button(self, label="Select Dictionary File")
+        hbox7.Add(self.setDictFileButton)
         vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -205,10 +210,25 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         self.SetSizer(vbox)
 
+        #add tooltips
+        self.selectAlgorithmHeader.SetToolTip(wx.ToolTip('The selected algorithm will be used to hash the entries in the \n'
+                                                         'dictionary file, which will then be compared to the hash that \n'
+                                                         'needs to be cracked'))
+        self.selectedAlgorithm.SetToolTip(wx.ToolTip('The selected algorithm will be used to hash the entries in the \n'
+                                                         'dictionary file, which will then be compared to the hash that \n'
+                                                         'needs to be cracked'))
+        self.inputHashButton.SetToolTip(wx.ToolTip('Enter in or paste in the hash code that needs to be cracked.'))
+        self.generateHashButton.SetToolTip(wx.ToolTip('Input a key and the hash will be generated for you using the \n'
+                                                      'selected algorithm (above).'))
+        self.setDictFileButton.SetToolTip(wx.ToolTip('Select which file will be used as the dictionary file.\n'
+                                                     '(.txt files only)'))
+        self.StartConnectButton.SetToolTip(wx.ToolTip('Start cracking the hash code.\n'
+                                                      'If server, Start hosting a dictionary cracking session.'))
+
         #Bind the buttons to events
-        inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogDic)
-        setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
+        self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
+        self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogDic)
+        self.setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -308,6 +328,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         self.SetSizer(vbox)
 
+        #TODO add tooltips to this panel
+
         #Bind the buttons to events
         inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
         generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogBF)
@@ -361,6 +383,8 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 
         self.SetSizer(vbox)
 
+        #TODO add tooltips to this panel
+
         #Bind the buttons to events
         crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
         makeRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel12)
@@ -402,6 +426,8 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
+
+        #TODO add tooltips to this panel
 
         #Bind the buttons to events
         NetworkServerButton.Bind(wx.EVT_BUTTON, parent.onNetworkModeButtonClick)
@@ -453,6 +479,8 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         self.SetSizer(vbox)
 
+        #TODO add tooltips to this panel
+
         #Bind the buttons to events
         InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
         ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.connectToServer)
@@ -501,6 +529,8 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         vbox.Add(hbox5, flag=wx.CENTER, border=10)
 
         self.SetSizer(vbox)
+
+        #TODO add tooltips to this panel
 
         #Bind the buttons to events
         disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
@@ -551,6 +581,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         self.SetSizer(vbox)
 
+        #TODO add tooltips to this panel
+
         #Bind the buttons to events
         forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -592,6 +624,8 @@ class PanelTen(wx.Panel):                          #====================Single M
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
+
+        #TODO add tooltips to this panel
 
         #Bind the buttons to events
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
@@ -674,6 +708,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
+
+        #TODO add tooltips to this panel
 
         #bind the buttons to events
         selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
@@ -784,6 +820,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         self.SetSizer(vbox)
 
+        #TODO add tooltips to this panel
+
         #bind the buttons to events
         changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
         changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.setRMChainLength)
@@ -821,6 +859,8 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         vbox.Add(hbox3, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
+
+        #TODO add tooltips to this panel
 
         #link the buttons up to events
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
