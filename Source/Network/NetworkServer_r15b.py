@@ -67,13 +67,26 @@ class Server():
             #print "DEBUG: file name= "+str(settings["file name"])
             #print "DEBUG: single= "+str(settings["single"])
             #Brute Force settings Check
+            #print "DEBUG: cracking method= "+str(settings["cracking method"])
+            #print "DEBUG: algorithm= "+str(settings["algorithm"])
+            #print "DEBUG: hash= "+str(settings["hash"])
+            #print "DEBUG: min key length= "+str(settings["min key length"])
+            #print "DEBUG: max key length= "+str(settings["max key length"])
+            #print "DEBUG: alphabet= "+str(settings["alphabet"])
+            #print "DEBUG: single= "+str(settings["single"])
+
+            #Rainbow Table Maker settings check
+            '''
+            print "Rainbow Table Maker Settings Check"
             print "DEBUG: cracking method= "+str(settings["cracking method"])
             print "DEBUG: algorithm= "+str(settings["algorithm"])
-            print "DEBUG: hash= "+str(settings["hash"])
-            print "DEBUG: min key length= "+str(settings["min key length"])
-            print "DEBUG: max key length= "+str(settings["max key length"])
+            print "DEBUG: key length= "+str(settings["key length"])
             print "DEBUG: alphabet= "+str(settings["alphabet"])
+            print "DEBUG: chain length= "+str(settings["chain length"])
+            print "DEBUG: num rows= "+str(settings["num rows"])
+            print "DEBUG: file name= "+str(settings["file name"])
             print "DEBUG: single= "+str(settings["single"])
+            '''
             if "single" in settings:
                 if settings["single"] == "True":
                     self.single_user_mode = True

@@ -39,6 +39,7 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         aboutUsButton= wx.Button(self, label="About Us")
+        #TODO need to insert text into the about us page (panel 13)
         hbox4.Add(aboutUsButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -53,6 +54,8 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 
         #Bind the buttons to events
         SingleModeButton.Bind(wx.EVT_BUTTON,  parent.onSingleModeButtonClick)
+        SingleModeButton.Bind(wx.EVT_ENTER_WINDOW, parent.enterSingleModeButton)#testing status bar
+        SingleModeButton.Bind(wx.EVT_LEAVE_WINDOW, parent.leaveSingleModeButton)
         NetworkModeButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel6)
         aboutUsButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel1ToPanel13)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -183,6 +186,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        #TODO need to make sure that all fields have data entered into them
         hbox8.Add(self.StartConnectButton)
         vbox.Add(hbox8, flag=wx.CENTER, border=10)
 
@@ -212,7 +216,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
-        #TODO if large number is insered, the button covers it up
+        #TODO if large number is inserted, the button covers up the max key length static text
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -257,6 +261,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
+        #TODO specifiy what the minimum key length is
+        #TODO handle invalid key lengths
         hbox6.Add(self.minKeyLengthHeader)
         changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
         hbox6.Add(changeMinKeyLengthButton, flag=wx.LEFT, border=5)
@@ -285,6 +291,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        #TODO need to make sure that all fields have data entered into them
         hbox9.Add(self.StartConnectButton)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -428,6 +435,7 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         ConnectToServerButton= wx.Button(self, label="Connect To The Server")
+        #TODO need to make sure all fields have data enetered into them
         hbox4.Add(ConnectToServerButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -499,6 +507,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -545,6 +555,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+
+        #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -645,6 +657,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
+        #TODO need to make sure all fields have data entered into them
         hbox7.Add(self.StartConnectButton)
         vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
@@ -703,6 +716,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
+        #TODO need to tell the user what the minimum key length is
+        #TODO need to handle invalid key lengths
         hbox4.Add(self.keyLengthHeader)
         changeKeyLengthButton= wx.Button(self, label="Set Key Length")
         hbox4.Add(changeKeyLengthButton, flag=wx.LEFT, border=5)
@@ -720,7 +735,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         vbox.Add((-1,10))
 
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
-        self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 1000")
+        self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 100")
+        #TODO need to specifiy what the minimum chain length is
+        #TODO need to handle invalid chain lengths
         hbox6.Add(self.chainLengthHeader)
         changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
         hbox6.Add(changeChainLengthButton, flag=wx.LEFT, border=5)
@@ -729,7 +746,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         vbox.Add((-1,10))
 
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
-        self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 10000")
+        self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 100")
+        #TODO need to specify what the minimum number of rows is
+        #TODO need to handle invalid number of rows
         hbox7.Add(self.numOfRowsHeader)
         setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
         hbox7.Add(setNumOfRowsButton, flag=wx.LEFT, border=5)
@@ -753,6 +772,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox10=wx.BoxSizer(wx.HORIZONTAL)
         self.startConnectButton= wx.Button(self, label="Start/Connect Button")
+        #TODO need to make sure that all fields have data entered into them
         hbox10.Add(self.startConnectButton)
         vbox.Add(hbox10, flag=wx.CENTER, border=10)
 
@@ -779,7 +799,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
-
+        #TODO need to insert the about us text into the textctrl
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -902,7 +922,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 class myFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
-
+        #TODO add menubar for all panels, allowing close program, pasting,  show hidden windows, etc
         self.panel_one= PanelOne(self)
         self.panel_two= PanelTwo(self)
         self.panel_three= PanelThree(self)
@@ -944,6 +964,9 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_twelve, 1, wx.EXPAND)
         self.sizer.Add(self.panel_thirteen, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
+
+        self.statusBar= self.CreateStatusBar() #used for the status bar
+        self.statusBar.SetStatusText(' ')
 
         #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
         self.update = Event()
@@ -1207,15 +1230,15 @@ class myFrame(wx.Frame):
         dial.Destroy()
 
     def setDictionaryHashToBeCracked(self, event):
-        dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked", "Input Hash", "", style=wx.OK)
-        #TODO need to inform the user than non-ascii characters are not allowed
+        dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
+                                        "(Must be Standard ASCII Characters)", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
     def setBruteForceHashToBeCracked(self, event):
-        dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked", "Input Hash", "", style=wx.OK)
-        #TODO need to inform the user than non-ascii characters are not allowed
+        dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
+                                        "(Must be Standard ASCII Characters)", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
@@ -1251,6 +1274,15 @@ class myFrame(wx.Frame):
 
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
+
+    ###########################enter and leave mouse over events================
+    def enterSingleModeButton(self, event):
+        self.statusBar.SetStatusText('Single Mode')
+        event.Skip()
+
+    def leaveSingleModeButton(self, event):
+        self.statusBar.SetStatusText(' ')
+        event.Skip()
 
     def generateHashDialogDic(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
