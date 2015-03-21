@@ -137,7 +137,9 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfHashingModes= ['Individual Hash Code','File of Hash Codes']
 
+        #TODO FINISH adding support for cracking a file of hash codes
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -160,6 +162,15 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
         vbox.Add(hbox3, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox10=wx.BoxSizer(wx.HORIZONTAL)
+        hashTypeHeader= wx.StaticText(self, label="Select Hashing Mode: (NOT FUNCTIONING YET) ")
+        hbox10.Add(hashTypeHeader)
+        self.selectedHashingMode= wx.ComboBox(self, choices= listOfHashingModes, style=wx.CB_READONLY)
+        hbox10.Add(self.selectedHashingMode, flag=wx.LEFT, border=5)
+        vbox.Add(hbox10, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
 
@@ -196,8 +207,25 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
         #TODO need to make sure that all fields have data entered into them
+        #make sure that  selected algorithm is not the empty string
+        #make sure a hashing mode has been selected (not the empty string)
+        #make sure a hash has been entered in
+        #make sure a dictionary file is selected
         hbox8.Add(self.StartConnectButton)
         vbox.Add(hbox8, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox11= wx.BoxSizer(wx.HORIZONTAL)
+        self.resetToDefaultsButton= wx.Button(self, label="Reset Settings Back To Default")
+        hbox11.Add(self.resetToDefaultsButton)
+        vbox.Add(hbox11, flag=wx.CENTER, border=10)
+        #DEFAULT SETTINGS-------------
+        #leave current mode the same
+        #set selected algorithm to MD5
+        #set selected hashing mode to individual hash code
+        #set hash to be cracked to: no hash has been input
+        #set selected dictionary file to: no dictionary file has been selected.
 
         vbox.Add((-1,10))
 
@@ -224,12 +252,15 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
                                                      '(.txt files only)'))
         self.StartConnectButton.SetToolTip(wx.ToolTip('Start cracking the hash code.\n'
                                                       'If server, Start hosting a dictionary cracking session.'))
+        self.selectedHashingMode.SetToolTip(wx.ToolTip('Choose whether to crack a single hash code or a file of hash codes.'))
+        self.resetToDefaultsButton.SetToolTip(wx.ToolTip('Resets all of the dictionary cracking settings back their default settings.'))
 
         #Bind the buttons to events
         self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
         self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogDic)
         self.setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
+        self.resetToDefaultsButton.Bind(wx.EVT_BUTTON, parent.resetDictionarySettingsToDefault)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -237,11 +268,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
-        #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
-        #TODO if large number is inserted, the button covers up the max key length static text
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -275,10 +303,10 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         vbox.Add((-1,10))
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
-        inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
-        hbox5.Add(inputHashButton)
-        generateHashButton= wx.Button(self, label="Generate Hash Code")
-        hbox5.Add(generateHashButton, flag=wx.LEFT, border=5)
+        self.inputHashButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox5.Add(self.inputHashButton)
+        self.generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox5.Add(self.generateHashButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -286,8 +314,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
         hbox6.Add(self.minKeyLengthHeader)
-        changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
-        hbox6.Add(changeMinKeyLengthButton, flag=wx.LEFT, border=25)
+        self.changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
+        hbox6.Add(self.changeMinKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -295,8 +323,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15")
         hbox7.Add(self.maxKeyLengthHeader)
-        changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length")
-        hbox7.Add(changeMaxKeyLengthButton, flag=wx.LEFT, border=25)
+        self.changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length")
+        hbox7.Add(self.changeMaxKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -319,6 +347,19 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         vbox.Add((-1,10))
 
+        hbox11= wx.BoxSizer(wx.HORIZONTAL)
+        self.resetBackToDefaultValues= wx.Button(self, label="Reset Settings Back To Default")
+        hbox11.Add(self.resetBackToDefaultValues)
+        vbox.Add(hbox11, flag=wx.CENTER, border=10)
+        #DEFAULTS SETTINGS-----------------
+        #change selected algorithm back to MD5
+        #change inputhash header to say no hash has been input
+        #set min key length to 5
+        #set max key length to 15
+        #changed selected alphabet to all
+
+        vbox.Add((-1,10))
+
         hbox10= wx.BoxSizer(wx.HORIZONTAL)
         BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
         hbox10.Add(BackToMainMenuButton)
@@ -328,14 +369,28 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #tooltips
+        self.selectedAlgorithm.SetToolTip(wx.ToolTip('The selected algorithm will be used to hash the generated entries \n'
+                                                            ', which will then be compared to the hash that \n'
+                                                         'needs to be cracked to see if they match'))
+        self.inputHashButton.SetToolTip(wx.ToolTip('Enter in or paste in the hash code that needs to be cracked.'))
+        self.generateHashButton.SetToolTip(wx.ToolTip('Input a key and the hash will be generated for you using the \n'
+                                                      'selected algorithm (above).'))
+        self.changeMinKeyLengthButton.SetToolTip(wx.ToolTip('Sets what the minimum amount of characters that will be in the key.'))
+        self.changeMaxKeyLengthButton.SetToolTip(wx.ToolTip('Sets what the maximum amount of characters that will be in the key.'))
+        self.selectedAlphabet.SetToolTip(wx.ToolTip('Sets which characters could be in the key. (The fewer possible characters, \n'
+                                                    'the faster the cracking process goes)'))
+        self.StartConnectButton.SetToolTip(wx.ToolTip('Start cracking the hash code. \n'
+                                                      'If server, start hosting a brute force cracking session.'))
+        self.resetBackToDefaultValues.SetToolTip(wx.ToolTip('Resets all of the Brute-Force Cracking Settings back to their default values.'))
 
         #Bind the buttons to events
-        inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogBF)
-        changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
-        changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
+        self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
+        self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogBF)
+        self.changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
+        self.changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
+        self.resetBackToDefaultValues.Bind(wx.EVT_BUTTON, parent.resetBruteForceSettingsToDefault)
         #TODO check to make sure that min key is less than or equal to max key
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -361,15 +416,15 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
         vbox.Add((-1,10))
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table")
-        hbox3.Add(crackRainbowTableButton)
+        self.crackRainbowTableButton= wx.Button(self, label="Crack Using Rainbow Table")
+        hbox3.Add(self.crackRainbowTableButton)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
-        makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker")
-        hbox4.Add(makeRainbowTableButton)
+        self.makeRainbowTableButton= wx.Button(self, label="Rainbow Table Maker")
+        hbox4.Add(self.makeRainbowTableButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -383,11 +438,13 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #tooltips
+        self.crackRainbowTableButton.SetToolTip(wx.ToolTip('Crack a hash code by using a rainbow table.'))
+        self.makeRainbowTableButton.SetToolTip(wx.ToolTip('Create a rainbow table to be used with the rainbow table cracking method (above).'))
 
         #Bind the buttons to events
-        crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
-        makeRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel12)
+        self.crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
+        self.makeRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel12)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -405,15 +462,15 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add((-1,10))
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
-        NetworkServerButton= wx.Button(self, label="Network Server")
-        hbox2.Add(NetworkServerButton)
+        self.NetworkServerButton= wx.Button(self, label="Network Server")
+        hbox2.Add(self.NetworkServerButton)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
-        NetworkClientButton= wx.Button(self, label="Network Client")
-        hbox3.Add(NetworkClientButton)
+        self.NetworkClientButton= wx.Button(self, label="Network Client")
+        hbox3.Add(self.NetworkClientButton)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -427,11 +484,13 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #Tooltips
+        self.NetworkServerButton.SetToolTip(wx.ToolTip('Host a cracking session.'))
+        self.NetworkClientButton.SetToolTip(wx.ToolTip('Participate in a hosts cracking session'))
 
         #Bind the buttons to events
-        NetworkServerButton.Bind(wx.EVT_BUTTON, parent.onNetworkModeButtonClick)
-        NetworkClientButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel7)
+        self.NetworkServerButton.Bind(wx.EVT_BUTTON, parent.onNetworkModeButtonClick)
+        self.NetworkClientButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel7)
         BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -634,7 +693,6 @@ class PanelTen(wx.Panel):                          #====================Single M
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
-
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -700,6 +758,17 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         vbox.Add((-1,10))
 
+        hbox10= wx.BoxSizer(wx.HORIZONTAL)
+        self.resetSettingsToDefaultButton= wx.Button(self, label="Reset Settings Back To Default")
+        hbox10.Add(self.resetSettingsToDefaultButton)
+        vbox.Add(hbox10, flag=wx.CENTER, border=10)
+        #DEFAULT SETTINGS-------------------
+        #set selected algorithm back to MD5
+        #reset the selected rainbow table file back to nothing
+        #set hash to be cracked value back to nothing
+
+        vbox.Add((-1,10))
+
         hbox8=wx.BoxSizer(wx.HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
         hbox8.Add(backToMainMenuButton)
@@ -716,6 +785,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
         generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
+        self.resetSettingsToDefaultButton.Bind(wx.EVT_BUTTON, parent.resetRainbowTableCrackingSettingsToDefault)
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -724,10 +794,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         wx.Panel.__init__(self, parent)
 
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
-        #listOfAlphabets= ['All', 'ASCII_Uppercase', 'ASCII_Lowercase', 'Digits', 'Special_Symbols']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -811,6 +879,20 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         vbox.Add((-1,10))
 
+        hbox12=wx.BoxSizer(wx.HORIZONTAL)
+        self.resetSettingsBackToDefault= wx.Button(self, label="Reset Settings Back To Default")
+        hbox12.Add(self.resetSettingsBackToDefault)
+        vbox.Add(hbox12, flag=wx.CENTER, border=10)
+        #DEFAULT SETTINGS-----------
+        #set selected algorithm back to MD5
+        #set key length back to 10
+        #set selected alphabet back to All
+        #set table chain length back to 100
+        #set number of rows back to 100
+        #set save rainbowtable file name back to default
+
+        vbox.Add((-1,10))
+
         hbox11=wx.BoxSizer(wx.HORIZONTAL)
         backToMainMenuButton= wx.Button(self, label="Back to Main Menu")
         hbox11.Add(backToMainMenuButton)
@@ -828,6 +910,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         setNumOfRowsButton.Bind(wx.EVT_BUTTON, parent.setRMNumOfRows)
         changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
         self.startConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCreationSession)
+        self.resetSettingsBackToDefault.Bind(wx.EVT_BUTTON, parent.resetRainbowTableMakerSettingsToDefault)
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1316,7 +1399,90 @@ class myFrame(wx.Frame):
 
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
+    '''
+    def checkThatAllDictionaryFieldsAreNotEmpty(self, event):
+        emptyFieldDetected= False
+        selectedAlgorithmEmpty= False
+        selectedHashingModeEmpty= False
+        hashValueEmpty= False
+        selectedDictionaryFileEmpty=False
 
+        if(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()),"MD5",0,0,len('MD5'), len('MD5'))==False): #is not 'MD5' or 'SHA1' or 'SHA224' or 'SHA256' or 'SHA512'):
+            emptyFieldDetected= True
+            selectedAlgorithmEmpty= True
+            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
+        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA1",0,0,len('SHA1'),len('SHA1'))==False):
+            emptyFieldDetected= True
+            selectedAlgorithmEmpty=True
+            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
+        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA224",0,0,len('SHA224'),len('SHA224'))==False):
+            emptyFieldDetected=True
+            selectedAlgorithmEmpty=True
+            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
+        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA256",0,0,len('SHA256'),len('SHA256'))==False):
+            emptyFieldDetected=True
+            selectedAlgorithmEmpty=True
+            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
+        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA512",0,0,len('SHA512'),len('SHA512'))==False):
+            emptyFieldDetected=True
+            selectedAlgorithmEmpty=True
+            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
+        if(self.compareString(str(self.panel_three.selectedHashingMode.GetValue()), "Individual Hash Code",0,0, len('Individual Hash Code'),len('Individual Hash Code'))==True): #is not 'Individual Hash Code' or 'File of Hash Codes'):
+            emptyFieldDetected=True
+            selectedHashingModeEmpty=True
+            print "GUI DEBUG: selectedHashingMode: '"+str(self.panel_three.selectedHashingMode.GetValue())+"'"
+        elif(self.compareString(str(self.panel_three.selectedHashingMode.GetValue()), "File of Hash Codes",0,0, len('File of Hash Codes'), len('File of Hash Codes'))==True):
+            emptyFieldDetected=True
+            selectedHashingModeEmpty=True
+            print "GUI DEBUG: selectedHashingMode: '"+str(self.panel_three.selectedHashingMode.GetValue())+"'"
+
+        if(self.panel_three.inputHashHeader.GetLabel() is "Hash to be Cracked: No Hash has been input"):
+            emptyFieldDetected=True
+            hashValueEmpty=True
+        if(self.panel_three.inputDictFileHeader.GetLabel() is "Selected Dictionary File: No Dictionary File Selected"):
+            emptyFieldDetected=True
+            selectedDictionaryFileEmpty=True
+        if(emptyFieldDetected is False):
+            self.startDictionaryCrack(event)
+        else:
+            combinedErrorMessage="Please "
+            if(selectedAlgorithmEmpty is True):
+                combinedErrorMessage+= "Select An Algorithm To Use "
+            if(selectedHashingModeEmpty is True):
+                combinedErrorMessage+= ", Select A Hashing Mode "
+            if(hashValueEmpty is True):
+                combinedErrorMessage+= ", Set a hash value to be cracked "
+            if(selectedDictionaryFileEmpty is True):
+                combinedErrorMessage+= ", Select A Dictionary File "
+            dial= wx.MessageDialog(None, str(combinedErrorMessage), "Empty/Non-selected field detected.", wx.OK)
+            dial.ShowModal()
+        '''
+
+    def resetDictionarySettingsToDefault(self, event):
+        self.panel_three.selectedAlgorithm.SetValue('MD5')
+        self.panel_three.selectedHashingMode.SetValue('Individual Hash Code')
+        self.panel_three.inputHashHeader.SetLabel("Hash to be Cracked: No Hash has been input")
+        self.panel_three.inputDictFileHeader.SetLabel("Selected Dictionary File: No Dictionary File Selected")
+
+    def resetBruteForceSettingsToDefault(self, event):
+        self.panel_four.selectedAlgorithm.SetValue('MD5')
+        self.panel_four.inputHashHeader.SetLabel('Hash To Be Cracked: No Hash has been Input')
+        self.panel_four.minKeyLengthHeader.SetLabel('Min Key Length: 5')
+        self.panel_four.maxKeyLengthHeader.SetLabel('Max Key Length: 15')
+        self.panel_four.selectedAlphabet.SetValue('All')
+
+    def resetRainbowTableCrackingSettingsToDefault(self, event):
+        self.panel_eleven.selectedAlgorithm.SetValue('MD5')
+        self.panel_eleven.selectedFileHeader.SetLabel('Selected Rainbow Table File: No File has been Selected')
+        self.panel_eleven.hashToBeCrackedHeader.SetLabel('Hash to be cracked: No Hash has been entered')
+
+    def resetRainbowTableMakerSettingsToDefault(self, event):
+        self.panel_twelve.selectedAlgorithm.SetValue('MD5')
+        self.panel_twelve.keyLengthHeader.SetLabel('Key Length: 10')
+        self.panel_twelve.selectedAlphabet.SetValue('All')
+        self.panel_twelve.chainLengthHeader.SetLabel('Table Chain Length: 100')
+        self.panel_twelve.numOfRowsHeader.SetLabel('Number of Rows: 100')
+        self.panel_twelve.fileNameHeader.SetLabel('Save Rainbow Table File As: myRainbowTable.txt')
 
 
     def generateHashDialogDic(self, event):
@@ -1507,16 +1673,17 @@ class myFrame(wx.Frame):
             #TODO illegal for Linux: /, .(as the first character), \0 (null terminator),
             #TODO special cases for Linux: \(backslash), ?,  *, |, <, >,
         #TODO =================================end of illegal file name characters==================================
-        if((self.checkForValidFileNameLength(dial.GetValue()) is True) and (self.checkForIllegalFileNameChar(dial.GetValue()) is False)):
+        if((self.checkForValidFileNameLength(dial.GetValue()) is True)):
                 self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
         else:
             dial2= wx.MessageDialog(None, "Illegal File Name Length. \n"
-                                          "The new filename was not set.", "File Name is longer than 255 characters", wx.OK)
+                                          "The new filename was not set.", "File Name needs to be less than 255 characters\n"
+                                                                           "but more than zero characters long.", wx.OK)
             dial2.ShowModal()
         dial.Destroy()
 
     def checkForValidFileNameLength(self, inputString):
-        if(len(inputString) > 255):
+        if((len(inputString) > 255) or (len(inputString) < 1)):
             return False
         else:
             return True
@@ -1558,8 +1725,8 @@ class myFrame(wx.Frame):
         serverIP=""
         for i in range(21, len(tempServerIP)):
             serverIP+= tempServerIP[i]
-        print "GUI DEBUG: started Network Client"
-        print "GUI DEBUG: server IP: '"+str(serverIP)+"'"
+        #print "GUI DEBUG: started Network Client"
+        #print "GUI DEBUG: server IP: '"+str(serverIP)+"'"
         self.NetworkClient= Process(target=Client, args=(serverIP,))
         self.NetworkClient.start()
         self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
@@ -1596,7 +1763,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        print "GUI DEBUG: Starting up Server Process"
+        #print "GUI DEBUG: Starting up Server Process"
         self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
         #print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
