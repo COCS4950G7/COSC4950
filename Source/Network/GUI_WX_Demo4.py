@@ -1085,6 +1085,24 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_thirteen, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
 
+        #add a menubar at the top of the window/screen
+        menubar= wx.MenuBar()
+        fileMenu= wx.Menu()
+        fileMenuClose= fileMenu.Append(wx.ID_EXIT, "Close","Close Application")
+        menubar.Append(fileMenu, '&File')
+        viewMenu= wx.Menu()
+        #viewMenuFullScreen= viewMenu.Append(wx.ID_ANY, "Full Screen", "View in Full Screen Mode") #omitted due to bug in python
+        viewMenuMaximizeScreen= viewMenu.Append(wx.ID_ANY, "Maximize Screen", "Make the window fill the entire screen")
+        viewMenuNormalScreen= viewMenu.Append(wx.ID_ANY, "Normal Size", "Make the window it's native resolution")
+        menubar.Append(viewMenu, '&View')
+        self.SetMenuBar(menubar)
+
+        #bind menu items to events
+        self.Bind(wx.EVT_MENU, self.OnClose, fileMenuClose)
+        #self.Bind(wx.EVT_MENU, self.viewInFullScreen, viewMenuFullScreen) #omittwed due to bug in python
+        self.Bind(wx.EVT_MENU, self.viewMaximizedScreen, viewMenuMaximizeScreen)
+        self.Bind(wx.EVT_MENU, self.viewNormalScreen, viewMenuNormalScreen)
+
 
         #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
         self.update = Event()
@@ -1094,6 +1112,19 @@ class myFrame(wx.Frame):
         self.shutdown = Event()
         self.shutdown.clear()
 
+
+    #specail frame resizing functions
+    '''
+    def viewInFullScreen(self, event):
+        self.ShowFullScreen(True)
+        #TODO FULL SCREEN MODE HIDES THE MENU BAR FOR SOME REASON!!!! MIGHT OMIT
+    '''
+    def viewMaximizedScreen(self, event):
+        self.Maximize(True)
+
+    def viewNormalScreen(self, event):
+        self.Maximize(False)
+        self.ShowFullScreen(False)
 
     #---------switch from Panel 1
     def switchFromPanel1ToPanel2(self):
