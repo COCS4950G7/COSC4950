@@ -6,8 +6,6 @@
 #   Chris Bugg
 #   10/7/14
 
-#TODO:  Implement hashes from file
-
 #TODO:  Implement collision detection
 
 #Imports
@@ -533,7 +531,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)"
+                print "From a File (f)  BROKE BROKE BROKE"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -550,6 +548,8 @@ class ConsoleUI():
                     #Get the hash
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -560,10 +560,17 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
+
+                    #Get the file name
+                    print
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
-                self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
                 self.settings['min key length'] = int(min_key_length)
                 self.settings['max key length'] = int(max_key_length)
@@ -658,8 +665,19 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Server -> Brute Force -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And that took: ", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
+
                 print
                 print "Go Back (back)"
                 print "(Exit)"
@@ -737,10 +755,48 @@ class ConsoleUI():
 
                 #Get the hash
                 print
-                temp_hash = raw_input("What's the hash we're searching for: ")
+                print "Are we searching for a single hash, or from a file of hashes?"
+                print
+                print "Single Hash (s)"
+                print "From a File (f)  BROKE BROKE BROKE"
+                print
+                single_or_file = raw_input("Choice: ")
+
+                #Sterolize inputs
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
+
+                    print "Input Error!"
+
+                    single_or_file = raw_input("Try Again: ")
+
+                if single_or_file in ("single", "s", "Single"):
+
+                    #Get the hash
+                    print
+                    temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
+
+                elif single_or_file in ("file", "f", "File"):
+
+                    #Get the file name
+                    print
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
+
+                        print "File not found..."
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
+
+                    #Get the file name
+                    print
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "rain"
-                self.settings['hash'] = temp_hash
                 self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "False"
 
@@ -834,8 +890,18 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Server -> Rainbow User -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And it took", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
 
                 print "(back)"
                 print "(Exit)"
@@ -975,11 +1041,11 @@ class ConsoleUI():
 
                 #Get the file name
                 print
-                file_name = raw_input("What's the file name: ")
+                file_name = raw_input("What's the file name (___.txt): ")
 
                 self.settings['cracking method'] = "rainmaker"
                 self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name
+                self.settings['file name'] = file_name + ".txt"
                 self.settings['key length'] = key_length
                 self.settings['alphabet'] = alphabet_string
                 self.settings['chain length'] = chain_length
@@ -1058,9 +1124,14 @@ class ConsoleUI():
 
                 self.clock = time.time() - self.clock
 
-                '''
+                #Collision Detector has been nullified with placeholder values
+                #   till it is implemented in server. You should still be able
+                #   to see the functionality, but this means it won't break
+                #   the program when run.
+
                 #If there are 10,000 or less rows, run collision detection
-                if self.rainbowMaker.getHeight() <= 10000:
+                #if self.settings['num rows'] <= 10000:
+                if 1 == 2:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -1068,23 +1139,24 @@ class ConsoleUI():
                     print "Collision Detector Running..."
                     print "(This should take less than a minute)"
 
-                    #self.colidingClock = time()
+                    self.colidingClock = time.time()
 
-                    collisions = self.rainbowMaker.collisionFinder()
+                    #collisions = self.rainbowMaker.collisionFinder()
+                    collisions = 0
 
                     print "Collision Detector Complete"
 
-                    #elapsed = (time() - self.colidingClock)
-                    #self.colidingClock = elapsed
+                    elapsed = (time.time() - self.colidingClock)
+                    self.colidingClock = elapsed
                     print "And it took", self.colidingClock, "seconds."
                     print
 
                     if collisions > 0:
 
-                        percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
+                        #percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
 
                         print str(collisions) + " Collisions found."
-                        print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
+                        #print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
 
                         #Get the go-ahead
                         print
@@ -1117,7 +1189,7 @@ class ConsoleUI():
 
                         if user_input in ("Yes", "yes", "Y"):
 
-                            #self.colidingClock2 = time()
+                            self.colidingClock2 = time.time()
 
                             while collisions > 0:
 
@@ -1132,16 +1204,15 @@ class ConsoleUI():
                                     white_r = "            "
                                 else:
                                     star_counter += 1
-                                    white_l = white_l + " "
+                                    white_l += " "
                                     white_r = white_r[:-1]
 
-                                self.rainbowMaker.collisionFixer()
+                                #self.rainbowMaker.collisionFixer()
 
-                                collisions = self.rainbowMaker.collisionFinder()
+                                #collisions = self.rainbowMaker.collisionFinder()
 
-                           # elapsed = (time() - self.colidingClock2)
-                            #self.colidingClock2 = elapsed
-                '''
+                            elapsed = (time.time() - self.colidingClock2)
+                            self.colidingClock2 = elapsed
 
                 #Done, next screen
                 self.state = "serverRainMakerDoneScreen"
@@ -1231,7 +1302,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)"
+                print "From a File (f)  BROKE BROKE BROKE"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -1248,6 +1319,8 @@ class ConsoleUI():
                     #Get the hash
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -1258,16 +1331,18 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
                     self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
                 self.settings['file name'] = file_name + ".txt"
-                self.settings['hash'] = temp_hash
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -1361,8 +1436,19 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Server -> Dictionary -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And that took: ", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
+
                 print
                 print "Go Back (back)"
                 print "(Exit)"
@@ -1551,7 +1637,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)"
+                print "From a File (f)  BROKE BROKE BROKE"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -1568,6 +1654,8 @@ class ConsoleUI():
                     #Get the hash
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -1578,10 +1666,17 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
+
+                    #Get the file name
+                    print
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
-                self.settings['hash'] = temp_hash
                 self.settings['alphabet'] = alphabet
                 self.settings['min key length'] = int(min_key_length)
                 self.settings['max key length'] = int(max_key_length)
@@ -1674,8 +1769,18 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And it took", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
 
                 print "Go Back (back)"
                 print "(Exit)"
@@ -1756,10 +1861,48 @@ class ConsoleUI():
 
                 #Get the hash
                 print
-                temp_hash = raw_input("What's the hash we're searching for: ")
+                print "Are we searching for a single hash, or from a file of hashes?"
+                print
+                print "Single Hash (s)"
+                print "From a File (f)  BROKE BROKE BROKE"
+                print
+                single_or_file = raw_input("Choice: ")
+
+                #Sterolize inputs
+                good_names = {"single", "s", "file", "f", "Single", "File"}
+                while not single_or_file in good_names:
+
+                    print "Input Error!"
+
+                    single_or_file = raw_input("Try Again: ")
+
+                if single_or_file in ("single", "s", "Single"):
+
+                    #Get the hash
+                    print
+                    temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
+
+                elif single_or_file in ("file", "f", "File"):
+
+                    #Get the file name
+                    print
+                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    while not self.does_file_exist(hash_file_name):
+
+                        print "File not found..."
+                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
+
+                    #Get the file name
+                    print
+                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+                    self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "rain"
-                self.settings['hash'] = temp_hash
                 self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "True"
 
@@ -1854,8 +1997,18 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Rainbow User -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And it took", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
 
                 print "Go Back (back)"
                 print "(Exit)"
@@ -1995,11 +2148,11 @@ class ConsoleUI():
 
                 #Get the file name
                 print
-                file_name = raw_input("What's the file name: ")
+                file_name = raw_input("What's the file name (___.txt): ")
 
                 self.settings['cracking method'] = "rainmaker"
                 self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name
+                self.settings['file name'] = file_name + ".txt"
                 self.settings['key length'] = key_length
                 self.settings['alphabet'] = alphabet_string
                 self.settings['chain length'] = chain_length
@@ -2077,9 +2230,14 @@ class ConsoleUI():
 
                 self.clock = time.time() - self.clock
 
-                '''
+                #Collision Detector has been nullified with placeholder values
+                #   till it is implemented in server. You should still be able
+                #   to see the functionality, but this means it won't break
+                #   the program when run.
+
                 #If there are 10,000 or less rows, run collision detection
-                if self.rainbowMaker.getHeight() <= 10000:
+                #if self.settings['num rows'] <= 10000:
+                if 1 == 2:
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
@@ -2087,23 +2245,24 @@ class ConsoleUI():
                     print "Collision Detector Running..."
                     print "(This should take less than a minute)"
 
-                    #self.colidingClock = time()
+                    self.colidingClock = time.time()
 
-                    collisions = self.rainbowMaker.collisionFinder()
+                    #collisions = self.rainbowMaker.collisionFinder()
+                    collisions = 0
 
                     print "Collision Detector Complete"
 
-                    #elapsed = (time() - self.colidingClock)
-                    #self.colidingClock = elapsed
+                    elapsed = (time.time() - self.colidingClock)
+                    self.colidingClock = elapsed
                     print "And it took", self.colidingClock, "seconds."
                     print
 
                     if collisions > 0:
 
-                        percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
+                        #percent = (float(collisions) / float(self.rainbowMaker.getHeight())) * 100.0
 
                         print str(collisions) + " Collisions found."
-                        print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
+                        #print "Out of: " + str(self.rainbowMaker.getHeight()) + " Rows Total (" + str(percent) + "%)"
 
                         #Get the go-ahead
                         print
@@ -2136,7 +2295,7 @@ class ConsoleUI():
 
                         if user_input in ("Yes", "yes", "Y"):
 
-                            #self.colidingClock2 = time()
+                            self.colidingClock2 = time.time()
 
                             while collisions > 0:
 
@@ -2151,16 +2310,15 @@ class ConsoleUI():
                                     white_r = "            "
                                 else:
                                     star_counter += 1
-                                    white_l = white_l + " "
+                                    white_l += " "
                                     white_r = white_r[:-1]
 
-                                self.rainbowMaker.collisionFixer()
+                                #self.rainbowMaker.collisionFixer()
 
-                                collisions = self.rainbowMaker.collisionFinder()
+                                #collisions = self.rainbowMaker.collisionFinder()
 
-                           # elapsed = (time() - self.colidingClock2)
-                            #self.colidingClock2 = elapsed
-                '''
+                            elapsed = (time.time() - self.colidingClock2)
+                            self.colidingClock2 = elapsed
 
                 self.networkServer.terminate()
 
@@ -2251,7 +2409,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)"
+                print "From a File (f)  BROKE BROKE BROKE"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -2268,6 +2426,8 @@ class ConsoleUI():
                     #Get the hash
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
+                    self.settings['hash'] = temp_hash
+                    self.settings['hash file'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -2278,17 +2438,18 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
+                    self.settings['hash file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file
+                    self.settings['results file'] = results_file + ".txt"
+                    #Hashes from a file?
+                    self.settings['hash file'] = True
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
                 self.settings['file name'] = file_name + ".txt"
-                self.settings['hash'] = temp_hash
-                #In the form of: "single" or "server" or "client"
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -2380,8 +2541,19 @@ class ConsoleUI():
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Found!"
                 print
-                print "Key is: ", self.dictionary["key"]
-                print "And that took: ", self.clock, "seconds."
+
+                #If we were using just one hash, not a file
+                if not self.settings['hash file']:
+
+                    print "Key is: ", self.dictionary["key"]
+                    print "And that took: ", self.clock, "seconds."
+
+                else:
+
+                    print "We just make ", self.settings['hash file name']
+                    print "Which lists out the hash/key pairs we found."
+                    print "And that took: ", self.clock, "seconds."
+
                 print
                 print "Go Back (back)"
                 print "(Exit)"
