@@ -16,10 +16,19 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        logo= wx.StaticBitmap(self, -1, wx.Bitmap("Mighty_cracker_logo_r2.png", wx.BITMAP_TYPE_ANY))
+        hbox6.Add(logo)
+        vbox.Add(hbox6, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,25))
+
+        ''' #the picture is currently taking place of this
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Mighty Cracker")
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
+        '''
 
         vbox.Add((-1, 25)) #add extra space between header and the first button
 
