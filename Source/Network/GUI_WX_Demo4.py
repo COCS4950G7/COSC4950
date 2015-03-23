@@ -30,7 +30,7 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
         '''
 
-        vbox.Add((-1, 25)) #add extra space between header and the first button
+        #vbox.Add((-1, 25)) #add extra space between header and the first button
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.SingleModeButton= wx.Button(self, label="Single Mode")
@@ -938,6 +938,63 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         textBox= wx.TextCtrl(self, style=wx.TE_MULTILINE|wx.CB_READONLY|wx.HSCROLL)
+        newLineCharacter= "" #this is used for the new line character,set according to your OS
+        insertFourCharTab= "    "
+        if(parent.compareString(str(parent.theDetectedOS), str('Windows'),0,0,len('Windows'),len('Windows'))==True): #if Windows
+            newLineCharacter= "\r\n"
+        elif(parent.compareString(str(parent.theDetectedOS), str('Linux'),0,0,len('Linux'),len('Linux'))==True): #if linux
+            newLineCharacter= "\n"
+        elif(parent.compareString(str(parent.theDetectedOS), str('Darwin'),0,0,len('Darwin'),len('Darwin'))==True): #if mac
+            newLineCharacter= "\n"
+        else:
+            print "=============================================================="
+            print "GUI ERROR: invalid OS detected: '"+str(parent.theDetectedOS)+"'"
+            print "=============================================================="
+        #insert the about me text----------------------------------
+        textBox.WriteText("testing new line for your OS. "+newLineCharacter+" did it work?")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+"Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+"Description: ")
+        textBox.WriteText(newLineCharacter+"============================================================")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"Our project, Mighty Cracker, is a program designed to crack hashed")
+        textBox.WriteText(newLineCharacter+"passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,")
+        textBox.WriteText(newLineCharacter+"and Windows 7+. It uses the power of multiprocessing to fully utilize")
+        textBox.WriteText(newLineCharacter+"every computer available, and can utilize a LAN to distribute the")
+        textBox.WriteText(newLineCharacter+"workload over up to 90 computers (nodes). For now, the algorithms")
+        textBox.WriteText(newLineCharacter+"that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,")
+        textBox.WriteText(newLineCharacter+"which cover a fair amount of the common hashing algorithms used.")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"We've implemented three common attack methods to find an original password.")
+        textBox.WriteText(newLineCharacter+"Dictionary takes a list of passwords, hashes them, and compares the")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     hashes to the original (user inputted) hash to find a match.")
+        textBox.WriteText(newLineCharacter+"Brute Force will iterate through any combination (up to 16")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     characters) of letters, numbers, and symbols to brute-force")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     the password, returning an original if found.")
+        textBox.WriteText(newLineCharacter+"Rainbow Tables are pre-computed arrays of hashes, organized to to")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     provide a time-cost trade-off. The creator creates tables to")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     be used at a later time, and the user uses created tables.")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     This gives one a huge advantage if you know what the password")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"     will consist of ahead of time.")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"These three methods can all be used on either a single computer")
+        textBox.WriteText(newLineCharacter+"(single-user mode) or on a network of computers (similar to")
+        textBox.WriteText(newLineCharacter+"a Beowulf cluster). When using on headless systems, the program")
+        textBox.WriteText(newLineCharacter+"can run in terminal (text-only) mode with a -c command.")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"Of the distributed, multi-process, simple GUI approach this program")
+        textBox.WriteText(newLineCharacter+"takes, it is potentially more powerful and more user-friendly than")
+        textBox.WriteText(newLineCharacter+"most other hash cracking software out there today, making it more")
+        textBox.WriteText(newLineCharacter+"accessible for more people. Simply open the executable and crack")
+        textBox.WriteText(newLineCharacter+"passwords.")
+        textBox.WriteText(newLineCharacter)
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"In the future we'd like to add on the ability to crack the LMT-family")
+        textBox.WriteText(newLineCharacter+"of hashes (Windows) as well as add in GPU support for additional power.")
+        textBox.WriteText(newLineCharacter)
+        #end of  insert aboout me text-----------------------------
+        #TODO update the about me, there are several out of date items and typos
+        #TODO is 16 characters long still the max brute force can do?
         hbox2.Add(textBox, proportion=1, flag=wx.EXPAND)
         vbox.Add(hbox2, proportion=1, flag=wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
 
@@ -1052,6 +1109,13 @@ class myFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
         #TODO add menubar for all panels, allowing close program, pasting,  show hidden windows, etc
+
+        #detectedOS variable
+        self.theDetectedOS= "None"
+
+        #detect the OS
+        self.detectOS()
+
         self.panel_one= PanelOne(self)
         self.panel_two= PanelTwo(self)
         self.panel_three= PanelThree(self)
@@ -2060,6 +2124,30 @@ class myFrame(wx.Frame):
             print "Exception thrown in compareString Function: " +str(inst)+"\n"
             print "========================================================================\n"
             return False
+
+    def detectOS(self):
+        import platform
+        print "OS DETECTION:"
+        if(platform.system()=="Windows"): #Detecting Windows
+            print "GUI DEBUG: Windows OS detected"
+            print platform.system()
+            print platform.win32_ver()
+            self.theDetectedOS= "Windows"
+        elif(platform.system()=="Linux"): #Detecting Linux
+            print "GUI DEBUG: Linux OS detected"
+            print platform.system()
+            print platform.dist()
+            self.theDetectedOS= "Linux"
+        elif(platform.system()=="Darwin"): #Detecting OSX
+            print "GUI DEBUG: Darwin OS detected"
+            print platform.system()
+            print platform.mac_ver()
+            self.theDetectedOS= "Darwin"
+        else:   #other, which defaults to linux
+            print "GUI DEBUG: Unknown OS detected"
+            print platform.system()
+            print "Treating your OS as Linux by default."
+            self.theDetectedOS= "Linux"
 
 
 if __name__ == '__main__':
