@@ -1110,6 +1110,7 @@ class myFrame(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
         #TODO add menubar for all panels, allowing close program, pasting,  show hidden windows, etc
 
+
         #detectedOS variable
         self.theDetectedOS= "None"
 
