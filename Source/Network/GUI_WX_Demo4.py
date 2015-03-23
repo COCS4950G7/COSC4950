@@ -48,7 +48,6 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.aboutUsButton= wx.Button(self, label="About Us")
-        #TODO need to insert text into the about us page (panel 13)
         hbox4.Add(self.aboutUsButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -149,6 +148,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         listOfHashingModes= ['Individual Hash Code','File of Hash Codes']
 
         #TODO FINISH adding support for cracking a file of hash codes
+        #TODO (supposed to work for single mode already)
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -279,6 +279,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
+        #TODO add support for spaces, but uses ' ' instead of strring library!
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -660,6 +661,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         wx.Panel.__init__(self, parent)
 
         #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
+        #TODO for rainbow table maker ditto
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -926,7 +928,6 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
-        #TODO need to insert the about us text into the textctrl
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -968,15 +969,15 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         textBox.WriteText(newLineCharacter)
         textBox.WriteText(newLineCharacter+insertFourCharTab+"We've implemented three common attack methods to find an original password.")
         textBox.WriteText(newLineCharacter+"Dictionary takes a list of passwords, hashes them, and compares the")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     hashes to the original (user inputted) hash to find a match.")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"hashes to the original (user inputted) hash to find a match.")
         textBox.WriteText(newLineCharacter+"Brute Force will iterate through any combination (up to 16")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     characters) of letters, numbers, and symbols to brute-force")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     the password, returning an original if found.")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"characters) of letters, numbers, and symbols to brute-force")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"the password, returning an original if found.")
         textBox.WriteText(newLineCharacter+"Rainbow Tables are pre-computed arrays of hashes, organized to to")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     provide a time-cost trade-off. The creator creates tables to")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     be used at a later time, and the user uses created tables.")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     This gives one a huge advantage if you know what the password")
-        textBox.WriteText(newLineCharacter+insertFourCharTab+"     will consist of ahead of time.")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"provide a time-cost trade-off. The creator creates tables to")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"be used at a later time, and the user uses created tables.")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"This gives one a huge advantage if you know what the password")
+        textBox.WriteText(newLineCharacter+insertFourCharTab+"will consist of ahead of time.")
         textBox.WriteText(newLineCharacter)
         textBox.WriteText(newLineCharacter+insertFourCharTab+"These three methods can all be used on either a single computer")
         textBox.WriteText(newLineCharacter+"(single-user mode) or on a network of computers (similar to")
@@ -1014,96 +1015,6 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         #link the buttons up to events
         backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
         closeButton.Bind(wx.EVT_BUTTON, parent.OnClose)
-
-'''
-        #define buttons and widgets
-        aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody1= wx.StaticText(self, label="Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody2= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody3= wx.StaticText(self, label="Description: ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody4= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody5= wx.StaticText(self, label="Our project, Mighty Cracker, is a program designed to crack hashed", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody6= wx.StaticText(self, label="passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody7= wx.StaticText(self, label="and Windows 7+. It uses the power of multiprocessing to fully utilize", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody8= wx.StaticText(self, label="every computer available, and can utilize a LAN to distribute the", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody9= wx.StaticText(self, label="workload over up to 90 computers (nodes). For now, the algorithms", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody10= wx.StaticText(self, label="that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody11= wx.StaticText(self, label="which cover a fair amount of the common hashing algorithms used.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody12= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody13= wx.StaticText(self, label="We've implemented three common attack methods to find an original password.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody14= wx.StaticText(self, label=" Dictionary takes a list of passwords, hashes them, and compares the", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody15= wx.StaticText(self, label="     hashes to the original (user inputted) hash to find a match.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody16= wx.StaticText(self, label=" Brute Force will iterate through any combination (up to 16 ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody17= wx.StaticText(self, label="     characters) of letters, numbers, and symbols to brute-force", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody18= wx.StaticText(self, label="     the password, returning an original if found.",style= wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody19= wx.StaticText(self, label=" Rainbow Tables are pre-computed arrays of hashes, organized to to", style= wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody20= wx.StaticText(self, label="     provide a time-cost trade-off. The creator creates tables to", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody21= wx.StaticText(self, label="     be used at a later time, and the user uses created tables.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody22= wx.StaticText(self, label="     This gives one a huge advantage if you know what the password", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody23= wx.StaticText(self, label="     will consist of ahead of time.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody24= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody25= wx.StaticText(self, label="These three methods can all be used on either a single computer", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody26= wx.StaticText(self, label="(single-user mode) or on a network of computers (similar to", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody27= wx.StaticText(self, label="a Beowulf cluster). When using on headless systems, the program", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody28= wx.StaticText(self, label="can run in terminal (text-only) mode with a -c command.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody29= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody30= wx.StaticText(self, label="Of the distributed, multi-process, simple GUI approach this program", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody31= wx.StaticText(self, label="takes, it is potentially more powerful and more user-friendly than", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody32= wx.StaticText(self, label="most other hash cracking software out there today, making it more", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody33= wx.StaticText(self, label="accessible for more people. Simply open the executable and crack ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody34= wx.StaticText(self, label="passwords.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody35= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody36= wx.StaticText(self, label="In the future we'd like to add on the ability to crack the LMT-family", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody37= wx.StaticText(self, label="of hashes (Windows) as well as add in GPU support for additional power.", style=wx.ALIGN_CENTER_HORIZONTAL)
-        aboutUsTextBody38= wx.StaticText(self, label=" ", style=wx.ALIGN_CENTER_HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back To Main Menu", style=wx.ALIGN_CENTER_HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close", style=wx.ALIGN_CENTER_HORIZONTAL)
-'''
-'''
-        #add buttons to the grid
-        gsizer.AddMany([(aboutUsHeader, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody1, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody2, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody3, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody4, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody5, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody6, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody7, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody8, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody9, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody10, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody11, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody12, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody13, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody14, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody15, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody16, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody17, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody18, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody19, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody20, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody21, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody22, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody23, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody24, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody25, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody26, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody27, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody28, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody29, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody30, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody31, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody32, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody33, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody34, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody35, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody36, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody37, 0, wx.ALIGN_CENTER, 9),
-            (aboutUsTextBody38, 0, wx.ALIGN_CENTER, 9),
-            (backToMainMenuButton, 0, wx.ALIGN_CENTER, 9),
-            (CloseButton, 0, wx.ALIGN_CENTER, 9)])
-        #TODO text and buttons are still offscreen in linux
-'''
 
 class myFrame(wx.Frame):
     def __init__(self):
@@ -1188,11 +1099,6 @@ class myFrame(wx.Frame):
 
 
     #specail frame resizing functions
-    '''
-    def viewInFullScreen(self, event):
-        self.ShowFullScreen(True)
-        #TODO FULL SCREEN MODE HIDES THE MENU BAR FOR SOME REASON!!!! MIGHT OMIT
-    '''
     def viewMaximizedScreen(self, event):
         self.Maximize(True)
 
@@ -1504,64 +1410,6 @@ class myFrame(wx.Frame):
 
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
-    '''
-    def checkThatAllDictionaryFieldsAreNotEmpty(self, event):
-        emptyFieldDetected= False
-        selectedAlgorithmEmpty= False
-        selectedHashingModeEmpty= False
-        hashValueEmpty= False
-        selectedDictionaryFileEmpty=False
-
-        if(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()),"MD5",0,0,len('MD5'), len('MD5'))==False): #is not 'MD5' or 'SHA1' or 'SHA224' or 'SHA256' or 'SHA512'):
-            emptyFieldDetected= True
-            selectedAlgorithmEmpty= True
-            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
-        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA1",0,0,len('SHA1'),len('SHA1'))==False):
-            emptyFieldDetected= True
-            selectedAlgorithmEmpty=True
-            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
-        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA224",0,0,len('SHA224'),len('SHA224'))==False):
-            emptyFieldDetected=True
-            selectedAlgorithmEmpty=True
-            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
-        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA256",0,0,len('SHA256'),len('SHA256'))==False):
-            emptyFieldDetected=True
-            selectedAlgorithmEmpty=True
-            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
-        elif(self.compareString(str(self.panel_three.selectedAlgorithm.GetValue()), "SHA512",0,0,len('SHA512'),len('SHA512'))==False):
-            emptyFieldDetected=True
-            selectedAlgorithmEmpty=True
-            print "GUI DEBUG: selectedALgorithm: '"+str(self.panel_three.selectedAlgorithm.GetValue())+"'"
-        if(self.compareString(str(self.panel_three.selectedHashingMode.GetValue()), "Individual Hash Code",0,0, len('Individual Hash Code'),len('Individual Hash Code'))==True): #is not 'Individual Hash Code' or 'File of Hash Codes'):
-            emptyFieldDetected=True
-            selectedHashingModeEmpty=True
-            print "GUI DEBUG: selectedHashingMode: '"+str(self.panel_three.selectedHashingMode.GetValue())+"'"
-        elif(self.compareString(str(self.panel_three.selectedHashingMode.GetValue()), "File of Hash Codes",0,0, len('File of Hash Codes'), len('File of Hash Codes'))==True):
-            emptyFieldDetected=True
-            selectedHashingModeEmpty=True
-            print "GUI DEBUG: selectedHashingMode: '"+str(self.panel_three.selectedHashingMode.GetValue())+"'"
-
-        if(self.panel_three.inputHashHeader.GetLabel() is "Hash to be Cracked: No Hash has been input"):
-            emptyFieldDetected=True
-            hashValueEmpty=True
-        if(self.panel_three.inputDictFileHeader.GetLabel() is "Selected Dictionary File: No Dictionary File Selected"):
-            emptyFieldDetected=True
-            selectedDictionaryFileEmpty=True
-        if(emptyFieldDetected is False):
-            self.startDictionaryCrack(event)
-        else:
-            combinedErrorMessage="Please "
-            if(selectedAlgorithmEmpty is True):
-                combinedErrorMessage+= "Select An Algorithm To Use "
-            if(selectedHashingModeEmpty is True):
-                combinedErrorMessage+= ", Select A Hashing Mode "
-            if(hashValueEmpty is True):
-                combinedErrorMessage+= ", Set a hash value to be cracked "
-            if(selectedDictionaryFileEmpty is True):
-                combinedErrorMessage+= ", Select A Dictionary File "
-            dial= wx.MessageDialog(None, str(combinedErrorMessage), "Empty/Non-selected field detected.", wx.OK)
-            dial.ShowModal()
-        '''
 
     def resetDictionarySettingsToDefault(self, event):
         self.panel_three.selectedAlgorithm.SetValue('MD5')
