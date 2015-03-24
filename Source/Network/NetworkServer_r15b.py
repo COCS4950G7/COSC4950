@@ -733,6 +733,17 @@ class Server():
                 finished_chunk = maker.create(params_chunk)
                 result_queue.put(('f', finished_chunk))
 
+        #Returns a list of hashes from the hash file
+        def get_hashes_from_file(self, file_name):
+
+            temp_file = open(file_name, "r")
+
+            list_of_hashes = list(temp_file)
+
+            temp_file.close()
+
+            return list_of_hashes
+
         #=======================================4=======================================================================
         #END OF FUNCTIONS
         #===============================================================================================================
