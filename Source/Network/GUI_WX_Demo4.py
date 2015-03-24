@@ -1073,7 +1073,7 @@ class myFrame(wx.Frame):
         #add a menubar at the top of the window/screen
         menubar= wx.MenuBar()
         fileMenu= wx.Menu()
-        fileMenuClose= fileMenu.Append(wx.ID_EXIT, "Close","Close Application")
+        fileMenuClose= fileMenu.Append(wx.ID_ANY, "Close","Close Application")
         menubar.Append(fileMenu, '&File')
         viewMenu= wx.Menu()
         #viewMenuFullScreen= viewMenu.Append(wx.ID_ANY, "Full Screen", "View in Full Screen Mode") #omitted due to bug in python
