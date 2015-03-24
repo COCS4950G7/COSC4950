@@ -4,7 +4,7 @@ __author__ = 'chris hamm'
 import wx
 import string
 import hashlib
-from multiprocessing import Process, Event
+from multiprocessing import Process, Event, Manager
 from NetworkServer_r15b import Server
 from NetworkClient_r15b import Client
 
@@ -1122,14 +1122,38 @@ class myFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.viewMaximizedScreen, viewMenuMaximizeScreen)
         self.Bind(wx.EVT_MENU, self.viewNormalScreen, viewMenuNormalScreen)
 
+        #If this is the main process and not a subprocess
+        if __name__ == '__main__':
 
-        #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
-        self.update = Event()
-        self.update.clear()
+            #Define the shared dictionary and it's values
+            manager = Manager()
+            self.dictionary = manager.dict()
+            self.dictionary["key"] = ''
+            self.dictionary["finished chunks"] = 0
 
-        #shutdown is linked the the server/client shared shutdown command. setting this should should down server and client.
-        self.shutdown = Event()
-        self.shutdown.clear()
+            #client signals if it's connected or not
+            self.is_connected = Event()
+            self.is_connected.clear()
+
+            #client signals if it's doing stuff or not
+            self.is_doing_stuff = Event()
+            self.is_doing_stuff.clear()
+
+            #update is an event intended to be set by server to let the UI know that the shared dictionary has been updated
+            self.update = Event()
+            self.update.clear()
+
+            #shutdown is linked the the server/client shared shutdown command. setting this should should down server and client.
+            self.shutdown = Event()
+            self.shutdown.clear()
+
+            #Shared is a list of shared events
+            self.shared = []
+            self.shared.append(self.dictionary)
+            self.shared.append(self.shutdown)
+            self.shared.append(self.update)
+            self.shared.append(self.is_connected)
+            self.shared.append(self.is_doing_stuff)
 
 
     #specail frame resizing functions
@@ -1714,7 +1738,7 @@ class myFrame(wx.Frame):
             serverIP+= tempServerIP[i]
         #print "GUI DEBUG: started Network Client"
         #print "GUI DEBUG: server IP: '"+str(serverIP)+"'"
-        self.NetworkClient= Process(target=Client, args=(serverIP,))
+        self.NetworkClient= Process(target=Client, args=(serverIP,self.shared))
         self.NetworkClient.start()
         self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
         self.switchFromPanel7ToPanel8()
