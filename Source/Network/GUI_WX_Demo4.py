@@ -116,15 +116,15 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
         vbox.Add((-1,10))
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox6.Add(BackToMainMenuButton)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox6.Add(self.BackToMainMenuButton)
         vbox.Add(hbox6, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close")
-        hbox7.Add(CloseButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox7.Add(self.CloseButton)
         vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
         self.SetSizer(vbox)
@@ -133,13 +133,15 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
         self.DictionaryMethodButton.SetToolTip(wx.ToolTip('Crack a hash code using a dictionary file for a reference.'))
         self.BruteForceMethodButton.SetToolTip(wx.ToolTip('Crack a hash code by trying every possible combination.'))
         self.RainbowTableMethodButton.SetToolTip(wx.ToolTip('Crack a hash code using a rainbow table as a reference.'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.DictionaryMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel3)
         self.BruteForceMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel4)
         self.RainbowTableMethodButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel5)
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel2ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings=================
     def __init__(self, parent):
@@ -239,10 +241,10 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         vbox.Add((-1,10))
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox9.Add(BackToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox9.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox9.Add(self.BackToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox9.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox9, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
@@ -263,6 +265,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
                                                       'If server, Start hosting a dictionary cracking session.'))
         self.selectedHashingMode.SetToolTip(wx.ToolTip('Choose whether to crack a single hash code or a file of hash codes.'))
         self.resetToDefaultsButton.SetToolTip(wx.ToolTip('Resets all of the dictionary cracking settings back their default settings.'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
@@ -270,8 +274,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         self.setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
         self.resetToDefaultsButton.Bind(wx.EVT_BUTTON, parent.resetDictionarySettingsToDefault)
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings==================
     def __init__(self, parent):
@@ -371,10 +375,10 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         vbox.Add((-1,10))
 
         hbox10= wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox10.Add(BackToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox10.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox10.Add(self.BackToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox10.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox10, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
@@ -393,6 +397,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.StartConnectButton.SetToolTip(wx.ToolTip('Start cracking the hash code. \n'
                                                       'If server, start hosting a brute force cracking session.'))
         self.resetBackToDefaultValues.SetToolTip(wx.ToolTip('Resets all of the Brute-Force Cracking Settings back to their default values.'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setBruteForceHashToBeCracked)
@@ -402,8 +408,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
         self.resetBackToDefaultValues.Bind(wx.EVT_BUTTON, parent.resetBruteForceSettingsToDefault)
         #TODO check to make sure that min key is less than or equal to max key
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
@@ -440,10 +446,10 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
         vbox.Add((-1,10))
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox5.Add(BackToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox5.Add(self.BackToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
@@ -451,12 +457,14 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
         #tooltips
         self.crackRainbowTableButton.SetToolTip(wx.ToolTip('Crack a hash code by using a rainbow table.'))
         self.makeRainbowTableButton.SetToolTip(wx.ToolTip('Create a rainbow table to be used with the rainbow table cracking method (above).'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.crackRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel11)
         self.makeRainbowTableButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel12)
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel5ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
@@ -486,10 +494,10 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox4.Add(BackToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox4.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox4.Add(self.BackToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox4.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
@@ -497,12 +505,14 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         #Tooltips
         self.NetworkServerButton.SetToolTip(wx.ToolTip('Host a cracking session.'))
         self.NetworkClientButton.SetToolTip(wx.ToolTip('Participate in a hosts cracking session'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.NetworkServerButton.Bind(wx.EVT_BUTTON, parent.onNetworkModeButtonClick)
         self.NetworkClientButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel7)
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel6ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
@@ -525,36 +535,40 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
         vbox.Add((-1,10))
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
-        InputServerIPButton= wx.Button(self, label="Input the Server IP")
-        hbox3.Add(InputServerIPButton)
+        self.InputServerIPButton= wx.Button(self, label="Input the Server IP")
+        hbox3.Add(self.InputServerIPButton)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
-        ConnectToServerButton= wx.Button(self, label="Connect To The Server")
+        self.ConnectToServerButton= wx.Button(self, label="Connect To The Server")
         #TODO need to make sure all fields have data enetered into them
-        hbox4.Add(ConnectToServerButton)
+        hbox4.Add(self.ConnectToServerButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
-        BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox5.Add(BackToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.BackToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox5.Add(self.BackToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.InputServerIPButton.SetToolTip(wx.ToolTip('Input the IP address of the server you are connecting to'))
+        self.ConnectToServerButton.SetToolTip(wx.ToolTip('Connect to the server'))
+        self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
-        InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
-        ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.connectToServer)
-        BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel7ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
+        self.ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.connectToServer)
+        self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel7ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
@@ -586,24 +600,26 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
-        disconnectClientButton= wx.Button(self, label="Disconnect From Server")
-        hbox4.Add(disconnectClientButton)
+        self.disconnectClientButton= wx.Button(self, label="Disconnect From Server")
+        hbox4.Add(self.disconnectClientButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
-        CloseButton= wx.Button(self, label="Close")
-        hbox5.Add(CloseButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(self.CloseButton)
         vbox.Add(hbox5, flag=wx.CENTER, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.disconnectClientButton.SetToolTip(wx.ToolTip('Disconnect from the server'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
-        disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
@@ -642,19 +658,21 @@ class PanelNine(wx.Panel):                     #================Network Server S
         vbox.Add((-1,10))
 
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
-        forceQuitServerButton= wx.Button(self, label="Close the server")
-        hbox5.Add(forceQuitServerButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox5.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.forceQuitServerButton= wx.Button(self, label="Close the server")
+        hbox5.Add(self.forceQuitServerButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox5.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.forceQuitServerButton.SetToolTip(wx.ToolTip('Forcefully stop the server'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
-        forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
@@ -687,19 +705,21 @@ class PanelTen(wx.Panel):                          #====================Single M
         vbox.Add((-1,10))
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox4.Add(backToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox4.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox4.Add(self.backToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox4.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
-        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
@@ -739,8 +759,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
-        selectFileButton= wx.Button(self, label="Select File")
-        hbox4.Add(selectFileButton)
+        self.selectFileButton= wx.Button(self, label="Select File")
+        hbox4.Add(self.selectFileButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -753,10 +773,10 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         vbox.Add((-1,10))
 
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
-        setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked")
-        hbox6.Add(setHashCodeButton)
-        generateHashButton= wx.Button(self, label="Generate Hash Code")
-        hbox6.Add(generateHashButton, flag=wx.LEFT, border=5)
+        self.setHashCodeButton= wx.Button(self, label="Set Hash To Be Cracked")
+        hbox6.Add(self.setHashCodeButton)
+        self.generateHashButton= wx.Button(self, label="Generate Hash Code")
+        hbox6.Add(self.generateHashButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -781,24 +801,30 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         vbox.Add((-1,10))
 
         hbox8=wx.BoxSizer(wx.HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox8.Add(backToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox8.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox8.Add(self.backToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox8.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.selectedAlgorithm.SetToolTip(wx.ToolTip('Select the algorithm you want to use for cracking the hash code'))
+        self.selectFileButton.SetToolTip(wx.ToolTip('Select what rainbow table file you want to use'))
+        self.setHashCodeButton.SetToolTip(wx.ToolTip('Set the hash code you want to crack'))
+        self.generateHashButton.SetToolTip(wx.ToolTip('Generate the hash code you want to crack based on the key you input and the selected algorithm'))
+        self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #bind the buttons to events
-        selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
-        setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
-        generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
+        self.selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
+        self.setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
+        self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
         self.resetSettingsToDefaultButton.Bind(wx.EVT_BUTTON, parent.resetRainbowTableCrackingSettingsToDefault)
-        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
@@ -835,8 +861,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
         hbox4.Add(self.keyLengthHeader)
-        changeKeyLengthButton= wx.Button(self, label="Set Key Length")
-        hbox4.Add(changeKeyLengthButton, flag=wx.LEFT, border=25)
+        self.changeKeyLengthButton= wx.Button(self, label="Set Key Length")
+        hbox4.Add(self.changeKeyLengthButton, flag=wx.LEFT, border=25)
         vbox.Add(hbox4, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -853,8 +879,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
         self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 100")
         hbox6.Add(self.chainLengthHeader)
-        changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
-        hbox6.Add(changeChainLengthButton, flag=wx.LEFT, border=125)
+        self.changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
+        hbox6.Add(self.changeChainLengthButton, flag=wx.LEFT, border=125)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -862,8 +888,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 100")
         hbox7.Add(self.numOfRowsHeader)
-        setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
-        hbox7.Add(setNumOfRowsButton, flag=wx.LEFT, border=125)
+        self.setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
+        hbox7.Add(self.setNumOfRowsButton, flag=wx.LEFT, border=125)
         vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
@@ -876,8 +902,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         vbox.Add((-1,10))
 
         hbox9=wx.BoxSizer(wx.HORIZONTAL)
-        changeFileNameButton= wx.Button(self, label="Change Saved File Name")
-        hbox9.Add(changeFileNameButton)
+        self.changeFileNameButton= wx.Button(self, label="Change Saved File Name")
+        hbox9.Add(self.changeFileNameButton)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
@@ -905,25 +931,33 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         vbox.Add((-1,10))
 
         hbox11=wx.BoxSizer(wx.HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back to Main Menu")
-        hbox11.Add(backToMainMenuButton)
-        CloseButton= wx.Button(self, label="Close")
-        hbox11.Add(CloseButton, flag=wx.LEFT, border=5)
+        self.backToMainMenuButton= wx.Button(self, label="Back to Main Menu")
+        hbox11.Add(self.backToMainMenuButton)
+        self.CloseButton= wx.Button(self, label="Close")
+        hbox11.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox11, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        #ToolTips
+        self.changeKeyLengthButton.SetToolTip(wx.ToolTip('Set how many characters the key will be'))
+        self.changeChainLengthButton.SetToolTip(wx.ToolTip('Set how long the chains (which go horizontally) are in the table'))
+        self.setNumOfRowsButton.SetToolTip(wx.ToolTip('Set how many rows there will be in the table (which run vertically)'))
+        self.changeFileNameButton.SetToolTip(wx.ToolTip('Change the name of the rainbow table file that you want to save'))
+        self.startConnectButton.SetToolTip(wx.ToolTip('Start making (or if server, start hosting) a rainbow table making session'))
+        self.resetSettingsBackToDefault.SetToolTip(wx.ToolTip('Reset the rainbow table maker settings back to default values'))
+        self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #bind the buttons to events
-        changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
-        changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.setRMChainLength)
-        setNumOfRowsButton.Bind(wx.EVT_BUTTON, parent.setRMNumOfRows)
-        changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
+        self.changeKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setRMKeyLength)
+        self.changeChainLengthButton.Bind(wx.EVT_BUTTON, parent.setRMChainLength)
+        self.setNumOfRowsButton.Bind(wx.EVT_BUTTON, parent.setRMNumOfRows)
+        self.changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
         self.startConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCreationSession)
         self.resetSettingsBackToDefault.Bind(wx.EVT_BUTTON, parent.resetRainbowTableMakerSettingsToDefault)
-        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
-        CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
+        self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
@@ -1019,8 +1053,6 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 class myFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
-        #TODO add menubar for all panels, allowing close program, pasting,  show hidden windows, etc
-
 
         #detectedOS variable
         self.theDetectedOS= "None"
