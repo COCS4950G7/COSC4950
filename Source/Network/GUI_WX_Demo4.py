@@ -574,6 +574,8 @@ class PanelEight(wx.Panel):       #========================Network Client Status
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO launch status monitor process at end of window
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -626,6 +628,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         wx.Panel.__init__(self, parent)
 
         #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
+        #TODO start up status monitor process at end of window
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -704,6 +707,28 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         vbox.Add((-1,10))
 
+        hbox5= wx.BoxSizer(wx.HORIZONTAL)
+        activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
+        hbox5.Add(activityGaugeHeader)
+        self.activityGauge= wx.Gauge(self, range=100, style=wx.GA_HORIZONTAL )
+        self.activityGauge.Pulse() #switch gauge to indeterminate mode
+        hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
+        vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+        #TODO ask about a shared variable indicating when the the search is complete, so i can stop the activity gauge
+
+        vbox.Add((-1,10))
+
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        progressBarHeader= wx.StaticText(self, label="Progress:")
+        hbox6.Add(progressBarHeader)
+        self.progressBar= wx.Gauge(self, range=100, style=wx.GA_HORIZONTAL )
+        self.progressBar.SetValue(0) #set value to start at zero
+        hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+        #TODO need to set up how to increment progress bar
+
+        vbox.Add((-1,10))
+
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
         hbox4.Add(self.backToMainMenuButton)
@@ -714,12 +739,19 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.SetSizer(vbox)
 
         #ToolTips
+        self.activityGauge.SetToolTip(wx.ToolTip('Indicates that the program is still running'))
+        self.progressBar.SetToolTip(wx.ToolTip('Shows how far the search is overall'))
         self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+
+        #start up the status monitoring process
+        myStatusMonitor= Process(target=parent.startStatusMonitor, args=(True,self.currentCrackingMode.GetLabel,))
+        myStatusMonitor.start()
+        #TODO this process needs to be killed!
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
@@ -1728,6 +1760,32 @@ class myFrame(wx.Frame):
         self.panel_eleven.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
         self.panel_twelve.startConnectButton.SetLabel("Start Hosting a Rainbow Table Creation Session")
         self.switchFromPanel6ToPanel2()
+
+    def startStatusMonitor(self, singleMode, crackingMode):
+        #monitor the status of the server for either single or network mode
+        self.singleMode= singleMode
+        self.myCrackingMode=crackingMode
+
+        #TODO implement this into client, server, and single status screens
+        while not self.shutdown.is_set():
+            if(singleMode == True): #if in single mode
+                if(self.is_connected == True):
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Connected to Internal Server")
+                else:
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Not Connected To Internal Server")
+            else: #if network mode
+                if(self.is_connected == True):
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Server is Connected To Network")
+                    self.panel_eight.currentStatus.SetLabel("Current Status: Connected to Server")
+                else:
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Server is Not Connected to the Network")
+                    self.panel_eight.currentStatus.SetLabel("Current Status: Not Connected to the Server")
+            #TODO if doing_stuff is true, show the activity guage
+            #end of if by single/network mode
+            if(self.compareString(self.myCrackingMode, "Current Mode: Dictionary",0,0,len("Dictionary"),len("Dictionary"))==True):
+                self.panel_ten.progressBar.SetValue(self.dictionary['finished chunks'] / self.dictionary['total chunks'])
+                #TODO add this for panels 8 and 9
+        #end of while not self.shutdown
 
     def connectToServer(self, event):
         tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
