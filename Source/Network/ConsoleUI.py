@@ -2734,8 +2734,7 @@ class ConsoleUI():
 
             elif attack_method == "rainbowuser":
 
-                #BROKEN
-                self.current_search_item = chunk_list[1]
+                self.current_search_item = chunk_list[0]
 
 
 ConsoleUI()
