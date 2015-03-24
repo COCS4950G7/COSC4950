@@ -952,7 +952,6 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
             print "GUI ERROR: invalid OS detected: '"+str(parent.theDetectedOS)+"'"
             print "=============================================================="
         #insert the about me text----------------------------------
-        textBox.WriteText("testing new line for your OS. "+newLineCharacter+" did it work?")
         textBox.WriteText(newLineCharacter)
         textBox.WriteText(newLineCharacter+"Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.")
         textBox.WriteText(newLineCharacter)
@@ -1002,19 +1001,20 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         vbox.Add((-1, 25)) #add extra space between the textctrl and the buttons
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
-        hbox3.Add(backToMainMenuButton)
-        closeButton= wx.Button(self, label="Close")
-        hbox3.Add(closeButton, flag=wx.LEFT|wx.BOTTOM, border=5)
+        self.backToMainMenuButton= wx.Button(self, label="Back To Main Menu")
+        hbox3.Add(self.backToMainMenuButton)
+        self.closeButton= wx.Button(self, label="Close")
+        hbox3.Add(self.closeButton, flag=wx.LEFT|wx.BOTTOM, border=5)
         vbox.Add(hbox3, flag=wx.ALIGN_RIGHT|wx.RIGHT, border=10)
 
         self.SetSizer(vbox)
 
-        #TODO add tooltips to this panel
+        self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
+        self.closeButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #link the buttons up to events
-        backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
-        closeButton.Bind(wx.EVT_BUTTON, parent.OnClose)
+        self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel13ToPanel1)
+        self.closeButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 class myFrame(wx.Frame):
     def __init__(self):
