@@ -659,7 +659,7 @@ class Server():
                         chunk = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
                     except Qqueue.Empty:
                         continue
-
+                    self.shared_dict["current chunk"] = chunk
                     dictionary.find(chunk)
                     result = dictionary.isFound()
                     params = chunk.params.split()
@@ -691,7 +691,7 @@ class Server():
                         chunk = job_queue.get(timeout=.1)
                     except Qqueue.Empty:
                         continue
-
+                    self.shared_dict["current chunk"] = chunk
                     bf.run_chunk(chunk)
                     bf.start_processes()
 
@@ -714,6 +714,7 @@ class Server():
                     chunk = job_queue.get(block=True, timeout=.25)
                 except Qqueue.Empty:
                     continue
+                self.shared_dict["current chunk"] = chunk
                 rain.find(chunk)
                 if rain.isFound():
                     result_queue.put(("w", rain.getKey()))

@@ -13,6 +13,7 @@ import time
 import os
 from multiprocessing import Process, Event, Manager
 import string
+import Chunk
 
 from NetworkClient_r15b import Client
 from NetworkServer_r15b import Server
@@ -37,6 +38,7 @@ class ConsoleUI():
         dictionary["finished chunks"] = 0
         dictionary["total chunks"] = 0
         dictionary["server ip"] = "127.1.1.1"
+        dictionary["current chunk"] = Chunk.Chunk()
 
         #server/client/GUI signals shutdown when they're all done
         shutdown = Event()
@@ -68,6 +70,9 @@ class ConsoleUI():
         networkClient = Process(target=Client, args=(serverIP, shared,))
 
         state = "startScreen"
+
+        #Displayed to the user while searching
+        current_search_item = ""
 
         clock = 0
         #colliding_Clock = 0
@@ -1740,6 +1745,8 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1968,6 +1975,8 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2514,6 +2523,8 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2693,5 +2704,38 @@ class ConsoleUI():
                 alphabet_string += digits
 
         return alphabet_string
+
+    #Parses the current chunk from server to display more info to the user
+    def parse_chunk(self, chunk):
+
+        #If the chunk isn't empty
+        if not chunk.params == "":
+
+            params_list = chunk.params.split()
+
+            attack_method = params_list[0]
+
+            chunk_list = chunk.data.split()
+
+            if attack_method == "dictionary":
+
+                self.current_search_item = chunk_list[1]
+
+            elif attack_method == "bruteforce":
+
+                #BROKEN
+                #self.current_search_item = chunk_list[1]
+                x = 1
+
+            elif attack_method == "rainbowmaker":
+
+                #NOT IMPLEMENTED
+                self.current_search_item = chunk_list[1]
+
+            elif attack_method == "rainbowuser":
+
+                #BROKEN
+                self.current_search_item = chunk_list[1]
+
 
 ConsoleUI()
