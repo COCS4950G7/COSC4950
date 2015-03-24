@@ -40,6 +40,7 @@ class RainbowUser():
     key = ""
     iteration = 100000
     numProcesses = cpu_count()
+    total_chunks = 0
 
     #Constructor
     def __init__(self):
@@ -527,6 +528,9 @@ class RainbowUser():
         self.width = int(varsList[3])
         #print self.width
 
+        #Sets the total_chunks variable based on file
+        self.set_total_chunks()
+
     #Returns the original hash
     def getHash(self):
 
@@ -539,3 +543,30 @@ class RainbowUser():
         chunky = [list[i::pieces] for i in range(pieces)]
 
         return chunky
+
+    #Sets the total_chunks variable based on file
+    def set_total_chunks(self):
+
+        temp_file = open(self.fileName, "r")
+
+        list_of_lines = list(temp_file)
+
+        temp_file.close()
+
+        total_lines = len(list_of_lines)
+
+        #Total chunks = lines in dictionary minus first line divided by size of chunks
+        self.total_chunks = (total_lines - 1) / 1000
+
+        #Adjust the total chunks to account for larger chunks that occur
+        self.total_chunks -= 1
+
+        #If total chunks is <1, make it at least 1
+        if self.total_chunks < 1:
+
+            self.total_chunks = 1
+
+    #Returns total_chunks variable
+    def get_total_chunks(self):
+
+        return self.total_chunks

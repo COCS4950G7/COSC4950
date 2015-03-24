@@ -59,6 +59,7 @@ class Dictionary():
     doneList = []
     singleHash = True
     maxLines = 1000000
+    total_chunks = 0
 
 
     #Constructor
@@ -83,6 +84,9 @@ class Dictionary():
 
         except (OSError, IOError):
             return "Fail"
+
+        #sets total_chunks variable, based on dictionary file
+        self.set_total_chunks()
 
         return "Good"
 
@@ -574,3 +578,30 @@ class Dictionary():
         chunk.params = "dictionary " + self.algorithm + " " + self.hash + " 0 0 0 0 " + str(fileLocation) + " 0 0 "
 
         return chunk
+
+    #Sets the total_chunks variable based on dictionary file
+    def set_total_chunks(self):
+
+        temp_file = open(self.fileName, "r")
+
+        list_of_lines = list(temp_file)
+
+        temp_file.close()
+
+        total_lines = len(list_of_lines)
+
+        #Total chunks = lines in dictionary minus first line divided by size of chunks
+        self.total_chunks = (total_lines - 1) / self.maxLines
+
+        #Adjust the total chunks to account for larger chunks that occur
+        self.total_chunks -= 1
+
+        #If total chunks is <1, make it at least 1
+        if self.total_chunks < 1:
+
+            self.total_chunks = 1
+
+    #Returns total_chunks variable
+    def get_total_chunks(self):
+
+        return self.total_chunks

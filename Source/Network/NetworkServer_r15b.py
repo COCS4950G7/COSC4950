@@ -132,6 +132,8 @@ class Server():
                     dictionary.setFileName(self.settings["file name"])
                     dictionary.setHash(self.settings["hash"])
                     self.found_solution.value = False
+                    self.total_chunks = dictionary.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, manager, shared_job_q))
                 elif self.cracking_mode == "bf":
                     if not self.single_user_mode:
@@ -144,6 +146,7 @@ class Server():
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
                     self.total_chunks = bf.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, manager, shared_job_q))
                 elif self.cracking_mode == "rain":
                     if not self.single_user_mode:
@@ -154,7 +157,8 @@ class Server():
                     rain.setFileName(self.settings["file name"])
                     rain.setHash(self.settings["hash"])
                     rain.gatherInfo()
-
+                    self.total_chunks = rain.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow, args=(rain, manager, shared_job_q))
 
                 elif self.cracking_mode == "rainmaker":
@@ -169,7 +173,8 @@ class Server():
                     rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
                     rainmaker.setFileName(self.settings['file name'])
                     rainmaker.setupFile()
-
+                    self.total_chunks = rainmaker.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, shared_job_q))
 
                 else:

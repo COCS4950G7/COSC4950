@@ -35,6 +35,7 @@ class RainbowMaker():
     fileLocation = 1
     chunkCount = 0
     numProcesses = cpu_count()
+    total_chunks = 0
 
     #Constructor
     def __init__(self):
@@ -308,6 +309,8 @@ class RainbowMaker():
 
         self.file.close()
 
+        #Sets total_chunk variable, based on input variables
+        self.set_total_chunks()
 
     #Puts a done chunk (already processed by a node) into the table (file)
     def putChunkInFile(self, chunkOfDone):
@@ -502,3 +505,19 @@ class RainbowMaker():
         tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
 
         return tempChunk
+
+    #Sets the total_chunks variable
+    def set_total_chunks(self):
+
+        #total chunks equals num rows divided by chunk size
+        self.total_chunks = self.height / (100 * self.numProcesses)
+
+        #If total chunks is <1, make it at least 1
+        if self.total_chunks < 1:
+
+            self.total_chunks = 1
+
+    #Returns total_chunks variable
+    def get_total_chunks(self):
+
+        return self.total_chunks

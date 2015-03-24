@@ -35,6 +35,7 @@ class ConsoleUI():
         dictionary = manager.dict()
         dictionary["key"] = ''
         dictionary["finished chunks"] = 0
+        dictionary["total chunks"] = 0
         dictionary["server ip"] = "127.1.1.1"
 
         #server/client/GUI signals shutdown when they're all done
@@ -1738,6 +1739,7 @@ class ConsoleUI():
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1965,6 +1967,7 @@ class ConsoleUI():
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2217,6 +2220,7 @@ class ConsoleUI():
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
                     print "Creating--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2509,6 +2513,7 @@ class ConsoleUI():
                     os.system('cls' if os.name == 'nt' else 'clear')
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
