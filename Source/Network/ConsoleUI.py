@@ -20,55 +20,57 @@ from NetworkServer_r15b import Server
 
 class ConsoleUI():
 
-    #Class variables
-    settings = dict()
-    done = False
+    if __name__ == '__main__':
 
-    #Initializing variable to a default value
-    #serverIP = "192.168.1.3"
-    serverIP = "127.0.1.1"
+        #Class variables
+        settings = dict()
+        done = False
 
-    #Define the shared dictionary and it's values
-    manager = Manager()
-    dictionary = manager.dict()
-    dictionary["key"] = ''
-    dictionary["finished chunks"] = 0
-    dictionary["server ip"] = "127.1.1.1"
+        #Initializing variable to a default value
+        #serverIP = "192.168.1.3"
+        serverIP = "127.0.1.1"
 
-    #server/client/GUI signals shutdown when they're all done
-    shutdown = Event()
-    shutdown.clear()
+        #Define the shared dictionary and it's values
+        manager = Manager()
+        dictionary = manager.dict()
+        dictionary["key"] = ''
+        dictionary["finished chunks"] = 0
+        dictionary["server ip"] = "127.1.1.1"
 
-    #Define the various events
-    #server signals update when something has occurred (ie: chunk processed)
-    update = Event()
-    update.clear()
+        #server/client/GUI signals shutdown when they're all done
+        shutdown = Event()
+        shutdown.clear()
 
-    #client signals if it's connected or not
-    is_connected = Event()
-    is_connected.clear()
+        #Define the various events
+        #server signals update when something has occurred (ie: chunk processed)
+        update = Event()
+        update.clear()
 
-    #client signals if it's doing stuff or not
-    is_doing_stuff = Event()
-    is_doing_stuff.clear()
+        #client signals if it's connected or not
+        is_connected = Event()
+        is_connected.clear()
 
-    #Shared is a list of shared events
-    shared = []
-    shared.append(dictionary)
-    shared.append(shutdown)
-    shared.append(update)
-    shared.append(is_connected)
-    shared.append(is_doing_stuff)
+        #client signals if it's doing stuff or not
+        is_doing_stuff = Event()
+        is_doing_stuff.clear()
 
-    #Defining network sub-processes as class variables that are instances of the network objects
-    networkServer = Process(target=Server, args=(settings, shared,))
-    networkClient = Process(target=Client, args=(serverIP, shared,))
+        #Shared is a list of shared events
+        shared = []
+        shared.append(dictionary)
+        shared.append(shutdown)
+        shared.append(update)
+        shared.append(is_connected)
+        shared.append(is_doing_stuff)
 
-    state = "startScreen"
+        #Defining network sub-processes as class variables that are instances of the network objects
+        networkServer = Process(target=Server, args=(settings, shared,))
+        networkClient = Process(target=Client, args=(serverIP, shared,))
 
-    clock = 0
-    #colliding_Clock = 0
-    #colliding_Clock2 = 0
+        state = "startScreen"
+
+        clock = 0
+        #colliding_Clock = 0
+        #colliding_Clock2 = 0
 
     #Constructor
     def __init__(self):
