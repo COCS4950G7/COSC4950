@@ -940,6 +940,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.SetSizer(vbox)
 
         #ToolTips
+        self.selectedAlgorithm.SetToolTip(wx.ToolTip('Set which algorithm to use for creating the table'))
+        self.selectedAlphabet.SetToolTip(wx.ToolTip('Set which characters to use when making the rainbow table'))
         self.changeKeyLengthButton.SetToolTip(wx.ToolTip('Set how many characters the key will be'))
         self.changeChainLengthButton.SetToolTip(wx.ToolTip('Set how long the chains (which go horizontally) are in the table'))
         self.setNumOfRowsButton.SetToolTip(wx.ToolTip('Set how many rows there will be in the table (which run vertically)'))
