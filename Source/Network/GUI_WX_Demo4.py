@@ -1462,20 +1462,21 @@ class myFrame(wx.Frame):
 
     def updateTimer(self,  event):
         #import time
-        #print "GUI DEBUG: updated timer: "+str(time.ctime())
-        print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
-        #print "GUI DEBUG: type of dic finished chunks: "+str(type(self.dictionary['finished chunks']))
-        print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
-        #print "GUI DEBUG: type of dictionary total chunks: "+str(self.dictionary['total chunks'])
-        percentComplete= 0
-        if(self.dictionary["total chunks"] is not 0):
-            percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
-        print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
-        self.panel_ten.progressBar.SetValue(percentComplete)
-        #import time
-        #time.sleep(1)
-        #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
-        self.update.clear()
+        if(not self.shutdown.is_set()):
+            #print "GUI DEBUG: updated timer: "+str(time.ctime())
+            print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
+            #print "GUI DEBUG: type of dic finished chunks: "+str(type(self.dictionary['finished chunks']))
+            print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
+            #print "GUI DEBUG: type of dictionary total chunks: "+str(self.dictionary['total chunks'])
+            percentComplete= 0
+            if(self.dictionary["total chunks"] is not 0):
+                percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
+            print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
+            self.panel_ten.progressBar.SetValue(percentComplete)
+            #import time
+            #time.sleep(1)
+            #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
+            self.update.clear()
 
     def getIPFromUser(self, event):
         dial = wx.TextEntryDialog(self, "What is the Server's IP Address?", "Input IP Address", "", style=wx.OK)
