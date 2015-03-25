@@ -747,8 +747,6 @@ class PanelTen(wx.Panel):                          #====================Single M
         #create timer
         self.timer= wx.Timer()
         print "GUI DEBUG: created timer"
-        #self.timer.Start()
-        #print "GUI DEBUG: started timer"
 
         #Bind the buttons to events
         self.timer.Bind(wx.EVT_TIMER, parent.updateTimer, self.timer )
@@ -756,7 +754,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
         '''
-        #start up the status monitoring process
+        #start up the status monitoring process #CAUSING PICKLING ISSUES
         myStatusMonitor= Process(target=parent.startStatusMonitor, args=(True,self.currentCrackingMode.GetLabel,))
         myStatusMonitor.start()
         #TODO this process needs to be killed!
@@ -1198,7 +1196,7 @@ class myFrame(wx.Frame):
             self.shared.append(self.is_doing_stuff)
 
 
-    #specail frame resizing functions
+    #specail frame resizing functions====================================================================================
     def viewMaximizedScreen(self, event):
         self.Maximize(True)
 
@@ -1206,7 +1204,7 @@ class myFrame(wx.Frame):
         self.Maximize(False)
         self.ShowFullScreen(False)
 
-    #---------switch from Panel 1
+    #---------switch from Panel 1=======================================================================================
     def switchFromPanel1ToPanel2(self):
         self.SetTitle("Mighty Cracker: Select Cracking Method")
         self.panel_one.Hide()
@@ -1279,7 +1277,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
         self.panel_three.Hide()
         self.panel_ten.Show()
-        self.panel_ten.timer.Start()
+        self.panel_ten.timer.Start(1000)
         print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #----------end switch from panel 3
@@ -1305,7 +1303,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
         self.panel_four.Hide()
         self.panel_ten.Show()
-        self.panel_ten.timer.Start()
+        self.panel_ten.timer.Start(1000)
         print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #---------end switch from panel 4
@@ -1415,7 +1413,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
         self.panel_eleven.Hide()
         self.panel_ten.Show()
-        self.panel_ten.timer.Start()
+        self.panel_ten.timer.Start(1000) #1000 milliseconds = 1 second
         print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-----------end of switch from panel 11
@@ -1441,7 +1439,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table Maker")
         self.panel_twelve.Hide()
         self.panel_ten.Show()
-        self.panel_ten.timer.Start()
+        self.panel_ten.timer.Start(1000)
         print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-------------end of switch from panel 12
@@ -1455,13 +1453,12 @@ class myFrame(wx.Frame):
     #------------end of switch from panel 13
 
 
-    #defined functions
+    #defined functions ========================================================================================
     def ShowNotFinishedMessage1(self, event):
         dial= wx.MessageDialog(None, 'This function has not been completed yet', 'Notice:', wx.OK)
         dial.ShowModal()
 
     def updateTimer(self,  event):
-        #import time
         if(not self.shutdown.is_set()):
             #print "GUI DEBUG: updated timer: "+str(time.ctime())
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
@@ -1796,7 +1793,7 @@ class myFrame(wx.Frame):
         self.panel_eleven.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
         self.panel_twelve.startConnectButton.SetLabel("Start Hosting a Rainbow Table Creation Session")
         self.switchFromPanel6ToPanel2()
-
+    '''
     def startStatusMonitor(self, singleMode, crackingMode):
         #monitor the status of the server for either single or network mode
         self.singleMode= singleMode
@@ -1822,6 +1819,7 @@ class myFrame(wx.Frame):
                 self.panel_ten.progressBar.SetValue(self.dictionary['finished chunks'] / self.dictionary['total chunks'])
                 #TODO add this for panels 8 and 9
         #end of while not self.shutdown
+    '''
 
     def connectToServer(self, event):
         tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
