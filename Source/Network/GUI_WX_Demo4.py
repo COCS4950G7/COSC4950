@@ -749,7 +749,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         print "GUI DEBUG: created timer"
 
         #Bind the buttons to events
-        self.timer.Bind(wx.EVT_TIMER, parent.updateTimer, self.timer )
+        self.timer.Bind(wx.EVT_TIMER, parent.updateTimer, self.timer ) #timer is started in the switch to panel 10 function. Once started the timer will call updateTimer every 1000 milliseconds
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
