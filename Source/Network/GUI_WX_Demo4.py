@@ -756,7 +756,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         '''
         #start up the status monitoring process #CAUSING PICKLING ISSUES
         myStatusMonitor= Process(target=parent.startStatusMonitor, args=(True,self.currentCrackingMode.GetLabel,))
-        myStatusMonitor.start()
+        myStatusMonitor.start() #THIS FUNCTION IS ALSO COMMENTED OUT BELOW
         #TODO this process needs to be killed!
         '''
 
