@@ -205,7 +205,7 @@ class Brute_Force():
         #print "Checking ", self.charactersToCheck, "characters per chunk."
         self.chunk_size = iterations
         for i in range(self.minKeyLength, self.maxKeyLength):
-            self.total_work_units += ((self.alphabet.__len__() ^ i)/self.chunk_size)
+            self.total_work_units += ((self.alphabet.__len__() ** i)/self.chunk_size)
 
 #   get_chunk() is an iterator which yields a new chunk of data each time get_chunk.next() is called.
         # BROKEN, DO NOT USE!
