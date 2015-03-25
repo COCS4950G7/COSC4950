@@ -1867,7 +1867,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
         #print "GUI DEBUG: Starting up Server Process"
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         #print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
         #print "GUI DEBUG: after process has started"
@@ -1934,7 +1934,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel4ToPanel9()
@@ -1972,7 +1972,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel11ToPanel9()
@@ -2046,7 +2046,7 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,listOfSharedVariables,))
+        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel12ToPanel9()
