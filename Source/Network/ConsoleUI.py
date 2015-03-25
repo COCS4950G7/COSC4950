@@ -640,6 +640,9 @@ class ConsoleUI():
                     print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -865,6 +868,9 @@ class ConsoleUI():
                     print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1117,6 +1123,7 @@ class ConsoleUI():
                     print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Creating--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1411,6 +1418,9 @@ class ConsoleUI():
                     print "Server IP: ", self.dictionary["server ip"]
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
+                    print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
+                    self.parse_chunk(self.dictionary["current chunk"])
+                    print "Current Word: ", self.current_search_item
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2723,6 +2733,7 @@ class ConsoleUI():
 
             elif attack_method == "bruteforce":
 
+                #TODO: Fix bruteforce chunk parsing
                 #BROKEN
                 #self.current_search_item = chunk_list[1]
                 x = 1
