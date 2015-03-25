@@ -715,6 +715,8 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
         #TODO ask about a shared variable indicating when the the search is complete, so i can stop the activity gauge
+        #TODO gauge is tiny on OSX
+        #TODO activity gauge does not pulse on Linux
 
         vbox.Add((-1,10))
 
@@ -726,6 +728,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
         #TODO need to set up how to increment progress bar
+        #TODO gauge is tiny on OSX
 
         vbox.Add((-1,10))
 
