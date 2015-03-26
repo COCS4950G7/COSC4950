@@ -217,7 +217,6 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
-        #TODO need to make sure that all fields have data entered into them
         #make sure that  selected algorithm is not the empty string
         #make sure a hashing mode has been selected (not the empty string)
         #make sure a hash has been entered in
@@ -272,7 +271,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         self.inputHashButton.Bind(wx.EVT_BUTTON, parent.setDictionaryHashToBeCracked)
         self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogDic)
         self.setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startDictionaryCrack)
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateDictionaryInputs)
         self.resetToDefaultsButton.Bind(wx.EVT_BUTTON, parent.resetDictionarySettingsToDefault)
         self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -355,7 +354,6 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
-        #TODO need to make sure that all fields have data entered into them
         hbox9.Add(self.StartConnectButton)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -405,9 +403,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogBF)
         self.changeMinKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMinKeyLength)
         self.changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startBruteForceCrack)
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateBruteForceInputs)
         self.resetBackToDefaultValues.Bind(wx.EVT_BUTTON, parent.resetBruteForceSettingsToDefault)
-        #TODO check to make sure that min key is less than or equal to max key
         self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1477,6 +1474,179 @@ class myFrame(wx.Frame):
             #time.sleep(1)
             #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
             self.update.clear()
+        #TODO add if shut down is issued , stop activity bar and display results
+
+    def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
+        foundInvalidInput= "False"
+        invalidAlgorithm= "False"
+        invalidHashingMode= "False"
+        invalidHashToBeCracked= "False"
+        invalidDictionaryFile= "False"
+
+        #check for valid algorithm
+        if(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
+            print "GUI DEBUG: valid dictionary algorithm detected"
+        elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
+            print "GUI DEBUG: valid dictionary algorithm detected"
+        elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
+            print "GUI DEBUG: valid dictionary algorithm detected"
+        elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            print "GUI DEBUG: valid dictionary algorithm detected"
+        elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
+            print "GUI DEBUG: valid dictionary algorithm detected"
+        else:
+            foundInvalidInput= "True"
+            invalidAlgorithm= "True"
+            print "GUI DEBUG: Invalid dictionary algorithm detected"
+
+        #check for valid selected hashing mode
+        if(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "Individual Hash Code",0,0,len("Individual Hash Code"),len("Individual Hash Code"))==True):
+            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+        elif(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "File of Hash Codes",0,0,len("File of Hash Codes"),len("File of Hash Codes"))==True):
+            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+        else:
+            foundInvalidInput= "True"
+            invalidHashingMode= "True"
+            print "GUI DEBUG: Invlaid dictionary selected hashing mode detected"
+
+        #check for valid hash to be cracked value
+        if(self.compareString(self.panel_three.inputHashHeader.GetLabel(),"Hash to be Cracked: No Hash has been input",0,0,len("Hash to be Cracked: No Hash has been input"),len("Hash to be Cracked: No Hash has been input"))==True):
+            foundInvalidInput= "True"
+            invalidHashToBeCracked= "True"
+            print "GUI DEBUG: Default hash entry detected, not a valid hash"
+        else:
+            print "GUI DEBUG: valid hash entry detected"
+
+        #check for valid input dictionary file
+        if(self.compareString(self.panel_three.inputDictFileHeader.GetLabel(),"Selected Dictionary File: No Dictionary File Selected",0,0,len("Selected Dictionary File: No Dictionary File Selected"),len("Selected Dictionary File: No Dictionary File Selected"))==True):
+            foundInvalidInput= "True"
+            invalidDictionaryFile= "True"
+            print "GUI DEBUG: Default dictionary entry detected, not a valid dictionary file"
+        else:
+            print "GUI DEBUG: valid dictionary file detected"
+
+        #check to see if invalidinput was found
+        if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True): #no invalid entries
+            self.startDictionaryCrack()
+        else: #if invalid input detected
+            invalidInputString= ""
+            if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Algorithm Detected \n"
+            if(self.compareString(invalidHashingMode, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Hashing Mode Detected \n"
+            if(self.compareString(invalidHashToBeCracked, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Hash to be Cracked Detected \n"
+            if(self.compareString(invalidDictionaryFile, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Dictionary File Detected \n"
+            #TODO these string entries need to be adapted to work for windos also!
+            dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
+        #end of validate dictionary input
+
+    def validateBruteForceInputs(self, event):
+        foundInvalidInput= "False"
+        invalidAlgorithm= "False"
+        invalidHashToBeCracked= "False"
+        invalidMinKeyInput= "False"
+        tempMinKey= 0
+        invalidMaxKeyInput= "False"
+        tempMaxKey= 0
+        minKeyLessThanMaxKey= "True"
+        invalidAlphabet= "False"
+        
+        #check for valid algorithm
+        if(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
+            print "GUI DEBUG: valid bf algorithm detected"
+        elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
+            print "GUI DEBUG: valid bf algorithm detected"
+        elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
+            print "GUI DEBUG: valid bf algorithm detected"
+        elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            print "GUI DEBUG: valid bf algorithm detected"
+        elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
+            print "GUI DEBUG: valid bf algorithm detected"
+        else:
+            foundInvalidInput= "True"
+            invalidAlgorithm= "True"
+            print "GUI DEBUG: Invalid bf algorithm detected"
+
+        #check for valid hash to be cracked value
+        if(self.compareString(self.panel_four.inputHashHeader.GetLabel(),"Hash To Be Cracked: No Hash has been Input",0,0,len("Hash To Be Cracked: No Hash has been Input"),len("Hash To Be Cracked: No Hash has been Input"))==True):
+            foundInvalidInput= "True"
+            invalidHashToBeCracked= "True"
+            print "GUI DEBUG: Default hash entry detected, not a valid hash"
+        else:
+            print "GUI DEBUG: valid hash entry detected"
+
+        #check for valid min key length
+        if(len(str(self.panel_four.minKeyLengthHeader.GetLabel())) <= len("Min Key Length: ")):
+            foundInvalidInput= "True"
+            invalidMinKeyInput= "True"
+            print "GUI DEBUG: Invalid bf minkey input detected"
+        else:
+            print "GUI DEBUG: valid bf minkey input detected"
+
+        #check for valid max key length
+        if(len(str(self.panel_four.maxKeyLengthHeader.GetLabel())) <= len("Max Key Length: ")):
+            foundInvalidInput= "True"
+            invalidMaxKeyInput= "True"
+            print "GUI DEBUG: Invalid bf max key input detected"
+        else:
+            print "GUI DEBUG: valid bf max key input detected"
+
+        #check to make sure that the min key is less than or equal to max key
+        tempMaxKey1=""
+        tempMinKey1=""
+        for i in range(15,len(str(self.panel_four.minKeyLengthHeader.GetLabel()))):
+            tempMinKey1+= str(self.panel_four.minKeyLengthHeader.GetLabel()[i])
+        for j in range(15, len(str(self.panel_four.maxKeyLengthHeader.GetLabel()))):
+            tempMaxKey1+= str(self.panel_four.maxKeyLengthHeader.GetLabel()[i])
+        if(int(tempMinKey1) <= int(tempMaxKey1)):
+            print "GUI DEBUG: valid keys, minkey is <= maxkey"
+        else:
+            foundInvalidInput= "True"
+            minKeyLessThanMaxKey= "False"
+            print "GUI DEBUG: Invalid keys, min key is greater than max key"
+
+        #check for valid selected alphabet
+        if(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Letters and Digits",0,0,len("Letters and Digits"),len("Letters and Digits"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Letters and Punctuation",0,0,len("Letters and Punctuation"),len("Letters and Punctuation"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Letters Only",0,0,len("Letters Only"),len("Letters Only"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Uppercase Letters",0,0,len("Uppercase Letters"),len("Uppercase Letters"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Lowercase Letters",0,0,len("Lowercase Letters"),len("Lowercase Letters"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "Digits",0,0,len("Digits"),len("Digits"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        else:
+            foundInvalidInput= "True"
+            invalidAlphabet= "True"
+            print "GUI DEBUG: Invalid bf alphabet selected"
+
+        #check to see if any invalid input was detected
+        if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
+            self.startBruteForceCrack()
+        else:
+            invalidInputString= ""
+            if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Algorithm Selected \n"
+            if(self.compareString(invalidHashToBeCracked, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Hash to be cracked value detected \n"
+            if(self.compareString(invalidMinKeyInput, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Min Key Input Detected \n"
+            if(self.compareString(invalidMaxKeyInput, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Max key input detected \n"
+            if(self.compareString(minKeyLessThanMaxKey, "False",0,0,len("False"),len("False"))==True):
+                invalidInputString+= "Invalid key values, min key must be equal to or less than max key \n"
+            if(self.compareString(invalidAlphabet, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Alphabet selected \n"
+            #TODO make this new line friendly with windows
+            dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
+        #end of validate brute force inputs
 
     def getIPFromUser(self, event):
         dial = wx.TextEntryDialog(self, "What is the Server's IP Address?", "Input IP Address", "", style=wx.OK)
@@ -1838,7 +2008,7 @@ class myFrame(wx.Frame):
         self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
         self.switchFromPanel7ToPanel8()
 
-    def startDictionaryCrack(self, event):
+    def startDictionaryCrack(self):
         crackingMethodSetting= "dic"
         tempAlgorithmSetting= str(self.panel_three.selectedAlgorithm.GetValue())
         algorithmSetting= tempAlgorithmSetting
@@ -1880,7 +2050,7 @@ class myFrame(wx.Frame):
             self.switchFromPanel3ToPanel10()
 
 
-    def startBruteForceCrack(self, event):
+    def startBruteForceCrack(self):
         crackingMethodSetting= "bf"
         tempAlgorithmSetting= str(self.panel_four.selectedAlgorithm.GetValue())
         algorithmSetting= tempAlgorithmSetting
