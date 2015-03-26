@@ -11,7 +11,7 @@
 #Imports
 import time
 import os
-from multiprocessing import Process, Event, Manager
+from multiprocessing import Process, Event, Manager, freeze_support
 import string
 import Chunk
 
@@ -22,6 +22,7 @@ from NetworkServer_r15b import Server
 class ConsoleUI():
 
     if __name__ == '__main__':
+        freeze_support()
 
         #Class variables
         settings = dict()
