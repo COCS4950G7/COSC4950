@@ -822,7 +822,6 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
-        #TODO need to make sure all fields have data entered into them
         hbox7.Add(self.StartConnectButton)
         vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
@@ -860,7 +859,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.selectFileButton.Bind(wx.EVT_BUTTON, parent.selectRUFileSelect)
         self.setHashCodeButton.Bind(wx.EVT_BUTTON, parent.setRUHashToBeCracked)
         self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
-        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.startRainbowTableCrack)
+        self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateRainbowTableUserInputs)
         self.resetSettingsToDefaultButton.Bind(wx.EVT_BUTTON, parent.resetRainbowTableCrackingSettingsToDefault)
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
@@ -1069,7 +1068,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         textBox.WriteText(newLineCharacter)
         #end of  insert aboout me text-----------------------------
         #TODO update the about me, there are several out of date items and typos
-        #TODO is 16 characters long still the max brute force can do?
+        #TODO brute force can do more than 16 characters
         hbox2.Add(textBox, proportion=1, flag=wx.EXPAND)
         vbox.Add(hbox2, proportion=1, flag=wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
 
@@ -1602,9 +1601,6 @@ class myFrame(wx.Frame):
             tempMaxKey1+= str(self.panel_four.maxKeyLengthHeader.GetLabel()[j])
         if(int(tempMinKey1) <= int(tempMaxKey1)):
             print "GUI DEBUG: valid keys, minkey is <= maxkey"
-            #print "GUI DEBUG: maxLengthHeader= '"+str(self.panel_four.maxKeyLengthHeader.GetLabel())+"'"
-            #print "GUI DEBUG: tempMinKey1= '"+str(tempMinKey1)+"'"
-            #print "GUI DEBUG: tempMaxKey1= '"+str(tempMaxKey1)+"'"
         else:
             foundInvalidInput= "True"
             minKeyLessThanMaxKey= "False"
@@ -1650,6 +1646,158 @@ class myFrame(wx.Frame):
             #TODO make this new line friendly with windows
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate brute force inputs
+
+    def validateRainbowTableUserInputs(self, event):
+        foundInvalidInput= "False"
+        invalidAlgorithm= "False"
+        invalidFile= "False"
+        invalidHash="False"
+
+        #check for valid selected algorithm
+        if(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        else:
+            print "GUI DEBUG: Invalid algorithm detected"
+            foundInvalidInput= "True"
+            invalidAlgorithm= "True"
+
+        #check for valid rainbow table file
+        if(self.compareString(self.panel_eleven.selectedFileHeader.GetLabel(),"Selected Rainbow Table File: No File has been Selected",0,0,len("Selected Rainbow Table File: No File has been Selected"),len("Selected Rainbow Table File: No File has been Selected"))==True):
+            print "GUI DEBUG: Invalid file selected"
+            foundInvalidInput= "True"
+            invalidFile= "True"
+        else:
+            print "GUI DEBUG: valid file detected"
+
+        #check for valid hash to be cracked
+        if(self.compareString(self.panel_eleven.hashToBeCrackedHeader.GetLabel(),"Hash to be cracked: No Hash has been entered",0,0,len("Hash to be cracked: No Hash has been entered"),len("Hash to be cracked: No Hash has been entered"))==True):
+            print "GUI DEBUG: Invalid hash entry detected"
+            foundInvalidInput= "True"
+            invalidHash= "True"
+        else:
+            print "GUI DEBUG: valid hash detected"
+
+        #check to see if an invalid input was detected
+        if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
+            self.startRainbowTableCrack()
+        else:
+            invalidInputString = ""
+            if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Algorithm Selected \n"
+            if(self.compareString(invalidFile, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid File Selected \n"
+            if(self.compareString(invalidHash, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Hash Selected \n"
+            #TODO MAKE THIS NEW LINE WINDOWS COMPATIBLE!!!!!!!!!!!!
+            dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
+        #end of validate rainbowtable user inputs
+
+    def validateRainbowTableMakerInputs(self, event):
+        foundInvalidInput= "False"
+        invalidAlgorithm= "False"
+        invalidKeyLength= "False"
+        invalidAlphabet= "False"
+        invalidTableChainLength= "False"
+        invalidNumOfRows= "False"
+        invalidRainbowTableFile= "False"
+
+        #check for valid selected algorithm
+        if(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
+            print "GUI DEBUG: valid algorithm detected"
+        else:
+            print "GUI DEBUG: Invalid algorithm detected"
+            foundInvalidInput= "True"
+            invalidAlgorithm= "True"
+
+        #check for invalid key length
+        if(len(self.panel_twelve.keyLengthHeader.GetLabel()) <= len("Key Length: ")):
+            foundInvalidInput= "True"
+            invalidKeyLength= "True"
+            print "GUI DEBUG: Invalid key length detected"
+        else:
+            print "GUI DEBUG: valid key length detected"
+
+        #check for invalid alphabet
+        if(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Letters and Digits",0,0,len("Letters and Digits"),len("Letters and Digits"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Letters and Punctuation",0,0,len("Letters and Punctuation"),len("Letters and Punctuation"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Letters Only",0,0,len("Letters Only"),len("Letters Only"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Uppercase Letters",0,0,len("Uppercase Letters"),len("Uppercase Letters"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Lowercase Letters",0,0,len("Lowercase Letters"),len("Lowercase Letters"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        elif(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "Digits",0,0,len("Digits"),len("Digits"))==True):
+            print "GUI DEBUG: valid bf alphabet selected"
+        else:
+            foundInvalidInput= "True"
+            invalidAlphabet= "True"
+            print "GUI DEBUG: Invalid bf alphabet selected"
+
+        #check for invalid table chain length
+        if(len(self.panel_twelve.chainLengthHeader.GetLabel()) <= len("Table Chain Length: ")):
+            foundInvalidInput= "True"
+            invalidTableChainLength= "True"
+            print "GUI DEBUG: invalid table chain length detected"
+        else:
+            print "GUI DEBUG: valid table chain length detected"
+
+        #check for invalid num of rows
+        if(len(self.panel_twelve.numOfRowsHeader.GetLabel()) <= len("Number of Rows: ")):
+            foundInvalidInput= "True"
+            invalidNumOfRows= "True"
+            print "GUI DEBUG: invalid num of rows detected"
+        else:
+            print "GUI DEBUG: valid num of rows detected"
+
+        #check for invalid rainbow table file
+        if(len(self.panel_twelve.fileNameHeader.GetLabel()) <= len("Save Rainbow Table File As: ")):
+            foundInvalidInput= "True"
+            invalidRainbowTableFile= "True"
+            print "GUI DEBUG: invalid rainbow table file detected"
+        else:
+            print "GUI DEBUG: valid rainbow table file detected"
+
+        #check if invalid input was detected
+        if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
+            self.startRainbowTableCreationSession()
+        else:
+            invalidInputString= ""
+            if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Algorithm Detected \n"
+            if(self.compareString(invalidKeyLength, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Key length Detected \n"
+            if(self.compareString(invalidAlphabet, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Alphabet Detected \n"
+            if(self.compareString(invalidTableChainLength, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid table chain length Detected \n"
+            if(self.compareString(invalidNumOfRows, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Num of rows Detected \n"
+            if(self.compareString(invalidRainbowTableFile, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Rainbow table file Detected \n"
+            #TODO MAKE THIS NEW LINE WINDOWS COMPATIBLE!!!!!!!!!!!!
+            dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
+
+        #end of check for rainbow table maker inputs
 
     def getIPFromUser(self, event):
         dial = wx.TextEntryDialog(self, "What is the Server's IP Address?", "Input IP Address", "", style=wx.OK)
@@ -1845,6 +1993,14 @@ class myFrame(wx.Frame):
             dial2= wx.MessageDialog(None, "Illegal Alpha Character detected.\n"
                                           "Key Length was not set.", "Invalid Input", wx.OK)
             dial2.ShowModal()
+        elif(len(input) < 1):
+            dial2= wx.MessageDialog(None, "Cannot set value to nothing. \n"
+                                          "Key Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
+        elif(input.isdigit() == False):
+            dial2= wx.MessageDialog(None, "Must input a number.\n"
+                                          "Key Length was not set.", "Invalid Input", wx.OK)
+            dial2.ShowModal()
         elif(int(input) < 3):
             dial2= wx.MessageDialog(None, "Key Length is too short.\n"
                                           "Must be at least 3 \n"
@@ -1928,14 +2084,17 @@ class myFrame(wx.Frame):
         if((self.checkForValidFileNameLength(dial.GetValue()) is True)):
                 self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: "+str(dial.GetValue())+".txt")
         else:
-            dial2= wx.MessageDialog(None, "Illegal File Name Length. \n"
+            dial2= wx.MessageDialog(None, "Illegal File Name Length or Illegal first character. \n"
                                           "The new filename was not set.", "File Name needs to be less than 255 characters\n"
-                                                                           "but more than zero characters long.", wx.OK)
+                                                                           "but more than zero characters long.\n"
+                                                                           "Cannot start with a space.", wx.OK)
             dial2.ShowModal()
         dial.Destroy()
 
     def checkForValidFileNameLength(self, inputString):
         if((len(inputString) > 255) or (len(inputString) < 1)):
+            return False
+        elif(inputString.isspace() == True):
             return False
         else:
             return True
@@ -2117,7 +2276,7 @@ class myFrame(wx.Frame):
         else:
             self.switchFromPanel4ToPanel10()
 
-    def startRainbowTableCrack(self, event):
+    def startRainbowTableCrack(self):
         crackingMethod= "rain"
         tempFileName= self.panel_eleven.selectedFileHeader.GetLabelText()
         #remove extra heading in from of the file path
