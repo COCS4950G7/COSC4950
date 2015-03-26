@@ -1552,7 +1552,7 @@ class myFrame(wx.Frame):
         tempMaxKey= 0
         minKeyLessThanMaxKey= "True"
         invalidAlphabet= "False"
-        
+
         #check for valid algorithm
         if(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
             print "GUI DEBUG: valid bf algorithm detected"
@@ -1596,12 +1596,15 @@ class myFrame(wx.Frame):
         #check to make sure that the min key is less than or equal to max key
         tempMaxKey1=""
         tempMinKey1=""
-        for i in range(15,len(str(self.panel_four.minKeyLengthHeader.GetLabel()))):
+        for i in range(16,len(str(self.panel_four.minKeyLengthHeader.GetLabel()))):
             tempMinKey1+= str(self.panel_four.minKeyLengthHeader.GetLabel()[i])
         for j in range(15, len(str(self.panel_four.maxKeyLengthHeader.GetLabel()))):
-            tempMaxKey1+= str(self.panel_four.maxKeyLengthHeader.GetLabel()[i])
+            tempMaxKey1+= str(self.panel_four.maxKeyLengthHeader.GetLabel()[j])
         if(int(tempMinKey1) <= int(tempMaxKey1)):
             print "GUI DEBUG: valid keys, minkey is <= maxkey"
+            #print "GUI DEBUG: maxLengthHeader= '"+str(self.panel_four.maxKeyLengthHeader.GetLabel())+"'"
+            #print "GUI DEBUG: tempMinKey1= '"+str(tempMinKey1)+"'"
+            #print "GUI DEBUG: tempMaxKey1= '"+str(tempMaxKey1)+"'"
         else:
             foundInvalidInput= "True"
             minKeyLessThanMaxKey= "False"
