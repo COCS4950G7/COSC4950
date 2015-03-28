@@ -7,6 +7,7 @@
 #   Chris Bugg
 #   10/7/14
 
+#TODO: Implement hashes-from-a-file
 
 import hashlib
 import random

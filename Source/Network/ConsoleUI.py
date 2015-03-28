@@ -83,7 +83,7 @@ class ConsoleUI():
     def __init__(self):
 
         if not __name__ == '__main__':
-
+            freeze_support()
             return
 
         #Loop till we're done

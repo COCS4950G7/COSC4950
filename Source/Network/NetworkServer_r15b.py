@@ -353,7 +353,7 @@ class Server():
                                                          'halt': False})
                         while not self.shutdown.is_set():
                             try:
-                                self.shared_dict["current chunk"] = new_chunk
+                                #self.shared_dict["current chunk"] = new_chunk
                                 job_queue.put(new_chunk, timeout=.1)
                                 #add params to list of sent chunks along with a timestamp so we can monitor which ones come back
                                 self.sent_chunks.append((chunk.params, time.time()))
