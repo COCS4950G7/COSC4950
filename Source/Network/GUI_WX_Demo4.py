@@ -622,7 +622,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
         wx.Panel.__init__(self, parent)
 
         #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
-        #TODO start up status monitor process at end of window
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -713,12 +712,10 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
         hbox6.Add(progressBarHeader)
-        self.progressBar= wx.Gauge(self, range=100, style=wx.GA_HORIZONTAL )
+        self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.progressBar.SetValue(0) #set value to start at zero
         hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-        #TODO need to hide progress bar if there are too few chunks
-        #TODO gauge is tiny on OSX
 
         vbox.Add((-1,10))
 
@@ -739,19 +736,13 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         #create timer
         self.timer= wx.Timer()
-        print "GUI DEBUG: created timer"
+       # print "GUI DEBUG: created timer"
 
         #Bind the buttons to events
         self.timer.Bind(wx.EVT_TIMER, parent.updateTimer, self.timer ) #timer is started in the switch to panel 10 function. Once started the timer will call updateTimer every 1000 milliseconds
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
-        '''
-        #start up the status monitoring process #CAUSING PICKLING ISSUES
-        myStatusMonitor= Process(target=parent.startStatusMonitor, args=(True,self.currentCrackingMode.GetLabel,))
-        myStatusMonitor.start() #THIS FUNCTION IS ALSO COMMENTED OUT BELOW
-        #TODO this process needs to be killed!
-        '''
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
@@ -1138,7 +1129,6 @@ class myFrame(wx.Frame):
         fileMenuClose= fileMenu.Append(wx.ID_ANY, "Close","Close Application")
         menubar.Append(fileMenu, '&File')
         viewMenu= wx.Menu()
-        #viewMenuFullScreen= viewMenu.Append(wx.ID_ANY, "Full Screen", "View in Full Screen Mode") #omitted due to bug in python
         viewMenuMaximizeScreen= viewMenu.Append(wx.ID_ANY, "Maximize Screen", "Make the window fill the entire screen")
         viewMenuNormalScreen= viewMenu.Append(wx.ID_ANY, "Normal Size", "Make the window it's native resolution")
         menubar.Append(viewMenu, '&View')
@@ -1146,7 +1136,6 @@ class myFrame(wx.Frame):
 
         #bind menu items to events
         self.Bind(wx.EVT_MENU, self.OnClose, fileMenuClose)
-        #self.Bind(wx.EVT_MENU, self.viewInFullScreen, viewMenuFullScreen) #omittwed due to bug in python
         self.Bind(wx.EVT_MENU, self.viewMaximizedScreen, viewMenuMaximizeScreen)
         self.Bind(wx.EVT_MENU, self.viewNormalScreen, viewMenuNormalScreen)
 
@@ -1267,7 +1256,7 @@ class myFrame(wx.Frame):
         self.panel_three.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-        print "GUI DEBUG: starting panel ten timer"
+        #print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #----------end switch from panel 3
 
@@ -1293,7 +1282,7 @@ class myFrame(wx.Frame):
         self.panel_four.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-        print "GUI DEBUG: starting panel ten timer"
+       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #---------end switch from panel 4
 
@@ -1403,7 +1392,7 @@ class myFrame(wx.Frame):
         self.panel_eleven.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000) #1000 milliseconds = 1 second
-        print "GUI DEBUG: starting panel ten timer"
+       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-----------end of switch from panel 11
 
@@ -1429,7 +1418,7 @@ class myFrame(wx.Frame):
         self.panel_twelve.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-        print "GUI DEBUG: starting panel ten timer"
+       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-------------end of switch from panel 12
 
@@ -1503,16 +1492,16 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
             print "GUI DEBUG: Default hash entry detected, not a valid hash"
-        else:
-            print "GUI DEBUG: valid hash entry detected"
+       # else:
+        #    print "GUI DEBUG: valid hash entry detected"
 
         #check for valid input dictionary file
         if(self.compareString(self.panel_three.inputDictFileHeader.GetLabel(),"Selected Dictionary File: No Dictionary File Selected",0,0,len("Selected Dictionary File: No Dictionary File Selected"),len("Selected Dictionary File: No Dictionary File Selected"))==True):
             foundInvalidInput= "True"
             invalidDictionaryFile= "True"
             print "GUI DEBUG: Default dictionary entry detected, not a valid dictionary file"
-        else:
-            print "GUI DEBUG: valid dictionary file detected"
+       # else:
+        #    print "GUI DEBUG: valid dictionary file detected"
 
         #check to see if invalidinput was found
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True): #no invalid entries
@@ -1562,24 +1551,24 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
             print "GUI DEBUG: Default hash entry detected, not a valid hash"
-        else:
-            print "GUI DEBUG: valid hash entry detected"
+      #  else:
+       #     print "GUI DEBUG: valid hash entry detected"
 
         #check for valid min key length
         if(len(str(self.panel_four.minKeyLengthHeader.GetLabel())) <= len("Min Key Length: ")):
             foundInvalidInput= "True"
             invalidMinKeyInput= "True"
             print "GUI DEBUG: Invalid bf minkey input detected"
-        else:
-            print "GUI DEBUG: valid bf minkey input detected"
+       # else:
+        #    print "GUI DEBUG: valid bf minkey input detected"
 
         #check for valid max key length
         if(len(str(self.panel_four.maxKeyLengthHeader.GetLabel())) <= len("Max Key Length: ")):
             foundInvalidInput= "True"
             invalidMaxKeyInput= "True"
             print "GUI DEBUG: Invalid bf max key input detected"
-        else:
-            print "GUI DEBUG: valid bf max key input detected"
+       # else:
+        #    print "GUI DEBUG: valid bf max key input detected"
 
         #check to make sure that the min key is less than or equal to max key
         tempMaxKey1=""
@@ -1662,16 +1651,16 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: Invalid file selected"
             foundInvalidInput= "True"
             invalidFile= "True"
-        else:
-            print "GUI DEBUG: valid file detected"
+        #else:
+           # print "GUI DEBUG: valid file detected"
 
         #check for valid hash to be cracked
         if(self.compareString(self.panel_eleven.hashToBeCrackedHeader.GetLabel(),"Hash to be cracked: No Hash has been entered",0,0,len("Hash to be cracked: No Hash has been entered"),len("Hash to be cracked: No Hash has been entered"))==True):
             print "GUI DEBUG: Invalid hash entry detected"
             foundInvalidInput= "True"
             invalidHash= "True"
-        else:
-            print "GUI DEBUG: valid hash detected"
+       # else:
+          #  print "GUI DEBUG: valid hash detected"
 
         #check to see if an invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
@@ -1717,8 +1706,8 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidKeyLength= "True"
             print "GUI DEBUG: Invalid key length detected"
-        else:
-            print "GUI DEBUG: valid key length detected"
+       # else:
+        #    print "GUI DEBUG: valid key length detected"
 
         #check for invalid alphabet
         if(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
@@ -1745,24 +1734,24 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidTableChainLength= "True"
             print "GUI DEBUG: invalid table chain length detected"
-        else:
-            print "GUI DEBUG: valid table chain length detected"
+        #else:
+         #   print "GUI DEBUG: valid table chain length detected"
 
         #check for invalid num of rows
         if(len(self.panel_twelve.numOfRowsHeader.GetLabel()) <= len("Number of Rows: ")):
             foundInvalidInput= "True"
             invalidNumOfRows= "True"
             print "GUI DEBUG: invalid num of rows detected"
-        else:
-            print "GUI DEBUG: valid num of rows detected"
+        #else:
+         #   print "GUI DEBUG: valid num of rows detected"
 
         #check for invalid rainbow table file
         if(len(self.panel_twelve.fileNameHeader.GetLabel()) <= len("Save Rainbow Table File As: ")):
             foundInvalidInput= "True"
             invalidRainbowTableFile= "True"
             print "GUI DEBUG: invalid rainbow table file detected"
-        else:
-            print "GUI DEBUG: valid rainbow table file detected"
+        #else:
+         #   print "GUI DEBUG: valid rainbow table file detected"
 
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
@@ -1814,7 +1803,7 @@ class myFrame(wx.Frame):
 
     def setBruteForceHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be in Hexadecimal form)", "Input Hash", "", style=wx.OK)
+                                        "(Must be in hexadecimal form)", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
@@ -2128,33 +2117,6 @@ class myFrame(wx.Frame):
         self.panel_eleven.StartConnectButton.SetLabel("Start Hosting Rainbow Crack")
         self.panel_twelve.startConnectButton.SetLabel("Start Hosting a Rainbow Table Creation Session")
         self.switchFromPanel6ToPanel2()
-    '''
-    def startStatusMonitor(self, singleMode, crackingMode):
-        #monitor the status of the server for either single or network mode
-        self.singleMode= singleMode
-        self.myCrackingMode=crackingMode
-
-        #TODO implement this into client, server, and single status screens
-        while not self.shutdown.is_set():
-            if(singleMode == True): #if in single mode
-                if(self.is_connected == True):
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Connected to Internal Server")
-                else:
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Not Connected To Internal Server")
-            else: #if network mode
-                if(self.is_connected == True):
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Server is Connected To Network")
-                    self.panel_eight.currentStatus.SetLabel("Current Status: Connected to Server")
-                else:
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Server is Not Connected to the Network")
-                    self.panel_eight.currentStatus.SetLabel("Current Status: Not Connected to the Server")
-            #TODO if doing_stuff is true, show the activity guage
-            #end of if by single/network mode
-            if(self.compareString(self.myCrackingMode, "Current Mode: Dictionary",0,0,len("Dictionary"),len("Dictionary"))==True):
-                self.panel_ten.progressBar.SetValue(self.dictionary['finished chunks'] / self.dictionary['total chunks'])
-                #TODO add this for panels 8 and 9
-        #end of while not self.shutdown
-    '''
 
     def connectToServer(self):
         tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
@@ -2209,7 +2171,6 @@ class myFrame(wx.Frame):
             self.switchFromPanel3ToPanel9()
         else:
             self.switchFromPanel3ToPanel10()
-
 
     def startBruteForceCrack(self):
         crackingMethodSetting= "bf"
