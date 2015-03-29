@@ -357,6 +357,7 @@ class Server():
                                 job_queue.put(new_chunk, timeout=.1)
                                 #add params to list of sent chunks along with a timestamp so we can monitor which ones come back
                                 self.sent_chunks.append((chunk.params, time.time()))
+                                break
                             except Qqueue.Full:
                                 continue
 
