@@ -514,7 +514,6 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -540,7 +539,6 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.ConnectToServerButton= wx.Button(self, label="Connect To The Server")
-        #TODO need to make sure all fields have data enetered into them
         hbox4.Add(self.ConnectToServerButton)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -563,7 +561,7 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         #Bind the buttons to events
         self.InputServerIPButton.Bind(wx.EVT_BUTTON, parent.getIPFromUser)
-        self.ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.connectToServer)
+        self.ConnectToServerButton.Bind(wx.EVT_BUTTON, parent.validateNetworkClientInput)
         self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel7ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -707,7 +705,8 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         hbox5.Add(activityGaugeHeader)
-        self.activityGauge= wx.Gauge(self, range=100, style=wx.GA_HORIZONTAL )
+        #TODO size parameter is fo rtesting purposes only
+        self.activityGauge= wx.Gauge(self, range=100, size=(250,25), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
@@ -948,7 +947,6 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox10=wx.BoxSizer(wx.HORIZONTAL)
         self.startConnectButton= wx.Button(self, label="Start/Connect Button")
-        #TODO need to make sure that all fields have data entered into them
         hbox10.Add(self.startConnectButton)
         vbox.Add(hbox10, flag=wx.CENTER, border=10)
 
@@ -1799,6 +1797,20 @@ class myFrame(wx.Frame):
 
         #end of check for rainbow table maker inputs
 
+    def validateNetworkClientInput(self, event):
+        foundInvalidInput= "False"
+        if(len(self.panel_seven.serverIPAddress.GetLabel()) < 22): #check to see if ip is empty
+            foundInvalidInput= "True"
+        if(self.compareString(self.panel_seven.serverIPAddress.GetLabel(), "Server's IP Address: No IP Address Has been Input Yet",0,0,len("Server's IP Address: No IP Address Has been Input Yet"),len("Server's IP Address: No IP Address Has been Input Yet"))==True):
+            #if still set to default
+            foundInvalidInput= "True"
+        if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
+            #if no error detected
+            self.connectToServer()
+        else:
+            dial= wx.MessageBox("You must input an IP address", "No IP address entered", wx.OK, self)
+
+
     def getIPFromUser(self, event):
         dial = wx.TextEntryDialog(self, "What is the Server's IP Address?", "Input IP Address", "", style=wx.OK)
         dial.ShowModal()
@@ -1807,7 +1819,8 @@ class myFrame(wx.Frame):
 
     def setDictionaryHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be Standard ASCII Characters)", "Input Hash", "", style=wx.OK)
+                                        "(Must be )", "Input Hash", "", style=wx.OK)
+        #TODO chanhge to say input in hexaddecimal only for all windows!!!!
         dial.ShowModal()
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
@@ -2156,9 +2169,8 @@ class myFrame(wx.Frame):
         #end of while not self.shutdown
     '''
 
-    def connectToServer(self, event):
+    def connectToServer(self):
         tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
-        #TODO need error checking to make sure that the server ip has been entered
         #remove the prefix to th eip address
         serverIP=""
         for i in range(21, len(tempServerIP)):
