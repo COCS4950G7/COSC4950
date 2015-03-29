@@ -706,12 +706,11 @@ class PanelTen(wx.Panel):                          #====================Single M
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         hbox5.Add(activityGaugeHeader)
         #TODO size parameter is fo rtesting purposes only (Needs to be tested on Linux)
-        self.activityGauge= wx.Gauge(self, range=100, size=(250,25), style=wx.GA_HORIZONTAL )
+        self.activityGauge= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
         #TODO ask about a shared variable indicating when the the search is complete, so i can stop the activity gauge
-        #TODO gauge is tiny on OSX
         #TODO activity gauge does not pulse on Linux
 
         vbox.Add((-1,10))
