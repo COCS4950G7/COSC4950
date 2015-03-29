@@ -1453,15 +1453,12 @@ class myFrame(wx.Frame):
             #time.sleep(1)
             #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
             self.update.clear()
-        #TODO add if shut down is issued , stop activity bar and display results
         else: #if shutdown is set
             self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             #TODO on windows this fill the gauge, then empties it
-            #TODO on linux this fills the gauge and leaves it full
-            #TODO test this activity gauge on os x
+            #TODO on linux and os x this fills the gauge and leaves it full
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
-            #TODO test this progress bar on  os x
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
