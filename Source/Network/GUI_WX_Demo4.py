@@ -1462,7 +1462,7 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             #print "GUI DEBUG: type of dictionary total chunks: "+str(self.dictionary['total chunks'])
             percentComplete= 0
-            if(self.dictionary["total chunks"] is not 0):
+            if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_ten.progressBar.SetValue(percentComplete)
