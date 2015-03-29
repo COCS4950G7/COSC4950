@@ -621,7 +621,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
+        #TODO add activity bar to screen
+        #TODO  add a progress bar to indicated where in  the dictionary/bf the program is looking at
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -1453,25 +1454,40 @@ class myFrame(wx.Frame):
             #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
             self.update.clear()
         #TODO add if shut down is issued , stop activity bar and display results
+        else: #if shutdown is set
+            self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
+            self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+            #TODO on windows this fill the gauge, then empties it 
+            #TODO test this activity gauge on linux and os x
+            self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            #TODO test this progress bar on linux and os x
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
+        inputAlgorithm= "" #added to store which algorithm was being used
         invalidHashingMode= "False"
         invalidHashToBeCracked= "False"
+        invlaidHashLength= "False" #added to indicate an ivalid length of hash based on the algorithm
         invalidDictionaryFile= "False"
 
+        #TODO make network server version of this validation
         #check for valid algorithm
         if(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
-            print "GUI DEBUG: valid dictionary algorithm detected"
+           # print "GUI DEBUG: valid dictionary algorithm detected"
+            inputAlgorithm= "MD5"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            print "GUI DEBUG: valid dictionary algorithm detected"
+            #print "GUI DEBUG: valid dictionary algorithm detected"
+            inputAlgorithm= "SHA1"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            print "GUI DEBUG: valid dictionary algorithm detected"
+            #print "GUI DEBUG: valid dictionary algorithm detected"
+            inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            print "GUI DEBUG: valid dictionary algorithm detected"
+           # print "GUI DEBUG: valid dictionary algorithm detected"
+            inputAlgorithm= "SHA256"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-            print "GUI DEBUG: valid dictionary algorithm detected"
+           # print "GUI DEBUG: valid dictionary algorithm detected"
+            inputAlgorithm= "SHA512"
         else:
             foundInvalidInput= "True"
             invalidAlgorithm= "True"
@@ -1495,6 +1511,70 @@ class myFrame(wx.Frame):
        # else:
         #    print "GUI DEBUG: valid hash entry detected"
 
+        #check for valid hash code length
+        if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
+            print "GUI DEBUG: checking for length of 32 (+20 for beginning of header) for MD5"
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 52):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too short"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 52):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
+            else:
+                print "GUI DEBUG: valid hash length detected"
+        elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
+            print "GUI DEBUG: checking for length of 40 (+20 for hash header) for SHA 1"
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 60):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too short"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 60):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
+            else:
+                print "GUI DEBUG: valid hash length detected"
+        elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
+            print "GUI DEBUG: checking for length of 56 (+20 for hash header) for SHA 224"
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 76):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too short"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 76):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
+            else:
+                print "GUI DEBUG: valid hash length detected"
+        elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            print "GUI DEBUG: checking for length of 64 (+20 for hash header) for SHA 256"
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 84):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too short"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 84):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
+            else:
+                print "GUI DEBUG: valid hash length detected"
+        elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
+            print "GUI DEBUG: checking for length of 128 (+20 for hash header) for SHA 512"
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 148):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too short"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 148):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+                print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
+            else:
+                print "GUI DEBUG: valid hash length detected"
+        else:
+            print "GUI DEBUG: non MD5 algorithm has been set, not set up yet"
+
         #check for valid input dictionary file
         if(self.compareString(self.panel_three.inputDictFileHeader.GetLabel(),"Selected Dictionary File: No Dictionary File Selected",0,0,len("Selected Dictionary File: No Dictionary File Selected"),len("Selected Dictionary File: No Dictionary File Selected"))==True):
             foundInvalidInput= "True"
@@ -1514,6 +1594,13 @@ class myFrame(wx.Frame):
                 invalidInputString+= "Invalid Hashing Mode Detected \n"
             if(self.compareString(invalidHashToBeCracked, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Hash to be Cracked Detected \n"
+            if(self.compareString(invalidHashLength, "True",0,0,len("True"),len("True"))==True):
+                invalidInputString+= "Invalid Hash length detected \n" \
+                                     "  Proper MD5 length: 32 \n" \
+                                     "  Proper SHA1 length: 40 \n" \
+                                     "  Proper SHA224 length: 56 \n" \
+                                     "  Proper SHA256 length: 64 \n" \
+                                     "  Proper SHA512 length: 128 \n"
             if(self.compareString(invalidDictionaryFile, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Dictionary File Detected \n"
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
@@ -1530,6 +1617,8 @@ class myFrame(wx.Frame):
         minKeyLessThanMaxKey= "True"
         invalidAlphabet= "False"
 
+        #TODO add hash length validation
+        #TODO make network server version of this validation
         #check for valid algorithm
         if(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
             print "GUI DEBUG: valid bf algorithm detected"
@@ -1630,6 +1719,8 @@ class myFrame(wx.Frame):
         invalidFile= "False"
         invalidHash="False"
 
+        #TODO add hash length validation
+        #TODO make network server version of this validation
         #check for valid selected algorithm
         if(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
             print "GUI DEBUG: valid algorithm detected"
@@ -1685,6 +1776,7 @@ class myFrame(wx.Frame):
         invalidNumOfRows= "False"
         invalidRainbowTableFile= "False"
 
+        #TODO make network server version of this input validation
         #check for valid selected algorithm
         if(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
             print "GUI DEBUG: valid algorithm detected"
@@ -1796,14 +1888,16 @@ class myFrame(wx.Frame):
 
     def setDictionaryHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be in hexadecimal form)", "Input Hash", "", style=wx.OK)
+                                        "(Must be in hexadecimal form \n"
+                                        "EX: popcorn = 33da7a40473c1637f1a2e142f4925194 )", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
     def setBruteForceHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be in hexadecimal form)", "Input Hash", "", style=wx.OK)
+                                        "(Must be in hexadecimal form \n"
+                                        "EX: popcorn = 33da7a40473c1637f1a2e142f4925194 )", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
