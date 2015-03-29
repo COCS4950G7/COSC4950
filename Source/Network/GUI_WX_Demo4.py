@@ -570,6 +570,11 @@ class PanelEight(wx.Panel):       #========================Network Client Status
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO add solution header to the screen
+        #TODO add number of completed chunks to screen
+        #TODO add number of total chunks to screen
+        #TODO add header indicating when the client is doing something, if self_isDoingStuff is set, the client is doing something
+        #TODO modify status header to say connected if the self.is_connected is set
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -622,6 +627,9 @@ class PanelNine(wx.Panel):                     #================Network Server S
         wx.Panel.__init__(self, parent)
 
         #TODO add activity bar to screen
+        #TODO add solution header to screen
+        #TODO add number of completed chunks to screen
+        #TODO add number of total chunks to screen
         #TODO  add a progress bar to indicated where in  the dictionary/bf the program is looking at
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -692,7 +700,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         vbox.Add((-1,10))
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        self.currentStatus= wx.StaticText(self, label="Current Status: Starting up")
         hbox3.Add(self.currentStatus)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -705,7 +713,6 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-        #TODO ask about a shared variable indicating when the the search is complete, so i can stop the activity gauge
         #TODO activity gauge does not pulse on Linux
 
         vbox.Add((-1,10))
@@ -717,6 +724,22 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.progressBar.SetValue(0) #set value to start at zero
         hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8= wx.BoxSizer(wx.HORIZONTAL)
+        self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
+        hbox8.Add(self.numCompletedChunksHeader)
+        self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
+        hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
+        hbox7.Add(self.SolutionHeader)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
@@ -740,7 +763,7 @@ class PanelTen(wx.Panel):                          #====================Single M
        # print "GUI DEBUG: created timer"
 
         #Bind the buttons to events
-        self.timer.Bind(wx.EVT_TIMER, parent.updateTimer, self.timer ) #timer is started in the switch to panel 10 function. Once started the timer will call updateTimer every 1000 milliseconds
+        self.timer.Bind(wx.EVT_TIMER, parent.updateSingleTimer, self.timer ) #timer is started in the switch to panel 10 function. Once started the timer will call updateSingleTimer every 1000 milliseconds
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1437,27 +1460,36 @@ class myFrame(wx.Frame):
         dial= wx.MessageDialog(None, 'This function has not been completed yet', 'Notice:', wx.OK)
         dial.ShowModal()
 
-    def updateTimer(self,  event):
+    def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
-            #print "GUI DEBUG: updated timer: "+str(time.ctime())
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
-            #print "GUI DEBUG: type of dic finished chunks: "+str(type(self.dictionary['finished chunks']))
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
-            #print "GUI DEBUG: type of dictionary total chunks: "+str(self.dictionary['total chunks'])
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_ten.progressBar.SetValue(percentComplete)
-            #import time
-            #time.sleep(1)
-            #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            if(self.is_doing_stuff.is_set()):
+                #TODO the doing stuff flag is never set, so this always reads inactive!!!
+                self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
+            else:
+                self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             #TODO BUG on windows this fill the activity gauge, then empties it
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            if(len(self.dictionary["key"]) < 1): #if no solution was found
+                self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+            else: #if a solution was found
+                self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
