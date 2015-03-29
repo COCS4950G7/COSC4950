@@ -570,6 +570,9 @@ class PanelEight(wx.Panel):       #========================Network Client Status
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO add solution header to the screen
+        #TODO add number of completed chunks to screen
+        #TODO add number of total chunks to screen
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -622,6 +625,9 @@ class PanelNine(wx.Panel):                     #================Network Server S
         wx.Panel.__init__(self, parent)
 
         #TODO add activity bar to screen
+        #TODO add solution header to screen
+        #TODO add number of completed chunks to screen
+        #TODO add number of total chunks to screen
         #TODO  add a progress bar to indicated where in  the dictionary/bf the program is looking at
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -717,6 +723,22 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.progressBar.SetValue(0) #set value to start at zero
         hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox8= wx.BoxSizer(wx.HORIZONTAL)
+        self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
+        hbox8.Add(self.numCompletedChunksHeader)
+        self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
+        hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
+        hbox7.Add(self.SolutionHeader)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
@@ -1449,15 +1471,20 @@ class myFrame(wx.Frame):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_ten.progressBar.SetValue(percentComplete)
-            #import time
-            #time.sleep(1)
-            #self.update.wait() #<--THIS CAUSES APPLICATION TO CRASH, IN ADDITION, PYTHON STOPS RESPONDING (windows)
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.update.clear()
         else: #if shutdown is set
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             #TODO BUG on windows this fill the activity gauge, then empties it
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            if(len(self.dictionary["key"]) < 1): #if no solution was found
+                self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+            else: #if a solution was found
+                self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
