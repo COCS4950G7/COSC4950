@@ -2486,7 +2486,7 @@ class myFrame(wx.Frame):
         tempFileName= self.panel_eleven.selectedFileHeader.GetLabelText()
         #remove extra heading in from of the file path
         fileName= ""
-        for i in range(28, len(tempFileName)):
+        for i in range(29, len(tempFileName)):
             fileName+= str(tempFileName[i])
         tempHashToBeCracked= self.panel_eleven.hashToBeCrackedHeader.GetLabelText()
         #remove extra heading from the front of the hash code
