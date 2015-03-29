@@ -86,7 +86,7 @@ class Dictionary():
             return "Fail"
 
         #sets total_chunks variable, based on dictionary file
-        self.set_total_chunks()
+        #self.set_total_chunks()
 
         return "Good"
 
