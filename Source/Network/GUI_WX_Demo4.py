@@ -705,7 +705,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         hbox5.Add(activityGaugeHeader)
-        #TODO size parameter is fo rtesting purposes only
+        #TODO size parameter is fo rtesting purposes only (Needs to be tested on Linux)
         self.activityGauge= wx.Gauge(self, range=100, size=(250,25), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
