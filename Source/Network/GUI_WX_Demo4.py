@@ -569,8 +569,6 @@ class PanelEight(wx.Panel):       #========================Network Client Status
     def __init__(self,parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO launch status monitor process at end of window
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -676,9 +674,6 @@ class PanelTen(wx.Panel):                          #====================Single M
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO for dictionary, add a progress bar to indicated where in  the dictionary the program is looking at
-        #TODO for rainbow table maker ditto
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -705,7 +700,6 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         hbox5.Add(activityGaugeHeader)
-        #TODO size parameter is fo rtesting purposes only (Needs to be tested on Linux)
         self.activityGauge= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
@@ -722,7 +716,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.progressBar.SetValue(0) #set value to start at zero
         hbox6.Add(self.progressBar, flag=wx.LEFT, border=5)
         vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-        #TODO need to set up how to increment progress bar
+        #TODO need to hide progress bar if there are too few chunks
         #TODO gauge is tiny on OSX
 
         vbox.Add((-1,10))
@@ -1064,8 +1058,6 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         textBox.WriteText(newLineCharacter+"of hashes (Windows) as well as add in GPU support for additional power.")
         textBox.WriteText(newLineCharacter)
         #end of  insert aboout me text-----------------------------
-        #TODO update the about me, there are several out of date items and typos
-        #TODO brute force can do more than 16 characters
         hbox2.Add(textBox, proportion=1, flag=wx.EXPAND)
         vbox.Add(hbox2, proportion=1, flag=wx.LEFT|wx.RIGHT|wx.EXPAND, border=10)
 
@@ -1534,7 +1526,6 @@ class myFrame(wx.Frame):
                 invalidInputString+= "Invalid Hash to be Cracked Detected \n"
             if(self.compareString(invalidDictionaryFile, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Dictionary File Detected \n"
-            #TODO these string entries need to be adapted to work for windos also!
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate dictionary input
 
@@ -1640,7 +1631,6 @@ class myFrame(wx.Frame):
                 invalidInputString+= "Invalid key values, min key must be equal to or less than max key \n"
             if(self.compareString(invalidAlphabet, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Alphabet selected \n"
-            #TODO make this new line friendly with windows
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate brute force inputs
 
@@ -1693,7 +1683,6 @@ class myFrame(wx.Frame):
                 invalidInputString+= "Invalid File Selected \n"
             if(self.compareString(invalidHash, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Hash Selected \n"
-            #TODO MAKE THIS NEW LINE WINDOWS COMPATIBLE!!!!!!!!!!!!
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
         #end of validate rainbowtable user inputs
 
@@ -1791,7 +1780,6 @@ class myFrame(wx.Frame):
                 invalidInputString+= "Invalid Num of rows Detected \n"
             if(self.compareString(invalidRainbowTableFile, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Rainbow table file Detected \n"
-            #TODO MAKE THIS NEW LINE WINDOWS COMPATIBLE!!!!!!!!!!!!
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
 
         #end of check for rainbow table maker inputs
@@ -1818,15 +1806,14 @@ class myFrame(wx.Frame):
 
     def setDictionaryHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be )", "Input Hash", "", style=wx.OK)
-        #TODO chanhge to say input in hexaddecimal only for all windows!!!!
+                                        "(Must be in hexadecimal form)", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
     def setBruteForceHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
-                                        "(Must be Standard ASCII Characters)", "Input Hash", "", style=wx.OK)
+                                        "(Must be in Hexadecimal form)", "Input Hash", "", style=wx.OK)
         dial.ShowModal()
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
