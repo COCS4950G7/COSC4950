@@ -151,6 +151,13 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         #TODO FINISH adding support for cracking a file of hash codes
         #TODO (supposed to work for single mode already)
+
+        #TODO add a quick test button that sets values to default testing values
+            #TODO algorithm= MD5
+            #TODO Selected HAshing Mode: Individual Hash Code
+            #TODO Hash to be cracked: popcorn
+            #TODO dictionary file to be used: dic.txt
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -283,6 +290,14 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
         #TODO add support for spaces, but uses ' ' instead of strring library!
+
+        #TODO add a quick test button that sets values to default testing values
+            #TODO algorithm= MD5
+            #TODO hash to be cracked: aaaff
+            #TODO Min Key Length: 4
+            #TODO Max Key Length:  6
+            #TODO Alphabet: Lowercase Letters
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -575,6 +590,29 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         #TODO add number of total chunks to screen
         #TODO add header indicating when the client is doing something, if self_isDoingStuff is set, the client is doing something
         #TODO modify status header to say connected if the self.is_connected is set
+        #TODO display the cracking settings on the screen
+            #TODO Dictionary Settings
+                #TODO algorithm
+                #TODO Selected HAshing Mode
+                #TODO Hash to be cracked
+                #TODO dictionary file to be used
+            #TODO Brute Force Settings
+                #TODO algorithm
+                #TODO hash to be cracked
+                #TODO Min Key Length
+                #TODO Max Key Length
+                #TODO Alphabet
+            #TODO Rainbow Table User
+                #TODO algorithm
+                #TODO rainbow table file
+                #TODO hash to be cracked
+            #TODO RAinbow Table Maker
+                #TODO algorithm
+                #TODO Key LEngth
+                #TODO Alphabet
+                #TODO Table CHain Length
+                #TODO Number of Rows
+                #TODO save rainbow Table file as
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -625,6 +663,30 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
+
+        #TODO display the cracking settings on the screen
+            #TODO Dictionary Settings
+                #TODO algorithm
+                #TODO Selected HAshing Mode
+                #TODO Hash to be cracked
+                #TODO dictionary file to be used
+            #TODO Brute Force Settings
+                #TODO algorithm
+                #TODO hash to be cracked
+                #TODO Min Key Length
+                #TODO Max Key Length
+                #TODO Alphabet
+            #TODO Rainbow Table User
+                #TODO algorithm
+                #TODO rainbow table file
+                #TODO hash to be cracked
+            #TODO RAinbow Table Maker
+                #TODO algorithm
+                #TODO Key LEngth
+                #TODO Alphabet
+                #TODO Table CHain Length
+                #TODO Number of Rows
+                #TODO save rainbow Table file as
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -720,6 +782,30 @@ class PanelTen(wx.Panel):                          #====================Single M
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO display the cracking settings on the screen
+            #TODO Dictionary Settings
+                #TODO algorithm
+                #TODO Selected HAshing Mode
+                #TODO Hash to be cracked
+                #TODO dictionary file to be used
+            #TODO Brute Force Settings
+                #TODO algorithm
+                #TODO hash to be cracked
+                #TODO Min Key Length
+                #TODO Max Key Length
+                #TODO Alphabet
+            #TODO Rainbow Table User
+                #TODO algorithm
+                #TODO rainbow table file
+                #TODO hash to be cracked
+            #TODO RAinbow Table Maker
+                #TODO algorithm
+                #TODO Key LEngth
+                #TODO Alphabet
+                #TODO Table CHain Length
+                #TODO Number of Rows
+                #TODO save rainbow Table file as
+
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -750,7 +836,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-        #TODO activity gauge does not pulse on Linux
+        #TODO BUG activity gauge does not pulse on Linux
 
         vbox.Add((-1,10))
 
@@ -810,6 +896,11 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         wx.Panel.__init__(self,parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
+
+        #TODO add a quick test button that sets values to default testing values
+            #TODO algorithm= MD5
+            #TODO rainbow table file: rain.txt ??? (check this)
+            #TODO hash to be cracked: popcorn
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -912,7 +1003,13 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
-
+        #TODO add a quick test button that sets values to default testing values
+            #TODO algorithm= MD5
+            #TODO Key LEngth= 10
+            #TODO Alphabet: Lowercase Letters
+            #TODO Table CHain Length: 100
+            #TODO Number of Rows: 100
+            #TODO save rainbow Table file as: myRainbowTable.txt
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
@@ -1499,6 +1596,7 @@ class myFrame(wx.Frame):
 
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER STAT SCREEN
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
@@ -1520,6 +1618,7 @@ class myFrame(wx.Frame):
                 self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER STAT SCREEN
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
@@ -1541,6 +1640,7 @@ class myFrame(wx.Frame):
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+            #TODO solution does not update on the server status screen
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"

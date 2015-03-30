@@ -17,7 +17,7 @@
 #=====================================================================================================================
 #IMPORTS
 #=====================================================================================================================
-import dill
+#import dill #temporarily commented out
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, Value, Event, Queue, freeze_support
 import os
