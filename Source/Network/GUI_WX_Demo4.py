@@ -5,7 +5,7 @@ import wx
 import string
 import hashlib
 from multiprocessing import Process, Event, Manager
-from NetworkServer_r15b import Server
+from NetworkServer_r15c import Server
 from NetworkClient_r15b import Client
 
 
@@ -152,12 +152,6 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         #TODO FINISH adding support for cracking a file of hash codes
         #TODO (supposed to work for single mode already)
 
-        #TODO add a quick test button that sets values to default testing values
-            #TODO algorithm= MD5
-            #TODO Selected HAshing Mode: Individual Hash Code
-            #TODO Hash to be cracked: popcorn
-            #TODO dictionary file to be used: dic.txt
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -237,6 +231,14 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         self.resetToDefaultsButton= wx.Button(self, label="Reset Settings Back To Default")
         hbox11.Add(self.resetToDefaultsButton)
         vbox.Add(hbox11, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox12= wx.BoxSizer(wx.HORIZONTAL)
+        self.startQuickSampleTestButton= wx.Button(self, label="Run Quick Sample Test")
+        hbox12.Add(self.startQuickSampleTestButton)
+        vbox.Add(hbox12, flag=wx.CENTER, border=10)
+
         #DEFAULT SETTINGS-------------
         #leave current mode the same
         #set selected algorithm to MD5
@@ -271,6 +273,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
                                                       'If server, Start hosting a dictionary cracking session.'))
         self.selectedHashingMode.SetToolTip(wx.ToolTip('Choose whether to crack a single hash code or a file of hash codes.'))
         self.resetToDefaultsButton.SetToolTip(wx.ToolTip('Resets all of the dictionary cracking settings back their default settings.'))
+        self.startQuickSampleTestButton.SetToolTip(wx.ToolTip('Run a quick test using predefined settings. (Key: popcorn,\n'
+                                                              'Algorithm: MD5, Hashing Mode: Individual Hash Code, File: dic.txt'))
         self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -280,6 +284,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         self.setDictFileButton.Bind(wx.EVT_BUTTON, parent.selectDictFile)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateDictionaryInputs)
         self.resetToDefaultsButton.Bind(wx.EVT_BUTTON, parent.resetDictionarySettingsToDefault)
+        self.startQuickSampleTestButton.Bind(wx.EVT_BUTTON, parent.configureDictionaryQuickTest)
         self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel3ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -291,12 +296,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
                           "Digits"]
         #TODO add support for spaces, but uses ' ' instead of strring library!
 
-        #TODO add a quick test button that sets values to default testing values
-            #TODO algorithm= MD5
-            #TODO hash to be cracked: aaaff
-            #TODO Min Key Length: 4
-            #TODO Max Key Length:  6
-            #TODO Alphabet: Lowercase Letters
+
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -378,6 +378,13 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.resetBackToDefaultValues= wx.Button(self, label="Reset Settings Back To Default")
         hbox11.Add(self.resetBackToDefaultValues)
         vbox.Add(hbox11, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox12= wx.BoxSizer(wx.HORIZONTAL)
+        self.startBruteForceQuickTestButton= wx.Button(self, label="Run Quick Sample Test")
+        hbox12.Add(self.startBruteForceQuickTestButton)
+        vbox.Add(hbox12, flag=wx.CENTER, border=10)
         #DEFAULTS SETTINGS-----------------
         #change selected algorithm back to MD5
         #change inputhash header to say no hash has been input
@@ -410,6 +417,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.StartConnectButton.SetToolTip(wx.ToolTip('Start cracking the hash code. \n'
                                                       'If server, start hosting a brute force cracking session.'))
         self.resetBackToDefaultValues.SetToolTip(wx.ToolTip('Resets all of the Brute-Force Cracking Settings back to their default values.'))
+        self.startBruteForceQuickTestButton.SetToolTip(wx.ToolTip('Run quick test using predefined settings. (Key: aaaff, \n'
+                                                                  'Algorithm: MD5, Min Key Length: 4, Max Key Length: 6, Alphabet: Lowercase Letters)'))
         self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -420,6 +429,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.changeMaxKeyLengthButton.Bind(wx.EVT_BUTTON, parent.setBFMaxKeyLength)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateBruteForceInputs)
         self.resetBackToDefaultValues.Bind(wx.EVT_BUTTON, parent.resetBruteForceSettingsToDefault)
+        self.startBruteForceQuickTestButton.Bind(wx.EVT_BUTTON, parent.configureBruteForceQuickTest)
         self.BackToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel4ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -664,6 +674,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO add what hash is being cracked
         #TODO display the cracking settings on the screen
             #TODO Dictionary Settings
                 #TODO algorithm
@@ -782,6 +793,7 @@ class PanelTen(wx.Panel):                          #====================Single M
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
+        #TODO add what hash is being cracked
         #TODO display the cracking settings on the screen
             #TODO Dictionary Settings
                 #TODO algorithm
@@ -1596,57 +1608,99 @@ class myFrame(wx.Frame):
 
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER STAT SCREEN
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER OR SINGLE STAT SCREEN
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
+            else:
+                #if equal to or less than zero
+                print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
+                print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             if(self.panel_nine.Show() == True):
-                print "GUI DEBUG: panel nin eis shown"
-                #TODO modify this to update only panel nine
-            if(self.panel_ten.Show() == True):
+                print "GUI DEBUG: panel nine is shown"
+                self.panel_nine.progressBar.SetValue(percentComplete)
+                self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+                self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            elif(self.panel_ten.Show() == True):
                 print "GUI DEBUG: panel ten is shown"
-                #TODO update to only update panel ten
-            self.panel_nine.progressBar.SetValue(percentComplete)
-            self.panel_ten.progressBar.SetValue(percentComplete)
-            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+                self.panel_ten.progressBar.SetValue(percentComplete)
+                self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+                self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            else:
+                print "GUI DEBUG: ERROR panel nine and panel ten are hidden"
+            #self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+
             if(self.is_doing_stuff.is_set()):
                 #TODO the doing stuff flag is never set, so this always reads inactive!!!
-                self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
-                self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
+                if(self.panel_nine.Show() == True):
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
+                elif(self.panel_ten.Show() == True):
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
             else:
-                self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
-                self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
+                if(self.panel_nine.Show() == True):
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
+                elif(self.panel_ten.Show() == True):
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER STAT SCREEN
-            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
-            self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
-            self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
-            self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER OR SINGLE STAT SCREEN
             #TODO BUG on windows this fill the activity gauge, then empties it
-            self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
-            self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            if(self.panel_nine.Show() == True):
+                print "GUI DEBUG: shutdown flag has been set, panel nine is being dislayed"
+                self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+                self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+                self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
+                self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+                self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            elif(self.panel_ten.Show() == True):
+                print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
+                self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+                self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+                self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
+                self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+                self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+            else:
+                print "GUI DEBUG: ERROR: panel nine and panel ten are hidden"
+
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
-                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+                if(self.panel_nine.Show() == True):
+                    print "GUI DEBUG: shutdown flag is set, solution was not found"
+                    self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+                elif(self.panel_ten.Show() == True):
+                    print "GUI DEBUG: shutdown flag is set, solution was not found"
+                    self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
-                self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
-                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
-                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
-            #TODO solution does not update on the server status screen
+                #TODO solution does not update on the server status screen
+                if(self.panel_nine.Show() == True):
+                    print "GUI DEBUG: shutdown flag is set, solution was found"
+                    self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+                elif(self.panel_ten.Show() == True):
+                    print "GUI DEBUG: shutdown flag is set, solution was found"
+                    self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+
+    def configureDictionaryQuickTest(self, event):
+        self.panel_three.selectedAlgorithm.SetValue("MD5")
+        self.panel_three.selectedHashingMode.SetValue("Individual Hash Code")
+        self.panel_three.inputHashHeader.SetLabel("Hash to be Cracked: 33da7a40473c1637f1a2e142f4925194")
+        self.panel_three.inputDictFileHeader.SetLabel("Selected Dictionary File: dic.txt")
+        fakeVariable= ""
+        self.validateDictionaryInputs(fakeVariable)
+
+    def configureBruteForceQuickTest(self,event):
+        self.panel_four.selectedAlgorithm.SetValue("MD5")
+        self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: 98ae126efdbc62e121649406c83337d9")
+        self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: 4")
+        self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: 6")
+        self.panel_four.selectedAlphabet.SetValue("Lowercase Letters")
+        fakeVariable= ""
+        self.validateBruteForceInputs(fakeVariable)
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"

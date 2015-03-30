@@ -445,7 +445,7 @@ class Server():
                     if self.single_user_mode:
                         while True:
                             try:
-                                self.shared_dict["current chunk"] = chunk
+                                #self.shared_dict["current chunk"] = chunk #TEMPORARY
                                 job_queue.put(chunk, timeout=.1)
                                 break
                             except Qqueue.Full:
@@ -456,7 +456,7 @@ class Server():
                                                          'timestamp': time.time()})
                         while True:
                             try:
-                                self.shared_dict["current chunk"] = new_chunk
+                                #self.shared_dict["current chunk"] = new_chunk #TEMPORARY
                                 job_queue.put(new_chunk, timeout=.1)
                                 self.sent_chunks.append((chunk.params, time.time()))
                                 break
