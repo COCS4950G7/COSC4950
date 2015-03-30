@@ -1603,6 +1603,12 @@ class myFrame(wx.Frame):
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
+            if(self.panel_nine.Show() == True):
+                print "GUI DEBUG: panel nin eis shown"
+                #TODO modify this to update only panel nine
+            if(self.panel_ten.Show() == True):
+                print "GUI DEBUG: panel ten is shown"
+                #TODO update to only update panel ten
             self.panel_nine.progressBar.SetValue(percentComplete)
             self.panel_ten.progressBar.SetValue(percentComplete)
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
