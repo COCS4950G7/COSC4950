@@ -626,12 +626,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO add activity bar to screen
-        #TODO add solution header to screen
-        #TODO add number of completed chunks to screen
-        #TODO add number of total chunks to screen
-        #TODO  add a progress bar to indicated where in  the dictionary/bf the program is looking at
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -662,6 +656,47 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         vbox.Add((-1,10))
 
+        #TODO modify timer to edit this activity gauge
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
+        hbox6.Add(activityGaugeHeader)
+        self.activityGauge = wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
+        self.activityGauge.Pulse() #switch gauge to indeterminate mode
+        hbox6.Add(self.activityGauge, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        #TODO  modify timer to edit this progress bar
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        progressBarHeader= wx.StaticText(self, label="Progress:")
+        hbox7.Add(progressBarHeader)
+        self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
+        self.progressBar.SetValue(0) #set value to start at zero
+        hbox7.Add(self.progressBar, flag=wx.LEFT, border=5)
+        vbox.Add(hbox7, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        #TODO modify timer to edit this number
+        #TODO modify timer to edit this number
+        hbox8= wx.BoxSizer(wx.HORIZONTAL)
+        self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
+        hbox8.Add(self.numCompletedChunksHeader)
+        self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
+        hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
+        vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
+        #TODO modify timer to change this status
+        hbox9= wx.BoxSizer(wx.HORIZONTAL)
+        self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
+        hbox9.Add(self.SolutionHeader)
+        vbox.Add(hbox9, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
         self.forceQuitServerButton= wx.Button(self, label="Close the server")
         hbox5.Add(self.forceQuitServerButton)
@@ -672,6 +707,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
         self.SetSizer(vbox)
 
         #ToolTips
+        self.activityGauge.SetToolTip(wx.ToolTip('Indicates that the program is still running'))
+        self.progressBar.SetToolTip(wx.ToolTip('Shows how far the search is overall'))
         self.forceQuitServerButton.SetToolTip(wx.ToolTip('Forcefully stop the server'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -1468,27 +1505,41 @@ class myFrame(wx.Frame):
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
+            self.panel_nine.progressBar.SetValue(percentComplete)
             self.panel_ten.progressBar.SetValue(percentComplete)
+            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             if(self.is_doing_stuff.is_set()):
                 #TODO the doing stuff flag is never set, so this always reads inactive!!!
+                self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
                 self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
             else:
+                self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
                 self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
+            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
+            self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             #TODO BUG on windows this fill the activity gauge, then empties it
+            self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
             if(len(self.dictionary["key"]) < 1): #if no solution was found
+                self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                 self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
+                self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
