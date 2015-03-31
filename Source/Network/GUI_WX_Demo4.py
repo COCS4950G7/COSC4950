@@ -785,10 +785,11 @@ class PanelNine(wx.Panel):                     #================Network Server S
         self.forceQuitServerButton.SetToolTip(wx.ToolTip('Forcefully stop the server'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
-        #TODO create the timer object to be used for updating server stat screen
+        #create timer
+        self.timer= wx.Timer()
 
         #Bind the buttons to events
-        #TODO bind the timer object to be used with the server stat screen
+        self.timer.Bind(wx.EVT_TIMER, parent.updateNetworkServerTimer, self.timer)
         self.forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1421,7 +1422,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_three.Hide()
         self.panel_nine.Show()
-        #TODO add new timer for server stat screen
+        self.panel_nine.timer.Start(1000)
         self.Layout()
 
     def switchFromPanel3ToPanel10(self):
@@ -1448,7 +1449,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_four.Hide()
         self.panel_nine.Show()
-        #TODO add timer for server stat screen
+        self.panel_nine.timer.Start(1000)
         self.Layout()
 
     def switchFromPanel4ToPanel10(self):
@@ -1559,7 +1560,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
-        #TODO add timer for server stat screen
+        self.panel_nine.timer.Start(1000)
         self.Layout()
 
     def switchFromPanel11ToPanel10(self):
@@ -1586,7 +1587,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_twelve.Hide()
         self.panel_nine.Show()
-        #TODO add timer for server stat screen
+        self.panel_nine.timer.Start(1000)
         self.Layout()
 
     def switchFromPanel12ToPanel10(self):
@@ -1656,7 +1657,6 @@ class myFrame(wx.Frame):
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
-    #TODO have the server timer in panel nine call this timer instead of the timer above
     def updateNetworkServerTimer(self, event):
         if(not self.shutdown.is_set()):
             print "GUI DEBUG: shutdown flag has not been set yet"
@@ -2249,7 +2249,8 @@ class myFrame(wx.Frame):
 
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
-            self.startRainbowTableCreationSession()
+            fakeVariable=""
+            self.startRainbowTableCreationSession(fakeVariable)
         else:
             invalidInputString= ""
             if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
@@ -2644,6 +2645,7 @@ class myFrame(wx.Frame):
         for i in range(14, len(tempSingleSetting)):
             tempSingleSetting2+= tempSingleSetting[i]
         singleSetting=""
+        #Tested, single mode is the correct value to check for
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
         else:
@@ -2711,6 +2713,7 @@ class myFrame(wx.Frame):
         for i in range(14, len(tempSingleSetting)):
             tempSingleSetting2+= tempSingleSetting[i]
         singleSetting=""
+        #Tested, single mode is the correct value to check for
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
         else:
@@ -2750,7 +2753,6 @@ class myFrame(wx.Frame):
         for i in range (13, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
-        #print "GUI DEBUG: tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
         #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
         if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
@@ -2825,6 +2827,8 @@ class myFrame(wx.Frame):
         for i in range (14, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
+        #print "GUI DEBUG: tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
+        #tested, and the single mode has no space in front
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
         else:
