@@ -19,7 +19,7 @@
 #=====================================================================================================================
 #import dill #temporarily commented out
 from multiprocessing.managers import SyncManager
-from multiprocessing import Process, Value, Event, Queue, freeze_support
+from multiprocessing import Process, Value, Event, Queue, freeze_support, current_process
 import os
 import platform
 import Queue as Qqueue
@@ -59,6 +59,7 @@ class Server():
         manager_authkey = None
 
         def __init__(self, settings, shared_variables):
+            current_process()._authkey = "popcorn"
             self.settings = settings
             self.get_ip()
             self.cracking_mode = settings["cracking method"]
