@@ -5,7 +5,7 @@ import wx
 import string
 import hashlib
 from multiprocessing import Process, Event, Manager
-from NetworkServer_r15c import Server
+from NetworkServer_r15b import Server
 from NetworkClient_r15b import Client
 
 
@@ -1656,6 +1656,7 @@ class myFrame(wx.Frame):
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
+    #TODO have the server timer in panel nine call this timer instead of the timer above
     def updateNetworkServerTimer(self, event):
         if(not self.shutdown.is_set()):
             print "GUI DEBUG: shutdown flag has not been set yet"
@@ -2749,7 +2750,9 @@ class myFrame(wx.Frame):
         for i in range (13, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
-        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+        #print "GUI DEBUG: tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
+        #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
+        if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
