@@ -226,9 +226,9 @@ class Client():
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']
-                print chunk.params
-                bf.start_processes()
+                #print chunk.params
                 bf.run_chunk(chunk)
+                bf.start_processes()
 
         except Exception as inst:
             print "============================================================================================="

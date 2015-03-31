@@ -30,8 +30,7 @@ import Brute_Force
 import RainbowMaker
 import RainbowUser
 import Chunk
-
-import pickle
+import signal
 #=====================================================================================================================
 #END OF IMPORTS
 #=====================================================================================================================
@@ -176,20 +175,14 @@ class Server():
 
                 else:
                     return "wtf?"
-                print "something"
 
                 chunk_maker.start()
-                print "something"
-                time.sleep(.5)
 
                 chunk_maker.join()
                 chunk_maker.terminate()
-                # Sleep a bit before shutting down the server - to give clients time to
-                # realize the job queue is empty and exit in an orderly way.
-                time.sleep(1)
-                print "something"
 
                 self.update.set()
+
 
             except Exception as inst:
                 print "============================================================================================="
@@ -204,6 +197,7 @@ class Server():
             finally:
                 end_time= time.time() - start_time
                 print "Server ran for "+str(end_time)+" seconds"
+                return
 
         #--------------------------------------------------------------------------------------------------
         #End of runserver function
@@ -346,6 +340,7 @@ class Server():
                             return
                 result_monitor.join()
                 result_monitor.terminate()
+                time.sleep(2)
                 manager.shutdown()
             except Exception as inst:
                 print "============================================================================================="
@@ -411,6 +406,10 @@ class Server():
                             except Qqueue.Empty:
                                 return
                             finally:
+                                result_monitor.terminate()
+                                time.sleep(2)
+                                manager.shutdown()
+
                                 return
 
             except Exception as inst:
@@ -480,6 +479,8 @@ class Server():
                             except Qqueue.Empty:
                                 return
                             finally:
+                                time.sleep(2)
+                                manager.shutdown()
                                 return
 
             except Exception as inst:
@@ -532,6 +533,8 @@ class Server():
                             except Qqueue.Empty:
                                 return
                             finally:
+                                time.sleep(2)
+                                manager.shutdown()
                                 return
             except Exception as inst:
                 print "============================================================================================="
