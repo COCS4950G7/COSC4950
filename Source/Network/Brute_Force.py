@@ -26,17 +26,18 @@ from time import time, sleep
 
 
 class WorkUnit(object):
-    def __init__(self, prefix, length, alphabet):
+    def __init__(self, prefix, length, alphabet, algorithm):
         self.prefix = prefix
         self.length = length
         self.alphabet = alphabet
+        self.algorithm = algorithm
 
 
 class Brute_Force():
     minKeyLength = 6
     maxKeyLength = 16
     alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
-    algorithm = ""
+    algorithm = None
     origHash = ''
     key = ''
     rec = None
@@ -131,15 +132,11 @@ class Brute_Force():
         return False
 
     def check_keys(self):
-
         while self.queue:
             if self.done.value:
                 return
             workunit = self.queue.get()
-            length = workunit.length + workunit.prefix.__len__()
-
-            #print "check_keys called for length %d and the prefix %s" % (length, ''.join(workunit.prefix))
-
+            self.algorithm = workunit.algorithm
             prefix = ''.join(workunit.prefix)
             keylist = itertools.product(self.alphabet, repeat=self.charactersToCheck)
 
@@ -228,29 +225,31 @@ class Brute_Force():
 
     def run_chunk(self, chunk):
         settings = chunk.params
-        settings_list = settings.split()
-        self.algorithm = settings_list[1]
-        self.origHash = settings_list[2]
-        self.alphabet = settings_list[3]
-        self.minKeyLength = int(settings_list[4])
-        self.maxKeyLength = int(settings_list[5])
+        settings_list = settings.split('\n')
+
         prefix = settings_list[6]
         if self.first_unit:
+            self.algorithm = settings_list[1]
+            print "Algorithm set to %s" % self.algorithm
+            self.origHash = settings_list[2]
+            print "Hash set to %s" %self.origHash
+            self.alphabet = settings_list[3]
+            self.minKeyLength = int(settings_list[4])
+            self.maxKeyLength = int(settings_list[5])
             self.set_chars_to_check()
 
-        alphabet = self.alphabet
         if prefix == "-99999999999999999999999999999999999":
             prefix = ''
         if prefix == '' and self.first_unit:
 
-            self.check_short_keys()
+            Process(self.check_short_keys).start().join(block=False)
         else:
             if self.done.value:
                 return True
             else:
                 #print "run chunk prefix: %s" % prefix
 
-                self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet))
+                self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet, self.algorithm))
 
         self.first_unit = False
         if self.done:

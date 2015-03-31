@@ -366,22 +366,20 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_brute_force(self, bf, shutdown):
             try:
-                if not self.single_user_mode:
-                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
-                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
-                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
-                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
-                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
-                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
-                    manager.start()
-                    job_queue = manager.get_job_q()
-                    result_queue = manager.get_result_q()
-                    mode_bit_1 = manager.get_mode_bit_1()
-                    mode_bit_2 = manager.get_mode_bit_2()
-                    mode_bit_1.set()
-                    mode_bit_2.set()
-                else:
-                    result_queue = self.result_queue
+                JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                manager.start()
+                job_queue = manager.get_job_q()
+                result_queue = manager.get_result_q()
+                mode_bit_1 = manager.get_mode_bit_1()
+                mode_bit_2 = manager.get_mode_bit_2()
+                mode_bit_1.set()
+                mode_bit_2.set()
+
 
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
