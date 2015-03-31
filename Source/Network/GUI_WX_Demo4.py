@@ -785,7 +785,10 @@ class PanelNine(wx.Panel):                     #================Network Server S
         self.forceQuitServerButton.SetToolTip(wx.ToolTip('Forcefully stop the server'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
+        #TODO create the timer object to be used for updating server stat screen
+
         #Bind the buttons to events
+        #TODO bind the timer object to be used with the server stat screen
         self.forceQuitServerButton.Bind(wx.EVT_BUTTON, parent.forceCloseServer)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1418,6 +1421,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_three.Hide()
         self.panel_nine.Show()
+        #TODO add new timer for server stat screen
         self.Layout()
 
     def switchFromPanel3ToPanel10(self):
@@ -1444,6 +1448,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_four.Hide()
         self.panel_nine.Show()
+        #TODO add timer for server stat screen
         self.Layout()
 
     def switchFromPanel4ToPanel10(self):
@@ -1554,6 +1559,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
+        #TODO add timer for server stat screen
         self.Layout()
 
     def switchFromPanel11ToPanel10(self):
@@ -1580,6 +1586,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         self.panel_twelve.Hide()
         self.panel_nine.Show()
+        #TODO add timer for server stat screen
         self.Layout()
 
     def switchFromPanel12ToPanel10(self):
@@ -1608,7 +1615,7 @@ class myFrame(wx.Frame):
 
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER OR SINGLE STAT SCREEN
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SINGLE STAT SCREEN
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
@@ -1619,71 +1626,75 @@ class myFrame(wx.Frame):
                 print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
                 print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
-            if(self.panel_nine.Show() == True):
-                print "GUI DEBUG: panel nine is shown"
-                self.panel_nine.progressBar.SetValue(percentComplete)
-                self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-                self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            elif(self.panel_ten.Show() == True):
-                print "GUI DEBUG: panel ten is shown"
-                self.panel_ten.progressBar.SetValue(percentComplete)
-                self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-                self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            else:
-                print "GUI DEBUG: ERROR panel nine and panel ten are hidden"
-            #self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            #print "GUI DEBUG: panel ten is shown"
+            self.panel_ten.progressBar.SetValue(percentComplete)
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
 
             if(self.is_doing_stuff.is_set()):
                 #TODO the doing stuff flag is never set, so this always reads inactive!!!
-                if(self.panel_nine.Show() == True):
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
-                elif(self.panel_ten.Show() == True):
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
+                self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
             else:
-                if(self.panel_nine.Show() == True):
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
-                elif(self.panel_ten.Show() == True):
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
+                self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SERVER OR SINGLE STAT SCREEN
+            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SINGLE STAT SCREEN
             #TODO BUG on windows this fill the activity gauge, then empties it
-            if(self.panel_nine.Show() == True):
-                print "GUI DEBUG: shutdown flag has been set, panel nine is being dislayed"
-                self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-                self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-                self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
-                self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
-                self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
-            elif(self.panel_ten.Show() == True):
-                print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
-                self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
-                self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-                self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
-                self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
-                self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
-            else:
-                print "GUI DEBUG: ERROR: panel nine and panel ten are hidden"
+            print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
+            self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
+            self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+            self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                if(self.panel_nine.Show() == True):
-                    print "GUI DEBUG: shutdown flag is set, solution was not found"
-                    self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
-                elif(self.panel_ten.Show() == True):
-                    print "GUI DEBUG: shutdown flag is set, solution was not found"
-                    self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+                print "GUI DEBUG: shutdown flag is set, solution was not found"
+                self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                #TODO solution does not update on the server status screen
-                if(self.panel_nine.Show() == True):
-                    print "GUI DEBUG: shutdown flag is set, solution was found"
-                    self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
-                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
-                elif(self.panel_ten.Show() == True):
-                    print "GUI DEBUG: shutdown flag is set, solution was found"
-                    self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
-                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+                print "GUI DEBUG: shutdown flag is set, solution was found"
+                self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+
+    def updateNetworkServerTimer(self, event):
+        if(not self.shutdown.is_set()):
+            print "GUI DEBUG: shutdown flag has not been set yet"
+            print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
+            print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
+            percentComplete= 0
+            if(int(self.dictionary["total chunks"]) > 0):
+                percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
+            else:
+                #if equal to or less than zero
+                print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
+                print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
+            print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
+            self.panel_nine.progressBar.SetValue(percentComplete)
+            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+
+            if(self.is_doing_stuff.is_set()):
+                #TODO the doing stuff flag is never set, so this always reads inactive!!!
+                self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
+            else:
+                self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
+            self.update.clear()
+        else: #if shutdown flag has been set
+            print "GUI DEBUG: shutdown flag has been set, displaying panel nine"
+            self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
+            self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
+            self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
+            self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
+            self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
+
+            if(len(self.dictionary["key"]) < 1): #if no solution was found
+                print "GUI DEBUG: shutdown flag is set, solution was not found"
+                self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+            else: #if a solution was found
+                print "GUI DEBUG: shutdown flag is set, solution was found"
+                self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def configureDictionaryQuickTest(self, event):
         self.panel_three.selectedAlgorithm.SetValue("MD5")
