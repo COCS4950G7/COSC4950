@@ -4,6 +4,9 @@ from multiprocessing import Process, Event, Manager
 from NetworkServer_r15b import Server
 import string
 import os
+import time
+import signal
+
 
 class start():
 
@@ -52,7 +55,7 @@ class start():
                      "key length": 10,
                      "alphabet": string.ascii_letters+string.digits+string.punctuation,
                      "chain length": 100,
-                     "num rows": 1000,
+                     "num rows": 3600,
                      "file name": "rain2.txt",
                      "single": "True"})
 
@@ -61,8 +64,8 @@ class start():
                      "key length": 10,
                      "alphabet": string.ascii_letters+string.digits+string.punctuation,
                      "chain length": 100,
-                     "num rows": 1000,
-                     "file name": "rain.txt",
+                     "num rows": 3600,
+                     "file name": "rain2.txt",
                      "single": "False"})
 
     settings.append({"cracking method": "rain",  # settings[6]
@@ -101,7 +104,7 @@ class start():
         shared.append(shutdown)
         shared.append(update)
 
-        self.server = Process(target=Server, args=(self.settings[7], shared))
+        self.server = Process(target=Server, args=(self.settings[3], shared))
         self.server.start()
 
         # this is a very simple example of how an update loop in the UI classes might work
@@ -115,9 +118,11 @@ class start():
             # after UI data has been updated, .clear() the update event so it will wait again in the next iteration
             update.clear()
 
-        print "end"
         #self.server.join()
+        shutdown.set()
+        time.sleep(1)
         self.server.terminate()
+
 
 
 if __name__ == '__main__':
