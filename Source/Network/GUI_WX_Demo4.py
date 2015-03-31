@@ -1025,13 +1025,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
-        #TODO add a quick test button that sets values to default testing values
-            #TODO algorithm= MD5
-            #TODO Key LEngth= 10
-            #TODO Alphabet: Lowercase Letters
-            #TODO Table CHain Length: 100
-            #TODO Number of Rows: 100
-            #TODO save rainbow Table file as: myRainbowTable.txt
+
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
@@ -1121,6 +1115,14 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.resetSettingsBackToDefault= wx.Button(self, label="Reset Settings Back To Default")
         hbox12.Add(self.resetSettingsBackToDefault)
         vbox.Add(hbox12, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox13= wx.BoxSizer(wx.HORIZONTAL)
+        self.startRainbowTableMakerQuickTestButton= wx.Button(self, label="Run Quick Sample Test")
+        hbox13.Add(self.startRainbowTableMakerQuickTestButton)
+        vbox.Add(hbox13, flag=wx.CENTER, border=10)
+
         #DEFAULT SETTINGS-----------
         #set selected algorithm back to MD5
         #set key length back to 10
@@ -1149,6 +1151,9 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.changeFileNameButton.SetToolTip(wx.ToolTip('Change the name of the rainbow table file that you want to save'))
         self.startConnectButton.SetToolTip(wx.ToolTip('Start making (or if server, start hosting) a rainbow table making session'))
         self.resetSettingsBackToDefault.SetToolTip(wx.ToolTip('Reset the rainbow table maker settings back to default values'))
+        self.startRainbowTableMakerQuickTestButton.SetToolTip(wx.ToolTip('Run quick test using predefined settings. (Algorithm: MD5, '
+                                                                         'Key Length: 10, Alphabet: Lowercase Letters, Table Chain Length: 100,'
+                                                                         ' Number of Rows: 100, Save As: myRainbowTable.txt)'))
         self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -1159,6 +1164,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         self.changeFileNameButton.Bind(wx.EVT_BUTTON, parent.setRMFileName)
         self.startConnectButton.Bind(wx.EVT_BUTTON, parent.validateRainbowTableMakerInputs)
         self.resetSettingsBackToDefault.Bind(wx.EVT_BUTTON, parent.resetRainbowTableMakerSettingsToDefault)
+        self.startRainbowTableMakerQuickTestButton.Bind(wx.EVT_BUTTON, parent.configureRainbowTableMakerQuickTest)
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel12ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1724,6 +1730,16 @@ class myFrame(wx.Frame):
         self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash to be cracked: 33da7a40473c1637f1a2e142f4925194")
         fakeVariable= ""
         self.validateRainbowTableUserInputs(fakeVariable)
+
+    def configureRainbowTableMakerQuickTest(self, event):
+        self.panel_twelve.selectedAlgorithm.SetValue("MD5")
+        self.panel_twelve.keyLengthHeader.SetLabel("Key Length: 10")
+        self.panel_twelve.selectedAlphabet.SetValue("Lowercase Letters")
+        self.panel_twelve.chainLengthHeader.SetLabel("Table Chain Length: 100")
+        self.panel_twelve.numOfRowsHeader.SetLabel("Number of Rows: 100")
+        self.panel_twelve.fileNameHeader.SetLabel("Save Rainbow Table File As: myRainbowTable.txt")
+        fakeVariable= ""
+        self.validateRainbowTableMakerInputs(fakeVariable)
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
