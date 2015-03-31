@@ -17,20 +17,18 @@
 #   efficiency of parallel processing with the new network client functionality by minimizing downtime and overhead.
 
 import hashlib
-import math
 import itertools
 import string
 from multiprocessing import cpu_count, Process, Queue, Value
 
-from time import time, sleep
-
 
 class WorkUnit(object):
-    def __init__(self, prefix, length, alphabet, algorithm):
+    def __init__(self, prefix, length, alphabet, algorithm, hash):
         self.prefix = prefix
         self.length = length
         self.alphabet = alphabet
         self.algorithm = algorithm
+        self.hash = hash
 
 
 class Brute_Force():
@@ -38,7 +36,7 @@ class Brute_Force():
     maxKeyLength = 16
     alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
     algorithm = None
-    origHash = ''
+    origHash = None
     key = ''
     rec = None
     charactersToCheck = 3
@@ -137,6 +135,7 @@ class Brute_Force():
                 return
             workunit = self.queue.get()
             self.algorithm = workunit.algorithm
+            self.origHash = workunit.hash
             prefix = ''.join(workunit.prefix)
             keylist = itertools.product(self.alphabet, repeat=self.charactersToCheck)
 
@@ -230,9 +229,7 @@ class Brute_Force():
         prefix = settings_list[6]
         if self.first_unit:
             self.algorithm = settings_list[1]
-            print "Algorithm set to %s" % self.algorithm
             self.origHash = settings_list[2]
-            print "Hash set to %s" %self.origHash
             self.alphabet = settings_list[3]
             self.minKeyLength = int(settings_list[4])
             self.maxKeyLength = int(settings_list[5])
@@ -249,7 +246,7 @@ class Brute_Force():
             else:
                 #print "run chunk prefix: %s" % prefix
 
-                self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet, self.algorithm))
+                self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet, self.algorithm, self.origHash))
 
         self.first_unit = False
         if self.done:
