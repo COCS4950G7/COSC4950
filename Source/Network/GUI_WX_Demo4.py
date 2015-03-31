@@ -912,11 +912,6 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         wx.Panel.__init__(self,parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
-
-        #TODO add a quick test button that sets values to default testing values
-            #TODO algorithm= MD5
-            #TODO rainbow table file: rain.txt ??? (check this)
-            #TODO hash to be cracked: popcorn
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -983,6 +978,13 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.resetSettingsToDefaultButton= wx.Button(self, label="Reset Settings Back To Default")
         hbox10.Add(self.resetSettingsToDefaultButton)
         vbox.Add(hbox10, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox11= wx.BoxSizer(wx.HORIZONTAL)
+        self.startRainbowTableQuickTestButton= wx.Button(self, label="Run Quick Sample Test")
+        hbox11.Add(self.startRainbowTableQuickTestButton)
+        vbox.Add(hbox11, flag=wx.CENTER, border=10)
         #DEFAULT SETTINGS-------------------
         #set selected algorithm back to MD5
         #reset the selected rainbow table file back to nothing
@@ -1004,6 +1006,9 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.selectFileButton.SetToolTip(wx.ToolTip('Select what rainbow table file you want to use'))
         self.setHashCodeButton.SetToolTip(wx.ToolTip('Set the hash code you want to crack'))
         self.generateHashButton.SetToolTip(wx.ToolTip('Generate the hash code you want to crack based on the key you input and the selected algorithm'))
+        self.resetSettingsToDefaultButton.SetToolTip(wx.ToolTip('Resets all Rainbow Table User Settings Back to their default Values.'))
+        self.startRainbowTableQuickTestButton.SetToolTip(wx.ToolTip('Run Quick Test using predefined settings. (Algorithm: MD5, '
+                                                                    'Selected Rainbow Table File: rain.txt, Key: popcorn)'))
         self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -1013,6 +1018,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.generateHashButton.Bind(wx.EVT_BUTTON, parent.generateHashDialogRT)
         self.StartConnectButton.Bind(wx.EVT_BUTTON, parent.validateRainbowTableUserInputs)
         self.resetSettingsToDefaultButton.Bind(wx.EVT_BUTTON, parent.resetRainbowTableCrackingSettingsToDefault)
+        self.startRainbowTableQuickTestButton.Bind(wx.EVT_BUTTON, parent.configureRainbowTableUserQuickTest)
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.switchFromPanel11ToPanel1)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -1616,7 +1622,6 @@ class myFrame(wx.Frame):
 
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SINGLE STAT SCREEN
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
@@ -1639,7 +1644,6 @@ class myFrame(wx.Frame):
                 self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
             self.update.clear()
         else: #if shutdown is set
-            #TODO activity gauge , progress bar, current status, and chunk counts DO NOT UPDATE ON SINGLE STAT SCREEN
             #TODO BUG on windows this fill the activity gauge, then empties it
             print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
@@ -1713,6 +1717,13 @@ class myFrame(wx.Frame):
         self.panel_four.selectedAlphabet.SetValue("Lowercase Letters")
         fakeVariable= ""
         self.validateBruteForceInputs(fakeVariable)
+
+    def configureRainbowTableUserQuickTest(self, event):
+        self.panel_eleven.selectedAlgorithm.SetValue("MD5")
+        self.panel_eleven.selectedFileHeader.SetLabel("Selected Rainbow Table File: rain.txt")
+        self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash to be cracked: 33da7a40473c1637f1a2e142f4925194")
+        fakeVariable= ""
+        self.validateRainbowTableUserInputs(fakeVariable)
 
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
