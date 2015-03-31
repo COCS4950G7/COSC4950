@@ -180,6 +180,8 @@ class Server():
 
                 chunk_maker.join()
                 chunk_maker.terminate()
+                if chunk_maker.is_alive():
+                    print "oh no!"
 
                 self.update.set()
 
@@ -300,8 +302,11 @@ class Server():
                     mode_bit_2 = manager.get_mode_bit_2()
                     mode_bit_1.set()
                     mode_bit_2.set()
-                    result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
-                    result_monitor.start()
+                else:
+                    job_queue = self.job_queue
+                    result_queue = self.result_queue
+                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor.start()
                 import time
                 while not dictionary.isEof() and not self.found_solution.value:  # Keep looping while it is not eof
                     #chunk is a Chunk object
@@ -361,20 +366,24 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_brute_force(self, bf, shutdown):
             try:
-                JobQueueManager.register('get_job_q', callable=self.get_job_queue)
-                JobQueueManager.register('get_result_q', callable=self.get_result_queue)
-                JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
-                JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
-                JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
-                manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
-                manager.start()
-                job_queue = manager.get_job_q()
-                result_queue = manager.get_result_q()
-                mode_bit_1 = manager.get_mode_bit_1()
-                mode_bit_2 = manager.get_mode_bit_2()
-                mode_bit_1.set()
-                mode_bit_2.set()
+                if not self.single_user_mode:
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    mode_bit_1.set()
+                    mode_bit_2.clear()
 
+                else:
+                    result_queue = self.result_queue
+                    job_queue = self.job_queue
 
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
@@ -392,9 +401,9 @@ class Server():
                                                          'data': '',
                                                          'timestamp': time.time(),
                                                          'halt': False})
-                    while True:
+                    while not shutdown.is_set():
                         try:
-                            job_queue.put(new_chunk)  # put next chunk on the job queue.
+                            job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
                             break
                         except Qqueue.Full:
@@ -443,10 +452,11 @@ class Server():
                     result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
-                    mode_bit_1.set()
+                    mode_bit_1.clear()
                     mode_bit_2.set()
                 else:
                     result_queue = self.result_queue
+                    job_queue = self.job_queue
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
                 while not rainbow.isEof() and not shutdown.is_set():
@@ -463,7 +473,7 @@ class Server():
                         new_chunk = manager.Value(dict, {'params': chunk.params,
                                                          'data': chunk.data,
                                                          'timestamp': time.time()})
-                        while True:
+                        while not shutdown.is_set():
                             try:
                                 self.shared_dict["current chunk"] = new_chunk
                                 job_queue.put(new_chunk, timeout=.1)
@@ -502,22 +512,27 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_rainbow_maker(self, rainmaker, shutdown):
             try:
+                if not self.single_user_mode:
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    mode_bit_1.clear()
+                    mode_bit_2.clear()
+                else:
+                    result_queue = self.result_queue
+                    job_queue = self.job_queue
 
-                JobQueueManager.register('get_job_q', callable=self.get_job_queue)
-                JobQueueManager.register('get_result_q', callable=self.get_result_queue)
-                JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
-                JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
-                JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
-                manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
-                manager.start()
-                job_queue = manager.get_job_q()
-                result_queue = manager.get_result_q()
-                mode_bit_1 = manager.get_mode_bit_1()
-                mode_bit_2 = manager.get_mode_bit_2()
-                mode_bit_1.set()
-                mode_bit_2.set()
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
+
                 while not shutdown.is_set():
                     params_chunk = rainmaker.makeParamsChunk()
                     new_chunk = {"params": params_chunk.params,
