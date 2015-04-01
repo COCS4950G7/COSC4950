@@ -5,7 +5,7 @@ import wx
 import string
 import hashlib
 from multiprocessing import Process, Event, Manager
-from NetworkServer_r15b import Server
+from NetworkServer_r15c import Server
 from NetworkClient_r15b import Client
 
 
@@ -674,31 +674,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO add what hash is being cracked
-        #TODO display the cracking settings on the screen
-            #TODO Dictionary Settings
-                #TODO algorithm
-                #TODO Selected HAshing Mode
-                #TODO Hash to be cracked
-                #TODO dictionary file to be used
-            #TODO Brute Force Settings
-                #TODO algorithm
-                #TODO hash to be cracked
-                #TODO Min Key Length
-                #TODO Max Key Length
-                #TODO Alphabet
-            #TODO Rainbow Table User
-                #TODO algorithm
-                #TODO rainbow table file
-                #TODO hash to be cracked
-            #TODO RAinbow Table Maker
-                #TODO algorithm
-                #TODO Key LEngth
-                #TODO Alphabet
-                #TODO Table CHain Length
-                #TODO Number of Rows
-                #TODO save rainbow Table file as
-
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -729,7 +704,66 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         vbox.Add((-1,10))
 
-        #TODO modify timer to edit this activity gauge
+        hbox10= wx.BoxSizer(wx.HORIZONTAL)
+        self.crackingThisHashHeader= wx.StaticText(self, label="Hash Being Cracked: Not Specified")
+        hbox10.Add(self.crackingThisHashHeader)
+        vbox.Add(hbox10, flag=wx.CENTER, border=10)
+        ''' (may be placed in the wrong section)
+        #TODO display the cracking settings on the screen
+            #TODO Dictionary Settings   (LINK UP NEW SETTINGS TO ACTUAL STATS)
+                #TODO algorithm
+                #TODO Selected HAshing Mode
+                #TODO Hash to be cracked
+                #TODO dictionary file to be used
+            #TODO Brute Force Settings
+                #TODO algorithm
+                #TODO hash to be cracked
+                #TODO Min Key Length
+                #TODO Max Key Length
+                #TODO Alphabet
+            #TODO Rainbow Table User
+                #TODO algorithm
+                #TODO rainbow table file
+                #TODO hash to be cracked
+            #TODO RAinbow Table Maker
+                #TODO algorithm
+                #TODO Key LEngth
+                #TODO Alphabet
+                #TODO Table CHain Length
+                #TODO Number of Rows
+                #TODO save rainbow Table file as
+        vbox.Add((-1,10))
+
+        #based on what mode you are in display the corresponding settings
+        #dictionary: Cracking Mode: Dictionary
+        #brute force: Cracking Mode: Brute-Force
+        #rainbow user: Cracking Mode: Rainbow Table
+        #rainbow table maker: Cracking Mode: Rainbow Table Maker
+        if(parent.compareString(self.currentCrackingMode, "Cracking Mode: Dictionary",0,0,len("Cracking Mode: Dictionary"),len("Cracking Mode: Dictionary"))==True):
+            #show dictionary settings
+            hbox11A= wx.BoxSizer(wx.HORIZONTAL)
+            self.dictionaryAlgorithmSetting= wx.StaticText(self, label="Algorithm: Not Specified")
+            hbox11A.Add(self.dictionaryAlgorithmSetting)
+            self.dictionarySelectedHashingModeSetting= wx.StaticText(self, label="Selected Hashing Mode: Not Specified")
+            hbox11A.Add(self.dictionarySelectedHashingModeSetting, flag=wx.LEFT, border=25)
+            self.dictionarySelectedDictionaryFile= wx.StaticText(self, label="Dictionary File: Not Specified")
+            hbox11A.Add(self.dictionarySelectedDictionaryFile, flag=wx.LEFT, border=25)
+            vbox.Add(hbox11A, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+            print "GUI DEBUG: displaying dictionary settings"
+        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Brute-Force",0,0,len("Cracking Mode: Brute-Force"),len("Cracking Mode: Brute-Force"))==True):
+            #show brute force settings
+            print "GUI DEBUG: displaying brute froce settings"
+        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Rainbow Table",0,0,len("Cracking Mode: Rainbow Table"),len("Cracking Mode: Rainbow Table"))==True):
+            #show rainbow user settings
+            print "GUI DEBUG: diplaying rainbow user settings"
+        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Rainbow Table Maker",0,0,len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
+            #show rainbow table maker settings
+            print "GUI DEBUG: displaying rainbow table maker settings"
+        else:
+            print "GUI DEBUG ERROR: invalid Cracking Mode detected: '"+str(self.currentCrackingMode)+"'"
+        '''
+        vbox.Add((-1,10))
+
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         hbox6.Add(activityGaugeHeader)
@@ -740,7 +774,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         vbox.Add((-1,10))
 
-        #TODO  modify timer to edit this progress bar
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
         hbox7.Add(progressBarHeader)
@@ -751,8 +784,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         vbox.Add((-1,10))
 
-        #TODO modify timer to edit this number
-        #TODO modify timer to edit this number
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
         hbox8.Add(self.numCompletedChunksHeader)
@@ -762,7 +793,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         vbox.Add((-1,10))
 
-        #TODO modify timer to change this status
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
         hbox9.Add(self.SolutionHeader)
@@ -797,7 +827,35 @@ class PanelTen(wx.Panel):                          #====================Single M
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
 
-        #TODO add what hash is being cracked
+
+        vbox= wx.BoxSizer(wx.VERTICAL)
+
+        hbox1= wx.BoxSizer(wx.HORIZONTAL)
+        screenHeader= wx.StaticText(self, label="Single Mode Status Screen")
+        hbox1.Add(screenHeader)
+        vbox.Add(hbox1, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox2=wx.BoxSizer(wx.HORIZONTAL)
+        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
+        hbox2.Add(self.currentCrackingMode)
+        vbox.Add(hbox2, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox3= wx.BoxSizer(wx.HORIZONTAL)
+        self.currentStatus= wx.StaticText(self, label="Current Status: Starting up")
+        hbox3.Add(self.currentStatus)
+        vbox.Add(hbox3, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
+        hbox9= wx.BoxSizer(wx.HORIZONTAL)
+        self.hashBeingCrackedHeader= wx.StaticText(self, label="Hash Being Cracked: Not Specified")
+        hbox9.Add(self.hashBeingCrackedHeader)
+        vbox.Add(hbox9, flag=wx.CENTER, border=10)
+
         #TODO display the cracking settings on the screen
             #TODO Dictionary Settings
                 #TODO algorithm
@@ -822,26 +880,6 @@ class PanelTen(wx.Panel):                          #====================Single M
                 #TODO Number of Rows
                 #TODO save rainbow Table file as
 
-        vbox= wx.BoxSizer(wx.VERTICAL)
-
-        hbox1= wx.BoxSizer(wx.HORIZONTAL)
-        screenHeader= wx.StaticText(self, label="Single Mode Status Screen")
-        hbox1.Add(screenHeader)
-        vbox.Add(hbox1, flag=wx.CENTER, border=10)
-
-        vbox.Add((-1,10))
-
-        hbox2=wx.BoxSizer(wx.HORIZONTAL)
-        self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
-        hbox2.Add(self.currentCrackingMode)
-        vbox.Add(hbox2, flag=wx.CENTER, border=10)
-
-        vbox.Add((-1,10))
-
-        hbox3= wx.BoxSizer(wx.HORIZONTAL)
-        self.currentStatus= wx.StaticText(self, label="Current Status: Starting up")
-        hbox3.Add(self.currentStatus)
-        vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
 
@@ -1432,6 +1470,12 @@ class myFrame(wx.Frame):
         self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
         tempIP= self.get_ip()
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
+        tempHash= self.panel_three.inputHashHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 3 to panel 9 theHash: '"+str(theHash)+"'"
+        self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_nine.Show()
         self.panel_nine.timer.Start(1000)
@@ -1440,10 +1484,15 @@ class myFrame(wx.Frame):
     def switchFromPanel3ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
+        tempHash= self.panel_three.inputHashHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 3 to panel 10 theHash: '"+str(theHash)+"'"
+        self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-        #print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #----------end switch from panel 3
 
@@ -1459,6 +1508,12 @@ class myFrame(wx.Frame):
         self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
         tempIP= self.get_ip()
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
+        tempHash= self.panel_four.inputHashHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 4 to panel 9 theHash: '"+str(theHash)+"'"
+        self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_nine.Show()
         self.panel_nine.timer.Start(1000)
@@ -1467,6 +1522,12 @@ class myFrame(wx.Frame):
     def switchFromPanel4ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
+        tempHash= self.panel_four.inputHashHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
+        self.panel_ten.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
@@ -1570,6 +1631,12 @@ class myFrame(wx.Frame):
         self.panel_nine.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
         tempIP= self.get_ip()
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
+        tempHash= self.panel_eleven.hashToBeCrackedHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
+        self.panel_nine.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
         self.panel_nine.timer.Start(1000)
@@ -1578,6 +1645,12 @@ class myFrame(wx.Frame):
     def switchFromPanel11ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
+        tempHash= self.panel_eleven.hashToBeCrackedHeader.GetLabel()
+        theHash=""
+        for i in range(19,len(tempHash)):
+            theHash+= tempHash[i]
+        print "GUI DEBUG: panel 11 to panel 10 the Hash: '"+str(theHash)+"'"
+        self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000) #1000 milliseconds = 1 second
@@ -2679,7 +2752,12 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting,
                            "file name":FileName, "single": singleSetting, "finished chunks":0}
-
+        #DEBUG SETTINGS MESSAGES
+        print "GUI DICTIONARY SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
+        print "GUI DICTIONARY SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        print "GUI DICTIONARY SETTINGS DEBUG: Hash: "+str(hashSetting)
+        print "GUI DICTIONARY SETTINGS DEBUG: File Name: "+str(FileName)
+        print "GUI DICTIONARY SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -2749,6 +2827,15 @@ class myFrame(wx.Frame):
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting
                             , "finished chunks":0}
 
+        #DEBUG SETTING MESSAGES
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Hash: "+str(hashSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Min Key Length: "+str(finalMinKeyLengthSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Max Key Length: "+str(finalMaxKeyLengthSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
+        print "GUI BRUTE FORCE SETTINGS DEBUG: Single: "+str(singleSetting)
+
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
         listOfSharedVariables= []
@@ -2787,6 +2874,12 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting
                             , "finished chunks":0}
+
+        #DEBUG SETTINGS MESSAGES
+        print "GUI RAINBOW USER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
+        print "GUI RAINBOW USER SETTINGS DEBUG: File Name: "+str(fileName)
+        print "GUI RAINBOW USER SETTINGS DEBUG: Hash: "+str(hashToBeCracked)
+        print "GUI RAINBOW USER SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -2863,6 +2956,15 @@ class myFrame(wx.Frame):
         crackingSettings = {"cracking method":crackingMethod, "algorithm":algorithmSetting, "key length":keyLengthSetting,
                             "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
                             "file name":fileNameSetting, "single":singleSetting, "finished chunks":0}
+        #DEBUG SETTINGS MESSAGES
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Key Length: "+str(keyLengthSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Chain Length: "+str(chainLengthSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Num Rows: "+str(numberOfRowsSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: File Name: "+str(fileNameSetting)
+        print "GUI RAINBOW MAKER SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
