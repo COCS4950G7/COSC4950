@@ -1356,12 +1356,38 @@ class myFrame(wx.Frame):
         viewMenuMaximizeScreen= viewMenu.Append(wx.ID_ANY, "Maximize Screen", "Make the window fill the entire screen")
         viewMenuNormalScreen= viewMenu.Append(wx.ID_ANY, "Normal Size", "Make the window it's native resolution")
         menubar.Append(viewMenu, '&View')
+        runMenu= wx.Menu()
+        dictionaryTestsLabel= runMenu.Append(wx.ID_ANY, "Dictionary Quick Tests", " ")
+        dictionaryTestsLabel.Enable(False)
+        runQuickStartSingleDictionaryTest= runMenu.Append(wx.ID_ANY, "Start Single Mode Dictionary Quick Test", "Starts a single mode, dictionary search using predefined settings")
+        runQuickStartNetworkServerDictionaryTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Dictionary Quick Test", "Starts a network server, dictionary search using predefined settings")
+        bruteForceTestsLabel= runMenu.Append(wx.ID_ANY, "Brute-Force Quick Tests", " ")
+        bruteForceTestsLabel.Enable(False)
+        runQuickStartSingleBruteForceTest= runMenu.Append(wx.ID_ANY, "Start Single Mode Brute Force Quick Test", "Starts a single mode, brute force search using predefined settings")
+        runQuickStartNetworkServerBruteForceTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Brute Force Quick Test", "Starts a network server, brute force search using predefined settings")
+        rainbowUserTestsLabel= runMenu.Append(wx.ID_ANY, "Rainbow Table User Quick Tests", " ")
+        rainbowUserTestsLabel.Enable(False)
+        runQuickStartSingleRainbowTableUserTest= runMenu.Append(wx.ID_ANY, "[BROKEN] Start Single Mode Rainbow Table User Quick Test", "Starts a single mode, rainbow table user search using predefined settings")
+        runQuickStartNetworkServerRainbowTableUserTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Rainbow Table User Quick Test", "Starts a Network Server, rainbow table user search using predefined settings")
+        rainbowMakerTestsLabel= runMenu.Append(wx.ID_ANY, "Rainbow Table Maker Quick Tests", " ")
+        rainbowMakerTestsLabel.Enable(False)
+        runQuickStartSingleRainbowTableMakerTest= runMenu.Append(wx.ID_ANY, "Start Single Mode Rainbow Table Maker Quick Test", "Starts a single mode, rainbow table maker using predefined setttings")
+        runQuickStartNetworkServerRainbowTableMakerTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Rainbow Table Maker Quick Test","Starts a Network Server, rainbow table maker session using predefined settings")
+        menubar.Append(runMenu, '&Run')
         self.SetMenuBar(menubar)
 
         #bind menu items to events
         self.Bind(wx.EVT_MENU, self.OnClose, fileMenuClose)
         self.Bind(wx.EVT_MENU, self.viewMaximizedScreen, viewMenuMaximizeScreen)
         self.Bind(wx.EVT_MENU, self.viewNormalScreen, viewMenuNormalScreen)
+        self.Bind(wx.EVT_MENU, self.startSingleDictionaryQuickTestFromMenu, runQuickStartSingleDictionaryTest)
+        self.Bind(wx.EVT_MENU, self.startNetworkServerDictionaryQuickTestFromMenu, runQuickStartNetworkServerDictionaryTest)
+        self.Bind(wx.EVT_MENU, self.startSingleBruteForceQuickTestFromMenu, runQuickStartSingleBruteForceTest)
+        self.Bind(wx.EVT_MENU, self.startNetworkServerBruteForceQuickTestFromMenu, runQuickStartNetworkServerBruteForceTest)
+        self.Bind(wx.EVT_MENU, self.startSingleRainbowTableUserTestFromMenu, runQuickStartSingleRainbowTableUserTest)
+        self.Bind(wx.EVT_MENU, self.startNetworkServerRainbowTableUserQuickTestFromMenu, runQuickStartNetworkServerRainbowTableUserTest)
+        self.Bind(wx.EVT_MENU, self.startSingleRainbowTableMakerQuickTestFromMenu, runQuickStartSingleRainbowTableMakerTest)
+        self.Bind(wx.EVT_MENU, self.startNetworkServerRainbowTableMakerQuickTestFromMenu, runQuickStartNetworkServerRainbowTableMakerTest)
 
         #If this is the main process and not a subprocess
         if __name__ == '__main__':
@@ -1405,6 +1431,136 @@ class myFrame(wx.Frame):
     def viewNormalScreen(self, event):
         self.Maximize(False)
         self.ShowFullScreen(False)
+
+    #special start quick test from menu functions---------------------------------------
+    def startSingleDictionaryQuickTestFromMenu(self, event):
+        self.panel_three.currentMode.SetLabel("Current Mode: Single Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_nine.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureDictionaryQuickTest(None)
+
+    def startNetworkServerDictionaryQuickTestFromMenu(self, event):
+        self.panel_three.currentMode.SetLabel("Current Mode: Network Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_ten.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureDictionaryQuickTest(None)
+
+    def startSingleBruteForceQuickTestFromMenu(self, event):
+        self.panel_four.currentMode.SetLabel("Current Mode: Single Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_nine.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureBruteForceQuickTest(None)
+
+    def startNetworkServerBruteForceQuickTestFromMenu(self, event):
+        self.panel_four.currentMode.SetLabel("Current Mode: Network Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_ten.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureBruteForceQuickTest(None)
+
+    def startSingleRainbowTableUserTestFromMenu(self, event):
+        #TODO this always calls Network server!!
+        self.panel_eleven.currentMode.SetLabel("Current Mode: Single Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_nine.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureRainbowTableUserQuickTest(None)
+
+    def startNetworkServerRainbowTableUserQuickTestFromMenu(self, event):
+        self.panel_eleven.currentMode.SetLabel("Current Mode: Network Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_ten.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureRainbowTableUserQuickTest(None)
+
+    def startSingleRainbowTableMakerQuickTestFromMenu(self, event):
+        self.panel_twelve.currentMode.SetLabel("Current Mode: Single Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_nine.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureRainbowTableMakerQuickTest(None)
+
+    def startNetworkServerRainbowTableMakerQuickTestFromMenu(self, event):
+        self.panel_twelve.currentMode.SetLabel("Current Mode: Network Mode")
+        self.panel_one.Hide()
+        self.panel_two.Hide()
+        self.panel_three.Hide()
+        self.panel_four.Hide()
+        self.panel_five.Hide()
+        self.panel_six.Hide()
+        self.panel_seven.Hide()
+        self.panel_eight.Hide()
+        self.panel_ten.Hide()
+        self.panel_eleven.Hide()
+        self.panel_twelve.Hide()
+        self.panel_thirteen.Hide()
+        self.configureRainbowTableMakerQuickTest(None)
 
     #---------switch from Panel 1=======================================================================================
     def switchFromPanel1ToPanel2(self):
@@ -1527,7 +1683,7 @@ class myFrame(wx.Frame):
         for i in range(19,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
-        self.panel_ten.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
+        self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
@@ -1636,7 +1792,7 @@ class myFrame(wx.Frame):
         for i in range(19,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
-        self.panel_nine.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
+        self.panel_nine.crackingThisHashHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
         self.panel_nine.timer.Start(1000)
@@ -2868,6 +3024,7 @@ class myFrame(wx.Frame):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
         #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
+        print "GUI DEBUG: rainbowTableUser tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
         if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
             singleSetting="True"
         else:
