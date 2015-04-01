@@ -56,10 +56,9 @@ class Server():
         mode_bit_1 = Event()
         mode_bit_2 = Event()
         manager = None
-        manager_authkey = None
 
         def __init__(self, settings, shared_variables):
-            current_process()._authkey = "popcorn"
+            current_process()._authkey = self.AUTHKEY
             self.settings = settings
             self.get_ip()
             self.cracking_mode = settings["cracking method"]

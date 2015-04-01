@@ -4,7 +4,7 @@ __author__ = 'chris hamm'
 import wx
 import string
 import hashlib
-from multiprocessing import Process, Event, Manager
+from multiprocessing import Process, Event, Manager, current_process
 from NetworkServer_r15c import Server
 from NetworkClient_r15b import Client
 
@@ -12,6 +12,7 @@ from NetworkClient_r15b import Client
 
 class PanelOne(wx.Panel):           #========================Main Menu=====================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -76,6 +77,7 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
 
 class PanelTwo(wx.Panel):             #====================Select Cracking Method=============================
     def __init__(self,parent):
+        
         wx.Panel.__init__(self, parent=parent)
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -145,6 +147,7 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings=================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfHashingModes= ['Individual Hash Code','File of Hash Codes']
@@ -273,7 +276,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
                                                       'If server, Start hosting a dictionary cracking session.'))
         self.selectedHashingMode.SetToolTip(wx.ToolTip('Choose whether to crack a single hash code or a file of hash codes.'))
         self.resetToDefaultsButton.SetToolTip(wx.ToolTip('Resets all of the dictionary cracking settings back their default settings.'))
-        self.startQuickSampleTestButton.SetToolTip(wx.ToolTip('Run a quick test using predefined settings. (Key: popcorn,\n'
+        self.startQuickSampleTestButton.SetToolTip(wx.ToolTip('Run a quick test using predefined settings. (Key: Popcorn is awesome!!!,\n'
                                                               'Algorithm: MD5, Hashing Mode: Individual Hash Code, File: dic.txt'))
         self.BackToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
@@ -290,6 +293,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings==================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
@@ -435,6 +439,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
 class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -490,6 +495,7 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 
 class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -539,6 +545,7 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent=parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -593,6 +600,7 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
 class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
+        
         wx.Panel.__init__(self, parent)
 
         #TODO add solution header to the screen
@@ -672,6 +680,7 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent)
 
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -825,6 +834,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
+        
         wx.Panel.__init__(self, parent)
 
 
@@ -947,6 +957,7 @@ class PanelTen(wx.Panel):                          #====================Single M
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
+        
         wx.Panel.__init__(self,parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
 
@@ -1046,7 +1057,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
         self.generateHashButton.SetToolTip(wx.ToolTip('Generate the hash code you want to crack based on the key you input and the selected algorithm'))
         self.resetSettingsToDefaultButton.SetToolTip(wx.ToolTip('Resets all Rainbow Table User Settings Back to their default Values.'))
         self.startRainbowTableQuickTestButton.SetToolTip(wx.ToolTip('Run Quick Test using predefined settings. (Algorithm: MD5, '
-                                                                    'Selected Rainbow Table File: rain.txt, Key: popcorn)'))
+                                                                    'Selected Rainbow Table File: rain.txt, Key: Popcorn is awesome!!!)'))
         self.backToMainMenuButton.SetToolTip(wx.ToolTip('Go back to the main menu'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
@@ -1062,6 +1073,7 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
+        
         wx.Panel.__init__(self, parent)
 
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
@@ -1208,6 +1220,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
+        
         wx.Panel.__init__(self,parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -1297,6 +1310,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 
 class myFrame(wx.Frame):
     def __init__(self):
+        
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
         #detectedOS variable
@@ -3233,6 +3247,7 @@ class myFrame(wx.Frame):
 
 
 if __name__ == '__main__':
+    current_process()._authkey = "Popcorn is awesome!!!"
     app= wx.App(0)
     frame= myFrame()
     frame.Show()
