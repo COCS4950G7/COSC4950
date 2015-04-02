@@ -1643,7 +1643,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         tempHash= self.panel_three.inputHashHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 3 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
@@ -1657,7 +1657,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Dictionary")
         tempHash= self.panel_three.inputHashHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 3 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
@@ -1681,7 +1681,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         tempHash= self.panel_four.inputHashHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 4 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
@@ -1695,7 +1695,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Brute-Force")
         tempHash= self.panel_four.inputHashHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
@@ -1804,7 +1804,7 @@ class myFrame(wx.Frame):
         self.panel_nine.serverIPAddress.SetLabel("Server IP Address: "+str(tempIP))
         tempHash= self.panel_eleven.hashToBeCrackedHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash to be cracked: "+str(theHash))
@@ -1818,7 +1818,7 @@ class myFrame(wx.Frame):
         self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
         tempHash= self.panel_eleven.hashToBeCrackedHeader.GetLabel()
         theHash=""
-        for i in range(19,len(tempHash)):
+        for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
         print "GUI DEBUG: panel 11 to panel 10 the Hash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
