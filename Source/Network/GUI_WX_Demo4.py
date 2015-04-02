@@ -1381,7 +1381,7 @@ class myFrame(wx.Frame):
         runQuickStartNetworkServerBruteForceTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Brute Force Quick Test", "Starts a network server, brute force search using predefined settings")
         rainbowUserTestsLabel= runMenu.Append(wx.ID_ANY, "Rainbow Table User Quick Tests", " ")
         rainbowUserTestsLabel.Enable(False)
-        runQuickStartSingleRainbowTableUserTest= runMenu.Append(wx.ID_ANY, "[BROKEN] Start Single Mode Rainbow Table User Quick Test", "Starts a single mode, rainbow table user search using predefined settings")
+        runQuickStartSingleRainbowTableUserTest= runMenu.Append(wx.ID_ANY, "Start Single Mode Rainbow Table User Quick Test", "Starts a single mode, rainbow table user search using predefined settings")
         runQuickStartNetworkServerRainbowTableUserTest= runMenu.Append(wx.ID_ANY, "Start Network Server Mode Rainbow Table User Quick Test", "Starts a Network Server, rainbow table user search using predefined settings")
         rainbowMakerTestsLabel= runMenu.Append(wx.ID_ANY, "Rainbow Table Maker Quick Tests", " ")
         rainbowMakerTestsLabel.Enable(False)
@@ -2917,12 +2917,12 @@ class myFrame(wx.Frame):
             tempSingleSetting2+= tempSingleSetting[i]
         singleSetting=""
         #Tested, single mode is the correct value to check for
-        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting,
-                           "file name":FileName, "single": singleSetting, "finished chunks":0}
+                           "file name":FileName, "single": singleSetting}#, "finished chunks":0} #TODO commented out because console does not have this
         #DEBUG SETTINGS MESSAGES
         print "GUI DICTIONARY SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
         print "GUI DICTIONARY SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
@@ -2990,13 +2990,13 @@ class myFrame(wx.Frame):
             tempSingleSetting2+= tempSingleSetting[i]
         singleSetting=""
         #Tested, single mode is the correct value to check for
-        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting
-                            , "finished chunks":0}
+                          }#, "finished chunks":0} #TODO commented out because conosle does not have this
 
         #DEBUG SETTING MESSAGES
         print "GUI BRUTE FORCE SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
@@ -3040,12 +3040,12 @@ class myFrame(wx.Frame):
         singleSetting = ""
         #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
         print "GUI DEBUG: rainbowTableUser tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
-        if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+        if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(" Single Mdoe"), len(" Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting
-                            , "finished chunks":0}
+                          }# , "finished chunks":0} #TODO commented out because console ui does not have this
 
         #DEBUG SETTINGS MESSAGES
         print "GUI RAINBOW USER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
@@ -3121,13 +3121,13 @@ class myFrame(wx.Frame):
         singleSetting = ""
         #print "GUI DEBUG: tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
         #tested, and the single mode has no space in front
-        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len(tempSingleSetting2), len("Single Mode"))==True):
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
         crackingSettings = {"cracking method":crackingMethod, "algorithm":algorithmSetting, "key length":keyLengthSetting,
                             "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
-                            "file name":fileNameSetting, "single":singleSetting, "finished chunks":0}
+                            "file name":fileNameSetting, "single":singleSetting}#, "finished chunks":0} #TODO commented out because console does not have this
         #DEBUG SETTINGS MESSAGES
         print "GUI RAINBOW MAKER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
         print "GUI RAINBOW MAKER SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)

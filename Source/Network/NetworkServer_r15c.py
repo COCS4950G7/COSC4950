@@ -34,76 +34,6 @@ import signal
 #=====================================================================================================================
 #END OF IMPORTS
 #=====================================================================================================================
-#NAMING CONFLICTS
-#TODO Problematic naming convention used, there is a global shutdown variable (called via self.shutdown)
-#TODO                                       there is also a shutdown variable as a parameter in chunk_results function (called shutdown)
-#TODO                                       there is also a shutdown variable as a parameter in chunk_dictionary function (called shutdown)
-#TODO                                       same thing for chunk_brute_force
-#TODO                                       same thing for chunk_rainbow
-#TODO                                       same thing for chunk_rainbow_maker
-#TODO                                       same thing for check_results
-#TODO RECOMMENDED SOLUTION: only use the global shutdown variable, OR set self.shutdown= shutdown (the parameter shutdown)
-
-#NAMING CONFLICTS
-#TODO Problematic naming convention used, there is a global result_queue variable (called via self.result_queue)
-#TODO                                       there is also a result_queue local variable in chunk_dictionary (called result_queue)
-#TODO                                       there is also a result_queue local variable in chunk_brute_force
-#TODO                                       there is also a result_queue local variable in chunk_rainbow
-#TODO                                       there is also a result_queue local variable in chunk_rainbow_maker
-#TODO                                       there is also a result_queue local variable in start_single_user
-#TODO                                       there is also a result_queue local variable in run_dictionary
-#TODO                                       there is also a result_queue local variable in run_brute_force
-#TODO                                       there is also a result_queue local variable in run_rain_user
-#TODO                                       there is also a result_queue local variable in run_rain_maker
-
-#NAMING CONFLICTS
-#TODO Problematic naming convention used, there is a global job_queue variable (called via self.job_queue)
-#TODO                                       there is also a job_queue local variable in chunk_dictionary (called job_queue)
-#TODO                                       there is also a job_queue local variable in chunk_brute_force
-#TODO                                       there is also a job_queue local variable in chunk_rainbow
-#TODO                                       there is also a job_queue local variable in chunk_rainbow_maker
-#TODO                                       there is also a job_queue local variable in start_single_user
-#TODO                                       there is also a job_queue local variable in run_dictionary
-#TODO                                       there is also a job_queue local variable in run_brute_force
-#TODO                                       there is also a job_queue local variable in run_rain_user
-#TODO                                       there is also a job_queue local variable in run_rain_maker
-
-#INCONSISTENT USE OF self.total_chunks variable
-#TODO self.total_chunks= dictionary.get_total_chunks inconsistancy, the assignment statement for self.total_chunks is commented out in run_server, if cracking mode == dic
-#TODO                  = bf.get_total_chunks  inconsistency,  the assignment statement for self.total_chunks is NOT commented out in run_server, if cracking mode == bf
-#TODO                  = rain.get_total_chunks inconsistency, the assignment statement for self.total_chunks is NOT commented out in run_server, if cracking mode == rain
-#TODO                  = rainmaker.get_total_chunks inconsistency, the assignment statement for self.total_chunks is NOT commented out in run_server, if cracking mode == rainmaker
-
-#INCONSISTENT USE OF THE SHUTDOWN VARIABLE
-#TODO while not shutdown.is_set inconsistency, the while loop in chunk_results checks the local variable shutdown
-#TODO while not SELF.shutdown.is_set (for single mode) the while loop in chunk_dictionary checks the global variable shutdown
-#TODO while not shutdown.is_set  (for network mode)  the while  loop in chunk_dictionary checks the local variable shutdown
-#TODO while not shutdown.is_set   the while loop in chunk_brute_force checks the local variable shutdown
-#TODO while not rainbow.isEof() and not shutdown.is_set    the while loop in chunk_rainbow checks the local variable shutdown
-#TODO while not shutdown.is_set (inside the while loop mentioned above)  the while loop in chunk_rainbow checks the local variable shutdown
-#TODO if shutdown.is_set   the conditional if statement in chunk_rainbow checks the local variable shutdown
-#TODO while not shutdown.is_set     the while loop in chunk_rainbow_maker checks the local variable shutdown
-#TODO if shutdown.is_set       the conditional if statement in chunk_rainbow_maker checks the local variable shutdown
-#TODO if SELF.shutdown.is_set    the conditional if statement in start_single_user checks the global variable shutdown
-#TODO while not SELF.shutdown.is_set   the while loop in run_dictionary checks the global variable shutdown
-#TODO while not SELF.shutdown.is_set   the while loop in run_brute_force checks the global variable shutdown
-#TODO while not SELF.shutdown.is_set   the while loop in run_rain_user checks the global variable shutdown
-#TODO while not SELF.shutdown.is_set   the while loop in run_rain_maker checks the global variable shutdown
-
-#CREATING A REDUNDANT LOCAL VARIABLE OF A GLOBAL VARIABLE
-#TODO creating a local variable job_queue with the same name and the same value as the global variable self.job_queue in chunk_dictionary
-#TODO                           job_queue with the same name and the same value as the global variable self.job_queue in chunk_brute_force
-#TODO                           job_queue with the same name and the same value as the global variable self.job_queue in chunk_rainbow
-#TODO [this list is not exhaustive...]
-
-#CREATING A REDUNDANT LOCAL VARIABLE OF A GLOBAL VARIABLE
-#TODO creating a local variable result_queue with the same name and the same value as the global variable self.result_queue in chunk_dictionary
-#TODO                           result_queue with the same name and the same value as the global variable self.result_queue in chunk_brute_force
-#TODO                           result_queue with the same name and the same value as the global variable self.result_queue in chunk_rainbow
-#TODO [this list is not exhaustive...]
-
-#I am sure there are more, but this is definely enough to get started, Chris Hamm (Sorry to have to be the bringer of bad news)
-
 
 class Server():
         IP = "127.0.0.1"  # defaults to the ping back
@@ -427,7 +357,7 @@ class Server():
                 result_monitor.join()
                 result_monitor.terminate()
                 time.sleep(2)
-                manager.shutdown()
+                manager.shutdown() #TODO FATAL ERROR: ERROR THROWN HERE, no manager is defined
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_dictionary definition Try block"
@@ -499,7 +429,7 @@ class Server():
                             finally:
                                 result_monitor.terminate()
                                 time.sleep(2)
-                                manager.shutdown()
+                                manager.shutdown() #TODO OBSERVED ERROR: THIS IS NOT DEFINED IF RUNNING SINGLE MODE
 
                                 return
 
