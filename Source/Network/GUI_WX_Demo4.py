@@ -1403,6 +1403,7 @@ class myFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.startSingleRainbowTableMakerQuickTestFromMenu, runQuickStartSingleRainbowTableMakerTest)
         self.Bind(wx.EVT_MENU, self.startNetworkServerRainbowTableMakerQuickTestFromMenu, runQuickStartNetworkServerRainbowTableMakerTest)
 
+
         #If this is the main process and not a subprocess
         if __name__ == '__main__':
 
