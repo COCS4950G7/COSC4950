@@ -84,6 +84,8 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Select Cracking Method")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temporary color scheme
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
@@ -91,6 +93,8 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not yet Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temporay color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -159,6 +163,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
@@ -166,6 +172,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -173,6 +181,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
+        self.selectAlgorithmHeader.SetFont(parent.textFont)
+        self.selectAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.selectAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -182,6 +192,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox10=wx.BoxSizer(wx.HORIZONTAL)
         hashTypeHeader= wx.StaticText(self, label="Select Hashing Mode: (NOT FUNCTIONING YET) ")
+        hashTypeHeader.SetFont(parent.textFont)
+        hashTypeHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox10.Add(hashTypeHeader)
         self.selectedHashingMode= wx.ComboBox(self, choices= listOfHashingModes, style=wx.CB_READONLY)
         hbox10.Add(self.selectedHashingMode, flag=wx.LEFT, border=5)
@@ -191,6 +203,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input")
+        self.inputHashHeader.SetFont(parent.textFont)
+        self.inputHashHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox4.Add(self.inputHashHeader)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -207,6 +221,8 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected")
+        self.inputDictFileHeader.SetFont(parent.textFont)
+        self.inputDictFileHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox6.Add(self.inputDictFileHeader)
         vbox.Add(hbox6, flag=wx.CENTER, border=10)
 
@@ -306,6 +322,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
@@ -313,6 +331,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -320,6 +340,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:")
+        self.selectedAlgorithmHeader.SetFont(parent.textFont)
+        self.selectedAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.selectedAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -329,6 +351,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input")
+        self.inputHashHeader.SetFont(parent.textFont)
+        self.inputHashHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox4.Add(self.inputHashHeader)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -345,6 +369,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
+        self.minKeyLengthHeader.SetFont(parent.textFont)
+        self.minKeyLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox6.Add(self.minKeyLengthHeader)
         self.changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
         hbox6.Add(self.changeMinKeyLengthButton, flag=wx.LEFT, border=25)
@@ -354,6 +380,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         self.maxKeyLengthHeader= wx.StaticText(self, label="Max Key Length: 15")
+        self.maxKeyLengthHeader.SetFont(parent.textFont)
+        self.maxKeyLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox7.Add(self.maxKeyLengthHeader)
         self.changeMaxKeyLengthButton= wx.Button(self, label="Set Max Key Length")
         hbox7.Add(self.changeMaxKeyLengthButton, flag=wx.LEFT, border=25)
@@ -363,6 +391,8 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlphabetHeader= wx.StaticText(self, label="Selected Alphabet: ")
+        self.selectedAlphabetHeader.SetFont(parent.textFont)
+        self.selectedAlphabetHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.selectedAlphabetHeader)
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
         hbox8.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
@@ -446,6 +476,8 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Rainbow Table Mode Select")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -453,6 +485,8 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -502,6 +536,8 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Select Node Type")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -551,6 +587,8 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Network Client Main Screen")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -558,6 +596,8 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.serverIPAddress= wx.StaticText(self, label="Server's IP Address: No IP Address Has been Input Yet")
+        self.serverIPAddress.SetFont(parent.textFont)
+        self.serverIPAddress.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.serverIPAddress)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -635,6 +675,8 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Network Client Status Screen")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -642,8 +684,12 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.clientIPAddress= wx.StaticText(self, label="Client IP Address: Not Specified")
+        self.clientIPAddress.SetFont(parent.textFont)
+        self.clientIPAddress.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.clientIPAddress)
         self.connectedToIP= wx.StaticText(self, label="Connected To: Not Connected to any Server")
+        self.connectedToIP.SetFont(parent.textFont)
+        self.connectedToIP.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.connectedToIP, flag=wx.LEFT, border=5)
         vbox.Add(hbox2, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
@@ -651,6 +697,8 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        self.currentStatus.SetFont(parent.textFont)
+        self.currentStatus.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.currentStatus)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -687,6 +735,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Network Server Status Screen")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -694,6 +744,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
+        self.currentCrackingMode.SetFont(parent.textFont)
+        self.currentCrackingMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentCrackingMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -701,6 +753,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
         self.serverIPAddress= wx.StaticText(self, label="Server IP Address: Not Set Yet")
+        self.serverIPAddress.SetFont(parent.textFont)
+        self.serverIPAddress.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.serverIPAddress)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -708,6 +762,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Running")
+        self.currentStatus.SetFont(parent.textFont)
+        self.currentStatus.SetForegroundColour((255,255,255)) #TODO temp color
         hbox4.Add(self.currentStatus)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -715,9 +771,11 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox10= wx.BoxSizer(wx.HORIZONTAL)
         self.crackingThisHashHeader= wx.StaticText(self, label="Hash Being Cracked: Not Specified")
+        self.crackingThisHashHeader.SetFont(parent.textFont)
+        self.crackingThisHashHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox10.Add(self.crackingThisHashHeader)
         vbox.Add(hbox10, flag=wx.CENTER, border=10)
-        ''' (may be placed in the wrong section)
+
         #TODO display the cracking settings on the screen
             #TODO Dictionary Settings   (LINK UP NEW SETTINGS TO ACTUAL STATS)
                 #TODO algorithm
@@ -748,6 +806,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         #brute force: Cracking Mode: Brute-Force
         #rainbow user: Cracking Mode: Rainbow Table
         #rainbow table maker: Cracking Mode: Rainbow Table Maker
+        '''
         if(parent.compareString(self.currentCrackingMode, "Cracking Mode: Dictionary",0,0,len("Cracking Mode: Dictionary"),len("Cracking Mode: Dictionary"))==True):
             #show dictionary settings
             hbox11A= wx.BoxSizer(wx.HORIZONTAL)
@@ -771,10 +830,13 @@ class PanelNine(wx.Panel):                     #================Network Server S
         else:
             print "GUI DEBUG ERROR: invalid Cracking Mode detected: '"+str(self.currentCrackingMode)+"'"
         '''
-        vbox.Add((-1,10))
+
+        #vbox.Add((-1,10))
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
+        activityGaugeHeader.SetFont(parent.textFont)
+        activityGaugeHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox6.Add(activityGaugeHeader)
         self.activityGauge = wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
@@ -785,6 +847,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
+        progressBarHeader.SetFont(parent.textFont)
+        progressBarHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox7.Add(progressBarHeader)
         self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.progressBar.SetValue(0) #set value to start at zero
@@ -795,8 +859,12 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
+        self.numCompletedChunksHeader.SetFont(parent.textFont)
+        self.numCompletedChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.numCompletedChunksHeader)
         self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
+        self.numTotalChunksHeader.SetFont(parent.textFont)
+        self.numTotalChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
@@ -804,6 +872,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
+        self.SolutionHeader.SetFont(parent.textFont)
+        self.SolutionHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox9.Add(self.SolutionHeader)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -842,6 +912,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Single Mode Status Screen")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -849,6 +921,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
+        self.currentCrackingMode.SetFont(parent.textFont)
+        self.currentCrackingMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentCrackingMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -856,6 +930,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Starting up")
+        self.currentStatus.SetFont(parent.textFont)
+        self.currentStatus.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.currentStatus)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -863,6 +939,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.hashBeingCrackedHeader= wx.StaticText(self, label="Hash Being Cracked: Not Specified")
+        self.hashBeingCrackedHeader.SetFont(parent.textFont)
+        self.hashBeingCrackedHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox9.Add(self.hashBeingCrackedHeader)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -895,6 +973,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
+        activityGaugeHeader.SetFont(parent.textFont)
+        activityGaugeHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox5.Add(activityGaugeHeader)
         self.activityGauge= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
@@ -906,6 +986,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
+        progressBarHeader.SetFont(parent.textFont)
+        progressBarHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox6.Add(progressBarHeader)
         self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.progressBar.SetValue(0) #set value to start at zero
@@ -916,8 +998,12 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
+        self.numCompletedChunksHeader.SetFont(parent.textFont)
+        self.numCompletedChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.numCompletedChunksHeader)
         self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
+        self.numTotalChunksHeader.SetFont(parent.textFont)
+        self.numTotalChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
@@ -925,6 +1011,8 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
+        self.SolutionHeader.SetFont(parent.textFont)
+        self.SolutionHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox7.Add(self.SolutionHeader)
         vbox.Add(hbox7, flag=wx.CENTER, border=10)
 
@@ -965,6 +1053,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Rainbow Table Cracking Method Settings")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -972,6 +1062,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -979,6 +1071,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox9=wx.BoxSizer(wx.HORIZONTAL)
         selectedAlgorithmHeader= wx.StaticText(self, label="Selected Algorithm: ")
+        selectedAlgorithmHeader.SetFont(parent.textFont)
+        selectedAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox9.Add(selectedAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox9.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -988,6 +1082,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
         self.selectedFileHeader= wx.StaticText(self, label="Selected Rainbow Table File: No File has been Selected")
+        self.selectedFileHeader.SetFont(parent.textFont)
+        self.selectedFileHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.selectedFileHeader)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -1002,6 +1098,8 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 
         hbox5= wx.BoxSizer(wx.HORIZONTAL)
         self.hashToBeCrackedHeader= wx.StaticText(self, label="Hash to be cracked: No Hash has been entered")
+        self.hashToBeCrackedHeader.SetFont(parent.textFont)
+        self.hashToBeCrackedHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox5.Add(self.hashToBeCrackedHeader)
         vbox.Add(hbox5, flag=wx.CENTER, border=10)
 
@@ -1083,6 +1181,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Rainbow Table Maker")
+        screenHeader.SetFont(parent.titleFont)
+        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -1090,6 +1190,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
+        self.currentMode.SetFont(parent.textFont)
+        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -1097,6 +1199,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox3=wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
+        self.selectedAlgorithmHeader.SetFont(parent.textFont)
+        self.selectedAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox3.Add(self.selectedAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -1106,6 +1210,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
+        self.keyLengthHeader.SetFont(parent.textFont)
+        self.keyLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox4.Add(self.keyLengthHeader)
         self.changeKeyLengthButton= wx.Button(self, label="Set Key Length")
         hbox4.Add(self.changeKeyLengthButton, flag=wx.LEFT, border=25)
@@ -1115,6 +1221,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
         selectAlphabetHeader= wx.StaticText(self, label="Select Alphabet")
+        selectAlphabetHeader.SetFont(parent.textFont)
+        selectAlphabetHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox5.Add(selectAlphabetHeader)
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
         hbox5.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
@@ -1124,6 +1232,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
         self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 100")
+        self.chainLengthHeader.SetFont(parent.textFont)
+        self.chainLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox6.Add(self.chainLengthHeader)
         self.changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
         hbox6.Add(self.changeChainLengthButton, flag=wx.LEFT, border=125)
@@ -1133,6 +1243,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 100")
+        self.numOfRowsHeader.SetFont(parent.textFont)
+        self.numOfRowsHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox7.Add(self.numOfRowsHeader)
         self.setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
         hbox7.Add(self.setNumOfRowsButton, flag=wx.LEFT, border=125)
@@ -1142,6 +1254,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         hbox8=wx.BoxSizer(wx.HORIZONTAL)
         self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt")
+        self.fileNameHeader.SetFont(parent.textFont)
+        self.fileNameHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox8.Add(self.fileNameHeader)
         vbox.Add(hbox8, flag=wx.CENTER, border=10)
 
@@ -1226,6 +1340,8 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
+        aboutUsHeader.SetFont(parent.titleFont)
+        aboutUsHeader.SetForegroundColour((255,255,255)) #TODO temp color
         hbox1.Add(aboutUsHeader)
         vbox.Add(hbox1, flag=wx.CENTER|wx.TOP, border=10)
 
@@ -1313,6 +1429,10 @@ class myFrame(wx.Frame):
         
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
+        #custom defined fonts
+        self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, True) #custom font for the title
+        self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True)#custom font for the normal text
+
         #detectedOS variable
         self.theDetectedOS= "None"
 
@@ -1320,18 +1440,31 @@ class myFrame(wx.Frame):
         self.detectOS()
 
         self.panel_one= PanelOne(self)
+        self.panel_one.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY,
         self.panel_two= PanelTwo(self)
+        self.panel_two.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY
         self.panel_three= PanelThree(self)
+        self.panel_three.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY
         self.panel_four= PanelFour(self)
+        self.panel_four.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_five= PanelFive(self)
+        self.panel_five.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_six= PanelSix(self)
+        self.panel_six.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_seven= PanelSeven(self)
+        self.panel_seven.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_eight= PanelEight(self)
+        self.panel_eight.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_nine= PanelNine(self)
+        self.panel_nine.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_ten= PanelTen(self)
+        self.panel_ten.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_eleven= PanelEleven(self)
+        self.panel_eleven.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_twelve= PanelTwelve(self)
+        self.panel_twelve.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_thirteen= PanelThirteen(self)
+        self.panel_thirteen.SetBackgroundColour("Black") #TODO this is temporary
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
