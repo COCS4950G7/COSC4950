@@ -1429,6 +1429,8 @@ class myFrame(wx.Frame):
         
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
+        #TODO idea, remove the close button, so you must close the window with the close button
+
         #custom defined fonts
         self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, True) #custom font for the title
         self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True)#custom font for the normal text
@@ -1646,7 +1648,6 @@ class myFrame(wx.Frame):
         self.configureBruteForceQuickTest(None)
 
     def startSingleRainbowTableUserTestFromMenu(self, event):
-        #TODO this always calls Network server!!
         self.panel_eleven.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
         self.panel_two.Hide()
@@ -1958,7 +1959,6 @@ class myFrame(wx.Frame):
         self.panel_eleven.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000) #1000 milliseconds = 1 second
-       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-----------end of switch from panel 11
 
@@ -1985,7 +1985,6 @@ class myFrame(wx.Frame):
         self.panel_twelve.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #-------------end of switch from panel 12
 
