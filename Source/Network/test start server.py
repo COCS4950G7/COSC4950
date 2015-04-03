@@ -1,6 +1,6 @@
 # This is a shortcut method to start server without any UI. For debugging purposes only.
 
-from multiprocessing import Process, Event, Manager
+from multiprocessing import Process, Event, Manager, current_process
 from NetworkServer_r15b import Server
 import string
 import os
@@ -41,11 +41,13 @@ class start():
                       "algorithm": "MD5",
                       #"hash": "d60d3056ff09d8d9a26da4fc116c7554",
                       "hash": "12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999 in md5  -short runtime
+                      "hash": "1f3870be274f6c49b3e31a0c6728957f",  # apple in md5
+                      #"hash": "98ae126efdbc62e121649406c83337d9",  # aaaff in md5
                       #"hash": "96f36b618b63f4c7f22a34b6cd2245467465b355",  # aa9999 in sha1
                       #"hash": "76c2436b593f27aa073f0b2404531b8de04a6ae7",  # apples in sha1  -fairly long runtime
                       #"hash": "dd9f980ae062d651ba2bf65053273dd25eafaa0ab3086909e3d0934320a66ad1",  # aa9999 in sha256
                       #"hash": "57178f9de330d80155a1f5feca08569cede59da3e5d59b3e3a861c93e37b44cdda355023bc74cb10c495f53413981373a78e9926bf249d3b862c795f23ee1d9c",  # aa9999 in sha512
-                      "min key length": 6,                         # short runtime
+                      "min key length": 5,                         # short runtime
                       "max key length": 16,
                       "alphabet": string.ascii_letters+string.digits+string.punctuation+' ',
                       "single": "False"})
@@ -71,7 +73,7 @@ class start():
     settings.append({"cracking method": "rain",  # settings[6]
                      "file name": "rain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
-                     "hash": "51fe5861351b604b32f8dfdf4fa3beca",
+                     "hash": "138e3514b94d53b9cb57d586c1b784c6",
                      "single": "True"})
 
     settings.append({"cracking method": "rain",  # settings[7]
@@ -84,9 +86,11 @@ class start():
         return
 
     def start_server(self):
+        print "test start server PID: %i" % current_process().pid
         #use a generic manager's shared dictionary to handle strings and ints
         manager = Manager()
         dictionary = manager.dict()
+        print "test start server manager PID: %i" % manager._process.pid
         dictionary["key"] = ''
         dictionary["finished chunks"] = 0
 
@@ -107,21 +111,30 @@ class start():
         self.server = Process(target=Server, args=(self.settings[3], shared))
         self.server.start()
 
+        print "server PID: %i" % self.server.pid
         # this is a very simple example of how an update loop in the UI classes might work
         while not shutdown.is_set():
             # update is an Event, this means that a process can use the .wait() command to block until it is .set()
-            update.wait()
+            update.wait(timeout=.5)
             os.system('cls' if os.name == 'nt' else 'clear')
             if dictionary["key"] is not '':
                 print "Printing key from start_server method: " + dictionary["key"]
+                break
             print "%d chunks completed." % dictionary["finished chunks"]
             # after UI data has been updated, .clear() the update event so it will wait again in the next iteration
             update.clear()
 
-        #self.server.join()
         shutdown.set()
         time.sleep(1)
+        manager.shutdown()
         self.server.terminate()
+        self.server.join()
+        if self.server.is_alive():
+            print "server process %i did not die." % self.server.pid
+        else:
+            print "server process %i should be dead." % self.server.pid
+        os.kill(self.server.pid + 3, signal.SIGTERM)
+        os.kill(self.server.pid + 4, signal.SIGTERM)
 
 
 
