@@ -435,6 +435,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox10.Add(self.CloseButton, flag=wx.LEFT, border=5)
         vbox.Add(hbox10, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
+
         self.SetSizer(vbox)
 
         #tooltips
@@ -1357,19 +1358,25 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
             newLineCharacter= "\n"
         elif(parent.compareString(str(parent.theDetectedOS), str('Darwin'),0,0,len('Darwin'),len('Darwin'))==True): #if mac
             newLineCharacter= "\n"
+        elif(parent.compareString(str(parent.theDetectedOS), str('FreeBSD'),0,0,len('FreeBSD'),len('FreeBSD'))==True): #if FreeBSD
+            newLineCharacter="\n"
+        elif(parent.compareString(str(parent.theDetectedOS), str('NetBSD'),0,0,len('NetBSD'),len('NetBSD'))==True): #if FreeBSD
+            newLineCharacter="\n"
+        elif(parent.compareString(str(parent.theDetectedOS), str('NetBSD'),0,0,len('NetBSD'),len('NetBSD'))==True): #if FreeBSD
+            newLineCharacter="\n"
         else:
             print "=============================================================="
             print "GUI ERROR: invalid OS detected: '"+str(parent.theDetectedOS)+"'"
             print "=============================================================="
         #insert the about me text----------------------------------
         textBox.WriteText(newLineCharacter)
-        textBox.WriteText(newLineCharacter+"Authors: Chris Hamm, John Wright, Nick Baum, and Chris Bugg.")
+        textBox.WriteText(newLineCharacter+"Authors: Chris Hamm, Jon Wright, Nick Baum, and Chris Bugg.")
         textBox.WriteText(newLineCharacter)
         textBox.WriteText(newLineCharacter+"Description: ")
         textBox.WriteText(newLineCharacter+"============================================================")
         textBox.WriteText(newLineCharacter)
         textBox.WriteText(newLineCharacter+insertFourCharTab+"Our project, Mighty Cracker, is a program designed to crack hashed")
-        textBox.WriteText(newLineCharacter+"passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,")
+        textBox.WriteText(newLineCharacter+"passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+, BSD 10+")
         textBox.WriteText(newLineCharacter+"and Windows 7+. It uses the power of multiprocessing to fully utilize")
         textBox.WriteText(newLineCharacter+"every computer available, and can utilize a LAN to distribute the")
         textBox.WriteText(newLineCharacter+"workload over up to 90 computers (nodes). For now, the algorithms")
@@ -3381,6 +3388,10 @@ class myFrame(wx.Frame):
             print platform.system()
             print platform.mac_ver()
             self.theDetectedOS= "Darwin"
+        elif(platform.system()=="FreeBSD" or platform.system()=="OpenBSD" or platform.system()=="NetBSD"):
+            print "GUI DEBUG: BSD"
+            print platform.system()
+            self.theDetectedOS= "Linux"
         else:   #other, which defaults to linux
             print "GUI DEBUG: Unknown OS detected"
             print platform.system()

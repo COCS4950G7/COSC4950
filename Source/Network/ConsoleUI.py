@@ -172,11 +172,11 @@ class ConsoleUI():
                 print "Start -> About"
 
                 print
-                print "Authors: Chris Hamm, John Wright, Nick Baum, Chris Bugg"
+                print "Authors: Chris Hamm, Jon Wright, Nick Baum, Chris Bugg"
                 print
                 print "Description:"
                 print "Our project, Mighty Cracker, is a program designed to crack hashed "
-                print "passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+,"
+                print "passwords. It is stand-alone, GUI, and can run on Mac 10+, Linux 14+, BSD 10+"
                 print "and Windows 7+. It uses the power of multiprocessing to fully utilize"
                 print "every computer available, and can utilize a LAN to distribute the"
                 print "workload over up to 90 computers (nodes). For now, the algorithms"
