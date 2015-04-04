@@ -552,7 +552,7 @@ class Server():
                         job_queue.put(new_chunk, timeout=.1)
                     except Qqueue.Full:
                         continue
-                    if localshutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                    if localshutdown.is_set():
                         while True:
                             try:
                                 job_queue.get_nowait()
@@ -560,7 +560,7 @@ class Server():
                                 return
                             finally:
                                 time.sleep(2)
-                                manager.shutdown() #TODO IMPORTANT ERROR, manager is not defined in single user mode 
+                                manager.shutdown() #TODO IMPORTANT ERROR, manager is not defined in single user mode
                                 return
             except Exception as inst:
                 print "============================================================================================="

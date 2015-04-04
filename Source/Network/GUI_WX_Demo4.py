@@ -6,6 +6,7 @@ import string
 import hashlib
 from multiprocessing import Process, Event, Manager, current_process
 from NetworkServer_r15c import Server
+from NetworkServer_r15b import Server as OldServer
 from NetworkClient_r15b import Client
 
 
@@ -543,6 +544,7 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
+
 
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
@@ -3085,7 +3087,10 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
         #print "GUI DEBUG: Starting up Server Process"
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        if(self.compareString(singleSetting, "False",0,0,len("False"),len("False"))):
+            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        else:
+            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
         #print "GUI DEBUG: before process is started"
         self.NetworkServer.start()
         #print "GUI DEBUG: after process has started"
@@ -3161,7 +3166,10 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        else:
+            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel4ToPanel9()
@@ -3207,7 +3215,10 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        else:
+            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel11ToPanel9()
@@ -3292,7 +3303,10 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        else:
+            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel12ToPanel9()
