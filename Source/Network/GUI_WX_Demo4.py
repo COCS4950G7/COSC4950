@@ -545,6 +545,7 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add((-1,10))
 
 
+
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.NetworkServerButton= wx.Button(self, label="Network Server")
         hbox2.Add(self.NetworkServerButton)
