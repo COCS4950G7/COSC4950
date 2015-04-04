@@ -232,11 +232,11 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # monitor results queue
         #--------------------------------------------------------------------------------------------------
-        def check_results(self, results_queue, shutdown): #TODO naming conflict, shutdown is also a global variable
+        def check_results(self, results_queue, localshutdown):
             print "check results started"
             completed_chunks = 0
             try:
-                while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                while not localshutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     try:
                         self.update.set()
                         result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
@@ -244,8 +244,10 @@ class Server():
                         continue
                     if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
-                        shutdown.set()
+                        localshutdown.set()
                         print "shutdown notice sent to clients"
+                        print "SERVER DEBUG: localshutdown.is_set()="+str(localshutdown.is_set())
+                        print "SERVER DEBUG: global shutdown.is_set()="+str(self.shutdown.is_set())
                         key = result[1]
                         self.found_solution.value = True
                         print "Key is: %s" % key
@@ -257,7 +259,7 @@ class Server():
                         print "A client has crashed!"  # THIS FUNCTION IS UNTESTED
                     elif result[0] == "e":
                         print "Final chunk processed, no solution found."
-                        shutdown.set()
+                        localshutdown.set()
                         self.shared_dict["finished chunks"] += 1
                         break
                     else:  # solution has not been found
@@ -274,7 +276,7 @@ class Server():
                             self.rainmaker.putChunkInFile(rainChunk)
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
-                                shutdown.set() #TODO are you setting the correct shutdown???
+                                localshutdown.set()
                                 return
 
             except Exception as inst:
@@ -294,7 +296,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # feed dictionary chunks to job queue
         #--------------------------------------------------------------------------------------------------
-        def chunk_dictionary(self, dictionary, shutdown):  #TODO naming conflict, shutdown is also a global variable
+        def chunk_dictionary(self, dictionary, localshutdown):
             try:
 
                 if not self.single_user_mode:
@@ -314,15 +316,14 @@ class Server():
                 else:
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global variable
-                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor = Process(target=self.check_results, args=(result_queue, localshutdown))
                 result_monitor.start()
                 import time
                 while not dictionary.isEof() and not self.found_solution.value:  # Keep looping while it is not eof
                     #chunk is a Chunk object
                     chunk = dictionary.getNextChunk()  # get next chunk from dictionary
                     if self.single_user_mode:
-                        while not self.shutdown.is_set(): #TODO INCONSISTANT: this uses the global shutdown variable
-                                                            #TODO while loop below uses the parameter shutdown variable
+                        while not self.shutdown.is_set():
                             try:
                                 self.shared_dict["current chunk"] = chunk
                                 job_queue.put(chunk)
@@ -330,12 +331,11 @@ class Server():
                             except Qqueue.Full:
                                 continue
                     else:
-                        new_chunk = manager.Value(dict, {'params': chunk.params,
+                        new_chunk = manager.Value(dict, {'params': chunk.params,  #TODO MAJOR ERROR: manager is reference before assignment here
                                                          'data': chunk.data,
                                                          'timestamp': time.time(),
                                                          'halt': False})
-                        while not shutdown.is_set():  #TODO INCONSISTANT: this uses the parameter shutdown variable
-                                                        #TODO while loop above uses the global shutdown variable
+                        while not localshutdown.is_set():
                             try:
                                 #self.shared_dict["current chunk"] = new_chunk
                                 job_queue.put(new_chunk, timeout=.1)
@@ -357,7 +357,7 @@ class Server():
                 result_monitor.join()
                 result_monitor.terminate()
                 time.sleep(2)
-                manager.shutdown() #TODO FATAL ERROR: ERROR THROWN HERE, no manager is defined
+                manager.shutdown() #TODO IMPORTANT FATAL ERROR: ERROR THROWN HERE, no manager is defined in single mode
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_dictionary definition Try block"
@@ -375,7 +375,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunk for brute force function
         #--------------------------------------------------------------------------------------------------
-        def chunk_brute_force(self, bf, shutdown):  #TODO naming conflict, shutdown is also a global variable
+        def chunk_brute_force(self, bf, localshutdown):
             try:
                 if not self.single_user_mode:
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
@@ -396,7 +396,7 @@ class Server():
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global variable
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
 
-                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor = Process(target=self.check_results, args=(result_queue, localshutdown))
                 result_monitor.start()
                 for prefix in bf.get_prefix():
                     if prefix == '':
@@ -412,8 +412,7 @@ class Server():
                                                          'data': '',
                                                          'timestamp': time.time(),
                                                          'halt': False})
-                    while not shutdown.is_set(): #TODO INCONSISTANT: does not match the (inconsistant) while not shutdown loops in dictionary
-                                                #TODO this uses the parameter shutdown variable
+                    while not localshutdown.is_set():
                         try:
                             job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
@@ -429,7 +428,7 @@ class Server():
                             finally:
                                 result_monitor.terminate()
                                 time.sleep(2)
-                                manager.shutdown() #TODO OBSERVED ERROR: THIS IS NOT DEFINED IF RUNNING SINGLE MODE
+                                manager.shutdown() #TODO IMPORTANT ERROR: THIS IS NOT DEFINED IF RUNNING SINGLE MODE
 
                                 return
 
@@ -450,7 +449,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunks for rainbow function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow(self, rainbow, shutdown): #TODO naming conflict, shutdown is also a global variable
+        def chunk_rainbow(self, rainbow, localshutdown):
             try:
                 if not self.single_user_mode: #if in network mode (THIS IS UNUSUAL, single is always dealt with first elsewhere)
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
@@ -469,9 +468,9 @@ class Server():
                 else: #if in single mode
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
-                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor = Process(target=self.check_results, args=(result_queue, localshutdown))
                 result_monitor.start()
-                while not rainbow.isEof() and not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                while not rainbow.isEof() and not localshutdown.is_set():
                     chunk = rainbow.getNextChunk()
                     if self.single_user_mode: #if in single mode
                         while True:
@@ -482,10 +481,10 @@ class Server():
                             except Qqueue.Full:
                                 continue
                     else:
-                        new_chunk = manager.Value(dict, {'params': chunk.params,
+                        new_chunk = manager.Value(dict, {'params': chunk.params, #TODO IMPORTANT ERROR, this manager isreferenced before it is assigned (ONLY DECLARED IF IN NETWORK MODE)
                                                          'data': chunk.data,
                                                          'timestamp': time.time()})
-                        while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                        while not localshutdown.is_set():
                             try:
                                 self.shared_dict["current chunk"] = new_chunk
                                 job_queue.put(new_chunk, timeout=.1)
@@ -493,7 +492,7 @@ class Server():
                                 break
                             except Qqueue.Full:
                                 continue
-                    if shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                    if localshutdown.is_set():
                         print "chunker trying to shut down"
                         while True:
                             try:
@@ -522,7 +521,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # chunks for rainbow maker function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow_maker(self, rainmaker, shutdown): #TODO naming conflict, shutdown is also a global variable
+        def chunk_rainbow_maker(self, rainmaker, localshutdown):
             try:
                 if not self.single_user_mode:
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
@@ -542,10 +541,10 @@ class Server():
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
 
-                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor = Process(target=self.check_results, args=(result_queue, localshutdown))
                 result_monitor.start()
 
-                while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                while not localshutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     params_chunk = rainmaker.makeParamsChunk()
                     new_chunk = {"params": params_chunk.params,
                                  "data": params_chunk.data}
@@ -553,7 +552,7 @@ class Server():
                         job_queue.put(new_chunk, timeout=.1)
                     except Qqueue.Full:
                         continue
-                    if shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                    if localshutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                         while True:
                             try:
                                 job_queue.get_nowait()
@@ -561,7 +560,7 @@ class Server():
                                 return
                             finally:
                                 time.sleep(2)
-                                manager.shutdown()
+                                manager.shutdown() #TODO IMPORTANT ERROR, manager is not defined in single user mode 
                                 return
             except Exception as inst:
                 print "============================================================================================="
@@ -694,6 +693,7 @@ class Server():
                                 chunk_runner.append(Process(target=self.run_rain_maker,
                                                             args=(rainmaker, job_queue, result_queue)))
                             else:
+                                print "SERVER ERROR: invalid cracking mode detected '"+str(self.cracking_mode)+"'"
                                 return "wtf?"
                 for process in chunk_runner:
                     process.start()
@@ -751,7 +751,7 @@ class Server():
 
                 while not self.shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     try:
-                        chunk = job_queue.get(timeout=.1)
+                        chunk = job_queue.get(timeout=.1) #TODO INCONSISTENCY, brute force does not block, but all other functions block, is this correct?
                     except Qqueue.Empty:
                         continue
                     bf.run_chunk(chunk)
