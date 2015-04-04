@@ -2653,10 +2653,10 @@ class myFrame(wx.Frame):
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
             fakeVariable=""
-            if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True):
-                self.startRainbowTableCreationSession()
-            else: #if running OS X or windows
-                self.startRainbowTableCreationSession(fakeVariable)
+            #if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True):
+             #   self.startRainbowTableCreationSession()
+            #else: #if running OS X or windows
+            self.startRainbowTableCreationSession()
         else:
             invalidInputString= ""
             if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
