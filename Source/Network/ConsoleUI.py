@@ -17,6 +17,7 @@ import Chunk
 
 from NetworkClient_r15b import Client
 from NetworkServer_r15c import Server
+from NetworkServer_r15b import Server as OldServer
 
 
 class ConsoleUI():
@@ -68,6 +69,7 @@ class ConsoleUI():
 
         #Defining network sub-processes as class variables that are instances of the network objects
         networkServer = Process(target=Server, args=(settings, shared,))
+        oldNetworkServer = Process(target=OldServer, args=(settings, shared,))
         networkClient = Process(target=Client, args=(serverIP, shared,))
 
         state = "startScreen"
@@ -1742,7 +1744,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.networkServer.start()
+                self.oldNetworkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -1786,7 +1788,7 @@ class ConsoleUI():
             #if we're at the singleBruteFoundScreen state (Screen)
             elif state == "singleBruteFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Found!"
@@ -1831,7 +1833,7 @@ class ConsoleUI():
             #if we're at the singleBruteNotFoundScreen state (Screen)
             elif state == "singleBruteNotFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Not Found"
@@ -1971,7 +1973,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.networkServer.start()
+                self.oldNetworkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -2016,7 +2018,7 @@ class ConsoleUI():
             #if we're at the singleRainUserFoundScreen state (Screen)
             elif state == "singleRainUserFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2062,7 +2064,7 @@ class ConsoleUI():
             #if we're at the singleRainUserNotFoundScreen state (Screen)
             elif state == "singleRainUserNotFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2226,7 +2228,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.networkServer.start()
+                self.oldNetworkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -2346,7 +2348,7 @@ class ConsoleUI():
                             elapsed = (time.time() - self.colidingClock2)
                             self.colidingClock2 = elapsed
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 time.sleep(2)
 
@@ -2520,7 +2522,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.networkServer.start()
+                self.oldNetworkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -2564,7 +2566,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "singleDictionaryFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2610,7 +2612,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "singleDictionaryNotFoundScreen":
 
-                self.networkServer.terminate()
+                self.oldNetworkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Not Found"
