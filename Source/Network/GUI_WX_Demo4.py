@@ -2653,7 +2653,10 @@ class myFrame(wx.Frame):
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
             fakeVariable=""
-            self.startRainbowTableCreationSession(fakeVariable)
+            if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True):
+                self.startRainbowTableCreationSession()
+            else: #if running OS X or windows
+                self.startRainbowTableCreationSession(fakeVariable)
         else:
             invalidInputString= ""
             if(self.compareString(invalidAlgorithm, "True",0,0,len("True"),len("True"))==True):
@@ -2773,6 +2776,12 @@ class myFrame(wx.Frame):
         self.panel_twelve.numOfRowsHeader.SetLabel('Number of Rows: 100')
         self.panel_twelve.fileNameHeader.SetLabel('Save Rainbow Table File As: myRainbowTable.txt')
 
+    #check to make sure all fields are filled
+    def checkForUnselectedDictionaryOptions(self, event):
+        foundUnselectedDictionaryOption= False
+        #if(checkDictionarySelectedAlgorithm == True): #if true, it found a non selected item
+        #TODO finish implementing, or remove
+    #end of check to make sure all fields are filled
 
     def generateHashDialogDic(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
@@ -3198,7 +3207,7 @@ class myFrame(wx.Frame):
         else:
             self.switchFromPanel11ToPanel10()
 
-    def startRainbowTableCreationSession(self, event):
+    def startRainbowTableCreationSession(self):
         crackingMethod= "rainmaker"
         tempAlgorithmSetting= str(self.panel_twelve.selectedAlgorithm.GetValue())
         algorithmSetting= tempAlgorithmSetting

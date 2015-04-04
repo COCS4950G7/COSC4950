@@ -16,7 +16,7 @@ import string
 import Chunk
 
 from NetworkClient_r15b import Client
-from NetworkServer_r15b import Server
+from NetworkServer_r15c import Server
 
 
 class ConsoleUI():
