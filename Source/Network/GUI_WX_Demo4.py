@@ -165,7 +165,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Dictionary Cracking Method Settings")
         screenHeader.SetFont(parent.titleFont)
-        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        screenHeader.SetForegroundColour((255,255,255))
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
@@ -174,7 +174,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
         self.currentMode.SetFont(parent.textFont)
-        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
+        self.currentMode.SetForegroundColour((255,255,255))
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -183,7 +183,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.selectAlgorithmHeader= wx.StaticText(self, label="Select Algorithm: ")
         self.selectAlgorithmHeader.SetFont(parent.textFont)
-        self.selectAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.selectAlgorithmHeader.SetForegroundColour((255,255,255))
         hbox3.Add(self.selectAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices= listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -194,7 +194,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox10=wx.BoxSizer(wx.HORIZONTAL)
         hashTypeHeader= wx.StaticText(self, label="Select Hashing Mode: (NOT FUNCTIONING YET) ")
         hashTypeHeader.SetFont(parent.textFont)
-        hashTypeHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        hashTypeHeader.SetForegroundColour((255,255,255))
         hbox10.Add(hashTypeHeader)
         self.selectedHashingMode= wx.ComboBox(self, choices= listOfHashingModes, style=wx.CB_READONLY)
         hbox10.Add(self.selectedHashingMode, flag=wx.LEFT, border=5)
@@ -205,7 +205,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash to be Cracked: No Hash has been input")
         self.inputHashHeader.SetFont(parent.textFont)
-        self.inputHashHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.inputHashHeader.SetForegroundColour((255,255,255))
         hbox4.Add(self.inputHashHeader)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -223,7 +223,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.inputDictFileHeader= wx.StaticText(self, label="Selected Dictionary File: No Dictionary File Selected")
         self.inputDictFileHeader.SetFont(parent.textFont)
-        self.inputDictFileHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.inputDictFileHeader.SetForegroundColour((255,255,255))
         hbox6.Add(self.inputDictFileHeader)
         vbox.Add(hbox6, flag=wx.CENTER, border=10)
 
@@ -324,7 +324,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Brute Force Cracking Method Settings")
         screenHeader.SetFont(parent.titleFont)
-        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        screenHeader.SetForegroundColour((255,255,255))
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
 
@@ -333,7 +333,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.currentMode= wx.StaticText(self, label="Current Mode: Not Specified")
         self.currentMode.SetFont(parent.textFont)
-        self.currentMode.SetForegroundColour((255,255,255)) #TODO temp color
+        self.currentMode.SetForegroundColour((255,255,255))
         hbox2.Add(self.currentMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -342,7 +342,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.selectedAlgorithmHeader= wx.StaticText(self, label="Select Algorithm:")
         self.selectedAlgorithmHeader.SetFont(parent.textFont)
-        self.selectedAlgorithmHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.selectedAlgorithmHeader.SetForegroundColour((255,255,255))
         hbox3.Add(self.selectedAlgorithmHeader)
         self.selectedAlgorithm= wx.ComboBox(self, choices=listOfAlgorithms, style=wx.CB_READONLY)
         hbox3.Add(self.selectedAlgorithm, flag=wx.LEFT, border=5)
@@ -353,7 +353,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox4= wx.BoxSizer(wx.HORIZONTAL)
         self.inputHashHeader= wx.StaticText(self, label="Hash To Be Cracked: No Hash has been Input")
         self.inputHashHeader.SetFont(parent.textFont)
-        self.inputHashHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.inputHashHeader.SetForegroundColour((255,255,255))
         hbox4.Add(self.inputHashHeader)
         vbox.Add(hbox4, flag=wx.CENTER, border=10)
 
@@ -371,7 +371,7 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         self.minKeyLengthHeader= wx.StaticText(self, label="Min Key Length: 5")
         self.minKeyLengthHeader.SetFont(parent.textFont)
-        self.minKeyLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.minKeyLengthHeader.SetForegroundColour((255,255,255))
         hbox6.Add(self.minKeyLengthHeader)
         self.changeMinKeyLengthButton= wx.Button(self, label="Set Min Key Length")
         hbox6.Add(self.changeMinKeyLengthButton, flag=wx.LEFT, border=25)
@@ -649,7 +649,6 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         #TODO add solution header to the screen
         #TODO add number of completed chunks to screen
         #TODO add number of total chunks to screen
-        #TODO add header indicating when the client is doing something, if self_isDoingStuff is set, the client is doing something
         #TODO modify status header to say connected if the self.is_connected is set
         #TODO display the cracking settings on the screen
             #TODO Dictionary Settings
@@ -1459,8 +1458,8 @@ class myFrame(wx.Frame):
         #TODO idea, remove the close button, so you must close the window with the close button
 
         #custom defined fonts
-        self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, True) #custom font for the title
-        self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True)#custom font for the normal text
+        self.titleFont= wx.Font(20, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, True) #custom font for the title
+        self.textFont= wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True)#custom font for the normal text
 
         #detectedOS variable
         self.theDetectedOS= "None"
@@ -1806,7 +1805,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 3 to panel 9 theHash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 3 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_nine.Show()
@@ -1820,7 +1819,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 3 to panel 10 theHash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 3 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_ten.Show()
@@ -1844,7 +1843,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 4 to panel 9 theHash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 4 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_nine.Show()
@@ -1858,7 +1857,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_ten.Show()
@@ -2421,16 +2420,12 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidMinKeyInput= "True"
             print "GUI DEBUG: Invalid bf minkey input detected"
-       # else:
-        #    print "GUI DEBUG: valid bf minkey input detected"
 
         #check for valid max key length
         if(len(str(self.panel_four.maxKeyLengthHeader.GetLabel())) <= len("Max Key Length: ")):
             foundInvalidInput= "True"
             invalidMaxKeyInput= "True"
             print "GUI DEBUG: Invalid bf max key input detected"
-       # else:
-        #    print "GUI DEBUG: valid bf max key input detected"
 
         #check to make sure that the min key is less than or equal to max key
         tempMaxKey1=""
@@ -2527,16 +2522,12 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: Invalid file selected"
             foundInvalidInput= "True"
             invalidFile= "True"
-        #else:
-           # print "GUI DEBUG: valid file detected"
 
         #check for valid hash to be cracked
         if(self.compareString(self.panel_eleven.hashToBeCrackedHeader.GetLabel(),"Hash to be cracked: No Hash has been entered",0,0,len("Hash to be cracked: No Hash has been entered"),len("Hash to be cracked: No Hash has been entered"))==True):
             print "GUI DEBUG: Invalid hash entry detected"
             foundInvalidInput= "True"
             invalidHash= "True"
-       # else:
-          #  print "GUI DEBUG: valid hash detected"
 
         #check for valid hash length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
@@ -2653,8 +2644,6 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidKeyLength= "True"
             print "GUI DEBUG: Invalid key length detected"
-       # else:
-        #    print "GUI DEBUG: valid key length detected"
 
         #check for invalid alphabet
         if(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
@@ -2681,24 +2670,18 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidTableChainLength= "True"
             print "GUI DEBUG: invalid table chain length detected"
-        #else:
-         #   print "GUI DEBUG: valid table chain length detected"
 
         #check for invalid num of rows
         if(len(self.panel_twelve.numOfRowsHeader.GetLabel()) <= len("Number of Rows: ")):
             foundInvalidInput= "True"
             invalidNumOfRows= "True"
             print "GUI DEBUG: invalid num of rows detected"
-        #else:
-         #   print "GUI DEBUG: valid num of rows detected"
 
         #check for invalid rainbow table file
         if(len(self.panel_twelve.fileNameHeader.GetLabel()) <= len("Save Rainbow Table File As: ")):
             foundInvalidInput= "True"
             invalidRainbowTableFile= "True"
             print "GUI DEBUG: invalid rainbow table file detected"
-        #else:
-         #   print "GUI DEBUG: valid rainbow table file detected"
 
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
