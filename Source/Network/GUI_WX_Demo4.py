@@ -707,6 +707,18 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         vbox.Add((-1,10))
 
+        hbox6= wx.BoxSizer(wx.HORIZONTAL)
+        activityGuageHeader= wx.StaticText(self, label="Activity Gauge:")
+        activityGuageHeader.SetFont(parent.textFont)
+        activityGuageHeader.SetForegroundColour((255,255,255))
+        hbox6.Add(activityGuageHeader)
+        self.activityGauge= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL)
+        self.activityGauge.Pulse() #set to indeterminate mode
+        hbox6.Add(self.activityGauge, flag=wx.LEFT, border=5)
+        vbox.Add(hbox6, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
+
+        vbox.Add((-1,10))
+
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.disconnectClientButton= wx.Button(self, label="Disconnect From Server")
         hbox4.Add(self.disconnectClientButton)
@@ -721,11 +733,15 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         self.SetSizer(vbox)
 
+        #timer
+        self.timer= wx.Timer()
+
         #ToolTips
         self.disconnectClientButton.SetToolTip(wx.ToolTip('Disconnect from the server'))
         self.CloseButton.SetToolTip(wx.ToolTip('Close the program'))
 
         #Bind the buttons to events
+        self.timer.Bind(wx.EVT_TIMER, parent.updateNetworkClientTimer, self.timer)
         self.disconnectClientButton.Bind(wx.EVT_BUTTON, parent.disconnectClient)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
@@ -764,6 +780,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
+        #TODO if we are running rainbow maker, it should not say no solution
         self.currentStatus= wx.StaticText(self, label="Current Status: Running")
         self.currentStatus.SetFont(parent.textFont)
         self.currentStatus.SetForegroundColour((255,255,255)) #TODO temp color
@@ -839,7 +856,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
         activityGaugeHeader.SetFont(parent.textFont)
-        activityGaugeHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        activityGaugeHeader.SetForegroundColour((255,255,255))
         hbox6.Add(activityGaugeHeader)
         self.activityGauge = wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
@@ -851,7 +868,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
         progressBarHeader.SetFont(parent.textFont)
-        progressBarHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        progressBarHeader.SetForegroundColour((255,255,255))
         hbox7.Add(progressBarHeader)
         self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.progressBar.SetValue(0) #set value to start at zero
@@ -863,20 +880,21 @@ class PanelNine(wx.Panel):                     #================Network Server S
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
         self.numCompletedChunksHeader.SetFont(parent.textFont)
-        self.numCompletedChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.numCompletedChunksHeader.SetForegroundColour((255,255,255))
         hbox8.Add(self.numCompletedChunksHeader)
         self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
         self.numTotalChunksHeader.SetFont(parent.textFont)
-        self.numTotalChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.numTotalChunksHeader.SetForegroundColour((255,255,255))
         hbox8.Add(self.numTotalChunksHeader, flag=wx.LEFT, border=25)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
 
         vbox.Add((-1,10))
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
+        #TODO if we are running rainbow maker, it should not say no solution
         self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
         self.SolutionHeader.SetFont(parent.textFont)
-        self.SolutionHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.SolutionHeader.SetForegroundColour((255,255,255))
         hbox9.Add(self.SolutionHeader)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -916,7 +934,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         screenHeader= wx.StaticText(self, label="Single Mode Status Screen")
         screenHeader.SetFont(parent.titleFont)
-        screenHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        screenHeader.SetForegroundColour((255,255,255))
         hbox1.Add(screenHeader)
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
@@ -925,7 +943,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.currentCrackingMode= wx.StaticText(self, label="Cracking Mode: Not Specified")
         self.currentCrackingMode.SetFont(parent.textFont)
-        self.currentCrackingMode.SetForegroundColour((255,255,255)) #TODO temp color
+        self.currentCrackingMode.SetForegroundColour((255,255,255))
         hbox2.Add(self.currentCrackingMode)
         vbox.Add(hbox2, flag=wx.CENTER, border=10)
 
@@ -934,7 +952,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox3= wx.BoxSizer(wx.HORIZONTAL)
         self.currentStatus= wx.StaticText(self, label="Current Status: Starting up")
         self.currentStatus.SetFont(parent.textFont)
-        self.currentStatus.SetForegroundColour((255,255,255)) #TODO temp color
+        self.currentStatus.SetForegroundColour((255,255,255))
         hbox3.Add(self.currentStatus)
         vbox.Add(hbox3, flag=wx.CENTER, border=10)
 
@@ -943,7 +961,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
         self.hashBeingCrackedHeader= wx.StaticText(self, label="Hash Being Cracked: Not Specified")
         self.hashBeingCrackedHeader.SetFont(parent.textFont)
-        self.hashBeingCrackedHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.hashBeingCrackedHeader.SetForegroundColour((255,255,255))
         hbox9.Add(self.hashBeingCrackedHeader)
         vbox.Add(hbox9, flag=wx.CENTER, border=10)
 
@@ -990,7 +1008,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         progressBarHeader= wx.StaticText(self, label="Progress:")
         progressBarHeader.SetFont(parent.textFont)
-        progressBarHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        progressBarHeader.SetForegroundColour((255,255,255))
         hbox6.Add(progressBarHeader)
         self.progressBar= wx.Gauge(self, range=100, size=(250,15), style=wx.GA_HORIZONTAL )
         self.progressBar.SetValue(0) #set value to start at zero
@@ -1002,7 +1020,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.numCompletedChunksHeader= wx.StaticText(self, label="Number of Completed Chunks: Calculating") #change in the update timer section
         self.numCompletedChunksHeader.SetFont(parent.textFont)
-        self.numCompletedChunksHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.numCompletedChunksHeader.SetForegroundColour((255,255,255))
         hbox8.Add(self.numCompletedChunksHeader)
         self.numTotalChunksHeader= wx.StaticText(self, label="Total Number of Chunks: Calculating") #change in the update timer function
         self.numTotalChunksHeader.SetFont(parent.textFont)
@@ -1214,7 +1232,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.keyLengthHeader= wx.StaticText(self, label="Key Length: 10")
         self.keyLengthHeader.SetFont(parent.textFont)
-        self.keyLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.keyLengthHeader.SetForegroundColour((255,255,255))
         hbox4.Add(self.keyLengthHeader)
         self.changeKeyLengthButton= wx.Button(self, label="Set Key Length")
         hbox4.Add(self.changeKeyLengthButton, flag=wx.LEFT, border=25)
@@ -1225,7 +1243,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox5=wx.BoxSizer(wx.HORIZONTAL)
         selectAlphabetHeader= wx.StaticText(self, label="Select Alphabet")
         selectAlphabetHeader.SetFont(parent.textFont)
-        selectAlphabetHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        selectAlphabetHeader.SetForegroundColour((255,255,255))
         hbox5.Add(selectAlphabetHeader)
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
         hbox5.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
@@ -1236,7 +1254,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox6=wx.BoxSizer(wx.HORIZONTAL)
         self.chainLengthHeader= wx.StaticText(self, label="Table Chain Length: 100")
         self.chainLengthHeader.SetFont(parent.textFont)
-        self.chainLengthHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.chainLengthHeader.SetForegroundColour((255,255,255))
         hbox6.Add(self.chainLengthHeader)
         self.changeChainLengthButton= wx.Button(self, label="Set Table Chain Length")
         hbox6.Add(self.changeChainLengthButton, flag=wx.LEFT, border=125)
@@ -1247,7 +1265,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox7=wx.BoxSizer(wx.HORIZONTAL)
         self.numOfRowsHeader= wx.StaticText(self, label="Number of Rows: 100")
         self.numOfRowsHeader.SetFont(parent.textFont)
-        self.numOfRowsHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.numOfRowsHeader.SetForegroundColour((255,255,255))
         hbox7.Add(self.numOfRowsHeader)
         self.setNumOfRowsButton= wx.Button(self, label="Set Number Of Rows")
         hbox7.Add(self.setNumOfRowsButton, flag=wx.LEFT, border=125)
@@ -1258,7 +1276,7 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
         hbox8=wx.BoxSizer(wx.HORIZONTAL)
         self.fileNameHeader= wx.StaticText(self, label="Save Rainbow Table File As: myRainbowTable.txt")
         self.fileNameHeader.SetFont(parent.textFont)
-        self.fileNameHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        self.fileNameHeader.SetForegroundColour((255,255,255))
         hbox8.Add(self.fileNameHeader)
         vbox.Add(hbox8, flag=wx.CENTER, border=10)
 
@@ -1344,7 +1362,7 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
         aboutUsHeader= wx.StaticText(self, label="About Us", style=wx.ALIGN_CENTER_HORIZONTAL)
         aboutUsHeader.SetFont(parent.titleFont)
-        aboutUsHeader.SetForegroundColour((255,255,255)) #TODO temp color
+        aboutUsHeader.SetForegroundColour((255,255,255))
         hbox1.Add(aboutUsHeader)
         vbox.Add(hbox1, flag=wx.CENTER|wx.TOP, border=10)
 
@@ -1904,6 +1922,8 @@ class myFrame(wx.Frame):
         self.SetTitle("Mighty Cracker: Client Status")
         tempIP= self.get_ip()
         self.panel_eight.clientIPAddress.SetLabel("Client IP Address: "+str(tempIP))
+        #print "GUI DEBUG: switch from panel 7 to panel 8"
+        self.panel_eight.timer.Start(1000)
         self.panel_seven.Hide()
         self.panel_eight.Show()
         self.Layout()
@@ -1949,7 +1969,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
@@ -1963,7 +1983,7 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        print "GUI DEBUG: panel 11 to panel 10 the Hash: '"+str(theHash)+"'"
+        #print "GUI DEBUG: panel 11 to panel 10 the Hash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_ten.Show()
@@ -2028,15 +2048,17 @@ class myFrame(wx.Frame):
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
 
-            if(self.is_doing_stuff.is_set()):
-                #TODO the doing stuff flag is never set, so this always reads inactive!!!
-                self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
-            else:
-                self.panel_ten.currentStatus.SetLabel("Current Status: Inactive")
+            self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
+
+            if(self.compareString(self.panel_ten.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
+                                  len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
+                self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: There is no hash to be cracked for this mode")
+
             self.update.clear()
         else: #if shutdown is set
             #TODO BUG on windows this fill the activity gauge, then empties it
-            print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
+            #TODO IDEA, set activity guage to a specified value with setting the pulse flag
+            #print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
@@ -2044,11 +2066,16 @@ class myFrame(wx.Frame):
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                print "GUI DEBUG: shutdown flag is set, solution was not found"
-                self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+                #print "GUI DEBUG: shutdown flag is set, solution was not found"
+                if(self.compareString(self.panel_ten.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
+                                      len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
+                    self.panel_ten.SolutionHeader.SetLabel("Solution: There is no solution for this mode")
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Creating Rainbow Table")
+                else:
+                    self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                print "GUI DEBUG: shutdown flag is set, solution was found"
+                #print "GUI DEBUG: shutdown flag is set, solution was found"
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
@@ -2069,14 +2096,15 @@ class myFrame(wx.Frame):
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
 
-            if(self.is_doing_stuff.is_set()):
-                #TODO the doing stuff flag is never set, so this always reads inactive!!!
-                self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
-            else:
-                self.panel_nine.currentStatus.SetLabel("Current Status: Inactive")
+            self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
+
+            if(self.compareString(self.panel_nine.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
+                                  len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
+                self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: There is no hash to be cracked for this mode")
+
             self.update.clear()
         else: #if shutdown flag has been set
-            print "GUI DEBUG: shutdown flag has been set, displaying panel nine"
+            #print "GUI DEBUG: shutdown flag has been set, displaying panel nine"
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
@@ -2084,13 +2112,26 @@ class myFrame(wx.Frame):
             self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                print "GUI DEBUG: shutdown flag is set, solution was not found"
-                self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
-                self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
+                #print "GUI DEBUG: shutdown flag is set, solution was not found"
+                if(self.compareString(self.panel_nine.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
+                                      len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
+                    self.panel_nine.SolutionHeader.SetLabel("Solution: There is no solutions for this mode")
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Creating Rainbow Table")
+                else:
+                    self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                print "GUI DEBUG: shutdown flag is set, solution was found"
+                #print "GUI DEBUG: shutdown flag is set, solution was found"
                 self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
+
+    def updateNetworkClientTimer(self, event):
+        if(not self.shutdown.is_set()):
+            print "GUI DEBUG: shutdown flag not set yet"
+        else: #if shutdown variable is set
+            self.panel_eight.currentStatus.SetLabel("Current Status: Finished Searching")
+            self.panel_eight.activityGauge.Pulse() #switch back to determinate mode
+            self.panel_eight.activityGauge.SetValue(100) #set value to 100 to fill the activity gauge
 
     def configureDictionaryQuickTest(self, event):
         self.panel_three.selectedAlgorithm.SetValue("MD5")
