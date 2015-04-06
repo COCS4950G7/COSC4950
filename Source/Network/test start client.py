@@ -1,19 +1,21 @@
 # this is a shortcut method to run client without any UI. For debugging purposes only.
 
-from multiprocessing import Process, Event, Manager
+from multiprocessing import Process, Event, Manager, current_process
 from NetworkClient_r15b import Client
-
-
+import os
+import signal
 
 class start():
 
-    client = Process()
+    client = None
 
     def __init__(self):
+
         #self.start_client()
         return
 
     def start_client(self):
+        print "client pid: %i" % current_process().pid
         #use a generic manager's shared dictionary to handle strings and ints
         #Define the shared dictionary and it's values
         manager = Manager()
@@ -52,7 +54,7 @@ class start():
         self.client.start()
         self.client.join()
         self.client.terminate()
-
+        print "current process PID = %i" % current_process().pid
 
 if __name__ == '__main__':
     start = start()

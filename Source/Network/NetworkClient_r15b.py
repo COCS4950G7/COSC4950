@@ -105,8 +105,9 @@ class Client():
                 #self.shutdown.set()
                 #self.is_connected.clear()
                 #self.is_doing_stuff.clear()
-                for process in chunk_runner:
-                    process.terminate()
+            for process in chunk_runner:
+                process.terminate()
+
 
         except Exception as inst:
             print "============================================================================================="
@@ -222,7 +223,10 @@ class Client():
         try:
             bf.result_queue = result_queue
             while not shutdown.is_set():
-                job = job_queue.get()
+                try:
+                    job = job_queue.get(block=True, timeout=.25)
+                except Queue.Empty:
+                    continue
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']

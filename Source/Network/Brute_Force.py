@@ -100,11 +100,16 @@ class Brute_Force():
             for j in range(0, cpu_count()):
                 self.children.append(Process(target=self.check_keys))
                 self.children[j].start()
+                #print "bf internal process %i started." % self.children[j].pid
             self.processes_running = True
 
     def terminate_processes(self):
         for process in self.children:
+            #print "killing process: %i" % process.pid
             process.terminate()
+            process.join(timeout=.1)
+            #if process.is_alive():
+             #   print "process %i did not die." % process.pid
 
     def check_short_keys(self):
         if self.done.value:

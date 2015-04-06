@@ -21,6 +21,7 @@ import Brute_Force
 import RainbowUser
 import RainbowMaker
 
+
 class Client():
     IP = "127.0.0.1" #default is pingback
     PORTNUM = 22536
@@ -36,7 +37,6 @@ class Client():
     #===================================================================================================================
     #FUNCTIONS
     #===================================================================================================================
-
 
     #--------------------------------------------------------------------------------------------------
     #runclient function
@@ -195,7 +195,10 @@ class Client():
         try:
             bf.result_queue = result_queue
             while not shutdown.is_set():
-                job = job_queue.get()
+                try:
+                    job = job_queue.get(timeout=.25)
+                except Queue.Empty:
+                    continue
                 chunk = Chunk.Chunk()
                 chunk.params = job.value['params']
                 chunk.data = job.value['data']

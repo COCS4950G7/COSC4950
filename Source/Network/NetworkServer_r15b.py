@@ -132,7 +132,7 @@ class Server():
                     dictionary.setFileName(self.settings["file name"])
                     dictionary.setHash(self.settings["hash"])
                     self.found_solution.value = False
-                    self.total_chunks = dictionary.get_total_chunks()
+                    #self.total_chunks = dictionary.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, manager, shared_job_q))
                 elif self.cracking_mode == "bf":
@@ -274,7 +274,7 @@ class Server():
                 while not self.shutdown.is_set():
                     try:
                         self.update.set()
-                        result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
+                        result = results_queue.get(block=True, timeout=.5)  # get chunk from shared result queue
                     except Qqueue.Empty:
                         continue
                     if result[0] == "w":  # check to see if solution was found
@@ -463,7 +463,7 @@ class Server():
                             except Qqueue.Full:
                                 continue
                     if self.shutdown.is_set():
-                        print "chunker trying to shut down"
+                        #print "chunker trying to shut down"
                         while True:
                             try:
                                 job_queue.get_nowait()
