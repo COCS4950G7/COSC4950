@@ -1458,8 +1458,8 @@ class myFrame(wx.Frame):
         #TODO idea, remove the close button, so you must close the window with the close button
 
         #custom defined fonts
-        self.titleFont= wx.Font(20, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, True) #custom font for the title
-        self.textFont= wx.Font(14, wx.FONTFAMILY_ROMAN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True)#custom font for the normal text
+        self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) #custom font for the title
+        self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)#custom font for the normal text
 
         #detectedOS variable
         self.theDetectedOS= "None"
