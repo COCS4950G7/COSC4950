@@ -718,6 +718,16 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 
         vbox.Add((-1,10))
 
+        hbox7= wx.BoxSizer(wx.HORIZONTAL)
+        #TODO needs to say no solution if making rainbow table
+        self.solutionHeader= wx.StaticText(self, label="Solution: Not Finished Searching Yet")
+        self.solutionHeader.SetFont(parent.textFont)
+        self.solutionHeader.SetForegroundColour((255,255,255))
+        hbox7.Add(self.solutionHeader)
+        vbox.Add(hbox7, flag=wx.CENTER, border=10)
+
+        vbox.Add((-1,10))
+
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
         self.disconnectClientButton= wx.Button(self, label="Disconnect From Server")
         hbox4.Add(self.disconnectClientButton)
@@ -779,7 +789,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
         vbox.Add((-1,10))
 
         hbox4=wx.BoxSizer(wx.HORIZONTAL)
-        #TODO if we are running rainbow maker, it should not say no solution
         self.currentStatus= wx.StaticText(self, label="Current Status: Running")
         self.currentStatus.SetFont(parent.textFont)
         self.currentStatus.SetForegroundColour((255,255,255)) 
@@ -890,7 +899,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
         vbox.Add((-1,10))
 
         hbox9= wx.BoxSizer(wx.HORIZONTAL)
-        #TODO if we are running rainbow maker, it should not say no solution
         self.SolutionHeader= wx.StaticText(self, label="Solution: Search Not Finished Yet")
         self.SolutionHeader.SetFont(parent.textFont)
         self.SolutionHeader.SetForegroundColour((255,255,255))
@@ -2064,7 +2072,6 @@ class myFrame(wx.Frame):
             self.update.clear()
         else: #if shutdown is set
             #TODO linux still does not have a pulsing activity gauge
-            #TODO IDEA, set activity guage to a specified value with setting the pulse flag
             #print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
@@ -2139,6 +2146,13 @@ class myFrame(wx.Frame):
             self.panel_eight.currentStatus.SetLabel("Current Status: Finished Searching")
             #self.panel_eight.activityGauge.Pulse() #switch back to determinate mode
             self.panel_eight.activityGauge.SetValue(100) #set value to 100 to fill the activity gauge
+            if(len(self.dictionary["key"])<1):
+                #if no solution was found
+                self.panel_eight.solutionHeader.SetLabel("Solution: Sorry, No Solution Was Found")
+            else:
+                #if there was a found solution
+                #TODO not showing the solution when found,
+                self.panel_eight.solutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
 
     def configureDictionaryQuickTest(self, event):
         self.panel_three.selectedAlgorithm.SetValue("MD5")
