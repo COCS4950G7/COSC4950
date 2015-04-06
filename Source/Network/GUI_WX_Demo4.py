@@ -1468,31 +1468,31 @@ class myFrame(wx.Frame):
         self.detectOS()
 
         self.panel_one= PanelOne(self)
-        self.panel_one.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY,
+        self.panel_one.SetBackgroundColour("Black")
         self.panel_two= PanelTwo(self)
-        self.panel_two.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY
+        self.panel_two.SetBackgroundColour("Black")
         self.panel_three= PanelThree(self)
-        self.panel_three.SetBackgroundColour("Black") #TODO THIS IS TEMPORARY
+        self.panel_three.SetBackgroundColour("Black")
         self.panel_four= PanelFour(self)
-        self.panel_four.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_four.SetBackgroundColour("Black")
         self.panel_five= PanelFive(self)
-        self.panel_five.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_five.SetBackgroundColour("Black")
         self.panel_six= PanelSix(self)
-        self.panel_six.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_six.SetBackgroundColour("Black")
         self.panel_seven= PanelSeven(self)
-        self.panel_seven.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_seven.SetBackgroundColour("Black")
         self.panel_eight= PanelEight(self)
-        self.panel_eight.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_eight.SetBackgroundColour("Black")
         self.panel_nine= PanelNine(self)
-        self.panel_nine.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_nine.SetBackgroundColour("Black")
         self.panel_ten= PanelTen(self)
-        self.panel_ten.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_ten.SetBackgroundColour("Black")
         self.panel_eleven= PanelEleven(self)
-        self.panel_eleven.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_eleven.SetBackgroundColour("Black")
         self.panel_twelve= PanelTwelve(self)
-        self.panel_twelve.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_twelve.SetBackgroundColour("Black")
         self.panel_thirteen= PanelThirteen(self)
-        self.panel_thirteen.SetBackgroundColour("Black") #TODO this is temporary
+        self.panel_thirteen.SetBackgroundColour("Black")
         self.panel_two.Hide()
         self.panel_three.Hide()
         self.panel_four.Hide()
@@ -2060,7 +2060,7 @@ class myFrame(wx.Frame):
             #print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
+            #self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
@@ -2106,7 +2106,7 @@ class myFrame(wx.Frame):
             #print "GUI DEBUG: shutdown flag has been set, displaying panel nine"
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
+            #self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
@@ -2129,7 +2129,7 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: shutdown flag not set yet"
         else: #if shutdown variable is set
             self.panel_eight.currentStatus.SetLabel("Current Status: Finished Searching")
-            self.panel_eight.activityGauge.Pulse() #switch back to determinate mode
+            #self.panel_eight.activityGauge.Pulse() #switch back to determinate mode
             self.panel_eight.activityGauge.SetValue(100) #set value to 100 to fill the activity gauge
 
     def configureDictionaryQuickTest(self, event):
