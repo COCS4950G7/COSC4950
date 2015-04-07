@@ -139,6 +139,8 @@ class Brute_Force():
             if self.done.value:
                 return
             workunit = self.queue.get()
+            if workunit.prefix == "******possibilities exhausted******":
+                self.result_queue.put(('e', "sadness"))
             self.algorithm = workunit.algorithm
             self.origHash = workunit.hash
             prefix = ''.join(workunit.prefix)
@@ -177,6 +179,7 @@ class Brute_Force():
                 if self.done.value:
                     return
                 yield ''.join(prefix)
+        yield "******possibilities exhausted******"
 
 #   Hash a possible key and check if it is equal to the hashed input.
     def isSolution(self, key):
@@ -204,8 +207,8 @@ class Brute_Force():
                 iterations /= self.alphabet.__len__()
                 break
         #print "Checking ", self.charactersToCheck, "characters per chunk."
-        self.chunk_size = iterations
-        for i in range(self.minKeyLength, self.maxKeyLength):
+        self.chunk_size = self.alphabet.__len__() ** self.charactersToCheck
+        for i in range(self.minKeyLength, self.maxKeyLength+1):
             self.total_work_units += ((self.alphabet.__len__() ** i)/self.chunk_size)
 
 #   get_chunk() is an iterator which yields a new chunk of data each time get_chunk.next() is called.
@@ -230,7 +233,7 @@ class Brute_Force():
     def run_chunk(self, chunk):
         settings = chunk.params
         settings_list = settings.split('\n')
-
+        #print settings
         prefix = settings_list[6]
         if self.first_unit:
             self.algorithm = settings_list[1]
@@ -244,7 +247,10 @@ class Brute_Force():
             prefix = ''
         if prefix == '' and self.first_unit:
 
-            Process(self.check_short_keys).start().join(block=False)
+            shorts = Process(target=self.check_short_keys)
+            shorts.start()
+            shorts.join()
+            print "short keys checked"
         else:
             if self.done.value:
                 return True

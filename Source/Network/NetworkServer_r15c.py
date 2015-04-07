@@ -119,9 +119,7 @@ class Server():
                 #if running in single mode, set shared queues and then start the process
                 if self.single_user_mode:
                     print "Single User Mode"
-                    shared_job_q = Queue(100)
-                    shared_result_q = Queue()
-                    single = Process(target=self.start_single_user, args=(shared_job_q, shared_result_q,))
+                    single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
                     single.start()
 
                 else:
@@ -138,25 +136,23 @@ class Server():
                     dictionary.setFileName(self.settings["file name"])
                     dictionary.setHash(self.settings["hash"])
                     self.found_solution.value = False
-                    #TODO INCONSISTANT why is this (line below) only commented out for dictionary???
                     #self.total_chunks = dictionary.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
-                    chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary,self.shutdown))
+                    chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, self.shutdown))
                 elif self.cracking_mode == "bf":
-
+                    self.found_solution.value = False
                     bf = Brute_Force.Brute_Force()
                     bf.set_params(alphabet=self.settings["alphabet"],
                                   algorithm=self.settings["algorithm"],
                                   origHash=self.settings["hash"],
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
-                    #TODO INCONSISTANT why is this line commented out for dictionary, but not here???????
                     self.total_chunks = bf.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, self.shutdown))
+
                 elif self.cracking_mode == "rain":
-
-
+                    self.found_solution.value = False
                     rain = RainbowUser.RainbowUser()
                     rain.setFileName(self.settings["file name"])
                     rain.setHash(self.settings["hash"])
@@ -185,15 +181,14 @@ class Server():
                     return "wtf?"
 
                 chunk_maker.start()
-
+                print "Chunk Maker PID: %i" % chunk_maker.pid
                 chunk_maker.join()
-                chunk_maker.terminate()
+                #chunk_maker.terminate()
                 if chunk_maker.is_alive():
                     print "oh no!"
                     print "NETWORKSERVER DEBUG: chunk_maker is alive" #Added by c hamm, a more useful print statement
 
                 self.update.set()
-
 
             except Exception as inst:
                 print "============================================================================================="
@@ -208,7 +203,6 @@ class Server():
             finally:
                 end_time= time.time() - start_time
                 print "Server ran for "+str(end_time)+" seconds"
-                return
 
         #--------------------------------------------------------------------------------------------------
         #End of runserver function
@@ -242,9 +236,12 @@ class Server():
                         result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
                     except Qqueue.Empty:
                         continue
+                    print "chunk done, result: %s" % result[0]
+                    print "params: %s" % result[1]
                     if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
                         shutdown.set()
+                        self.shutdown.set()
                         print "shutdown notice sent to clients"
                         key = result[1]
                         self.found_solution.value = True
@@ -252,12 +249,14 @@ class Server():
                         self.shared_dict["finished chunks"] += 1
                         self.shared_dict["key"] = key
                         self.update.set()
-
+                        break
                     elif(result[0] == "c"):  # check to see if client has crashed
                         print "A client has crashed!"  # THIS FUNCTION IS UNTESTED
+                        break
                     elif result[0] == "e":
                         print "Final chunk processed, no solution found."
                         shutdown.set()
+                        self.shutdown.set()
                         self.shared_dict["finished chunks"] += 1
                         break
                     else:  # solution has not been found
@@ -275,7 +274,7 @@ class Server():
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
                                 shutdown.set() #TODO are you setting the correct shutdown???
-                                return
+                                break
 
             except Exception as inst:
                 print "============================================================================================="
@@ -312,6 +311,7 @@ class Server():
                     mode_bit_1.set()
                     mode_bit_2.set()
                 else:
+                    manager = None
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global variable
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
@@ -348,16 +348,18 @@ class Server():
                         self.sent_chunks.append((chunk.params, time.time()))
                     if dictionary.isEof():
                         break
-                if self.found_solution.value:
-                    while True:
-                        try:
-                            job_queue.get_nowait()
-                        except Qqueue.Empty:
-                            return
+                    if self.found_solution.value:
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                break
                 result_monitor.join()
-                result_monitor.terminate()
-                time.sleep(2)
-                manager.shutdown() #TODO FATAL ERROR: ERROR THROWN HERE, no manager is defined
+                #result_monitor.terminate()
+                time.sleep(.5)
+                if manager is not None:
+                    manager.shutdown() #TODO FATAL ERROR: ERROR THROWN HERE, no manager is defined
+                time.sleep(1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_dictionary definition Try block"
@@ -385,22 +387,24 @@ class Server():
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
                     manager.start()
-                    job_queue = manager.get_job_q()  #TODO naming conflict, job_queue is alos a global variable
-                    result_queue = manager.get_result_q()  #TODO naming conflict, result_queue is also a global variable
+                    self.shared_dict["server manager pid"] = manager._process.pid
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
                     mode_bit_1.set()
                     mode_bit_2.clear()
-
+                    result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 else:
-                    result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global variable
-                    job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
+                    manager = None
+                    result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
 
-                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
                 for prefix in bf.get_prefix():
                     if prefix == '':
-                        prefix = "-99999999999999999999999999999999999"
+                        prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
+                    if prefix == "******possibilities exhausted******":
+                        prefix = "******possibilities exhausted******"
                     params = "bruteforce\n" + bf.algorithm + "\n" + bf.origHash + "\n" + bf.alphabet + "\n" \
                              + str(bf.minKeyLength) + "\n" + str(bf.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
                     #print params
@@ -412,25 +416,28 @@ class Server():
                                                          'data': '',
                                                          'timestamp': time.time(),
                                                          'halt': False})
-                    while not shutdown.is_set(): #TODO INCONSISTANT: does not match the (inconsistant) while not shutdown loops in dictionary
-                                                #TODO this uses the parameter shutdown variable
+                    while not shutdown.is_set():
                         try:
-                            job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
+                            self.job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
                             break
                         except Qqueue.Full:
                             continue
-                    if self.found_solution.value:
+                while not shutdown.is_set():
+                    time.sleep(.1)
+                    if shutdown.is_set() or self.shutdown.is_set() or self.found_solution.value:
+                        print "shutting down chunker"
                         while True:
                             try:
                                 job_queue.get_nowait()
                             except Qqueue.Empty:
-                                return
-                            finally:
-                                result_monitor.terminate()
-                                time.sleep(2)
-                                manager.shutdown() #TODO OBSERVED ERROR: THIS IS NOT DEFINED IF RUNNING SINGLE MODE
-
+                                result_monitor.join()
+                                #result_monitor.terminate()
+                                #os.kill(result_monitor.pid, signal.SIGTERM)
+                                time.sleep(.5)
+                                if manager is not None:
+                                   manager.shutdown()
+                                time.sleep(1)
                                 return
 
             except Exception as inst:
@@ -467,6 +474,7 @@ class Server():
                     mode_bit_1.clear()
                     mode_bit_2.set()
                 else: #if in single mode
+                    manager = None
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
@@ -502,7 +510,8 @@ class Server():
                                 return
                             finally:
                                 time.sleep(2)
-                                manager.shutdown()
+                                if manager is not None:
+                                    manager.shutdown()
                                 return
 
             except Exception as inst:
@@ -539,6 +548,7 @@ class Server():
                     mode_bit_1.clear()
                     mode_bit_2.clear()
                 else:
+                    manager = None
                     result_queue = self.result_queue  #TODO creating another variable (with the same name) that holds the same data as the global
                     job_queue = self.job_queue  #TODO creating another variable (with the same name) that hols the same data as the global variable
 
@@ -561,7 +571,8 @@ class Server():
                                 return
                             finally:
                                 time.sleep(2)
-                                manager.shutdown()
+                                if manager is not None:
+                                    manager.shutdown()
                                 return
             except Exception as inst:
                 print "============================================================================================="
@@ -745,30 +756,19 @@ class Server():
                 print "============================================================================================="
 
         def run_brute_force(self, bf, job_queue, result_queue):  #TODO name conflict result_queue os also the name of the global variable
-                                                                #TODO name conflict job_queue is also the name of the global variable
-            try:
-                bf.result_queue = result_queue   #TODO name conflict result_queue os also the name of the global variable
+            print "run brute force started"                                       #TODO name conflict job_queue is also the name of the global variable
+            bf.result_queue = result_queue   #TODO name conflict result_queue os also the name of the global variable
 
-                while not self.shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
-                    try:
-                        chunk = job_queue.get(timeout=.1)
-                    except Qqueue.Empty:
-                        continue
-                    bf.run_chunk(chunk)
-                    bf.start_processes()
+            while not self.shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                try:
+                    chunk = job_queue.get(timeout=.1)
+                except Qqueue.Empty:
+                    continue
+                #print chunk.params
+                bf.run_chunk(chunk)
+                bf.start_processes()
 
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in run_brute_force definition try block"
-                #the exception instance
-                print type(inst)
-                #arguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
-            finally:
-                bf.terminate_processes()
+            bf.terminate_processes()
 
         def run_rain_user(self, rain, job_queue, result_queue):  #TODO name conflict result_queue os also the name of the global variable
                                                                 #TODO name conflict job_queue is also the name of the global variable

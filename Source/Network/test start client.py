@@ -15,7 +15,6 @@ class start():
         return
 
     def start_client(self):
-        print "client pid: %i" % current_process().pid
         #use a generic manager's shared dictionary to handle strings and ints
         #Define the shared dictionary and it's values
         manager = Manager()
@@ -51,10 +50,10 @@ class start():
         shared.append(is_doing_stuff)
 
         self.client = (Process(target=Client, args=("192.168.2.136", shared)))
+        #self.client = (Process(target=Client, args=("10.121.12.111", shared)))
         self.client.start()
         self.client.join()
         self.client.terminate()
-        print "current process PID = %i" % current_process().pid
 
 if __name__ == '__main__':
     start = start()
