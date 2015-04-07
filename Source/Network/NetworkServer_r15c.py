@@ -136,7 +136,7 @@ class Server():
                     dictionary.setFileName(self.settings["file name"])
                     dictionary.setHash(self.settings["hash"])
                     self.found_solution.value = False
-                    #self.total_chunks = dictionary.get_total_chunks()
+                    self.total_chunks = dictionary.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, self.shutdown))
                 elif self.cracking_mode == "bf":
@@ -157,7 +157,6 @@ class Server():
                     rain.setFileName(self.settings["file name"])
                     rain.setHash(self.settings["hash"])
                     rain.gatherInfo()
-                    #TODO INCONSISTANT why is this line commented out for dictionary, but not here???????
                     self.total_chunks = rain.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow, args=(rain, self.shutdown))
@@ -172,7 +171,6 @@ class Server():
                     rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
                     rainmaker.setFileName(self.settings['file name'])
                     rainmaker.setupFile()
-                    #TODO INCONSISTANT why is this line commented out for dictionary, but not here???????
                     self.total_chunks = rainmaker.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, self.shutdown))
@@ -324,7 +322,11 @@ class Server():
                         while not self.shutdown.is_set(): #TODO INCONSISTANT: this uses the global shutdown variable
                                                             #TODO while loop below uses the parameter shutdown variable
                             try:
-                                self.shared_dict["current chunk"] = chunk
+                                #Retrieves word from chunk
+                                temp_word = self.extract_word(chunk)
+                                #Shares a 'current' word with UIs for display
+                                self.shared_dict["current word"] = temp_word
+
                                 job_queue.put(chunk)
                                 break
                             except Qqueue.Full:
@@ -337,7 +339,11 @@ class Server():
                         while not shutdown.is_set():  #TODO INCONSISTANT: this uses the parameter shutdown variable
                                                         #TODO while loop above uses the global shutdown variable
                             try:
-                                #self.shared_dict["current chunk"] = new_chunk
+                                #Retrieves word from chunk
+                                temp_word = self.extract_word(new_chunk)
+                                #Shares a 'current' word with UIs for display
+                                self.shared_dict["current word"] = temp_word
+
                                 job_queue.put(new_chunk, timeout=.1)
                                 #add params to list of sent chunks along with a timestamp so we can monitor which ones come back
                                 self.sent_chunks.append((chunk.params, time.time()))
@@ -418,6 +424,11 @@ class Server():
                                                          'halt': False})
                     while not shutdown.is_set():
                         try:
+                            #Retrieves word from chunk
+                            temp_word = self.extract_word(new_chunk)
+                            #Shares a 'current' word with UIs for display
+                            self.shared_dict["current word"] = temp_word
+
                             self.job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
                             break
@@ -484,7 +495,11 @@ class Server():
                     if self.single_user_mode: #if in single mode
                         while True:
                             try:
-                                self.shared_dict["current chunk"] = chunk
+                                #Retrieves word from chunk
+                                temp_word = self.extract_word(chunk)
+                                #Shares a 'current' word with UIs for display
+                                self.shared_dict["current word"] = temp_word
+
                                 job_queue.put(chunk, timeout=.1)
                                 break
                             except Qqueue.Full:
@@ -495,7 +510,11 @@ class Server():
                                                          'timestamp': time.time()})
                         while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                             try:
-                                self.shared_dict["current chunk"] = new_chunk
+                                #Retrieves word from chunk
+                                temp_word = self.extract_word(new_chunk)
+                                #Shares a 'current' word with UIs for display
+                                self.shared_dict["current word"] = temp_word
+
                                 job_queue.put(new_chunk, timeout=.1)
                                 self.sent_chunks.append((chunk.params, time.time()))
                                 break
@@ -807,6 +826,39 @@ class Server():
             temp_file.close()
 
             return list_of_hashes
+
+        #Retrieves word from chunk
+        def extract_word(self, chunk):
+
+            #If the chunk isn't empty
+            if not chunk.params == "":
+
+                #Take the parameters and split them into a list
+                params_list = chunk.params.split()
+
+                #Get the attack method from the parameters
+                attack_method = params_list[0]
+
+                #Take the data and split it into a list
+                chunk_list = chunk.data.split()
+
+                if attack_method == "dictionary":
+
+                    #Return the 1th item from the data
+                    return chunk_list[1]
+
+                elif attack_method == "bruteforce":
+
+                    #TODO: Fix bruteforce chunk parsing
+                    #BROKEN
+                    #return chunk_list[1]
+                    x = "Fix Me"
+                    return x
+
+                elif attack_method == "rainbowuser":
+
+                    #Return the 0th item from the data
+                    return chunk_list[0]
 
         #=======================================4=======================================================================
         #END OF FUNCTIONS

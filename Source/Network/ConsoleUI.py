@@ -17,8 +17,6 @@ import Chunk
 
 from NetworkClient_r15b import Client
 from NetworkServer_r15c import Server
-from NetworkServer_r15b import Server as OldServer
-
 
 class ConsoleUI():
 
@@ -40,7 +38,8 @@ class ConsoleUI():
         dictionary["finished chunks"] = 0
         dictionary["total chunks"] = 0
         dictionary["server ip"] = "127.1.1.1"
-        dictionary["current chunk"] = Chunk.Chunk()
+        #dictionary["current chunk"] = Chunk.Chunk()
+        dictionary["current word"] = ""
 
         #server/client/GUI signals shutdown when they're all done
         shutdown = Event()
@@ -69,7 +68,6 @@ class ConsoleUI():
 
         #Defining network sub-processes as class variables that are instances of the network objects
         networkServer = Process(target=Server, args=(settings, shared,))
-        oldNetworkServer = Process(target=OldServer, args=(settings, shared,))
         networkClient = Process(target=Client, args=(serverIP, shared,))
 
         state = "startScreen"
@@ -644,8 +642,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    #self.parse_chunk(self.dictionary["current chunk"])
-                    #print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -872,8 +869,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    self.parse_chunk(self.dictionary["current chunk"])
-                    print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1422,8 +1418,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    self.parse_chunk(self.dictionary["current chunk"])
-                    print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1744,7 +1739,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.oldNetworkServer.start()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -1758,8 +1753,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    self.parse_chunk(self.dictionary["current chunk"])
-                    print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -1788,7 +1782,7 @@ class ConsoleUI():
             #if we're at the singleBruteFoundScreen state (Screen)
             elif state == "singleBruteFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Found!"
@@ -1833,7 +1827,7 @@ class ConsoleUI():
             #if we're at the singleBruteNotFoundScreen state (Screen)
             elif state == "singleBruteNotFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Brute Force -> Not Found"
@@ -1973,7 +1967,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.oldNetworkServer.start()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -1988,8 +1982,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    #self.parse_chunk(self.dictionary["current chunk"])
-                    #print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2018,7 +2011,7 @@ class ConsoleUI():
             #if we're at the singleRainUserFoundScreen state (Screen)
             elif state == "singleRainUserFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2064,7 +2057,7 @@ class ConsoleUI():
             #if we're at the singleRainUserNotFoundScreen state (Screen)
             elif state == "singleRainUserNotFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2228,7 +2221,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.oldNetworkServer.start()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -2348,7 +2341,7 @@ class ConsoleUI():
                             elapsed = (time.time() - self.colidingClock2)
                             self.colidingClock2 = elapsed
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 time.sleep(2)
 
@@ -2522,7 +2515,7 @@ class ConsoleUI():
 
                 self.clock = time.time()
 
-                self.oldNetworkServer.start()
+                self.networkServer.start()
 
                 #Stuff for those pretty status pictures stuff
                 star_counter = 0
@@ -2536,8 +2529,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    self.parse_chunk(self.dictionary["current chunk"])
-                    print "Current Word: ", self.current_search_item
+                    print "Current Word: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
@@ -2566,7 +2558,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "singleDictionaryFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
@@ -2612,7 +2604,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "singleDictionaryNotFoundScreen":
 
-                self.oldNetworkServer.terminate()
+                self.networkServer.terminate()
 
                 print "============="
                 print "Start -> Single-User Mode -> Dictionary -> Not Found"
@@ -2717,38 +2709,6 @@ class ConsoleUI():
                 alphabet_string += digits
 
         return alphabet_string
-
-    #Parses the current chunk from server to display more info to the user
-    def parse_chunk(self, chunk):
-
-        #If the chunk isn't empty
-        if not chunk.params == "":
-
-            params_list = chunk.params.split()
-
-            attack_method = params_list[0]
-
-            chunk_list = chunk.data.split()
-
-            if attack_method == "dictionary":
-
-                self.current_search_item = chunk_list[1]
-
-            elif attack_method == "bruteforce":
-
-                #TODO: Fix bruteforce chunk parsing
-                #BROKEN
-                #self.current_search_item = chunk_list[1]
-                x = 1
-
-            elif attack_method == "rainbowmaker":
-
-                #NOT IMPLEMENTED
-                self.current_search_item = chunk_list[1]
-
-            elif attack_method == "rainbowuser":
-
-                self.current_search_item = chunk_list[0]
 
 
 ConsoleUI()

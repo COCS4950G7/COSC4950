@@ -550,14 +550,15 @@ class RainbowUser():
 
         temp_file = open(self.fileName, "r")
 
-        list_of_lines = list(temp_file)
+        line_count = 0
+
+        for line in temp_file:
+            line_count += 1
 
         temp_file.close()
 
-        total_lines = len(list_of_lines)
-
         #Total chunks = lines in dictionary minus first line divided by size of chunks
-        self.total_chunks = (total_lines - 1) / 1000
+        self.total_chunks = (line_count - 1) / 1000
 
         #Adjust the total chunks to account for larger chunks that occur
         self.total_chunks -= 1
