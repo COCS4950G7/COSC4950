@@ -36,6 +36,10 @@ class RainbowMaker():
     chunkCount = 0
     numProcesses = cpu_count()
     total_chunks = 0
+    #Total rows per chunk, depends on table width
+    total_rows = 0
+    #About how many operations per chunk, think of this as height*width of a chunk
+    chunk_size = 1000000
 
     #Constructor
     def __init__(self):
@@ -356,7 +360,26 @@ class RainbowMaker():
         #big list containing all the lines from the nodes
         bigChunk = ""
 
-        subChunkSize = 100
+        #This is duplicate code because it needs to be determined by server and clients
+        #rows per chunk equals chunk_size (good chunk size) divided by width
+        #   this gives us a continuous size of <= chunk_size
+        self.total_rows = self.chunk_size / self.width
+
+        #If table size wide enough, just make it one row per chunk
+        if self.total_rows <= 0:
+
+            self.total_rows = 1
+        #print "total_rows in create():", str(self.total_rows)
+        #Number of rows each sub-process will create
+        #   equals total rows per chunk divided by number of processes
+        subChunkSize = self.total_rows / self.numProcesses
+
+        #If the rows are wider than our chunk_size, do one per process
+        if subChunkSize <= 0:
+
+            subChunkSize = 1
+
+        #print "subChunkSize: ", str(subChunkSize)
 
         #Create lock
         lock = Lock()
@@ -509,8 +532,17 @@ class RainbowMaker():
     #Sets the total_chunks variable
     def set_total_chunks(self):
 
-        #total chunks equals num rows divided by chunk size
-        self.total_chunks = self.height / (100 * self.numProcesses)
+        #rows per chunk equals chunk_size (good chunk size) divided by width
+        #   this gives us a continuous size of <= chunk_size
+        self.total_rows = self.chunk_size / self.width
+
+        #If table size wide enough, just make it one row per chunk
+        if self.total_rows <= 0:
+
+            self.total_rows = 1
+
+        #total chunks equals all rows in table divided by rows per chunk
+        self.total_chunks = self.height / self.total_rows
 
         #If total chunks is <1, make it at least 1
         if self.total_chunks < 1:

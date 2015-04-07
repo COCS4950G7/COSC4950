@@ -2151,20 +2151,35 @@ class ConsoleUI():
 
                 #Get dimensions
                 print
-                chain_length = raw_input("How long will the chains be? ")
+                print "Longer chains reduce table size, but make using the table take longer."
+                chain_length = raw_input("How long will the chains be? (50000?) ")
                 while not self.is_int(chain_length):
 
                     print "Input Error, Not an Integer!"
 
                     chain_length = raw_input("Try Again: ")
 
+                if int(chain_length) >= 1000000:
+
+                    print
+                    print "If the table width (length of chains) is at least 1,000,000"
+                    print " the 'finished chunks' count should be multiplied by the average "
+                    print " number of CPU cores per client."
+
                 print
-                num_rows = raw_input("How many rows will there be? ")
+                print "More rows increases the size of the file and the table."
+                num_rows = raw_input("How many rows will there be? (50000?) ")
                 while not self.is_int(num_rows):
 
                     print "Input Error, Not an Integer!"
 
                     num_rows = raw_input("Try Again: ")
+
+                if (int(chain_length) * int(num_rows)) < 1000000:
+
+                    print
+                    print "The total dimensions of the table (width*height) will be set to at"
+                    print " least 1,000,000. Your set width won't change, but rows will be added."
 
                 #Get the file name
                 print
@@ -2175,8 +2190,8 @@ class ConsoleUI():
                 self.settings['file name'] = file_name + ".txt"
                 self.settings['key length'] = key_length
                 self.settings['alphabet'] = alphabet_string
-                self.settings['chain length'] = chain_length
-                self.settings['num rows'] = num_rows
+                self.settings['chain length'] = int(chain_length)
+                self.settings['num rows'] = int(num_rows)
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
