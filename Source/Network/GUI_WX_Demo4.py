@@ -3151,7 +3151,7 @@ class myFrame(wx.Frame):
         algorithmSetting= tempAlgorithmSetting
         tempHashSetting= str(self.panel_four.inputHashHeader.GetLabel())
         hashSetting=""
-        for i in range(19, len(tempHashSetting)):
+        for i in range(20, len(tempHashSetting)):
             hashSetting+= tempHashSetting[i]
         tempMinKeyLength= str(self.panel_four.minKeyLengthHeader.GetLabel())
         minKeyLengthSetting=""
@@ -3426,7 +3426,7 @@ class myFrame(wx.Frame):
             return True
         except Exception as inst:
             print "========================================================================\n"
-            print "Exception thrown in compareString Function: " +str(inst)+"\n"
+            print "GUI ERROR: Exception thrown in compareString Function: " +str(inst)+"\n"
             print "========================================================================\n"
             return False
 
