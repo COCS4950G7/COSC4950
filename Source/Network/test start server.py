@@ -38,9 +38,9 @@ class start():
                  })                   # (longest run time on realuniq dictionary ~1.2B lines)
 
     settings.append( {"cracking method": "bf",  # settings[3]
-                      "algorithm": "MD5",
+                      "algorithm": "md5",
                       #"hash": "d60d3056ff09d8d9a26da4fc116c7554",
-                      "hash": "12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999 in md5  -short runtime
+                      #"hash": "12c8de03d4562ba9f810e7e1e7c6fc15",  # aa9999 in md5  -short runtime
                       "hash": "1f3870be274f6c49b3e31a0c6728957f",  # apple in md5
                       #"hash": "98ae126efdbc62e121649406c83337d9",  # aaaff in md5
                       #"hash": "96f36b618b63f4c7f22a34b6cd2245467465b355",  # aa9999 in sha1
@@ -82,15 +82,21 @@ class start():
                      "hash": "51fe5861351b604b32f8dfdf4fa3beca",
                      "single": "False"})
 
+    settings.append( {"cracking method": "bf",  # settings[8]
+                      "algorithm": "md5",
+                      "hash": "98ae126efdbc62e121649406c83337d9",
+                      "min key length": 4,                         # short runtime
+                      "max key length": 6,
+                      "alphabet": string.ascii_lowercase,
+                      "single": "True"})
+
     def __init__(self):
         return
 
     def start_server(self):
-        print "test start server PID: %i" % current_process().pid
         #use a generic manager's shared dictionary to handle strings and ints
         manager = Manager()
         dictionary = manager.dict()
-        print "test start server manager PID: %i" % manager._process.pid
         dictionary["key"] = ''
         dictionary["finished chunks"] = 0
 
@@ -108,10 +114,14 @@ class start():
         shared.append(shutdown)
         shared.append(update)
 
-        self.server = Process(target=Server, args=(self.settings[3], shared))
+        preset = 3
+        if self.settings[preset]["single"] == "False":
+            network = True
+        else:
+            network = False
+        self.server = Process(target=Server, args=(self.settings[preset], shared))
         self.server.start()
 
-        print "server PID: %i" % self.server.pid
         # this is a very simple example of how an update loop in the UI classes might work
         while not shutdown.is_set():
             # update is an Event, this means that a process can use the .wait() command to block until it is .set()
@@ -120,21 +130,20 @@ class start():
             if dictionary["key"] is not '':
                 print "Printing key from start_server method: " + dictionary["key"]
                 break
-            print "%d chunks completed." % dictionary["finished chunks"]
+            print "%d chunks completed of %i total." % (dictionary["finished chunks"], dictionary["total chunks"])
             # after UI data has been updated, .clear() the update event so it will wait again in the next iteration
             update.clear()
-
         shutdown.set()
         time.sleep(1)
+
+
         manager.shutdown()
         self.server.terminate()
         self.server.join()
-        if self.server.is_alive():
-            print "server process %i did not die." % self.server.pid
-        else:
-            print "server process %i should be dead." % self.server.pid
-        os.kill(self.server.pid + 3, signal.SIGTERM)
-        os.kill(self.server.pid + 4, signal.SIGTERM)
+        if network:
+            print self.server.pid
+            os.kill(self.server.pid + 3, signal.SIGTERM)
+            os.kill(self.server.pid + 4, signal.SIGTERM)
 
 
 
