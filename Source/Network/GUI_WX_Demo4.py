@@ -6,7 +6,7 @@ import string
 import hashlib
 from multiprocessing import Process, Event, Manager, current_process
 from NetworkServer_r15c import Server
-from NetworkServer_r15b import Server as OldServer
+#from NetworkServer_r15b import Server as OldServer #keep if new server changes fail
 from NetworkClient_r15b import Client
 
 
@@ -24,15 +24,6 @@ class PanelOne(wx.Panel):           #========================Main Menu==========
         vbox.Add(hbox6, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,25))
-
-        ''' #the picture is currently taking place of this
-        hbox1= wx.BoxSizer(wx.HORIZONTAL)
-        screenHeader= wx.StaticText(self, label="Mighty Cracker")
-        hbox1.Add(screenHeader)
-        vbox.Add(hbox1, flag=wx.TOP|wx.CENTER, border=10)
-        '''
-
-        #vbox.Add((-1, 25)) #add extra space between header and the first button
 
         hbox2= wx.BoxSizer(wx.HORIZONTAL)
         self.SingleModeButton= wx.Button(self, label="Single Mode")
@@ -238,10 +229,6 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 
         hbox8= wx.BoxSizer(wx.HORIZONTAL)
         self.StartConnectButton= wx.Button(self, label="Start/Connect Button")
-        #make sure that  selected algorithm is not the empty string
-        #make sure a hashing mode has been selected (not the empty string)
-        #make sure a hash has been entered in
-        #make sure a dictionary file is selected
         hbox8.Add(self.StartConnectButton)
         vbox.Add(hbox8, flag=wx.CENTER, border=10)
 
@@ -316,8 +303,6 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
         #TODO add support for spaces, but uses ' ' instead of strring library!
-
-
 
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -398,7 +383,6 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
         self.selectedAlphabet= wx.ComboBox(self, choices=listOfAlphabets, style=wx.CB_READONLY)
         hbox8.Add(self.selectedAlphabet, flag=wx.LEFT, border=5)
         vbox.Add(hbox8, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-
 
         vbox.Add((-1,10))
 
@@ -544,8 +528,6 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
         vbox.Add(hbox1, flag=wx.CENTER, border=10)
 
         vbox.Add((-1,10))
-
-
 
         hbox2=wx.BoxSizer(wx.HORIZONTAL)
         self.NetworkServerButton= wx.Button(self, label="Network Server")
@@ -719,7 +701,6 @@ class PanelEight(wx.Panel):       #========================Network Client Status
         vbox.Add((-1,10))
 
         hbox7= wx.BoxSizer(wx.HORIZONTAL)
-        #TODO needs to say no solution if making rainbow table
         self.solutionHeader= wx.StaticText(self, label="Solution: Not Finished Searching Yet")
         self.solutionHeader.SetFont(parent.textFont)
         self.solutionHeader.SetForegroundColour((255,255,255))
@@ -758,7 +739,7 @@ class PanelNine(wx.Panel):                     #================Network Server S
     def __init__(self, parent):
         
         wx.Panel.__init__(self, parent)
-
+        #TODO if in dictionary, display what is currently being looked at (like it is done in console)
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -828,38 +809,6 @@ class PanelNine(wx.Panel):                     #================Network Server S
                 #TODO Number of Rows
                 #TODO save rainbow Table file as
         vbox.Add((-1,10))
-
-        #based on what mode you are in display the corresponding settings
-        #dictionary: Cracking Mode: Dictionary
-        #brute force: Cracking Mode: Brute-Force
-        #rainbow user: Cracking Mode: Rainbow Table
-        #rainbow table maker: Cracking Mode: Rainbow Table Maker
-        '''
-        if(parent.compareString(self.currentCrackingMode, "Cracking Mode: Dictionary",0,0,len("Cracking Mode: Dictionary"),len("Cracking Mode: Dictionary"))==True):
-            #show dictionary settings
-            hbox11A= wx.BoxSizer(wx.HORIZONTAL)
-            self.dictionaryAlgorithmSetting= wx.StaticText(self, label="Algorithm: Not Specified")
-            hbox11A.Add(self.dictionaryAlgorithmSetting)
-            self.dictionarySelectedHashingModeSetting= wx.StaticText(self, label="Selected Hashing Mode: Not Specified")
-            hbox11A.Add(self.dictionarySelectedHashingModeSetting, flag=wx.LEFT, border=25)
-            self.dictionarySelectedDictionaryFile= wx.StaticText(self, label="Dictionary File: Not Specified")
-            hbox11A.Add(self.dictionarySelectedDictionaryFile, flag=wx.LEFT, border=25)
-            vbox.Add(hbox11A, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-            print "GUI DEBUG: displaying dictionary settings"
-        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Brute-Force",0,0,len("Cracking Mode: Brute-Force"),len("Cracking Mode: Brute-Force"))==True):
-            #show brute force settings
-            print "GUI DEBUG: displaying brute froce settings"
-        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Rainbow Table",0,0,len("Cracking Mode: Rainbow Table"),len("Cracking Mode: Rainbow Table"))==True):
-            #show rainbow user settings
-            print "GUI DEBUG: diplaying rainbow user settings"
-        elif(parent.compareString(self.currentCrackingMode, "Cracking Mode: Rainbow Table Maker",0,0,len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
-            #show rainbow table maker settings
-            print "GUI DEBUG: displaying rainbow table maker settings"
-        else:
-            print "GUI DEBUG ERROR: invalid Cracking Mode detected: '"+str(self.currentCrackingMode)+"'"
-        '''
-
-        #vbox.Add((-1,10))
 
         hbox6= wx.BoxSizer(wx.HORIZONTAL)
         activityGaugeHeader= wx.StaticText(self, label="Activity Gauge:")
@@ -935,7 +884,7 @@ class PanelTen(wx.Panel):                          #====================Single M
         
         wx.Panel.__init__(self, parent)
 
-
+        #TODO if in dictionary, display what is currently being looked at (like it is done in console)
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1= wx.BoxSizer(wx.HORIZONTAL)
@@ -1071,13 +1020,11 @@ class PanelTen(wx.Panel):                          #====================Single M
 
         #create timer
         self.timer= wx.Timer()
-       # print "GUI DEBUG: created timer"
 
         #Bind the buttons to events
         self.timer.Bind(wx.EVT_TIMER, parent.updateSingleTimer, self.timer ) #timer is started in the switch to panel 10 function. Once started the timer will call updateSingleTimer every 1000 milliseconds
         self.backToMainMenuButton.Bind(wx.EVT_BUTTON, parent.quitSingleStatusBackToMainMenu)
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
-
 
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
@@ -1473,6 +1420,10 @@ class myFrame(wx.Frame):
 
         #TODO idea, remove the close button, so you must close the window with the close button
 
+        #TODO FATAL ERROR
+        #TODO FATAL ERROR: If you press the back to main menu button, the processes don;t terminate and GUI becomes a zombie process!!!!!
+        #TODO FATAL ERROR
+
         #custom defined fonts
         self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) #custom font for the title
         self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)#custom font for the normal text
@@ -1537,6 +1488,12 @@ class myFrame(wx.Frame):
         self.sizer.Add(self.panel_twelve, 1, wx.EXPAND)
         self.sizer.Add(self.panel_thirteen, 1, wx.EXPAND)
         self.SetSizer(self.sizer)
+
+        #set all panels to default values at the start
+        self.resetDictionarySettingsToDefault(None)
+        self.resetBruteForceSettingsToDefault(None)
+        self.resetRainbowTableCrackingSettingsToDefault(None)
+        self.resetRainbowTableMakerSettingsToDefault(None)
 
         #add a menubar at the top of the window/screen
         menubar= wx.MenuBar()
@@ -1807,6 +1764,7 @@ class myFrame(wx.Frame):
 
     #--------switch from panel 3
     def switchFromPanel3ToPanel1(self, event):
+        self.resetDictionarySettingsToDefault(None) #reset all settings back to the defualt settings
         self.SetTitle("Mighty Cracker")
         self.panel_three.Hide()
         self.panel_one.Show()
@@ -1821,7 +1779,6 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 3 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_nine.Show()
@@ -1835,7 +1792,6 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 3 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_three.Hide()
         self.panel_ten.Show()
@@ -1845,6 +1801,7 @@ class myFrame(wx.Frame):
 
     #--------switch from panel 4
     def switchFromPanel4ToPanel1(self, event):
+        self.resetBruteForceSettingsToDefault(None) #reset the inputs back to their default settings
         self.SetTitle("Mighty Cracker")
         self.panel_four.Hide()
         self.panel_one.Show()
@@ -1859,7 +1816,6 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 4 to panel 9 theHash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_nine.Show()
@@ -1873,12 +1829,10 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 4 to panel 10 theHash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: "+str(theHash))
         self.panel_four.Hide()
         self.panel_ten.Show()
         self.panel_ten.timer.Start(1000)
-       # print "GUI DEBUG: starting panel ten timer"
         self.Layout()
     #---------end switch from panel 4
 
@@ -1937,7 +1891,6 @@ class myFrame(wx.Frame):
         self.SetTitle("Mighty Cracker: Client Status")
         tempIP= self.get_ip()
         self.panel_eight.clientIPAddress.SetLabel("Client IP Address: "+str(tempIP))
-        #print "GUI DEBUG: switch from panel 7 to panel 8"
         self.panel_eight.timer.Start(1000)
         self.panel_seven.Hide()
         self.panel_eight.Show()
@@ -1970,6 +1923,7 @@ class myFrame(wx.Frame):
 
     #----------switch from panel 11
     def switchFromPanel11ToPanel1(self, event):
+        self.resetRainbowTableCrackingSettingsToDefault(None) #reset all settings back to default
         self.SetTitle("Mighty Cracker")
         self.panel_eleven.Hide()
         self.panel_one.Show()
@@ -1984,7 +1938,6 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 11 to panel 9 the Hash: '"+str(theHash)+"'"
         self.panel_nine.crackingThisHashHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_nine.Show()
@@ -1998,7 +1951,6 @@ class myFrame(wx.Frame):
         theHash=""
         for i in range(20,len(tempHash)):
             theHash+= tempHash[i]
-        #print "GUI DEBUG: panel 11 to panel 10 the Hash: '"+str(theHash)+"'"
         self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash to be cracked: "+str(theHash))
         self.panel_eleven.Hide()
         self.panel_ten.Show()
@@ -2008,6 +1960,7 @@ class myFrame(wx.Frame):
 
     #------------switch from panel 12
     def switchFromPanel12ToPanel1(self, event):
+        self.resetRainbowTableMakerSettingsToDefault(None) #resey all settings back to default
         self.SetTitle("Mighty Cracker")
         self.panel_twelve.Hide()
         self.panel_one.Show()
@@ -2052,13 +2005,12 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
-                percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
+                percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
             else:
                 #if equal to or less than zero
                 print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
                 print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
-            #print "GUI DEBUG: panel ten is shown"
             self.panel_ten.progressBar.SetValue(percentComplete)
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
@@ -2072,15 +2024,12 @@ class myFrame(wx.Frame):
             self.update.clear()
         else: #if shutdown is set
             #TODO linux still does not have a pulsing activity gauge
-            #print "GUI DEBUG: shutdown flag has been set, panel ten is being displayed"
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            #self.panel_ten.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             self.panel_ten.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                #print "GUI DEBUG: shutdown flag is set, solution was not found"
                 if(self.compareString(self.panel_ten.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
                                       len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
                     self.panel_ten.SolutionHeader.SetLabel("Solution: There is no solution for this mode")
@@ -2089,7 +2038,6 @@ class myFrame(wx.Frame):
                     self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                #print "GUI DEBUG: shutdown flag is set, solution was found"
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
@@ -2100,7 +2048,7 @@ class myFrame(wx.Frame):
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
-                percentComplete= float(int(self.dictionary['finished chunks']) / int(self.dictionary['total chunks']))
+                percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
             else:
                 #if equal to or less than zero
                 print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
@@ -2118,15 +2066,12 @@ class myFrame(wx.Frame):
 
             self.update.clear()
         else: #if shutdown flag has been set
-            #print "GUI DEBUG: shutdown flag has been set, displaying panel nine"
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
-            #self.panel_nine.activityGauge.Pulse() #switch gauge back to determinate mode.
             self.panel_nine.activityGauge.SetValue(100) #set value to maximum to fill the gauge
             self.panel_nine.progressBar.SetValue(100) #set progress bar value to maximum to fill the gauge
 
             if(len(self.dictionary["key"]) < 1): #if no solution was found
-                #print "GUI DEBUG: shutdown flag is set, solution was not found"
                 if(self.compareString(self.panel_nine.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
                                       len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
                     self.panel_nine.SolutionHeader.SetLabel("Solution: There is no solutions for this mode")
@@ -2135,7 +2080,6 @@ class myFrame(wx.Frame):
                     self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
-                #print "GUI DEBUG: shutdown flag is set, solution was found"
                 self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
@@ -2199,19 +2143,14 @@ class myFrame(wx.Frame):
 
         #check for valid algorithm
         if(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
-           # print "GUI DEBUG: valid dictionary algorithm detected"
             inputAlgorithm= "MD5"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: valid dictionary algorithm detected"
             inputAlgorithm= "SHA1"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            #print "GUI DEBUG: valid dictionary algorithm detected"
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-           # print "GUI DEBUG: valid dictionary algorithm detected"
             inputAlgorithm= "SHA256"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-           # print "GUI DEBUG: valid dictionary algorithm detected"
             inputAlgorithm= "SHA512"
         else:
             foundInvalidInput= "True"
@@ -2233,68 +2172,51 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
             print "GUI DEBUG: Default hash entry detected, not a valid hash"
-       # else:
-        #    print "GUI DEBUG: valid hash entry detected"
 
         #check for valid hash code length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
-            #print "GUI DEBUG: checking for length of 32 (+20 for beginning of header) for MD5"
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: checking for length of 40 (+20 for hash header) for SHA 1"
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            #print "GUI DEBUG: checking for length of 56 (+20 for hash header) for SHA 224"
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            #print "GUI DEBUG: checking for length of 64 (+20 for hash header) for SHA 256"
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-            #print "GUI DEBUG: checking for length of 128 (+20 for hash header) for SHA 512"
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_three.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         else:
@@ -2346,19 +2268,14 @@ class myFrame(wx.Frame):
 
         #check for valid algorithm
         if(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
-            #print "GUI DEBUG: valid bf algorithm detected"
             inputAlgorithm= "MD5"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: valid bf algorithm detected"
             inputAlgorithm= "SHA1"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            #print "GUI DEBUG: valid bf algorithm detected"
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            #print "GUI DEBUG: valid bf algorithm detected"
             inputAlgorithm= "SHA256"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-            #print "GUI DEBUG: valid bf algorithm detected"
             inputAlgorithm= "SHA512"
         else:
             foundInvalidInput= "True"
@@ -2370,68 +2287,51 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
             print "GUI DEBUG: Default hash entry detected, not a valid hash"
-      #  else:
-       #     print "GUI DEBUG: valid hash entry detected"
 
         #check for hash code length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
-            #print "GUI DEBUG: checking for length of 32 (+20 for beginning of header) for MD5"
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_four.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: checking for length of 40 (+20 for hash header) for SHA 1"
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_four.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            #print "GUI DEBUG: checking for length of 56 (+20 for hash header) for SHA 224"
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_four.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            #print "GUI DEBUG: checking for length of 64 (+20 for hash header) for SHA 256"
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_four.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-            #print "GUI DEBUG: checking for length of 128 (+20 for hash header) for SHA 512"
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-              #  print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_four.inputHashHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         else:
@@ -2448,6 +2348,7 @@ class myFrame(wx.Frame):
             foundInvalidInput= "True"
             invalidMaxKeyInput= "True"
             print "GUI DEBUG: Invalid bf max key input detected"
+
 
         #check to make sure that the min key is less than or equal to max key
         tempMaxKey1=""
@@ -2520,19 +2421,14 @@ class myFrame(wx.Frame):
 
         #check for valid selected algorithm
         if(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "MD5",0,0,len("MD5"),len("MD5"))==True):
-            #print "GUI DEBUG: valid algorithm detected"
             inputAlgorithm= "MD5"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: valid algorithm detected"
             inputAlgorithm= "SHA1"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-           #print "GUI DEBUG: valid algorithm detected"
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            #print "GUI DEBUG: valid algorithm detected"
             inputAlgorithm= "SHA256"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-           # print "GUI DEBUG: valid algorithm detected"
             inputAlgorithm= "SHA512"
         else:
             print "GUI DEBUG: Invalid algorithm detected"
@@ -2553,63 +2449,48 @@ class myFrame(wx.Frame):
 
         #check for valid hash length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
-            #print "GUI DEBUG: checking for length of 32 (+20 for beginning of header) for MD5"
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
-            #print "GUI DEBUG: checking for length of 40 (+20 for hash header) for SHA 1"
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
-            #print "GUI DEBUG: checking for length of 56 (+20 for hash header) for SHA 224"
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
-            #print "GUI DEBUG: checking for length of 64 (+20 for hash header) for SHA 256"
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too short"
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-                #print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
-            #print "GUI DEBUG: checking for length of 128 (+20 for hash header) for SHA 512"
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too short"
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-               # print "GUI DEBUG: hash is too long, length is (20 for beginning of hash header )"+str(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()))
             else:
                 print "GUI DEBUG: valid hash length detected"
         else:
@@ -2708,9 +2589,6 @@ class myFrame(wx.Frame):
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
             fakeVariable=""
-            #if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True):
-             #   self.startRainbowTableCreationSession()
-            #else: #if running OS X or windows
             self.startRainbowTableCreationSession()
         else:
             invalidInputString= ""
@@ -2831,13 +2709,6 @@ class myFrame(wx.Frame):
         self.panel_twelve.numOfRowsHeader.SetLabel('Number of Rows: 100')
         self.panel_twelve.fileNameHeader.SetLabel('Save Rainbow Table File As: myRainbowTable.txt')
 
-    #check to make sure all fields are filled
-    def checkForUnselectedDictionaryOptions(self, event):
-        foundUnselectedDictionaryOption= False
-        #if(checkDictionarySelectedAlgorithm == True): #if true, it found a non selected item
-        #TODO finish implementing, or remove
-    #end of check to make sure all fields are filled
-
     def generateHashDialogDic(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
         dial.ShowModal()
@@ -2846,7 +2717,6 @@ class myFrame(wx.Frame):
         generatedHash= str(hashlib.new(str(inputAlgorithm), inputKey).hexdigest())
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
-
 
     def generateHashDialogBF(self, event):
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
@@ -3088,8 +2958,6 @@ class myFrame(wx.Frame):
         serverIP=""
         for i in range(21, len(tempServerIP)):
             serverIP+= tempServerIP[i]
-        #print "GUI DEBUG: started Network Client"
-        #print "GUI DEBUG: server IP: '"+str(serverIP)+"'"
         self.NetworkClient= Process(target=Client, args=(serverIP,self.shared))
         self.NetworkClient.start()
         self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
@@ -3101,7 +2969,7 @@ class myFrame(wx.Frame):
         algorithmSetting= tempAlgorithmSetting
         tempHashSetting= str(self.panel_three.inputHashHeader.GetLabel())
         hashSetting= ""
-        for i in range(19, len(tempHashSetting)):
+        for i in range(20, len(tempHashSetting)):
             hashSetting+= tempHashSetting[i]
         tempFileName= str(self.panel_three.inputDictFileHeader.GetLabel())
         FileName= ""
@@ -3118,7 +2986,7 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting,
-                           "file name":FileName, "single": singleSetting}#, "finished chunks":0} #TODO commented out because console does not have this
+                           "file name":FileName, "single": singleSetting}
         #DEBUG SETTINGS MESSAGES
         print "GUI DICTIONARY SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
         print "GUI DICTIONARY SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
@@ -3136,10 +3004,9 @@ class myFrame(wx.Frame):
         if(self.compareString(singleSetting, "False",0,0,len("False"),len("False"))):
             self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         else:
-            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
-        #print "GUI DEBUG: before process is started"
+            #self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,)) #keep in the event that the new server changes do not work
+            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
-        #print "GUI DEBUG: after process has started"
         if(singleSetting is 'False'):
             self.switchFromPanel3ToPanel9()
         else:
@@ -3194,8 +3061,7 @@ class myFrame(wx.Frame):
         else:
             singleSetting="False"
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm":algorithmSetting, "hash":hashSetting, "min key length":finalMinKeyLengthSetting,
-                           "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting
-                          }#, "finished chunks":0} #TODO commented out because conosle does not have this
+                           "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
 
         #DEBUG SETTING MESSAGES
         print "GUI BRUTE FORCE SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
@@ -3215,7 +3081,8 @@ class myFrame(wx.Frame):
         if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
             self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         else:
-            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
+           #self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,)) #keep in case the new server changes dont work
+            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel4ToPanel9()
@@ -3232,22 +3099,21 @@ class myFrame(wx.Frame):
         tempHashToBeCracked= self.panel_eleven.hashToBeCrackedHeader.GetLabelText()
         #remove extra heading from the front of the hash code
         hashToBeCracked= ""
-        for i in range(19, len(tempHashToBeCracked)):
+        for i in range(20, len(tempHashToBeCracked)):
             hashToBeCracked+= str(tempHashToBeCracked[i])
         tempSingleSetting= self.panel_eleven.currentMode.GetLabelText()
         #remove extra heading from current Mode
         tempSingleSetting2= ""
-        for i in range (13, len(tempSingleSetting)):
+        for i in range (14, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
         #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
         print "GUI DEBUG: rainbowTableUser tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
-        if(self.compareString(tempSingleSetting2, " Single Mode",0,0,len(" Single Mdoe"), len(" Single Mode"))==True):
+        if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
             singleSetting="False"
-        crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting
-                          }# , "finished chunks":0} #TODO commented out because console ui does not have this
+        crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
 
         #DEBUG SETTINGS MESSAGES
         print "GUI RAINBOW USER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
@@ -3264,7 +3130,8 @@ class myFrame(wx.Frame):
         if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
             self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         else:
-            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
+            #self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,)) #keep in case the new server changes do not work
+            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel11ToPanel9()
@@ -3324,7 +3191,6 @@ class myFrame(wx.Frame):
         for i in range (14, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
-        #print "GUI DEBUG: tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
         #tested, and the single mode has no space in front
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
@@ -3332,7 +3198,7 @@ class myFrame(wx.Frame):
             singleSetting="False"
         crackingSettings = {"cracking method":crackingMethod, "algorithm":algorithmSetting, "key length":keyLengthSetting,
                             "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
-                            "file name":fileNameSetting, "single":singleSetting}#, "finished chunks":0} #TODO commented out because console does not have this
+                            "file name":fileNameSetting, "single":singleSetting}
         #DEBUG SETTINGS MESSAGES
         print "GUI RAINBOW MAKER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
         print "GUI RAINBOW MAKER SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
@@ -3352,7 +3218,8 @@ class myFrame(wx.Frame):
         if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
             self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
         else:
-            self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,))
+            #self.NetworkServer= Process(target=OldServer, args=(crackingSettings,self.shared,)) #keep in case new server changes do not work
+            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
         if(singleSetting is 'False'):
             self.switchFromPanel12ToPanel9()
@@ -3402,7 +3269,7 @@ class myFrame(wx.Frame):
 
         except Exception as inst:
             print "========================================================================================"
-            print "ERROR: An exception was thrown in getOS try block"
+            print "GUI ERROR: An exception was thrown in getOS try block"
             print type(inst)  # the exception instance
             print inst.args  # arguments stored in .args
             print inst  # _str_ allows args tto be printed directly
@@ -3414,6 +3281,13 @@ class myFrame(wx.Frame):
         try:
             posA = startA
             posB = startB
+            #TODO make sure that inboundStringA is longer than or equal to inboundStringB
+            if(len(inboundStringB) > len(inboundStringA)):
+                tempA= inboundStringA
+                inboundStringA= inboundStringB
+                inboundStringB= tempA
+                endA= len(inboundStringB)
+                endB= len(inboundStringB)
             if((endA-startA) != (endB-startB)):
                 return False
             for x in range(startA,endA):
@@ -3427,6 +3301,8 @@ class myFrame(wx.Frame):
         except Exception as inst:
             print "========================================================================\n"
             print "GUI ERROR: Exception thrown in compareString Function: " +str(inst)+"\n"
+            print "inboundStringA: '"+str(inboundStringA)+"'"
+            print "inboundStringB: '"+str(inboundStringB)+"'"
             print "========================================================================\n"
             return False
 
