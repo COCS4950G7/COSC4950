@@ -957,7 +957,6 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.activityGauge.Pulse() #switch gauge to indeterminate mode
         hbox5.Add(self.activityGauge, flag=wx.LEFT, border=5)
         vbox.Add(hbox5, flag=wx.ALIGN_CENTER|wx.RIGHT, border=10)
-        #TODO BUG activity gauge does not pulse on Linux
 
         vbox.Add((-1,10))
 
@@ -2017,13 +2016,19 @@ class myFrame(wx.Frame):
 
             self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
 
+            if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
+                currentGaugeValue= self.panel_ten.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_ten.activityGauge.SetValue(0)
+                else:
+                    self.panel_ten.activityGauge.SetValue(currentGaugeValue + 10)
+
             if(self.compareString(self.panel_ten.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
                                   len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
                 self.panel_ten.hashBeingCrackedHeader.SetLabel("Hash Being Cracked: There is no hash to be cracked for this mode")
 
             self.update.clear()
         else: #if shutdown is set
-            #TODO linux still does not have a pulsing activity gauge
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
             self.panel_ten.activityGauge.SetValue(100) #set value to maximum to fill the gauge
@@ -2060,6 +2065,13 @@ class myFrame(wx.Frame):
 
             self.panel_nine.currentStatus.SetLabel("Current Status: Searching")
 
+            if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
+                currentGaugeValue= self.panel_nine.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_nine.activityGauge.SetValue(0)
+                else:
+                    self.panel_nine.activityGauge.SetValue(currentGaugeValue + 10)
+
             if(self.compareString(self.panel_nine.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
                                   len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
                 self.panel_nine.crackingThisHashHeader.SetLabel("Hash Being Cracked: There is no hash to be cracked for this mode")
@@ -2086,6 +2098,13 @@ class myFrame(wx.Frame):
     def updateNetworkClientTimer(self, event):
         if(not self.shutdown.is_set()):
             print "GUI DEBUG: shutdown flag not set yet"
+            if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
+                currentGaugeValue= self.panel_eight.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_eight.activityGauge.SetValue(0)
+                else:
+                    self.panel_eight.activityGauge.SetValue(currentGaugeValue + 10)
+
         else: #if shutdown variable is set
             self.panel_eight.currentStatus.SetLabel("Current Status: Finished Searching")
             #self.panel_eight.activityGauge.Pulse() #switch back to determinate mode
