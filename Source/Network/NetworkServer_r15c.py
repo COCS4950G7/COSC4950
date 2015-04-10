@@ -422,8 +422,7 @@ class Server():
                     result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
 
                 result_monitor.start()
-                print "manager pid: %i" %manager._process.pid
-                print "result monitor pid: %i" % result_monitor.pid
+
                 for prefix in bf.get_prefix():
                     if prefix == '':
                         prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
@@ -450,12 +449,9 @@ class Server():
                             break
                         except Qqueue.Full:
                             continue
-                print "after for"
                 while not shutdown.is_set():
                     time.sleep(.1)
-                os.kill(manager._process._parent_pid, signal.SIGKILL)
 
-                print "shutting down chunker"
                 result_monitor.terminate()
                 result_monitor.join()
                 if manager is not None:
