@@ -148,16 +148,7 @@ class Server():
                                   origHash=self.settings["hash"],
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
-                    print "bf settings"
-                    print bf.alphabet
-                    print bf.algorithm
-                    print bf.origHash
-                    print bf.minKeyLength
-                    print bf.maxKeyLength
-                    if self.shutdown is not None:
-                        print "shutdown exists"
-                    if self.shared_dict is not None:
-                        print "shared dict exists"
+
                     self.total_chunks = bf.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, self.shutdown))
@@ -333,16 +324,15 @@ class Server():
                 while not dictionary.isEof() and not self.found_solution.value:  # Keep looping while it is not eof
                     #chunk is a Chunk object
                     chunk = dictionary.getNextChunk()  # get next chunk from dictionary
+                    #Retrieves word from chunk
+                    temp_word = self.extract_word(chunk)
+                    #Shares a 'current' word with UIs for display
+                    self.shared_dict["current word"] = temp_word
                     if self.single_user_mode:
                         while not self.shutdown.is_set(): #TODO INCONSISTANT: this uses the global shutdown variable
                                                             #TODO while loop below uses the parameter shutdown variable
                             try:
-                                #Retrieves word from chunk
-                                temp_word = self.extract_word(chunk)
-                                #Shares a 'current' word with UIs for display
-                                self.shared_dict["current word"] = temp_word
-
-                                job_queue.put(chunk)
+                                job_queue.put(chunk, timeout=.1)
                                 break
                             except Qqueue.Full:
                                 continue
@@ -354,11 +344,6 @@ class Server():
                         while not shutdown.is_set():  #TODO INCONSISTANT: this uses the parameter shutdown variable
                                                         #TODO while loop above uses the global shutdown variable
                             try:
-                                #Retrieves word from chunk
-                                #temp_word = self.extract_word(new_chunk)
-                                #Shares a 'current' word with UIs for display
-                                #self.shared_dict["current word"] = temp_word
-
                                 job_queue.put(new_chunk, timeout=.1)
                                 #add params to list of sent chunks along with a timestamp so we can monitor which ones come back
                                 self.sent_chunks.append((chunk.params, time.time()))
@@ -429,6 +414,9 @@ class Server():
                 for prefix in bf.get_prefix():
                     if prefix == '':
                         prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
+                    else:
+                        #Shares a 'current' word with UIs for display
+                        self.shared_dict["current word"] = prefix
                     if prefix == "******possibilities exhausted******":
                         prefix = "******possibilities exhausted******"
                     params = "bruteforce\n" + bf.algorithm + "\n" + bf.origHash + "\n" + bf.alphabet + "\n" \
@@ -444,11 +432,6 @@ class Server():
                                      'halt': False}
                     while not shutdown.is_set():
                         try:
-                            #Retrieves word from chunk
-                            #temp_word = self.extract_word(new_chunk)
-                            #Shares a 'current' word with UIs for display
-                            #self.shared_dict["current word"] = temp_word
-
                             self.job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
                             break
@@ -512,14 +495,13 @@ class Server():
                 result_monitor.start()
                 while not rainbow.isEof() and not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     chunk = rainbow.getNextChunk()
+                    #Retrieves word from chunk
+                    temp_word = self.extract_word(chunk)
+                    #Shares a 'current' word with UIs for display
+                    self.shared_dict["current word"] = temp_word
                     if self.single_user_mode: #if in single mode
                         while True:
                             try:
-                                #Retrieves word from chunk
-                                temp_word = self.extract_word(chunk)
-                                #Shares a 'current' word with UIs for display
-                                self.shared_dict["current word"] = temp_word
-
                                 job_queue.put(chunk, timeout=.1)
                                 break
                             except Qqueue.Full:
@@ -530,10 +512,6 @@ class Server():
                                      'timestamp': time.time()}
                         while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                             try:
-                                #Retrieves word from chunk
-                                temp_word = self.extract_word(new_chunk)
-                                #Shares a 'current' word with UIs for display
-                                self.shared_dict["current word"] = temp_word
 
                                 job_queue.put(new_chunk, timeout=.1)
                                 self.sent_chunks.append((chunk.params, time.time()))
