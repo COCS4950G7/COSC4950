@@ -113,8 +113,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
 
         def run_server(self):  # the primary server loop
-            print "run server"
-            print "NETWORK SERVER DEBUG: in run_server function" #Added by Chris Hamm, a more useful print statement
+            #print "run server"
             start_time = time.time()
             try:  # runserver definition try block
                 #if running in single mode, set shared queues and then start the process
@@ -181,8 +180,7 @@ class Server():
                     return "wtf?"
 
                 chunk_maker.start()
-                with open(self.debug_file, 'a') as file:
-                    file.write("Chunk Maker PID: %i" % chunk_maker.pid)
+                #print "chunk maker pid: %i" % chunk_maker.pid
                 chunk_maker.join()
                 #chunk_maker.terminate()
                 if chunk_maker.is_alive():
@@ -190,9 +188,7 @@ class Server():
                     print "NETWORKSERVER DEBUG: chunk_maker is alive" #Added by c hamm, a more useful print statement
 
                 self.update.set()
-                if not self.single_user_mode:
-                    os.kill(current_process().pid + 3, signal.SIGKILL)
-                    os.kill(current_process().pid + 4, signal.SIGKILL)
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in runserver definition Try block"
@@ -232,18 +228,16 @@ class Server():
         def check_results(self, results_queue, shutdown): #TODO naming conflict, shutdown is also a global variable
             current_process().authkey = "Popcorn is awesome!!!"
             #print "check results started"
-            with open(self.debug_file, 'a') as file:
-                    file.write("check_results PID: %i" % current_process().pid)
             completed_chunks = 0
             try:
                 while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     try:
                         self.update.set()
-                        result = results_queue.get(block=True, timeout=.1)  # get chunk from shared result queue
+                        result = results_queue.get(block=True, timeout=.5)  # get chunk from shared result queue
                     except Qqueue.Empty:
                         continue
-                    print "chunk done, result: %s" % result[0]
-                    print "params: %s" % result[1]
+                    #print "chunk done, result: %s" % result[0]
+                    #print "params: %s" % result[1]
                     if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
                         shutdown.set()
@@ -255,6 +249,25 @@ class Server():
                         self.shared_dict["finished chunks"] += 1
                         self.shared_dict["key"] = key
                         self.update.set()
+                        #print "win block finished"
+                        #print "result monitor process: %i" % current_process().pid
+                        #print "result monitor parent process: %i" % current_process()._parent_pid
+                        time.sleep(.5)
+                        try:
+                            os.kill(current_process().pid-1, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid-1
+                        try:
+                            os.kill(current_process()._parent_pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process()._parent_pid
+                        try:
+                            os.kill(current_process().pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid
                         break
                     elif(result[0] == "c"):  # check to see if client has crashed
                         print "A client has crashed!"  # THIS FUNCTION IS UNTESTED
@@ -280,6 +293,8 @@ class Server():
                             if self.rainmaker.isDone():
                                 print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
                                 shutdown.set() #TODO are you setting the correct shutdown???
+                                self.shutdown.set()
+                                self.found_solution = True
                                 break
 
             except Exception as inst:
@@ -365,12 +380,8 @@ class Server():
                 #result_monitor.terminate()
                 if manager is not None:
                     manager.shutdown()
-                    if result_monitor.is_alive():
-                        with open(self.debug_file, 'a') as file:
-                            file.write("chunk_dictionary manager PID: %i is alive" % manager._process.pid)
-                    else:
-                        with open(self.debug_file, 'a') as file:
-                            file.write("chunk_dictionary manager PID: %i is dead" % manager._process.pid)
+
+
                 time.sleep(1)
             except Exception as inst:
                 print "============================================================================================="
@@ -400,7 +411,6 @@ class Server():
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
                     manager.start()
-                    job_queue = manager.get_job_q()
                     result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
@@ -412,6 +422,8 @@ class Server():
                     result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
 
                 result_monitor.start()
+                print "manager pid: %i" %manager._process.pid
+                print "result monitor pid: %i" % result_monitor.pid
                 for prefix in bf.get_prefix():
                     if prefix == '':
                         prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
@@ -433,27 +445,23 @@ class Server():
                                      'halt': False}
                     while not shutdown.is_set():
                         try:
-                            self.job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
-                            self.sent_chunks.append((params, time.time()))
+                            self.job_queue.put(new_chunk, timeout=.05)  # put next chunk on the job queue.
+                            #self.sent_chunks.append((params, time.time()))
                             break
                         except Qqueue.Full:
                             continue
+                print "after for"
                 while not shutdown.is_set():
                     time.sleep(.1)
-                    if shutdown.is_set() or self.shutdown.is_set() or self.found_solution.value:
-                        print "shutting down chunker"
-                        while True:
-                            try:
-                                job_queue.get_nowait()
-                            except Qqueue.Empty:
-                                result_monitor.join()
-                                #result_monitor.terminate()
-                                #os.kill(result_monitor.pid, signal.SIGTERM)
-                                time.sleep(.5)
-                                if manager is not None:
-                                   manager.shutdown()
-                                time.sleep(1)
-                                return
+                os.kill(manager._process._parent_pid, signal.SIGKILL)
+
+                print "shutting down chunker"
+                result_monitor.terminate()
+                result_monitor.join()
+                if manager is not None:
+                    manager.shutdown()
+                time.sleep(1)
+                return
 
             except Exception as inst:
                 print "============================================================================================="
@@ -465,6 +473,7 @@ class Server():
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
+
         #--------------------------------------------------------------------------------------------------
         #end of chunk for brute force function
         #--------------------------------------------------------------------------------------------------
@@ -588,10 +597,9 @@ class Server():
                             except Qqueue.Empty:
                                 return
                             finally:
-                                time.sleep(2)
                                 if manager is not None:
+                                    time.sleep(1)
                                     manager.shutdown()
-                                    time.sleep(2)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
