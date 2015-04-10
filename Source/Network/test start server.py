@@ -1,7 +1,7 @@
 # This is a shortcut method to start server without any UI. For debugging purposes only.
 
 from multiprocessing import Process, Event, Manager, current_process
-from NetworkServer_r15b import Server
+from NetworkServer_r15c import Server
 import string
 import os
 import time
@@ -10,9 +10,9 @@ import signal
 
 class start():
 
-    client = Process()
-    server = Process()
+    server = None
     settings = []
+    debug_file = "/Users/327pzq/procs.txt"
 
     settings.append({"cracking method": "dic",  # settings[0]
                 "algorithm": "md5",
@@ -27,7 +27,7 @@ class start():
                  "hash": "33da7a40473c1637f1a2e142f4925194",  # popcorn (md5)
                  #"hash": "c3dc5a6ab47d683eb4e8d5c74c6147afa3f86f700301c3eb858689189761f91e4cfd2c6c5ccb1c03ec023b8f3457a5df918d279a4e192fabe1ef0f8b47592364",  # popcorn in sha512
 
-                 "file name": "realuniq.txt",                   # very short runtime in dic.txt
+                 "file name": "dic.txt",                   # very short runtime in dic.txt
                  "single": "True"})                    # (short run time on realuniq dictionary ~18M lines)
 
     settings.append( {"cracking method": "dic",  # settings[2]
@@ -114,7 +114,10 @@ class start():
         shared.append(shutdown)
         shared.append(update)
 
-        preset = 3
+        with open(self.debug_file, 'a') as file:
+            file.write("test start server PID: %i\n" % current_process().pid)
+
+        preset = 6
         if self.settings[preset]["single"] == "False":
             network = True
         else:
@@ -122,6 +125,7 @@ class start():
         self.server = Process(target=Server, args=(self.settings[preset], shared))
         self.server.start()
 
+        print "server pid: %i" % self.server.pid
         # this is a very simple example of how an update loop in the UI classes might work
         while not shutdown.is_set():
             # update is an Event, this means that a process can use the .wait() command to block until it is .set()
@@ -130,21 +134,19 @@ class start():
             if dictionary["key"] is not '':
                 print "Printing key from start_server method: " + dictionary["key"]
                 break
-            print "%d chunks completed of %i total." % (dictionary["finished chunks"], dictionary["total chunks"])
+            #print "%d chunks completed of %i total." % (dictionary["finished chunks"], dictionary["total chunks"])
             # after UI data has been updated, .clear() the update event so it will wait again in the next iteration
             update.clear()
         shutdown.set()
         time.sleep(1)
-
 
         manager.shutdown()
         self.server.terminate()
         self.server.join()
         if network:
             print self.server.pid
-            os.kill(self.server.pid + 3, signal.SIGTERM)
+            os.kill(self.server.pid + 3, signal.SIGKILL)
             os.kill(self.server.pid + 4, signal.SIGTERM)
-
 
 
 if __name__ == '__main__':

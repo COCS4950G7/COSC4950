@@ -55,6 +55,7 @@ class Server():
         mode_bit_1 = Event()
         mode_bit_2 = Event()
         manager = None
+        debug_file = "/Users/327pzq/procs.txt"
 
         def __init__(self, settings, shared_variables):
             current_process()._authkey = self.AUTHKEY #set the authentication key
@@ -74,13 +75,13 @@ class Server():
             #print "DEBUG: file name= "+str(settings["file name"])
             #print "DEBUG: single= "+str(settings["single"])
             #Brute Force settings Check
-            #print "DEBUG: cracking method= "+str(settings["cracking method"])
-            #print "DEBUG: algorithm= "+str(settings["algorithm"])
-            #print "DEBUG: hash= "+str(settings["hash"])
-            #print "DEBUG: min key length= "+str(settings["min key length"])
-            #print "DEBUG: max key length= "+str(settings["max key length"])
-            #print "DEBUG: alphabet= "+str(settings["alphabet"])
-            #print "DEBUG: single= "+str(settings["single"])
+            #print "DEBUG: cracking method="+str(settings["cracking method"])
+            #print "DEBUG: algorithm="+str(settings["algorithm"])
+            #print "DEBUG: hash="+str(settings["hash"])
+            #print "DEBUG: min key length="+str(settings["min key length"])
+            #print "DEBUG: max key length="+str(settings["max key length"])
+            #print "DEBUG: alphabet="+str(settings["alphabet"])
+            #print "DEBUG: single="+str(settings["single"])
 
             #Rainbow Table Maker settings check
             '''
@@ -147,6 +148,16 @@ class Server():
                                   origHash=self.settings["hash"],
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
+                    print "bf settings"
+                    print bf.alphabet
+                    print bf.algorithm
+                    print bf.origHash
+                    print bf.minKeyLength
+                    print bf.maxKeyLength
+                    if self.shutdown is not None:
+                        print "shutdown exists"
+                    if self.shared_dict is not None:
+                        print "shared dict exists"
                     self.total_chunks = bf.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, self.shutdown))
@@ -179,7 +190,8 @@ class Server():
                     return "wtf?"
 
                 chunk_maker.start()
-                print "Chunk Maker PID: %i" % chunk_maker.pid
+                with open(self.debug_file, 'a') as file:
+                    file.write("Chunk Maker PID: %i" % chunk_maker.pid)
                 chunk_maker.join()
                 #chunk_maker.terminate()
                 if chunk_maker.is_alive():
@@ -187,7 +199,8 @@ class Server():
                     print "NETWORKSERVER DEBUG: chunk_maker is alive" #Added by c hamm, a more useful print statement
 
                 self.update.set()
-
+                os.kill(current_process().pid + 3, signal.SIGKILL)
+                os.kill(current_process().pid + 4, signal.SIGKILL)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in runserver definition Try block"
@@ -225,7 +238,10 @@ class Server():
         # monitor results queue
         #--------------------------------------------------------------------------------------------------
         def check_results(self, results_queue, shutdown): #TODO naming conflict, shutdown is also a global variable
-            print "check results started"
+            current_process().authkey = "Popcorn is awesome!!!"
+            #print "check results started"
+            with open(self.debug_file, 'a') as file:
+                    file.write("check_results PID: %i" % current_process().pid)
             completed_chunks = 0
             try:
                 while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
@@ -293,7 +309,6 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_dictionary(self, dictionary, shutdown):  #TODO naming conflict, shutdown is also a global variable
             try:
-
                 if not self.single_user_mode:
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
                     JobQueueManager.register('get_result_q', callable=self.get_result_queue)
@@ -332,17 +347,17 @@ class Server():
                             except Qqueue.Full:
                                 continue
                     else:
-                        new_chunk = manager.Value(dict, {'params': chunk.params,
-                                                         'data': chunk.data,
-                                                         'timestamp': time.time(),
-                                                         'halt': False})
+                        new_chunk = {'params': chunk.params,
+                                     'data': chunk.data,
+                                     'timestamp': time.time(),
+                                     'halt': False}
                         while not shutdown.is_set():  #TODO INCONSISTANT: this uses the parameter shutdown variable
                                                         #TODO while loop above uses the global shutdown variable
                             try:
                                 #Retrieves word from chunk
-                                temp_word = self.extract_word(new_chunk)
+                                #temp_word = self.extract_word(new_chunk)
                                 #Shares a 'current' word with UIs for display
-                                self.shared_dict["current word"] = temp_word
+                                #self.shared_dict["current word"] = temp_word
 
                                 job_queue.put(new_chunk, timeout=.1)
                                 #add params to list of sent chunks along with a timestamp so we can monitor which ones come back
@@ -362,9 +377,14 @@ class Server():
                                 break
                 result_monitor.join()
                 #result_monitor.terminate()
-                time.sleep(.5)
                 if manager is not None:
-                    manager.shutdown() #TODO FATAL ERROR: ERROR THROWN HERE, no manager is defined
+                    manager.shutdown()
+                    if result_monitor.is_alive():
+                        with open(self.debug_file, 'a') as file:
+                            file.write("chunk_dictionary manager PID: %i is alive" % manager._process.pid)
+                    else:
+                        with open(self.debug_file, 'a') as file:
+                            file.write("chunk_dictionary manager PID: %i is dead" % manager._process.pid)
                 time.sleep(1)
             except Exception as inst:
                 print "============================================================================================="
@@ -383,8 +403,9 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunk for brute force function
         #--------------------------------------------------------------------------------------------------
-        def chunk_brute_force(self, bf, shutdown):  #TODO naming conflict, shutdown is also a global variable
+        def chunk_brute_force(self, bf, shutdown):
             try:
+                current_process()._authkey = self.AUTHKEY
                 if not self.single_user_mode:
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
                     JobQueueManager.register('get_result_q', callable=self.get_result_queue)
@@ -393,7 +414,6 @@ class Server():
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
                     manager.start()
-                    self.shared_dict["server manager pid"] = manager._process.pid
                     job_queue = manager.get_job_q()
                     result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
@@ -418,16 +438,16 @@ class Server():
                         new_chunk = Chunk.Chunk()
                         new_chunk.params = params
                     else: #if in network mode
-                        new_chunk = manager.Value(dict, {'params': params,
-                                                         'data': '',
-                                                         'timestamp': time.time(),
-                                                         'halt': False})
+                        new_chunk = {'params': params,
+                                     'data': '',
+                                     'timestamp': time.time(),
+                                     'halt': False}
                     while not shutdown.is_set():
                         try:
                             #Retrieves word from chunk
-                            temp_word = self.extract_word(new_chunk)
+                            #temp_word = self.extract_word(new_chunk)
                             #Shares a 'current' word with UIs for display
-                            self.shared_dict["current word"] = temp_word
+                            #self.shared_dict["current word"] = temp_word
 
                             self.job_queue.put(new_chunk, timeout=.25)  # put next chunk on the job queue.
                             self.sent_chunks.append((params, time.time()))
@@ -505,9 +525,9 @@ class Server():
                             except Qqueue.Full:
                                 continue
                     else:
-                        new_chunk = manager.Value(dict, {'params': chunk.params,
-                                                         'data': chunk.data,
-                                                         'timestamp': time.time()})
+                        new_chunk = {'params': chunk.params,
+                                     'data': chunk.data,
+                                     'timestamp': time.time()}
                         while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                             try:
                                 #Retrieves word from chunk
@@ -592,7 +612,7 @@ class Server():
                                 time.sleep(2)
                                 if manager is not None:
                                     manager.shutdown()
-                                return
+                                    time.sleep(2)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
@@ -879,4 +899,5 @@ class Server():
 
 
 class JobQueueManager(SyncManager):
+    current_process().authkey = "Popcorn is awesome!!!"
     pass

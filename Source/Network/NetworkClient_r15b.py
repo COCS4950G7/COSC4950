@@ -12,7 +12,7 @@
 
 
 from multiprocessing.managers import SyncManager
-from multiprocessing import Process
+from multiprocessing import Process, current_process
 import Queue
 import Chunk
 import time
@@ -31,7 +31,8 @@ class Client():
     shutdown = None
 
     def __init__(self, ip, shared_variables):
-
+        current_process().authkey = self.AUTHKEY
+        current_process().authkey = "Popcorn is awesome!!!"
         #Allows ConsoleUI to use shared value and others to use parameter value
         if not ip == "127.0.1.1":
 
@@ -61,6 +62,7 @@ class Client():
     #--------------------------------------------------------------------------------------------------
     def run_client(self):  # Client Primary loop
         #start_time = time.time()
+        current_process().authkey = "Popcorn is awesome!!!"
         try:  # runclient definition try block
             manager = self.make_client_manager(self.IP, self.PORTNUM, self.AUTHKEY)
             self.is_connected.set()
@@ -192,8 +194,8 @@ class Client():
                 except Queue.Empty:
                     continue
                 chunk = Chunk.Chunk()
-                chunk.params = job.value['params']
-                chunk.data = job.value['data']
+                chunk.params = job['params']
+                chunk.data = job['data']
                 dictionary.find(chunk)
                 result = dictionary.isFound()
                 params = chunk.params.split()
@@ -221,6 +223,7 @@ class Client():
 
     def run_brute_force(self, bf, job_queue, result_queue, shutdown):
         try:
+            current_process().authkey = "Popcorn is awesome!!!"
             bf.result_queue = result_queue
             while not shutdown.is_set():
                 try:
@@ -228,8 +231,8 @@ class Client():
                 except Queue.Empty:
                     continue
                 chunk = Chunk.Chunk()
-                chunk.params = job.value['params']
-                chunk.data = job.value['data']
+                chunk.params = job['params']
+                chunk.data = job['data']
                 #print chunk.params
                 bf.run_chunk(chunk)
                 bf.start_processes()
@@ -255,8 +258,8 @@ class Client():
                 except Queue.Empty:
                     continue
                 chunk = Chunk.Chunk()
-                chunk.params = job.value["params"]
-                chunk.data = job.value["data"]
+                chunk.params = job["params"]
+                chunk.data = job["data"]
                 rain.find(chunk)
                 if rain.isFound():
                     result_queue.put(("w", rain.getKey()))
