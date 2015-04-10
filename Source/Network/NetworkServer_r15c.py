@@ -190,8 +190,9 @@ class Server():
                     print "NETWORKSERVER DEBUG: chunk_maker is alive" #Added by c hamm, a more useful print statement
 
                 self.update.set()
-                os.kill(current_process().pid + 3, signal.SIGKILL)
-                os.kill(current_process().pid + 4, signal.SIGKILL)
+                if not self.single_user_mode:
+                    os.kill(current_process().pid + 3, signal.SIGKILL)
+                    os.kill(current_process().pid + 4, signal.SIGKILL)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in runserver definition Try block"
