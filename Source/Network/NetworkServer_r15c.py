@@ -252,7 +252,7 @@ class Server():
                         #print "win block finished"
                         #print "result monitor process: %i" % current_process().pid
                         #print "result monitor parent process: %i" % current_process()._parent_pid
-                        time.sleep(.5)
+                        time.sleep(2)
                         try:
                             os.kill(current_process().pid-1, signal.SIGKILL)
                         except Exception:
@@ -502,9 +502,9 @@ class Server():
                 while not rainbow.isEof() and not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     chunk = rainbow.getNextChunk()
                     #Retrieves word from chunk
-                    temp_word = self.extract_word(chunk)
+                    #temp_word = self.extract_word(chunk)
                     #Shares a 'current' word with UIs for display
-                    self.shared_dict["current word"] = temp_word
+                    #self.shared_dict["current word"] = temp_word
                     if self.single_user_mode: #if in single mode
                         while True:
                             try:
@@ -520,7 +520,7 @@ class Server():
                             try:
 
                                 job_queue.put(new_chunk, timeout=.1)
-                                self.sent_chunks.append((chunk.params, time.time()))
+                                #self.sent_chunks.append((chunk.params, time.time()))
                                 break
                             except Qqueue.Full:
                                 continue
