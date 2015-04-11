@@ -19,7 +19,7 @@
 import hashlib
 import itertools
 import string
-from multiprocessing import cpu_count, Process, Queue, Value
+from multiprocessing import cpu_count, Process, Queue, Value, current_process
 
 
 class WorkUnit(object):
@@ -44,7 +44,7 @@ class Brute_Force():
     chunk_size = 0
     countey = Value('I', 0)
     done = Value('b', False)
-    total_work_units = 0
+    total_work_units = 1
     possibilities_exhausted = False
     first_unit = True
     children = []
@@ -53,7 +53,8 @@ class Brute_Force():
 
     def __init__(self):
         if not __name__ == '__main__':
-                return
+            return
+        current_process().authkey = "Popcorn is awesome!!!"
 
     def set_params(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
         self.alphabet = alphabet
@@ -150,7 +151,10 @@ class Brute_Force():
                 tempkey = prefix + ''.join(key)
                 #print tempkey
                 if self.isSolution(tempkey):
-                    self.result_queue.put(('w', tempkey))
+                    try:
+                        self.result_queue.put(('w', tempkey), timeout=1)
+                    except Exception:
+                        return
                     while not self.queue.empty():
                         self.queue.get()
                     self.countey.value += 1
