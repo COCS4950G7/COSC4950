@@ -1999,6 +1999,7 @@ class myFrame(wx.Frame):
         dial.ShowModal()
 
     def updateSingleTimer(self,  event):
+        #solutionEnlarged= "False"
         if(not self.shutdown.is_set()):
             print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
             print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
@@ -2017,6 +2018,12 @@ class myFrame(wx.Frame):
             self.panel_ten.currentStatus.SetLabel("Current Status: Searching")
 
             if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
+                currentGaugeValue= self.panel_ten.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_ten.activityGauge.SetValue(0)
+                else:
+                    self.panel_ten.activityGauge.SetValue(currentGaugeValue + 10)
+            elif(self.compareString(self.theDetectedOS, "Darwin",0,0,len("Darwin"),len("Darwin"))==True):
                 currentGaugeValue= self.panel_ten.activityGauge.GetValue()
                 if(currentGaugeValue == 100):
                     self.panel_ten.activityGauge.SetValue(0)
@@ -2041,9 +2048,14 @@ class myFrame(wx.Frame):
                     self.panel_ten.currentStatus.SetLabel("Current Status: Finished Creating Rainbow Table")
                 else:
                     self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_ten.SolutionHeader.SetForegroundColour((255,0,0)) #change text color to red
                     self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_ten.SolutionHeader.SetForegroundColour((0,255,0)) #change text color to green
+               # if(self.compareString(solutionEnlarged, "False",0,0,len("False"),len("False"))==True):
+                self.panel_ten.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
+                #    solutionEnlarged= "True"
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def updateNetworkServerTimer(self, event):
@@ -2071,6 +2083,13 @@ class myFrame(wx.Frame):
                     self.panel_nine.activityGauge.SetValue(0)
                 else:
                     self.panel_nine.activityGauge.SetValue(currentGaugeValue + 10)
+            elif(self.compareString(self.theDetectedOS, "Darwin",0,0,len("Darwin"),len("Darwin"))==True):
+                currentGaugeValue= self.panel_nine.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_nine.activityGauge.SetValue(0)
+                else:
+                    self.panel_nine.activityGauge.SetValue(currentGaugeValue + 10)
+
 
             if(self.compareString(self.panel_nine.currentCrackingMode.GetLabel(),"Cracking Mode: Rainbow Table Maker",0,0,
                                   len("Cracking Mode: Rainbow Table Maker"),len("Cracking Mode: Rainbow Table Maker"))==True):
@@ -2090,15 +2109,23 @@ class myFrame(wx.Frame):
                     self.panel_nine.currentStatus.SetLabel("Current Status: Finished Creating Rainbow Table")
                 else:
                     self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
+                    self.panel_nine.SolutionHeader.SetForegroundColour((255,0,0)) #set text color to red
                     self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
+                self.panel_nine.SolutionHeader.SetForegroundColour((0,255,0)) #set text color to green
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def updateNetworkClientTimer(self, event):
         if(not self.shutdown.is_set()):
             print "GUI DEBUG: shutdown flag not set yet"
             if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
+                currentGaugeValue= self.panel_eight.activityGauge.GetValue()
+                if(currentGaugeValue == 100):
+                    self.panel_eight.activityGauge.SetValue(0)
+                else:
+                    self.panel_eight.activityGauge.SetValue(currentGaugeValue + 10)
+            elif(self.compareString(self.theDetectedOS, "Darwin",0,0,len("Darwin"),len("Darwin"))==True):
                 currentGaugeValue= self.panel_eight.activityGauge.GetValue()
                 if(currentGaugeValue == 100):
                     self.panel_eight.activityGauge.SetValue(0)
