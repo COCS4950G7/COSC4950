@@ -1426,6 +1426,7 @@ class myFrame(wx.Frame):
         #custom defined fonts
         self.titleFont= wx.Font(20, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) #custom font for the title
         self.textFont= wx.Font(14, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)#custom font for the normal text
+        self.enlargedSolutionFont= wx.Font(18, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD) #custom font for when solution is found/not found
 
         #detectedOS variable
         self.theDetectedOS= "None"
@@ -2049,13 +2050,13 @@ class myFrame(wx.Frame):
                 else:
                     self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_ten.SolutionHeader.SetForegroundColour((255,0,0)) #change text color to red
-                    self.panel_ten.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
+                    self.panel_ten.SolutionHeader.SetFont(self.enlargedSolutionFont)
                     self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_ten.SolutionHeader.SetForegroundColour((0,255,0)) #change text color to green
                # if(self.compareString(solutionEnlarged, "False",0,0,len("False"),len("False"))==True):
-                self.panel_ten.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
+                self.panel_ten.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 #    solutionEnlarged= "True"
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
@@ -2111,12 +2112,12 @@ class myFrame(wx.Frame):
                 else:
                     self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_nine.SolutionHeader.SetForegroundColour((255,0,0)) #set text color to red
-                    self.panel_nine.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
+                    self.panel_nine.SolutionHeader.SetFont(self.enlargedSolutionFont)
                     self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_nine.SolutionHeader.SetForegroundColour((0,255,0)) #set text color to green
-                self.panel_nine.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
+                self.panel_nine.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def updateNetworkClientTimer(self, event):
