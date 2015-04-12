@@ -1250,6 +1250,17 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 
         vbox.Add((-1,10))
 
+        hbox14= wx.BoxSizer(wx.HORIZONTAL)
+        tableSizeNotice= wx.StaticText(self, label="NOTICE: If the dimensions (width * height) of the table \n"
+                                                   "are less than 1 million, your table width won't change but \n"
+                                                   "rows will be automatically added to meet this requirement.")
+        tableSizeNotice.SetFont(parent.textFont)
+        tableSizeNotice.SetForegroundColour((255,255,255))
+        hbox14.Add(tableSizeNotice)
+        vbox.Add(hbox14, flag=wx.CENTER, border= 10)
+
+        vbox.Add((-1,10))
+
         hbox10=wx.BoxSizer(wx.HORIZONTAL)
         self.startConnectButton= wx.Button(self, label="Start/Connect Button")
         hbox10.Add(self.startConnectButton)
