@@ -2049,6 +2049,7 @@ class myFrame(wx.Frame):
                 else:
                     self.panel_ten.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_ten.SolutionHeader.SetForegroundColour((255,0,0)) #change text color to red
+                    self.panel_ten.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
                     self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_ten.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
@@ -2110,10 +2111,12 @@ class myFrame(wx.Frame):
                 else:
                     self.panel_nine.SolutionHeader.SetLabel("Solution: Sorry, but no solution found")
                     self.panel_nine.SolutionHeader.SetForegroundColour((255,0,0)) #set text color to red
+                    self.panel_nine.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
                     self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, No Solution Found")
             else: #if a solution was found
                 self.panel_nine.SolutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
                 self.panel_nine.SolutionHeader.SetForegroundColour((0,255,0)) #set text color to green
+                self.panel_nine.SolutionHeader.SetFont(self.panel_ten.SolutionHeader.GetFont().MakeBold())
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
     def updateNetworkClientTimer(self, event):
