@@ -267,6 +267,10 @@ class RainbowUser():
         #to send to controller to say we're not done yet
         eof = False
 
+        if line == "":
+
+            eof = True
+
         while not line == "":
 
             data += line

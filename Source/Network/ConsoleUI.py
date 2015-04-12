@@ -1753,7 +1753,7 @@ class ConsoleUI():
                     #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
-                    print "Current Word: ", self.dictionary["current word"]
+                    print "Current Prefix: ", self.dictionary["current word"]
                     if star_counter > 11:
                         star_counter = 0
                         white_l = ""
