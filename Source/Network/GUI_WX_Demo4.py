@@ -2011,17 +2011,16 @@ class myFrame(wx.Frame):
         dial.ShowModal()
 
     def updateSingleTimer(self,  event):
-        #solutionEnlarged= "False"
         if(not self.shutdown.is_set()):
-            print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
-            print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
+            #print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
+            #print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
-            else:
+           # else:
                 #if equal to or less than zero
-                print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
-                print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
+                #print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
+                #print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_ten.progressBar.SetValue(percentComplete)
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
@@ -2073,16 +2072,16 @@ class myFrame(wx.Frame):
 
     def updateNetworkServerTimer(self, event):
         if(not self.shutdown.is_set()):
-            print "GUI DEBUG: shutdown flag has not been set yet"
-            print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
-            print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
+            #print "GUI DEBUG: shutdown flag has not been set yet"
+            #print "GUI DEBUG: dictionary[finished chunks]: '"+str(self.dictionary['finished chunks'])+"'"
+            #print "GUI DEBUG: dictionary[total chunks]: '"+str(self.dictionary['total chunks'])+"'"
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
-            else:
+            #else:
                 #if equal to or less than zero
-                print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
-                print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
+              #  print "GUI DEBUG: ERROR: self.dictionary['total chunks'] is less than or equal to zero!!"
+              #  print "GUI DEBUG: Value of self.dictionary['total chunks']: '"+str(self.dictionary['total chunks'])+"'"
             print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_nine.progressBar.SetValue(percentComplete)
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
@@ -2133,7 +2132,7 @@ class myFrame(wx.Frame):
 
     def updateNetworkClientTimer(self, event):
         if(not self.shutdown.is_set()):
-            print "GUI DEBUG: shutdown flag not set yet"
+            #print "GUI DEBUG: shutdown flag not set yet"
             if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
                 currentGaugeValue= self.panel_eight.activityGauge.GetValue()
                 if(currentGaugeValue == 100):
@@ -2216,7 +2215,7 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             invalidAlgorithm= "True"
-            print "GUI DEBUG: Invalid dictionary algorithm detected"
+           # print "GUI DEBUG: Invalid dictionary algorithm detected"
 
         #check for valid selected hashing mode
         if(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "Individual Hash Code",0,0,len("Individual Hash Code"),len("Individual Hash Code"))==True):
@@ -2226,13 +2225,13 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             invalidHashingMode= "True"
-            print "GUI DEBUG: Invlaid dictionary selected hashing mode detected"
+            #print "GUI DEBUG: Invlaid dictionary selected hashing mode detected"
 
         #check for valid hash to be cracked value
         if(self.compareString(self.panel_three.inputHashHeader.GetLabel(),"Hash to be Cracked: No Hash has been input",0,0,len("Hash to be Cracked: No Hash has been input"),len("Hash to be Cracked: No Hash has been input"))==True):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
-            print "GUI DEBUG: Default hash entry detected, not a valid hash"
+            #print "GUI DEBUG: Default hash entry detected, not a valid hash"
 
         #check for valid hash code length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
@@ -2242,8 +2241,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
@@ -2251,8 +2250,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
@@ -2260,8 +2259,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+              #  print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
@@ -2269,8 +2268,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
@@ -2278,16 +2277,16 @@ class myFrame(wx.Frame):
             elif(len(self.panel_three.inputHashHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
-        else:
-            print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateDictionary inputs"
+            #else:
+             #   print "GUI DEBUG: valid hash length detected"
+        #else:
+            #print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateDictionary inputs"
 
         #check for valid input dictionary file
         if(self.compareString(self.panel_three.inputDictFileHeader.GetLabel(),"Selected Dictionary File: No Dictionary File Selected",0,0,len("Selected Dictionary File: No Dictionary File Selected"),len("Selected Dictionary File: No Dictionary File Selected"))==True):
             foundInvalidInput= "True"
             invalidDictionaryFile= "True"
-            print "GUI DEBUG: Default dictionary entry detected, not a valid dictionary file"
+            #print "GUI DEBUG: Default dictionary entry detected, not a valid dictionary file"
        # else:
         #    print "GUI DEBUG: valid dictionary file detected"
 
@@ -2341,13 +2340,13 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             invalidAlgorithm= "True"
-            print "GUI DEBUG: Invalid bf algorithm detected"
+           # print "GUI DEBUG: Invalid bf algorithm detected"
 
         #check for valid hash to be cracked value
         if(self.compareString(self.panel_four.inputHashHeader.GetLabel(),"Hash To Be Cracked: No Hash has been Input",0,0,len("Hash To Be Cracked: No Hash has been Input"),len("Hash To Be Cracked: No Hash has been Input"))==True):
             foundInvalidInput= "True"
             invalidHashToBeCracked= "True"
-            print "GUI DEBUG: Default hash entry detected, not a valid hash"
+            #print "GUI DEBUG: Default hash entry detected, not a valid hash"
 
         #check for hash code length
         if(self.compareString(inputAlgorithm, "MD5",0,0,len("MD5"),len("MD5"))==True):
@@ -2357,8 +2356,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
@@ -2366,8 +2365,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
@@ -2375,8 +2374,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
@@ -2384,8 +2383,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+               # print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             if(len(self.panel_four.inputHashHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
@@ -2393,22 +2392,22 @@ class myFrame(wx.Frame):
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
-        else:
-            print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateBruteForceInputs"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
+        #else:
+            #print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateBruteForceInputs"
 
         #check for valid min key length
         if(len(str(self.panel_four.minKeyLengthHeader.GetLabel())) <= len("Min Key Length: ")):
             foundInvalidInput= "True"
             invalidMinKeyInput= "True"
-            print "GUI DEBUG: Invalid bf minkey input detected"
+            #print "GUI DEBUG: Invalid bf minkey input detected"
 
         #check for valid max key length
         if(len(str(self.panel_four.maxKeyLengthHeader.GetLabel())) <= len("Max Key Length: ")):
             foundInvalidInput= "True"
             invalidMaxKeyInput= "True"
-            print "GUI DEBUG: Invalid bf max key input detected"
+           # print "GUI DEBUG: Invalid bf max key input detected"
 
 
         #check to make sure that the min key is less than or equal to max key
@@ -2423,7 +2422,7 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             minKeyLessThanMaxKey= "False"
-            print "GUI DEBUG: Invalid keys, min key is greater than max key"
+            #print "GUI DEBUG: Invalid keys, min key is greater than max key"
 
         #check for valid selected alphabet
         if(self.compareString(self.panel_four.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
@@ -2443,7 +2442,7 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             invalidAlphabet= "True"
-            print "GUI DEBUG: Invalid bf alphabet selected"
+            #print "GUI DEBUG: Invalid bf alphabet selected"
 
         #check to see if any invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
@@ -2498,13 +2497,13 @@ class myFrame(wx.Frame):
 
         #check for valid rainbow table file
         if(self.compareString(self.panel_eleven.selectedFileHeader.GetLabel(),"Selected Rainbow Table File: No File has been Selected",0,0,len("Selected Rainbow Table File: No File has been Selected"),len("Selected Rainbow Table File: No File has been Selected"))==True):
-            print "GUI DEBUG: Invalid file selected"
+            #print "GUI DEBUG: Invalid file selected"
             foundInvalidInput= "True"
             invalidFile= "True"
 
         #check for valid hash to be cracked
         if(self.compareString(self.panel_eleven.hashToBeCrackedHeader.GetLabel(),"Hash to be cracked: No Hash has been entered",0,0,len("Hash to be cracked: No Hash has been entered"),len("Hash to be cracked: No Hash has been entered"))==True):
-            print "GUI DEBUG: Invalid hash entry detected"
+            #print "GUI DEBUG: Invalid hash entry detected"
             foundInvalidInput= "True"
             invalidHash= "True"
 
@@ -2516,8 +2515,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 52):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA1",0,0,len("SHA1"),len("SHA1"))==True):
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 60):
                 foundInvalidInput= "True"
@@ -2525,8 +2524,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 60):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 76):
                 foundInvalidInput= "True"
@@ -2534,8 +2533,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 76):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 84):
                 foundInvalidInput= "True"
@@ -2543,8 +2542,8 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
@@ -2552,10 +2551,10 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 148):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
-            else:
-                print "GUI DEBUG: valid hash length detected"
-        else:
-            print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateRainbowUser input"
+            #else:
+                #print "GUI DEBUG: valid hash length detected"
+        #else:
+            #print "GUI DEBUG: ERROR, unrecognized algorithm detected in validateRainbowUser input"
 
         #check to see if an invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
@@ -2599,7 +2598,7 @@ class myFrame(wx.Frame):
         elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             print "GUI DEBUG: valid algorithm detected"
         else:
-            print "GUI DEBUG: Invalid algorithm detected"
+            #print "GUI DEBUG: Invalid algorithm detected"
             foundInvalidInput= "True"
             invalidAlgorithm= "True"
 
@@ -2607,7 +2606,7 @@ class myFrame(wx.Frame):
         if(len(self.panel_twelve.keyLengthHeader.GetLabel()) <= len("Key Length: ")):
             foundInvalidInput= "True"
             invalidKeyLength= "True"
-            print "GUI DEBUG: Invalid key length detected"
+            #print "GUI DEBUG: Invalid key length detected"
 
         #check for invalid alphabet
         if(self.compareString(self.panel_twelve.selectedAlphabet.GetValue(), "All",0,0,len("All"),len("All"))==True):
@@ -2627,25 +2626,25 @@ class myFrame(wx.Frame):
         else:
             foundInvalidInput= "True"
             invalidAlphabet= "True"
-            print "GUI DEBUG: Invalid bf alphabet selected"
+            #print "GUI DEBUG: Invalid bf alphabet selected"
 
         #check for invalid table chain length
         if(len(self.panel_twelve.chainLengthHeader.GetLabel()) <= len("Table Chain Length: ")):
             foundInvalidInput= "True"
             invalidTableChainLength= "True"
-            print "GUI DEBUG: invalid table chain length detected"
+            #print "GUI DEBUG: invalid table chain length detected"
 
         #check for invalid num of rows
         if(len(self.panel_twelve.numOfRowsHeader.GetLabel()) <= len("Number of Rows: ")):
             foundInvalidInput= "True"
             invalidNumOfRows= "True"
-            print "GUI DEBUG: invalid num of rows detected"
+            #print "GUI DEBUG: invalid num of rows detected"
 
         #check for invalid rainbow table file
         if(len(self.panel_twelve.fileNameHeader.GetLabel()) <= len("Save Rainbow Table File As: ")):
             foundInvalidInput= "True"
             invalidRainbowTableFile= "True"
-            print "GUI DEBUG: invalid rainbow table file detected"
+            #print "GUI DEBUG: invalid rainbow table file detected"
 
         #check if invalid input was detected
         if(self.compareString(foundInvalidInput, "False",0,0,len("False"),len("False"))==True):
@@ -3049,11 +3048,11 @@ class myFrame(wx.Frame):
         crackingSettings= {"cracking method":crackingMethodSetting, "algorithm": algorithmSetting, "hash":hashSetting,
                            "file name":FileName, "single": singleSetting}
         #DEBUG SETTINGS MESSAGES
-        print "GUI DICTIONARY SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
-        print "GUI DICTIONARY SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
-        print "GUI DICTIONARY SETTINGS DEBUG: Hash: "+str(hashSetting)
-        print "GUI DICTIONARY SETTINGS DEBUG: File Name: "+str(FileName)
-        print "GUI DICTIONARY SETTINGS DEBUG: Single: "+str(singleSetting)
+        #print "GUI DICTIONARY SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
+        #print "GUI DICTIONARY SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        #print "GUI DICTIONARY SETTINGS DEBUG: Hash: "+str(hashSetting)
+        #print "GUI DICTIONARY SETTINGS DEBUG: File Name: "+str(FileName)
+        #print "GUI DICTIONARY SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -3125,13 +3124,13 @@ class myFrame(wx.Frame):
                            "max key length":finalMaxKeyLengthSetting, "alphabet":alphabetSetting, "single":singleSetting}
 
         #DEBUG SETTING MESSAGES
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Hash: "+str(hashSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Min Key Length: "+str(finalMinKeyLengthSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Max Key Length: "+str(finalMaxKeyLengthSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
-        print "GUI BRUTE FORCE SETTINGS DEBUG: Single: "+str(singleSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Cracking Method: "+str(crackingMethodSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Hash: "+str(hashSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Min Key Length: "+str(finalMinKeyLengthSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Max Key Length: "+str(finalMaxKeyLengthSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
+        #print "GUI BRUTE FORCE SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -3177,10 +3176,10 @@ class myFrame(wx.Frame):
         crackingSettings= {"cracking method":crackingMethod, "file name":fileName, "hash":hashToBeCracked, "single":singleSetting}
 
         #DEBUG SETTINGS MESSAGES
-        print "GUI RAINBOW USER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
-        print "GUI RAINBOW USER SETTINGS DEBUG: File Name: "+str(fileName)
-        print "GUI RAINBOW USER SETTINGS DEBUG: Hash: "+str(hashToBeCracked)
-        print "GUI RAINBOW USER SETTINGS DEBUG: Single: "+str(singleSetting)
+        #print "GUI RAINBOW USER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
+        #print "GUI RAINBOW USER SETTINGS DEBUG: File Name: "+str(fileName)
+        #print "GUI RAINBOW USER SETTINGS DEBUG: Hash: "+str(hashToBeCracked)
+        #print "GUI RAINBOW USER SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -3261,14 +3260,14 @@ class myFrame(wx.Frame):
                             "alphabet":alphabetSetting, "chain length":chainLengthSetting, "num rows":numberOfRowsSetting,
                             "file name":fileNameSetting, "single":singleSetting}
         #DEBUG SETTINGS MESSAGES
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Key Length: "+str(keyLengthSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Chain Length: "+str(chainLengthSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Num Rows: "+str(numberOfRowsSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: File Name: "+str(fileNameSetting)
-        print "GUI RAINBOW MAKER SETTINGS DEBUG: Single: "+str(singleSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Cracking Method: "+str(crackingMethod)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Algorithm: "+str(algorithmSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Key Length: "+str(keyLengthSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Alphabet: "+str(alphabetSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Chain Length: "+str(chainLengthSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Num Rows: "+str(numberOfRowsSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: File Name: "+str(fileNameSetting)
+        #print "GUI RAINBOW MAKER SETTINGS DEBUG: Single: "+str(singleSetting)
 
         #shared variable array
         #[0]shared dictionary, [1]shutdown, [2]update
@@ -3342,7 +3341,6 @@ class myFrame(wx.Frame):
         try:
             posA = startA
             posB = startB
-            #TODO make sure that inboundStringA is longer than or equal to inboundStringB
             if(len(inboundStringB) > len(inboundStringA)):
                 tempA= inboundStringA
                 inboundStringA= inboundStringB
@@ -3371,26 +3369,26 @@ class myFrame(wx.Frame):
         import platform
         print "OS DETECTION:"
         if(platform.system()=="Windows"): #Detecting Windows
-            print "GUI DEBUG: Windows OS detected"
+            #print "GUI DEBUG: Windows OS detected"
             print platform.system()
             print platform.win32_ver()
             self.theDetectedOS= "Windows"
         elif(platform.system()=="Linux"): #Detecting Linux
-            print "GUI DEBUG: Linux OS detected"
+            #print "GUI DEBUG: Linux OS detected"
             print platform.system()
             print platform.dist()
             self.theDetectedOS= "Linux"
         elif(platform.system()=="Darwin"): #Detecting OSX
-            print "GUI DEBUG: Darwin OS detected"
+            #print "GUI DEBUG: Darwin OS detected"
             print platform.system()
             print platform.mac_ver()
             self.theDetectedOS= "Darwin"
         elif(platform.system()=="FreeBSD" or platform.system()=="OpenBSD" or platform.system()=="NetBSD"):
-            print "GUI DEBUG: BSD"
+            #print "GUI DEBUG: BSD"
             print platform.system()
             self.theDetectedOS= "Linux"
         else:   #other, which defaults to linux
-            print "GUI DEBUG: Unknown OS detected"
+           # print "GUI DEBUG: Unknown OS detected"
             print platform.system()
             print "Treating your OS as Linux by default."
             self.theDetectedOS= "Linux"
