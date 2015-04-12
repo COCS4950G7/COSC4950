@@ -1946,7 +1946,7 @@ class myFrame(wx.Frame):
 
     def switchFromPanel11ToPanel10(self):
         self.SetTitle("Mighty Cracker: Single Mode Status Screen")
-        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table")
+        self.panel_ten.currentCrackingMode.SetLabel("Cracking Mode: Rainbow Table User")
         tempHash= self.panel_eleven.hashToBeCrackedHeader.GetLabel()
         theHash=""
         for i in range(20,len(tempHash)):
