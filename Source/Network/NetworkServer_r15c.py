@@ -403,9 +403,7 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_brute_force(self, bf, shutdown):
             try:
-                print "bf1"
                 current_process()._authkey = self.AUTHKEY
-                print "bf2"
                 if not self.single_user_mode:
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
                     JobQueueManager.register('get_result_q', callable=self.get_result_queue)
@@ -421,14 +419,11 @@ class Server():
                     mode_bit_2.clear()
                     result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 else:
-                    print "bf3"
                     manager = None
                     result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
                     single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
                     single.start()
-                    print "bf4"
                 result_monitor.start()
-                print "bf5"
                 for prefix in bf.get_prefix():
                     if prefix == '':
                         prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
@@ -788,14 +783,10 @@ class Server():
                 print "============================================================================================="
 
         def run_brute_force(self, bf, job_queue, result_queue):  #TODO name conflict result_queue os also the name of the global variable
-            print "run brute force started"                                       #TODO name conflict job_queue is also the name of the global variable
             bf.result_queue = result_queue   #TODO name conflict result_queue os also the name of the global variable
-            print "rbf1"
             while not self.shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                 try:
-                    print "rbf2"
                     chunk = job_queue.get(timeout=.1)
-                    print "rbf3"
                 except Qqueue.Empty:
                     continue
                 #print chunk.params
