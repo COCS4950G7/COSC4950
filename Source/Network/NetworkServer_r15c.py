@@ -276,6 +276,22 @@ class Server():
                         shutdown.set()
                         self.shutdown.set()
                         self.shared_dict["finished chunks"] += 1
+                        time.sleep(2)
+                        try:
+                            os.kill(current_process().pid-1, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid-1
+                        try:
+                            os.kill(current_process()._parent_pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process()._parent_pid
+                        try:
+                            os.kill(current_process().pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid
                         break
                     else:  # solution has not been found
                         completed_chunks += 1
@@ -294,6 +310,22 @@ class Server():
                                 shutdown.set() #TODO are you setting the correct shutdown???
                                 self.shutdown.set()
                                 self.found_solution = True
+                                time.sleep(2)
+                                try:
+                                    os.kill(current_process().pid-1, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process().pid-1
+                                try:
+                                    os.kill(current_process()._parent_pid, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process()._parent_pid
+                                try:
+                                    os.kill(current_process().pid, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process().pid
                                 break
 
             except Exception as inst:
@@ -381,7 +413,6 @@ class Server():
                 #result_monitor.terminate()
                 if manager is not None:
                     manager.shutdown()
-
 
                 time.sleep(1)
             except Exception as inst:
@@ -490,8 +521,8 @@ class Server():
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
                     manager.start()
-                    job_queue = manager.get_job_q()  #TODO naming conflict, job_queue is alos a global variable
-                    result_queue = manager.get_result_q()   #TODO naming conflict, result_queue is also a global variable
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
                     mode_bit_1.clear()
@@ -504,14 +535,14 @@ class Server():
                     single.start()
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
-                while not rainbow.isEof() and not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
                     chunk = rainbow.getNextChunk()
                     #Retrieves word from chunk
                     #temp_word = self.extract_word(chunk)
                     #Shares a 'current' word with UIs for display
                     #self.shared_dict["current word"] = temp_word
                     if self.single_user_mode: #if in single mode
-                        while True:
+                        while not shutdown.is_set():
                             try:
                                 job_queue.put(chunk, timeout=.1)
                                 break
