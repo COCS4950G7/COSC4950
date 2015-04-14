@@ -99,7 +99,7 @@ class Brute_Force():
     def start_processes(self):
         if not self.processes_running:
             for j in range(0, cpu_count()):
-                self.children.append(Process(target=self.check_keys))
+                self.children.append(Process(target=self.check_keys, args=(self.queue,)))
                 self.children[j].start()
                 #print "bf internal process %i started." % self.children[j].pid
             self.processes_running = True
@@ -135,18 +135,17 @@ class Brute_Force():
         self.result_queue.put(('f', params))
         return False
 
-    def check_keys(self):
-        while self.queue:
+    def check_keys(self, queue):
+        while queue:
             if self.done.value:
                 return
-            workunit = self.queue.get()
+            workunit = queue.get()
             if workunit.prefix == "******possibilities exhausted******":
                 self.result_queue.put(('e', "sadness"))
             self.algorithm = workunit.algorithm
             self.origHash = workunit.hash
             prefix = ''.join(workunit.prefix)
             keylist = itertools.product(self.alphabet, repeat=self.charactersToCheck)
-
             for key in keylist:
                 tempkey = prefix + ''.join(key)
                 #print tempkey
@@ -156,9 +155,9 @@ class Brute_Force():
                     except Exception:
                         return
                     while not self.queue.empty():
-                        self.queue.get()
+                        queue.get()
                     self.countey.value += 1
-                    self.queue.close()
+                    queue.close()
                     print "We win!"
                     return True
             self.countey.value += 1
@@ -254,7 +253,8 @@ class Brute_Force():
             shorts = Process(target=self.check_short_keys)
             shorts.start()
             shorts.join()
-            print "short keys checked"
+            shorts.terminate()
+            print "short keys started"
         else:
             if self.done.value:
                 return True

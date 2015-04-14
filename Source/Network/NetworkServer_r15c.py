@@ -224,15 +224,15 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # monitor results queue
         #--------------------------------------------------------------------------------------------------
-        def check_results(self, results_queue, shutdown): #TODO naming conflict, shutdown is also a global variable
+        def check_results(self, results_queue, shutdown):
             current_process().authkey = "Popcorn is awesome!!!"
             #print "check results started"
             completed_chunks = 0
             try:
-                while not shutdown.is_set(): #TODO INCONSISTANT: doesnt match the (inconsistant) while not shut down loops in dictionary
+                while not shutdown.is_set():
                     try:
                         self.update.set()
-                        result = results_queue.get(block=True, timeout=.5)  # get chunk from shared result queue
+                        result = results_queue.get(block=True, timeout=.25)
                     except Qqueue.Empty:
                         continue
                     #print "chunk done, result: %s" % result[0]
@@ -413,6 +413,7 @@ class Server():
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
                     manager.start()
                     result_queue = manager.get_result_q()
+                    job_queue = manager.get_job_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
                     mode_bit_1.set()
@@ -420,6 +421,7 @@ class Server():
                     result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 else:
                     manager = None
+                    job_queue = self.job_queue
                     result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
                     single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
                     single.start()
@@ -445,7 +447,7 @@ class Server():
                                      'halt': False}
                     while not shutdown.is_set():
                         try:
-                            self.job_queue.put(new_chunk, timeout=.05)  # put next chunk on the job queue.
+                            job_queue.put(new_chunk, timeout=.05)  # put next chunk on the job queue.
                             #self.sent_chunks.append((params, time.time()))
                             break
                         except Qqueue.Full:
