@@ -28,7 +28,7 @@ class Client():
     cracking_mode = 'dic'
     is_connected = None
     is_doing_stuff = None
-    shutdown = None
+    client_shutdown = None
 
     def __init__(self, ip, shared_variables):
         current_process().authkey = self.AUTHKEY
@@ -44,7 +44,7 @@ class Client():
 
             self.IP = self.shared_dict["server ip"]
 
-        self.shutdown = shared_variables[1]
+        self.client_shutdown = shared_variables[1]
         self.is_connected = shared_variables[3]
         self.is_doing_stuff = shared_variables[4]
         
@@ -78,35 +78,36 @@ class Client():
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
+
+            elif self.cracking_mode == "bf":
+                print "Starting brute force cracking."
+                bf = Brute_Force.Brute_Force()
+                chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown)))
+
+            elif self.cracking_mode == "rain":
+                rainbow = RainbowUser.RainbowUser()
+                print "Starting rainbow table cracking."
+                chunk_runner.append(Process(target=self.run_rain_user(rainbow, job_queue, result_queue, shutdown)))
+
+            elif self.cracking_mode == "rainmaker":
+                rainmaker = RainbowMaker.RainbowMaker()
+                print "Starting rainbow table generator."
+                chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
+
             else:
-                if self.cracking_mode == "bf":
-                    print "Starting brute force cracking."
-                    bf = Brute_Force.Brute_Force()
+                return "wtf?"
 
-                    chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown)))
-                else:
-                    if self.cracking_mode == "rain":
-                        rainbow = RainbowUser.RainbowUser()
-                        print "Starting rainbow table cracking."
-
-                        chunk_runner.append(Process(target=self.run_rain_user(rainbow, job_queue, result_queue, shutdown)))
-                    else:
-                        if self.cracking_mode == "rainmaker":
-                            rainmaker = RainbowMaker.RainbowMaker()
-                            print "Starting rainbow table generator."
-
-                            chunk_runner.append(Process(target=self.run_rain_maker(rainmaker, job_queue, result_queue, shutdown)))
-                        else:
-                            return "wtf?"
             for process in chunk_runner:
                 process.start()
             for process in chunk_runner:
                 process.join()
+
             if shutdown.is_set():
                 print "received shutdown notice from server."
-                #self.shutdown.set()
-                #self.is_connected.clear()
-                #self.is_doing_stuff.clear()
+                self.client_shutdown.set()
+                self.is_connected.clear()
+                self.is_doing_stuff.clear()
+
             for process in chunk_runner:
                 process.terminate()
 
@@ -124,7 +125,7 @@ class Client():
             #result_queue.put(("c", chunk.params)) #tell server that client crashed, NEVER BEEN TESted
             print "Sent crash message to server"
         finally:
-            self.shutdown.set()
+            self.client_shutdown.set()
             self.is_connected.clear()
             self.is_doing_stuff.clear()
             #output the timer, stating how long client ran for
@@ -151,11 +152,6 @@ class Client():
     #make_client_manager function
     #--------------------------------------------------------------------------------------------------
     def make_client_manager(self, ip, port, authkey):
-        """ Create a manager for a client. This manager connects to a server on the
-            given address and exposes the get_job_q and get_result_q methods for
-            accessing the shared queues from the server.
-            Return a manager object.
-        """
         try:
 
             self.ServerQueueManager.register('get_job_q')
@@ -164,7 +160,6 @@ class Client():
             self.ServerQueueManager.register('get_mode_bit_1')
             self.ServerQueueManager.register('get_mode_bit_2')
             print [ip]
-            print type(ip)
             manager = self.ServerQueueManager(address=(ip, port), authkey=authkey)
             manager.connect()
             import time
@@ -204,12 +199,10 @@ class Client():
                     print "key is: " + dictionary.showKey()
                     key = dictionary.showKey()
                     result_queue.put(("w", key))
-                   # result_queue.put(("c", key))
                 elif params[10] == "True":
                     result_queue.put(("e", chunk.params))
                 else:
                     result_queue.put(("f", chunk.params))
-                        #result_q.put(("c", chunk.params)) #unction has never been tested
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in run_dictionary definition try block"
@@ -279,15 +272,28 @@ class Client():
             print "============================================================================================="
 
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-        while not shutdown.is_set():
-            paramsChunk = Chunk.Chunk()
-            try:
-                job = job_queue.get(block=True, timeout=.25)
-            except Queue.Empty:
-                continue
-            paramsChunk.params = job["params"]
-            chunkOfDone = maker.create(paramsChunk)
-            result_queue.put(('f', chunkOfDone))
+        try:
+            while not shutdown.is_set():
+                try:
+                    job = job_queue.get(block=True, timeout=.25)
+                except Queue.Empty:
+                    continue
+                params_chunk = Chunk.Chunk()
+                params_chunk.params = job["params"]
+                chunk_of_rainbow = maker.create(params_chunk)
+
+                result_queue.put(('f', chunk_of_rainbow), timeout=.2)
+                time.sleep(.05)
+        except Exception as inst:
+            print "============================================================================================="
+            print "ERROR: An exception was thrown in run_rain_maker definition try block"
+            #the exception instance
+            print type(inst)
+            #srguments stored in .args
+            print inst.args
+            #_str_ allows args tto be printed directly
+            print inst
+            print "============================================================================================="
     #===================================================================================================================
     #END OF FUNCTIONS
     #===================================================================================================================

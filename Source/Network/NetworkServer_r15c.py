@@ -121,8 +121,8 @@ class Server():
                     print "Network Server Mode"
 
                 # Spawn processes to feed the job queue and monitor the result queue
-                if self.cracking_mode == "dic": #if running dictionary mode, create new dictionary, set up settings, start new process
-
+                if self.cracking_mode == "dic":
+                    #if running dictionary mode, create new dictionary, set up settings, start new process
                     dictionary = Dictionary.Dictionary()
                     dictionary.setAlgorithm(self.settings["algorithm"])
                     dictionary.setFileName(self.settings["file name"])
@@ -571,9 +571,8 @@ class Server():
                                 return
                             finally:
                                 time.sleep(2)
-                                if manager is not None:
-                                    manager.shutdown()
-                                return
+                if manager is not None:
+                    manager.shutdown()
 
             except Exception as inst:
                 print "============================================================================================="
@@ -631,11 +630,10 @@ class Server():
                             try:
                                 job_queue.get_nowait()
                             except Qqueue.Empty:
-                                return
-                            finally:
-                                if manager is not None:
-                                    time.sleep(1)
-                                    manager.shutdown()
+                                break
+                if manager is not None:
+                    time.sleep(2)
+                    manager.shutdown()
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
