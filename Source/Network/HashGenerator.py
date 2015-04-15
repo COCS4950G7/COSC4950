@@ -20,3 +20,10 @@ print "\npasslib hashes:\n"
 for algorithm in schemes:
     print "The %s hash representation of %s is: " % (algorithm, key)
     print myctx.encrypt(key, algorithm)
+
+hash1 = myctx.encrypt(key, 'des_crypt')
+
+if myctx.verify(key, hash1):
+    print "true"
+else:
+    print "false"
