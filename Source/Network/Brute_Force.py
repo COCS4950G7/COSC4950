@@ -3,19 +3,6 @@
 #   This class does all the brute force cracking work,
 #   interacting only with the controller class.
 
-#   2/11/2015
-#   Complete reworking of the previous code. Removed as many unnecessary functions, variables, and operations as I could
-#   find. Minor changes to the way chunks are run.  Increased chunk size to a maximum of 100,000,000 hashes, since
-#   brute forcing is going to ba a long term computation, it makes sense to minimize network overhead by giving
-#   work units that last from a few tens to a couple hundred seconds.
-
-#   2/23/2015
-#   Removed internal get_chunk() method as chunking has moved into server to resolve a major issue. Removed internal
-#   testing method as this class should never be run directly anymore. Changed the name of from_controller to set_params
-#   to better reflect the new program structure. Added start_processes() method to start a global pool of processes
-#   which are fed by the internal queue. Changed run_chunk to simply add the chunk to the queue. This should improve
-#   efficiency of parallel processing with the new network client functionality by minimizing downtime and overhead.
-
 #from passlib.context import CryptContext
 #import passlib
 import hashlib

@@ -1,23 +1,11 @@
 # NetworkServer_r15c
-
-# 3/29/2015
-# UNFINISHED and UNSTABLE
-
-# This is a preliminary version to fix the Windows incompatibility.
-# By removing make_server_manager() and adding that functionality in to each of the chunk maker functions,
-# the SyncManager can be used without pickling. In addition, check results must be initiated from within the chunk
-# maker functions so the manager's queues can be passed in.
-
-# As of this update, the only function that has been tested and shown to do anything is Dictionary in networked mode,
-# but it currently stops after just one chunk, this appears to be a problem with dictionary.
-# Everything else should be treated as broken until proved otherwise.
-
-# Nick Baum
+#
+# This class does most of the work, it creates a queue of work units and a network server if needed.
+# It also runs the cracking classes as needed for single user mode.
 
 #=====================================================================================================================
 #IMPORTS
 #=====================================================================================================================
-#import dill #temporarily commented out
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, Value, Event, Queue, freeze_support, current_process
 import os
