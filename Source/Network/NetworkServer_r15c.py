@@ -120,7 +120,7 @@ class Server():
                 else:
                     print "Network Server Mode"
 
-                # Spawn processes to feed the job queue and monitor the result queue
+                # setup appropriate chunking class and spawn processes to feed the job queue and monitor the result queue
                 if self.cracking_mode == "dic":
                     #if running dictionary mode, create new dictionary, set up settings, start new process
                     dictionary = Dictionary.Dictionary()
@@ -198,6 +198,8 @@ class Server():
         #End of runserver function
         #--------------------------------------------------------------------------------------------------
 
+        # these get_* functions are registered with the manager to provide access to shared queues
+        # replaces the lambda functions since lambdas can not be pickled and would not work with windows
         def get_job_queue(self):
             return self.job_queue
 
@@ -243,6 +245,8 @@ class Server():
                         #print "win block finished"
                         #print "result monitor process: %i" % current_process().pid
                         #print "result monitor parent process: %i" % current_process()._parent_pid
+
+                        #wait for clients to get shutdown message, then kill processes
                         time.sleep(2)
                         try:
                             os.kill(current_process().pid-1, signal.SIGKILL)
@@ -289,10 +293,11 @@ class Server():
                         completed_chunks += 1
                         self.shared_dict["finished chunks"] += 1
                         #print "Chunk finished with params: %s" %result[1]
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print "%d chunks completed." % completed_chunks
+                        #os.system('cls' if os.name == 'nt' else 'clear')
+                        #print "%d chunks completed." % completed_chunks
                         # go through the sent chunks list and remove the finished chunk
 
+                        # rainmaker just runs until the table is big enough
                         if self.cracking_mode == "rainmaker":
                             rainChunk = result[1]
 
@@ -516,26 +521,32 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_rainbow(self, rainbow, shutdown):
             try:
-                if not self.single_user_mode:
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
                     JobQueueManager.register('get_result_q', callable=self.get_result_queue)
                     JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
                     JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
-                    manager.start()
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
                     job_queue = manager.get_job_q()
                     result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
                     mode_bit_1.clear()
                     mode_bit_2.set()
                 else: #if in single mode
-                    manager = None
+                    manager = None  # no manager needed for local cracking
                     result_queue = self.result_queue
                     job_queue = self.job_queue
+                    #start the single user process which starts the correct run method
                     single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
                     single.start()
+                #start the result monitor process which reads finished chunks off the result queue
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
                 while not shutdown.is_set():
@@ -593,30 +604,36 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         def chunk_rainbow_maker(self, rainmaker, shutdown):
             try:
-                if not self.single_user_mode:
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
                     JobQueueManager.register('get_job_q', callable=self.get_job_queue)
                     JobQueueManager.register('get_result_q', callable=self.get_result_queue)
                     JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
                     JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
                     JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
                     manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
-                    manager.start()
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
                     job_queue = manager.get_job_q()
                     result_queue = manager.get_result_q()
                     mode_bit_1 = manager.get_mode_bit_1()
                     mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
                     mode_bit_1.clear()
                     mode_bit_2.clear()
                 else:
-                    manager = None
+                    manager = None  # no manager needed for local cracking
                     result_queue = self.result_queue
                     job_queue = self.job_queue
+                    #start the single user process which starts the correct run method
                     single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
                     single.start()
-
+                #start the result monitor process which reads finished chunks off the result queue
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
 
+                #all rainbow table maker chunks are the same, keep running until file is big enough
                 while not shutdown.is_set():
                     params_chunk = rainmaker.makeParamsChunk()
                     new_chunk = {"params": params_chunk.params,
