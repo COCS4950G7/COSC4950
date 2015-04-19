@@ -86,7 +86,7 @@ class Dictionary():
             return "Fail"
 
         #sets total_chunks variable, based on dictionary file
-        self.set_total_chunks()
+        #self.set_total_chunks()
 
         return "Good"
 
@@ -225,7 +225,7 @@ class Dictionary():
 
                         self.hash = parentPipe.recv()
 
-                        self.doneList.append(self.hash + " " + self.key)
+                        self.doneList.append(self.hash + "\n" + self.key)
 
                         self.found = True
 
