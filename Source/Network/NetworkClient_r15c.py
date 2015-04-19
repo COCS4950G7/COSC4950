@@ -1,14 +1,7 @@
-# NetworkClient_r15a.py
+# NetworkClient_r15c.py
 
-# 3/1/2015
-
-# Now runs three instances of Dictionary concurrently, the result is consistent near 100% processor usage over
-# long term runs (>20 chunks). Previously, usage was 40-60%. Also, removed function to request server ip from user as
-# this is no longer used.
-
-# 3/2/2015
-
-# Added automatic setting of client cracking mode.
+# 4-18-2015
+# Experimental revision to implement hashes from a file, currently unfinished and unstable.
 
 
 from multiprocessing.managers import SyncManager

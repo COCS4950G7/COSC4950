@@ -1,7 +1,10 @@
-# NetworkServer_r15c
+# NetworkServer_r15d
 #
 # This class does most of the work, it creates a queue of work units and a network server if needed.
 # It also runs the cracking classes as needed for single user mode.
+
+# 4-18-2015
+# Experimental revision to implement hashes from a file, currently unfinished and unstable.
 
 #=====================================================================================================================
 #IMPORTS
