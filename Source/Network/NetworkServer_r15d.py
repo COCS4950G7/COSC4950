@@ -280,6 +280,7 @@ class Server():
                             shutdown.set()
                             self.shutdown.set()
                             self.shared_dict["finished chunks"] += 1
+                            self.shared_dict["key"] = " "
                             time.sleep(2)
                             try:
                                 os.kill(current_process().pid-1, signal.SIGKILL)

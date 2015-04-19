@@ -558,7 +558,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -569,14 +569,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
@@ -678,14 +678,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just make ", self.settings['input file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
@@ -787,7 +787,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -798,14 +798,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "rain"
                 self.settings['file name'] = file_name + ".txt"
@@ -905,14 +905,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just make ", self.settings['input file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
@@ -1334,7 +1334,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -1345,14 +1345,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
@@ -1454,14 +1454,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just make ", self.settings['input file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
@@ -1671,7 +1671,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -1682,14 +1682,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "bf"
                 self.settings['algorithm'] = algorithm
@@ -1789,14 +1789,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just make ", self.settings['input file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
@@ -1900,7 +1900,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -1911,14 +1911,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "rain"
                 self.settings['file name'] = file_name + ".txt"
@@ -2019,14 +2019,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just make ", self.settings['input file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
@@ -2463,7 +2463,7 @@ class ConsoleUI():
                     print
                     temp_hash = raw_input("What's the hash we're searching for: ")
                     self.settings['hash'] = temp_hash
-                    self.settings['hash file'] = False
+                    self.settings['file mode'] = False
 
                 elif single_or_file in ("file", "f", "File"):
 
@@ -2474,14 +2474,14 @@ class ConsoleUI():
 
                         print "File not found..."
                         hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['hash file name'] = hash_file_name + ".txt"
+                    self.settings['input file name'] = hash_file_name + ".txt"
 
                     #Get the file name
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['results file'] = results_file + ".txt"
+                    self.settings['output file name'] = results_file + ".txt"
                     #Hashes from a file?
-                    self.settings['hash file'] = True
+                    self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "dic"
                 self.settings['algorithm'] = algorithm
@@ -2581,14 +2581,14 @@ class ConsoleUI():
                 print
 
                 #If we were using just one hash, not a file
-                if not self.settings['hash file']:
+                if not self.settings['file mode']:
 
                     print "Key is: ", self.dictionary["key"]
                     print "And that took: ", self.clock, "seconds."
 
                 else:
 
-                    print "We just make ", self.settings['hash file name']
+                    print "We just made ", self.settings['output file name']
                     print "Which lists out the hash/key pairs we found."
                     print "And that took: ", self.clock, "seconds."
 
