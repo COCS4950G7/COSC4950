@@ -28,7 +28,7 @@ class start():
                  #"hash": "c3dc5a6ab47d683eb4e8d5c74c6147afa3f86f700301c3eb858689189761f91e4cfd2c6c5ccb1c03ec023b8f3457a5df918d279a4e192fabe1ef0f8b47592364",  # popcorn in sha512
 
                  "file name": "dic.txt",                   # very short runtime in dic.txt
-                 "single": "True"})                    # (short run time on realuniq dictionary ~18M lines)
+                 "single": "False"})                    # (short run time on realuniq dictionary ~18M lines)
 
     settings.append( {"cracking method": "dic",  # settings[2]
                  "algorithm": "md5",
@@ -65,30 +65,51 @@ class start():
                      "algorithm": "md5",
                      "key length": 10,
                      "alphabet": string.ascii_letters+string.digits+string.punctuation,
-                     "chain length": 100,
-                     "num rows": 3600,
-                     "file name": "rain2.txt",
+                     "chain length": 1000,
+                     "num rows": 100,
+                     "file name": "rain.txt",
                      "single": "False"})
 
     settings.append({"cracking method": "rain",  # settings[6]
                      "file name": "rain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
-                     "hash": "138e3514b94d53b9cb57d586c1b784c6",
+                     "hash": "9b6e7de86ccf4f9c05ac2504e132e414",
                      "single": "True"})
 
     settings.append({"cracking method": "rain",  # settings[7]
-                     "file name": "rain.txt",
+                     "file name": "myrain.txt",
                      #"hash": "d9af1fd83c9a1c30a7cc38c59acb31d7",   # pythagoras in md5
-                     "hash": "51fe5861351b604b32f8dfdf4fa3beca",
+                     "hash": "11464b55161a44abe7e27ac44a2e6385",
                      "single": "False"})
 
-    settings.append( {"cracking method": "bf",  # settings[8]
+    settings.append({"cracking method": "bf",  # settings[8]
                       "algorithm": "md5",
-                      "hash": "98ae126efdbc62e121649406c83337d9",
-                      "min key length": 4,                         # short runtime
+                      #"hash": "98ae126efdbc62e121649406c83337d9",
+                      "hash": "daeccf0ad3c1fc8c8015205c332f5b42", # apples in md5
+                      #"hash": "18b049cc8d8535787929df716f9f4e68",
+                      "min key length": 1,                         # short runtime
                       "max key length": 6,
                       "alphabet": string.ascii_lowercase,
                       "single": "True"})
+
+    settings.append({"cracking method": "bf",  # settings[9]
+                      "algorithm": "md5",
+                      "input file name": "top 500 password hashes.txt",
+                      "output file name": "found passwords.txt",
+                      "min key length": 1,
+                      "max key length": 6,
+                      "alphabet": string.ascii_lowercase,
+                      "single": "True",
+                      "file mode": True})
+
+    settings.append({"cracking method": "dic",  # settings[10]
+                      "algorithm": "md5",
+                      "input file name": "top 500 password hashes.txt",
+                      "output file name": "found passwords.txt",
+                      "file name": "realuniq.txt",
+                      "single": "True",
+                      "file mode": True
+                      })
 
     def __init__(self):
         return
@@ -114,10 +135,7 @@ class start():
         shared.append(shutdown)
         shared.append(update)
 
-        with open(self.debug_file, 'a') as file:
-            file.write("test start server PID: %i\n" % current_process().pid)
-
-        preset = 6
+        preset = 10
         if self.settings[preset]["single"] == "False":
             network = True
         else:
@@ -130,6 +148,7 @@ class start():
         while not shutdown.is_set():
             # update is an Event, this means that a process can use the .wait() command to block until it is .set()
             update.wait(timeout=.5)
+            print "%i chunks completed." % dictionary["finished chunks"]
             os.system('cls' if os.name == 'nt' else 'clear')
             if dictionary["key"] is not '':
                 print "Printing key from start_server method: " + dictionary["key"]
@@ -140,13 +159,16 @@ class start():
         shutdown.set()
         time.sleep(1)
 
-        manager.shutdown()
-        self.server.terminate()
+        #self.server.terminate()
         self.server.join()
+        self.server.terminate()
+        #os.kill(self.server.pid, signal.SIGKILL)
+        self.server.join()
+        manager.shutdown()
         if network:
             print self.server.pid
-            os.kill(self.server.pid + 3, signal.SIGKILL)
-            os.kill(self.server.pid + 4, signal.SIGTERM)
+            #os.kill(self.server.pid + 3, signal.SIGKILL)
+            #os.kill(self.server.pid + 4, signal.SIGTERM)
 
 
 if __name__ == '__main__':
