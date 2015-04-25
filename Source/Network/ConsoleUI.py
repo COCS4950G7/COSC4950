@@ -18,8 +18,11 @@ import Chunk
 from NetworkClient_r15b import Client
 from NetworkServer_r15c import Server
 
+
+#Main class that runs at start-up
 class ConsoleUI():
 
+    #Freeze support for windows executable
     if __name__ == '__main__':
         freeze_support()
 
@@ -28,7 +31,6 @@ class ConsoleUI():
         done = False
 
         #Initializing variable to a default value
-        #serverIP = "192.168.1.3"
         serverIP = "127.0.1.1"
 
         #Define the shared dictionary and it's values
@@ -38,7 +40,6 @@ class ConsoleUI():
         dictionary["finished chunks"] = 0
         dictionary["total chunks"] = 0
         dictionary["server ip"] = "127.1.1.1"
-        #dictionary["current chunk"] = Chunk.Chunk()
         dictionary["current word"] = ""
 
         #server/client/GUI signals shutdown when they're all done
@@ -70,11 +71,13 @@ class ConsoleUI():
         networkServer = Process(target=Server, args=(settings, shared,))
         networkClient = Process(target=Client, args=(serverIP, shared,))
 
+        #Set the 'state' or which screen to display
         state = "startScreen"
 
         #Displayed to the user while searching
         current_search_item = ""
 
+        #Clocks used for timing
         clock = 0
         #colliding_Clock = 0
         #colliding_Clock2 = 0
@@ -82,11 +85,14 @@ class ConsoleUI():
     #Constructor
     def __init__(self):
 
+        #Freeze support for Windows
         if not __name__ == '__main__':
+
             freeze_support()
+
             return
 
-        #Loop till we're done
+        #Main loop that switches between screens
         while not self.done:
 
             #Get current screen
@@ -102,17 +108,13 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the start state
             if state == "startScreen":
 
                 print "###################################################"
                 print "#################  MIGHTY CRACKER #################"
                 print "###################################################"
                 print "         Brought to you by: *************"
-
                 print "A general-purpose, hash cracking utility."
-
-                #What did the user pick? (Node, Server, Single, Exit)
                 print "============="
                 print "Start"
                 print
@@ -134,7 +136,7 @@ class ConsoleUI():
 
                     user_input = raw_input("Try Again: ")
 
-                #If user picks Node, tell GUI to go to Node start screen
+                #If user picks Node, tell GUI to go to Node start screen, etc...
                 if user_input in ("Node", "node", "n"):
 
                     self.state = "nodeStartScreen"
@@ -147,13 +149,7 @@ class ConsoleUI():
 
                     self.state = "singleStartScreen"
 
-                elif user_input in "a":
-
-                    self.aLane = True
-
-                    self.state = "serverStartScreen"
-
-                elif user_input in ("About", "about"):
+                elif user_input in ("About", "about", "a"):
 
                     self.state = "aboutScreen"
 
@@ -164,7 +160,6 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the node start state (Screen)
             elif state == "aboutScreen":
 
                 #What did the user pick? (Be a node, Back, Exit)
@@ -240,10 +235,8 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the node start state (Screen)
             elif state == "nodeStartScreen":
 
-                #What did the user pick? (Be a node, Back, Exit)
                 print "============="
                 print "Start -> Node"
                 print
@@ -300,7 +293,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Connecting--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
                         star_counter = 0
@@ -312,8 +304,6 @@ class ConsoleUI():
                         white_r = white_r[:-1]
 
                     time.sleep(1)
-                    #self.update.wait()
-                    #self.update.clear()
 
                 #Got connected, so switch screens
                 self.state = "nodeConnectedToScreen"
@@ -333,7 +323,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Connected--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
                         star_counter = 0
@@ -351,6 +340,7 @@ class ConsoleUI():
 
                     self.state = "nodeStartScreen"
                     time.sleep(2)
+                    #Kill client process, if it hasn't self-killed sooner
                     self.networkClient.terminate()
 
                 #if client is no longer connected, go to connecting screen
@@ -378,7 +368,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Working--> [" + white_l + "*" + white_r + "]"
                     if star_counter > 11:
                         star_counter = 0
@@ -396,6 +385,7 @@ class ConsoleUI():
 
                     self.state = "nodeStartScreen"
                     time.sleep(2)
+                    #Kill client process, if it hasn't self-killed sooner
                     self.networkClient.terminate()
 
                 #if not connected, go to connecting screen
@@ -468,10 +458,8 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverBruteForceScreen state (Screen)
             elif state == "serverBruteForceScreen":
 
-                #What did the user pick? (Crack it!, Back, Exit)
                 print "============="
                 print "Start -> Server Mode -> Brute Force"
                 print
@@ -540,7 +528,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -575,7 +563,6 @@ class ConsoleUI():
                     print
                     results_file = raw_input("What's file name that we'll put the results (____.txt): ")
                     self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
                     self.settings['file mode'] = True
 
                 self.settings['cracking method'] = "bf"
@@ -618,10 +605,8 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverBruteSearchingScreen state (Screen)
             elif state == "serverBruteSearchingScreen":
 
-                #display results and wait for user interaction
                 print "============="
                 print "Start -> Server Mode -> Brute Force -> Searching..."
 
@@ -639,7 +624,6 @@ class ConsoleUI():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print "Server IP: ", self.dictionary["server ip"]
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Word: ", self.dictionary["current word"]
@@ -671,6 +655,7 @@ class ConsoleUI():
             #if we're at the serverBruteFoundScreen state (Screen)
             elif state == "serverBruteFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -713,9 +698,9 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverBruteNotFoundScreen state (Screen)
             elif state == "serverBruteNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -749,7 +734,6 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverRainUserScreen state (Screen)
             elif state == "serverRainUserScreen":
 
                 print "============="
@@ -769,7 +753,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -845,7 +829,6 @@ class ConsoleUI():
 
             #############################################
             #############################################
-            #if we're at the serverRainUserSearchingScreen state (Screen)
             elif state == "serverRainUserSearchingScreen":
 
                 print "============="
@@ -866,7 +849,6 @@ class ConsoleUI():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print "Server IP: ", self.dictionary["server ip"]
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Word: ", self.dictionary["current word"]
@@ -898,6 +880,7 @@ class ConsoleUI():
             #if we're at the serverRainUserFoundScreen state (Screen)
             elif state == "serverRainUserFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -943,6 +926,7 @@ class ConsoleUI():
             #if we're at the serverRainUserNotFoundScreen state (Screen)
             elif state == "serverRainUserNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -1120,7 +1104,6 @@ class ConsoleUI():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print "Server IP: ", self.dictionary["server ip"]
-                    #Ohhh, pretty status pictures
                     print "Creating--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
@@ -1209,7 +1192,6 @@ class ConsoleUI():
 
                                 #Clear the screen and re-draw
                                 os.system('cls' if os.name == 'nt' else 'clear')
-                                #Ohhh, pretty status pictures
                                 print "Fixing--> [" + white_l + "*" + white_r + "]"
                                 print "Collisions Still Detected: " + str(collisions)
                                 if star_counter > 11:
@@ -1236,6 +1218,7 @@ class ConsoleUI():
             #if we're at the serverRainMakerDoneScreen state (Screen)
             elif state == "serverRainMakerDoneScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 #display results and wait for user interaction
@@ -1316,7 +1299,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -1415,7 +1398,6 @@ class ConsoleUI():
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print "Server IP: ", self.dictionary["server ip"]
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Word: ", self.dictionary["current word"]
@@ -1447,6 +1429,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "serverDictionaryFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -1492,6 +1475,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "serverDictionaryNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -1653,7 +1637,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -1750,7 +1734,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Prefix: ", self.dictionary["current word"]
@@ -1782,6 +1765,7 @@ class ConsoleUI():
             #if we're at the singleBruteFoundScreen state (Screen)
             elif state == "singleBruteFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -1827,6 +1811,7 @@ class ConsoleUI():
             #if we're at the singleBruteNotFoundScreen state (Screen)
             elif state == "singleBruteNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
@@ -1882,7 +1867,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -1979,7 +1964,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Word: ", self.dictionary["current word"]
@@ -2011,6 +1995,7 @@ class ConsoleUI():
             #if we're at the singleRainUserFoundScreen state (Screen)
             elif state == "singleRainUserFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
@@ -2057,6 +2042,7 @@ class ConsoleUI():
             #if we're at the singleRainUserNotFoundScreen state (Screen)
             elif state == "singleRainUserNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
@@ -2248,7 +2234,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Creating--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     if star_counter > 11:
@@ -2337,7 +2322,6 @@ class ConsoleUI():
 
                                 #Clear the screen and re-draw
                                 os.system('cls' if os.name == 'nt' else 'clear')
-                                #Ohhh, pretty status pictures
                                 print "Fixing--> [" + white_l + "*" + white_r + "]"
                                 print "Collisions Still Detected: " + str(collisions)
                                 if star_counter > 11:
@@ -2356,6 +2340,7 @@ class ConsoleUI():
                             elapsed = (time.time() - self.colidingClock2)
                             self.colidingClock2 = elapsed
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 time.sleep(2)
@@ -2445,7 +2430,7 @@ class ConsoleUI():
                 print "Are we searching for a single hash, or from a file of hashes?"
                 print
                 print "Single Hash (s)"
-                print "From a File (f)  BROKE BROKE BROKE"
+                print "From a File (f)"
                 print
                 single_or_file = raw_input("Choice: ")
 
@@ -2541,7 +2526,6 @@ class ConsoleUI():
 
                     #Clear the screen and re-draw
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    #Ohhh, pretty status pictures
                     print "Searching--> [" + white_l + "*" + white_r + "]"
                     print "Finished Chunks: ", self.dictionary['finished chunks'], "/", self.dictionary['total chunks']
                     print "Current Word: ", self.dictionary["current word"]
@@ -2573,6 +2557,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryFoundScreen state (Screen)
             elif state == "singleDictionaryFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 #What did the user pick? (Crack it!, Back, Exit)
@@ -2619,6 +2604,7 @@ class ConsoleUI():
             #if we're at the singleDictionaryNotFoundScreen state (Screen)
             elif state == "singleDictionaryNotFoundScreen":
 
+                #Kill server process, if it hasn't self-killed sooner
                 self.networkServer.terminate()
 
                 print "============="
