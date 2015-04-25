@@ -15,6 +15,10 @@ from NetworkClient_r15b import Client
 #--------------------------------------------------------------
 #           Main Menu Panel
 #               This is The Panel that the application always starts on
+#               Able to navigate to these Panels from this screen:
+#                   -Select Cracking Method Panel (via Single Mode button)
+#                   -Select Node Type Screen (via Network Mode button)
+#                   -About Us Page Panel (via About Us button)
 #--------------------------------------------------------------
 class PanelOne(wx.Panel):           #========================Main Menu Panel=====================
     def __init__(self, parent):
@@ -71,6 +75,11 @@ class PanelOne(wx.Panel):           #========================Main Menu Panel====
 #------------------------------------------------------------
 #           Select Cracking Method Panel
 #               This panel lets the user select which cracking method they wish to use
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Dictionary Cracking Method Settings Screen (via Dictionary button)
+#                   -Brute-Force Cracking Method Settings Screen (via Brute-Force button)
+#                   -Rainbow Table Mode Select Screen (via Rainbow Table button)
 #------------------------------------------------------------
 class PanelTwo(wx.Panel):             #====================Select Cracking Method Panel=============================
     def __init__(self,parent):
@@ -147,6 +156,10 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 #---------------------------------------------------------------
 #           Dictionary Cracking Method Settings Panel
 #               This Panel allows the user to configure the dictionary search settings
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
+#                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #---------------------------------------------------------------
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings Panel=================
     def __init__(self, parent):
@@ -300,6 +313,10 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 #-------------------------------------------------------------
 #           Brute-Force Cracking Method Settings Panel
 #               This Panel allows the user to configure the brute-force search settings
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
+#                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #-------------------------------------------------------------
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings Panel==================
     def __init__(self, parent):
@@ -458,6 +475,10 @@ class PanelFour(wx.Panel):            #==================Brute Force Cracking me
 #-------------------------------------------------------------------
 #           Rainbow Table Mode Select
 #               This Panel allows the user to specify which specific mode of rainbow table the user wishes to use
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back to Main Menu button)
+#                   -Rainbow Table Cracking Method Settings Screen (via Crack Using Rainbow Table button)
+#                   -Rainbow Table Maker Settings Screen (via Rainbow Table Maker button)
 #-------------------------------------------------------------------
 class PanelFive(wx.Panel):                 #====================Rainbow Table Mode Select=========================
     def __init__(self, parent):
@@ -519,6 +540,10 @@ class PanelFive(wx.Panel):                 #====================Rainbow Table Mo
 #------------------------------------------------------------
 #           Select Node Type Screen Panel
 #               This Panel allows the user to specify whether to run in Network Server mode or Network Client mode
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Select Cracking Method Screen (via Network Server button)
+#                   -Network Client Main Screen Panel (via Network Client button)
 #------------------------------------------------------------
 class PanelSix(wx.Panel):                  #====================Select Node Type Screen============================
     def __init__(self, parent):
@@ -572,6 +597,9 @@ class PanelSix(wx.Panel):                  #====================Select Node Type
 #------------------------------------------------------------
 #           Network Client Main Screen Panel
 #               This Panel lets the user input the Network Server's IP address and then connect to the server
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back to Main Menu button)
+#                   -Network Client Status Screen (via Connect to Server button)
 #------------------------------------------------------------
 class PanelSeven(wx.Panel):          #=============================Network Client Main Screen=======================
     def __init__(self, parent):
@@ -634,6 +662,8 @@ class PanelSeven(wx.Panel):          #=============================Network Clien
 #----------------------------------------------------------------
 #           Network Client Status Screen
 #               This Panel displays the status of the search to the client while a search is being conducted
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Disconnect From Server button)
 #----------------------------------------------------------------
 class PanelEight(wx.Panel):       #========================Network Client Status Screen===========================
     def __init__(self,parent):
@@ -721,6 +751,8 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 #---------------------------------------------------------------
 #           Network Server Status Screen
 #               This Panel displays the current status of the current search that is being conducted
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Close the Server button)
 #---------------------------------------------------------------
 class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
     def __init__(self, parent):
@@ -844,6 +876,8 @@ class PanelNine(wx.Panel):                     #================Network Server S
 #-------------------------------------------------------------
 #           Single Mode Status Screen
 #               This Panel displays the status of the current search being conducted to a user that is running in Single Mode
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
 #-------------------------------------------------------------
 class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
     def __init__(self, parent):
@@ -958,6 +992,10 @@ class PanelTen(wx.Panel):                          #====================Single M
 #----------------------------------------------------------------
 #           Rainbow Table Cracking Method Settings
 #               This Panel allows the user to configure the setting for the Rainbow Table Cracking method
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
+#                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #----------------------------------------------------------------
 class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
     def __init__ (self, parent):
@@ -1086,6 +1124,10 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 #------------------------------------------------------------
 #           Rainbow Table Maker Settings Screen
 #               This Panels allows the user to configure the settings for creating a rainbow table
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back To Main Menu button)
+#                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
+#                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #------------------------------------------------------------
 class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
     def __init__ (self,parent):
@@ -1262,6 +1304,8 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 #----------------------------------------------------------
 #           About Us Page Panel
 #               This Panel displays information about the Mighty Cracker Program and the people who developed it
+#               Able to navigate to these panels from this panel:
+#                   -Main Menu Panel (via Back to Main Menu button)
 #----------------------------------------------------------
 class PanelThirteen(wx.Panel):              #====================About Us Page===================================
     def __init__(self,parent):
