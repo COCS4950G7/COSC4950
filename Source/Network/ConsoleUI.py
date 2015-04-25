@@ -468,13 +468,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
@@ -973,13 +975,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
@@ -1273,13 +1277,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
@@ -1577,13 +1583,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
@@ -2089,13 +2097,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
@@ -2404,13 +2414,15 @@ class ConsoleUI():
                 print "What's the algorithm: "
                 print "(md5)"
                 print "(sha1)"
+                print "(sha224)"
                 print "(sha256)"
+                print "(sha384)"
                 print "(sha512)"
                 print
                 algorithm = raw_input("Choice: ")
 
                 #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
+                good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
                 while not algorithm in good_names:
 
                     print "Input Error!"
