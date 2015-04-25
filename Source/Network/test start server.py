@@ -15,11 +15,11 @@ class start():
     debug_file = "/Users/327pzq/procs.txt"
 
     settings.append({"cracking method": "dic",  # settings[0]
-                "algorithm": "md5",
+                "algorithm": "whirlpool",
                 "hash": "b17a9909e09fda53653332431a599941",  # Karntnerstrasse-Rotenturmstrasse in md5
                 #"hash": "e7c0efb2dc699ede79983b8dfb5cb509ebf2bde9",  # Karntnerstrasse-Rotenturmstrasse in sha1
                 #"hash": "7ab5f3733019c9e594526c9beb70c0cc51517b91a6557f4b4306564b753232af",  # Karntnerstrasse-Rotenturmstrasse in sha256
-                "file name": "realuniq.txt",                    # last word in dic.txt
+                "file name": "dic.txt",                    # last word in dic.txt
                 "single": "True"})                    # (long runtime on realuniq dictionary ~755M lines)
 
     settings.append({"cracking method": "dic",  # settings[1]
@@ -30,12 +30,12 @@ class start():
                  "file name": "dic.txt",                   # very short runtime in dic.txt
                  "single": "False"})                    # (short run time on realuniq dictionary ~18M lines)
 
-    settings.append( {"cracking method": "dic",  # settings[2]
-                 "algorithm": "md5",
-                 "hash": "9d86c2b0caad030430c093530b77ba63",  # Sixth line from the bottom, non-ascii characters (md5)
-                 "file name": "realuniq.txt",
-                 "single": "True"
-                 })                   # (longest run time on realuniq dictionary ~1.2B lines)
+    settings.append({"cracking method": "dic",  # settings[2]
+                     "algorithm": "md5",
+                     "hash": "9d86c2b0caad030430c093530b77ba63",  # Sixth line from the bottom, non-ascii characters (md5)
+                     "file name": "realuniq.txt",
+                     "single": "True"
+                     })                   # (longest run time on realuniq dictionary ~1.2B lines)
 
     settings.append( {"cracking method": "bf",  # settings[3]
                       "algorithm": "md5",
@@ -83,33 +83,40 @@ class start():
                      "single": "False"})
 
     settings.append({"cracking method": "bf",  # settings[8]
-                      "algorithm": "md5",
-                      #"hash": "98ae126efdbc62e121649406c83337d9",
-                      "hash": "daeccf0ad3c1fc8c8015205c332f5b42", # apples in md5
-                      #"hash": "18b049cc8d8535787929df716f9f4e68",
-                      "min key length": 1,                         # short runtime
-                      "max key length": 6,
-                      "alphabet": string.ascii_lowercase,
-                      "single": "True"})
+                     "algorithm": "sha256_crypt",
+                     #"hash": "98ae126efdbc62e121649406c83337d9",
+                     #"hash": "daeccf0ad3c1fc8c8015205c332f5b42",  # apples in md5
+                     #"hash": "1f3870be274f6c49b3e31a0c6728957f",  # apple in md5
+                     #"hash": "18b049cc8d8535787929df716f9f4e68",
+                     #"hash": "ec19d33418ced2ed541dc5d13492109b",
+                     #"hash": "{MD5}DMF1ucDxtqgxw5niaXcmYQ==",  # a in ldap_md5
+                     #"hash": "{MD5}HzhwvidPbEmz4xoMZyiVfw==",  # apple in ldap_md5
+                     #"hash": "{MD5}mK4Sbv28YuEhZJQGyDM32Q==",  # aaaff in ldap_md5
+                     "hash": "deb91e34a285a43e838676bd654690f03b67e90215422143c9271cd26372f82e",
+                     #"hash": "$5$rounds=110000$Kd0YeNXdQGzSeRdH$Vu6EGUXNIZPJcO1nPC4Yq38ZpO0ItD82XaFpEPkrPm1",
+                     "min key length": 5,
+                     "max key length": 6,
+                     "alphabet":  string.ascii_lowercase,# + string.digits,
+                     "single": "True"})
 
     settings.append({"cracking method": "bf",  # settings[9]
-                      "algorithm": "md5",
-                      "input file name": "top 500 password hashes.txt",
-                      "output file name": "found passwords.txt",
-                      "min key length": 1,
-                      "max key length": 6,
-                      "alphabet": string.ascii_lowercase,
-                      "single": "True",
-                      "file mode": True})
+                     "algorithm": "md5",
+                     "input file name": "top 500 password hashes.txt",
+                     "output file name": "found passwords2.txt",
+                     "min key length": 1,
+                     "max key length": 8,
+                     "alphabet": string.digits + string.ascii_lowercase,
+                     "single": "True",
+                     "file mode": True})
 
     settings.append({"cracking method": "dic",  # settings[10]
-                      "algorithm": "md5",
-                      "input file name": "top 500 password hashes.txt",
-                      "output file name": "found passwords.txt",
-                      "file name": "realuniq.txt",
-                      "single": "True",
-                      "file mode": True
-                      })
+                     "algorithm": "md5",
+                     "input file name": "top 500 password hashes.txt",
+                     "output file name": "found passwords2.txt",
+                     "file name": "dic.txt",
+                     "single": "True",
+                     "file mode": True
+                     })
 
     def __init__(self):
         return
@@ -135,7 +142,7 @@ class start():
         shared.append(shutdown)
         shared.append(update)
 
-        preset = 10
+        preset = 8
         if self.settings[preset]["single"] == "False":
             network = True
         else:
@@ -148,7 +155,10 @@ class start():
         while not shutdown.is_set():
             # update is an Event, this means that a process can use the .wait() command to block until it is .set()
             update.wait(timeout=.5)
-            print "%i chunks completed." % dictionary["finished chunks"]
+            print "%i/%i chunks completed." % (dictionary["finished chunks"], dictionary["total chunks"])
+            print "Current word: %s" % dictionary["current word"]
+            if preset > 8:
+                print "%i hashes found." % dictionary["hashes found"]
             os.system('cls' if os.name == 'nt' else 'clear')
             if dictionary["key"] is not '':
                 print "Printing key from start_server method: " + dictionary["key"]
