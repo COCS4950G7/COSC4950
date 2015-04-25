@@ -1,15 +1,15 @@
 #   Brute_Force.py
 
 #   This class does all the brute force cracking work,
-#   interacting only with the controller class.
+#   interacting only with the server or client classes.
+#   Can be used to get prefixes to send across the network, or to run them client side
 
+from multiprocessing import cpu_count, Process, Queue, Value, current_process
 #from passlib.context import CryptContext
-#import passlib
-import hashlib
 import itertools
+import hashlib
 import string
 import time
-from multiprocessing import cpu_count, Process, Queue, Value, current_process
 
 
 class WorkUnit(object):
@@ -24,7 +24,7 @@ class WorkUnit(object):
 class Brute_Force():
     minKeyLength = 6
     maxKeyLength = 16
-    alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits #+ string.punctuation
+    alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits + string.punctuation + ' '
     algorithm = None
     origHash = None
     key = ''
@@ -40,15 +40,20 @@ class Brute_Force():
     children = []
     result_queue = None
     processes_running = False
-    #myctx = CryptContext(schemes=["sha1_crypt", "sha256_crypt", "sha512_crypt", "md5_crypt",
-     #                             "des_crypt", 'ldap_salted_sha1', 'ldap_salted_md5',
-      #                            'ldap_sha1', 'ldap_md5', 'ldap_plaintext', "mysql323"])
+    hashlib_mode = False
+    hash_list = []
+    list_mode = False
+    #schemes = ["sha1_crypt", "sha256_crypt", "sha512_crypt", "md5_crypt",
+    #           "des_crypt", 'ldap_salted_sha1', 'ldap_salted_md5',
+    #           'ldap_sha1', 'ldap_md5', 'ldap_plaintext', "mysql323"]
+    #myctx = CryptContext(schemes)
 
     def __init__(self):
         if not __name__ == '__main__':
             return
         current_process().authkey = "Popcorn is awesome!!!"
 
+    #setup all variables necessary to get prefixes
     def set_params(self, alphabet, algorithm, origHash, min_key_length, max_key_length):
         self.alphabet = alphabet
         self.algorithm = algorithm
@@ -57,6 +62,7 @@ class Brute_Force():
         self.maxKeyLength = max_key_length
         self.set_chars_to_check()
 
+    #restore default values to internal variables
     def resetVariables(self):
         self.minKeyLength = 1
         self.maxKeyLength = 16
@@ -89,29 +95,24 @@ class Brute_Force():
     def get_total_chunks(self):
         return self.total_work_units
 
-    # start pool of check_keys workers
+    # start pool of check_keys workers getting work units from the internal queue
     def start_processes(self):
         if not self.processes_running:
             for j in range(0, cpu_count()):
                 self.children.append(Process(target=self.check_keys, args=(self.queue,)))
                 self.children[j].start()
-                #print "bf internal process %i started." % self.children[j].pid
             self.processes_running = True
 
     # shutdown process pool
     def terminate_processes(self):
         for process in self.children:
-            #print "killing process: %i" % process.pid
             process.terminate()
             process.join(timeout=.1)
-            #if process.is_alive():
-             #   print "process %i did not die." % process.pid
 
     # checks keys of length minKeyLength to charsToCheck, these keys will not use a prefix
     def check_short_keys(self):
         if self.done.value:
             return
-        #print "check_short_keys called for lengths %d-%d and no prefix." % (self.minKeyLength, self.charactersToCheck)
         # compound iterable creates strings with a range of lengths
         keylist = itertools.chain.from_iterable(itertools.product(self.alphabet, repeat=j)
                                                 for j in range(self.minKeyLength, self.charactersToCheck+1))
@@ -119,11 +120,12 @@ class Brute_Force():
             tempkey = ''.join(key)
             if self.isSolution(tempkey):
                 self.result_queue.put(('w', tempkey))
-                while not self.queue.empty():
-                    self.queue.get()
-                self.countey.value += 1
-                #print "We win!"
-                return True
+                if not self.list_mode:
+                    while not self.queue.empty():
+                        self.queue.get()
+                    self.countey.value += 1
+                    #print "We win!"
+                    return True
             self.countey.value += 1
         params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" \
                  + str(self.minKeyLength) + "\n" + str(self.maxKeyLength) + "\n" \
@@ -153,15 +155,19 @@ class Brute_Force():
                 if self.isSolution(tempkey):
                     try:
                         # send key with success message
-                        self.result_queue.put(('w', tempkey), timeout=1)
+                        if self.list_mode:
+                            self.result_queue.put(('w', (tempkey + '\n' + hashlib.new(self.algorithm, tempkey).hexdigest(),)))
+                        else:
+                            self.result_queue.put(('w', tempkey), timeout=1)
                     except Exception:
                         return
-                    while not self.queue.empty():
-                        queue.get()
-                    self.countey.value += 1
-                    queue.close()
-                    #print "We win!"
-                    return True
+                    if not self.list_mode:
+                        while not self.queue.empty():
+                            queue.get()
+                        self.countey.value += 1
+                        queue.close()
+                        #print "We win!"
+                        return True
             self.countey.value += 1
             # send back parameters with a fail result
             params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" \
@@ -185,31 +191,44 @@ class Brute_Force():
             for prefix in prefixes:
                 if self.done.value:
                     return
+                #return the nex prefix each time the function is called
                 yield ''.join(prefix)
+        #send sentinel when the final prefix has been returned
         yield "******possibilities exhausted******"
 
 #   Hash a possible key and check if it is equal to the hashed input.
     def isSolution(self, key):
-        temp_key = hashlib.new(self.algorithm, key).hexdigest()
-        if temp_key == self.origHash:
-            self.rec = "found"
-            #print "Solution found!\nKey is : %s\nWith a hash of %s" % (key, temp_key)
-            with self.done.get_lock():
-                self.done.value = True
-            self.key = key
-            return True
-        else:
-            return False
-
-    # experimental method designed to work with passlib hashing library, not for normal use
-    def isSolution2(self, key):
-        if self.myctx.verify(key, self.origHash):
-            #print "Solution found!\nKey is : %s\nWith a hash of %s" % (key, self.origHash)
-            self.done.value = True
-            self.key = key
-            return True
-        else:
-            return False
+        #check to see if python hashlib or passlib will be used to check hashes
+        if self.hashlib_mode:  # use built in hashlib hash algorithms
+            #hash key using correct algorithm
+            temp_key = hashlib.new(self.algorithm, key).hexdigest()
+            #for list mode check all hashes in the list
+            if self.list_mode:
+                for hash in self.hash_list:
+                    if hash == temp_key:
+                        return True
+                return False
+            else:  # single hash mode shuts down after the hash is found
+                if temp_key == self.origHash:
+                    self.rec = "found"
+                    #print "Solution found!\nKey is : %s\nWith a hash of %s" % (key, temp_key)
+                    if not self.list_mode:
+                        with self.done.get_lock():
+                            self.done.value = True
+                    self.key = key
+                    return True
+                else:
+                    return False
+        else:  # use passlib hash functions currently disabled because functionality is not yet supported in UI classes
+            #passlib uses the verify function to allow verifying salted hashes and other troublesome hash types
+            #if self.myctx.verify(key, self.origHash):
+            #    print "Solution found!\nKey is : %s\nWith a hash of %s" % (key, self.origHash)
+            #    self.done.value = True
+            #    self.key = key
+            #    return True
+            #else:
+            #    return False
+            return
 
 #   setup here is to make chunks large enough that constant network communications are avoided but that won't last
 #   forever on slower machines. A maximum chunk size of 10M hashes seemed a reasonable compromise.
@@ -228,51 +247,38 @@ class Brute_Force():
         for i in range(self.minKeyLength, self.maxKeyLength+1):
             self.total_work_units += ((self.alphabet.__len__() ** i)/self.chunk_size)
 
-#   get_chunk() is an iterator which yields a new chunk of data each time get_chunk.next() is called.
-        # BROKEN, DO NOT USE!
-    # def get_chunk(self):
-    #
-    #     for prefix in self.get_prefix():
-    #
-    #         print "get chunk prefix: %s" % prefix
-    #         if prefix == '':
-    #             prefix = "-99999999999999999999999999999999999"
-    #
-    #         chunk = Chunk.Chunk()
-    #         chunk.params = "bruteforce\n" + self.algorithm + "\n" + self.origHash + "\n" + self.alphabet + "\n" + str(self.minKeyLength) + "\n" + str(self.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
-    #
-    #         yield chunk
-    #     self.possibilities_exhausted = True
-
 #   run_chunk takes an object of type Chunk.Chunk(), checks all possibilities within the parameters of the chunk,
 #   sets global variables according to the chunk data and returns True or False to indicate if the cracking succeeded.
     def run_chunk(self, chunk):
         settings = chunk.params
         settings_list = settings.split('\n')
-        #print settings
         prefix = settings_list[6]
+        #do initial setup using the split settings string
         if self.first_unit:
             self.algorithm = settings_list[1]
+            self.hashlib_mode = True
+            #check to see if passlib hash library is being used
+            #for algorithm in  self.schemes:
+            #    if self.algorithm == algorithm:
+            #        self.hashlib_mode = False
+
             self.origHash = settings_list[2]
             self.alphabet = settings_list[3]
             self.minKeyLength = int(settings_list[4])
             self.maxKeyLength = int(settings_list[5])
             self.set_chars_to_check()
 
+        #check for sentinel indicating the need to check keys shorter than charactersToCheck
         if prefix == "-99999999999999999999999999999999999":
             prefix = ''
         if prefix == '' and self.first_unit:
-
             shorts = Process(target=self.check_short_keys)
             shorts.start()
-            #shorts.join()
-            #shorts.terminate()
-            #print "short keys started"
         else:
             if self.done.value:
                 return True
             else:
-                #print "run chunk prefix: %s" % prefix
+                #add chunk to queue for processing
                 self.queue.put(WorkUnit(prefix, self.charactersToCheck, self.alphabet, self.algorithm, self.origHash))
 
         self.first_unit = False
