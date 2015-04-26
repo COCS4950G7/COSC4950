@@ -2001,10 +2001,48 @@ class myFrame(wx.Frame):
 #           Defining Main Functions
 #               These are the functions that are called by the main code
 #=======================================================================================================================
+#-----------------------------------------------------------
+#           Show Not Finished Message 1 Function
+#               This function creates a dialog window that informs the user that a function has not been completed yet.
+#               This prevents the user from going to the screen that the particular button went to.
+#               Primary Purpose for this was debugging purposes indicating something was not completed yet.
+#-----------------------------------------------------------
     def ShowNotFinishedMessage1(self, event):
         dial= wx.MessageDialog(None, 'This function has not been completed yet', 'Notice:', wx.OK)
         dial.ShowModal()
 
+#--------------------------------------------------------------
+#           Update Single Timer Function (Used in Single Mode)
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -Sets the percent complete value to zero
+#                   -If the total chunks value is greater than 0, then set the percent Complete value to
+#                    number of finished chunks / number of total chunks
+#                   -Set the new percent complete value
+#                   -Set the number of completed chunks to the number of finished chunks
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the Current Status label to say 'Searching'
+#                   -If running OS X or Linux, check to see if the activity gauge is filled. If it is filled, set the activity
+#                    gauge to be empty. If not filled, increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly
+#                   -If in the Rainbow Table Maker Cracking Mode, set the hash to be cracked label to say 'There is no
+#                    hash to be cracked in this mode'
+#                   -Clear the update flag
+#               Else if the shutdown flag has been set, this function:
+#                   -Set the number of completed chunks label to the number of finished chunks value
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the activity gauge to full (on windows, this stops the gauge pulsing also)
+#                   -Set the progress bar to full
+#                   -If a solution was not found, check to see if in Rainbow Table Maker Cracking Mode. If in Rainbow Table
+#                    Maker Cracking Mode, set the solution header label to say 'There are no solutions for this mode'
+#                    and set the current Status label to say 'Finished Creating Rainbow Table'
+#                    If not in Rainbow Table Maker Cracking Mode, set the solution header label to say 'No solution
+#                    found' and set the current Status label to say 'Finished Searching, no solution found.' (For this
+#                    change the solution text color to red and change the font size)
+#                   -If a solution was found, set the solution header label to say what the solution was.
+#                    Then change the color of the solution text to be green and change the font size. Also, set the
+#                    current Status Label to say 'Finished Searching, Solution was found'
+#----------------------------------------------------------------
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
             percentComplete= 0
@@ -2056,6 +2094,38 @@ class myFrame(wx.Frame):
                 self.panel_ten.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
+#-------------------------------------------------------------
+#           Update Network Server Timer Function
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -Sets the percent complete value to zero
+#                   -If the total chunks value is greater than 0, then set the percent Complete value to
+#                    number of finished chunks / number of total chunks
+#                   -Set the new percent complete value
+#                   -Set the number of completed chunks to the number of finished chunks
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the Current Status label to say 'Searching'
+#                   -If running OS X or Linux, check to see if the activity gauge is filled. If it is filled, set the activity
+#                    gauge to be empty. If not filled, increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly
+#                   -If in the Rainbow Table Maker Cracking Mode, set the hash to be cracked label to say 'There is no
+#                    hash to be cracked in this mode'
+#                   -Clear the update flag
+#               Else if the shutdown flag has been set, this function:
+#                   -Set the number of completed chunks label to the number of finished chunks value
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the activity gauge to full (on windows, this stops the gauge pulsing also)
+#                   -Set the progress bar to full
+#                   -If a solution was not found, check to see if in Rainbow Table Maker Cracking Mode. If in Rainbow Table
+#                    Maker Cracking Mode, set the solution header label to say 'There are no solutions for this mode'
+#                    and set the current Status label to say 'Finished Creating Rainbow Table'
+#                    If not in Rainbow Table Maker Cracking Mode, set the solution header label to say 'No solution
+#                    found' and set the current Status label to say 'Finished Searching, no solution found.' (For this
+#                    change the solution text color to red and change the font size)
+#                   -If a solution was found, set the solution header label to say what the solution was.
+#                    Then change the color of the solution text to be green and change the font size. Also, set the
+#                    current Status Label to say 'Finished Searching, Solution was found'
+#----------------------------------------------------------------
     def updateNetworkServerTimer(self, event):
         if(not self.shutdown.is_set()):
             percentComplete= 0
@@ -2102,6 +2172,19 @@ class myFrame(wx.Frame):
                 self.panel_nine.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
+#-----------------------------------------------------------------
+#           Update Network Client Timer Function
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -(If running OS X or Linux) checks to see the activity gauge of the Network Client is completely filled,
+#                    if it is, then reset it back to empty. If not full, then increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly.
+#               Else if the shutdown flag is set, then this function:
+#                   -Sets the Current Status Label to say 'Finished Searching'
+#                   -Fills the activity gauge to full (regardless of OS)
+#                   -If a solution was found, change the solution header label to print out the solution
+#                   -If no solution was found, change the solution header label to say 'No solution was found'
+#-----------------------------------------------------------------
     def updateNetworkClientTimer(self, event):
         if(not self.shutdown.is_set()):
             if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
@@ -2125,6 +2208,11 @@ class myFrame(wx.Frame):
             else:      #if there was a found solution
                 self.panel_eight.solutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
 
+#------------------------------------------------------------
+#           Configure Dictionary Quick Test Function
+#               This function sets the Dictionary Crack settings to a predefined default value and then calls
+#               the Validate Dictionary Inputs Function
+#------------------------------------------------------------
     def configureDictionaryQuickTest(self, event):
         self.panel_three.selectedAlgorithm.SetValue("MD5")
         self.panel_three.selectedHashingMode.SetValue("Individual Hash Code")
@@ -2133,6 +2221,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateDictionaryInputs(fakeVariable)
 
+#-----------------------------------------------------------
+#           Configure Brute Force Quick Test Function
+#               This function sets the Brute Force Crack settings to a predefined default value and then calls
+#               the Validate Brute Force Inputs Function
+#-----------------------------------------------------------
     def configureBruteForceQuickTest(self,event):
         self.panel_four.selectedAlgorithm.SetValue("MD5")
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: 98ae126efdbc62e121649406c83337d9")
@@ -2142,6 +2235,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateBruteForceInputs(fakeVariable)
 
+#------------------------------------------------------------
+#           Configure Rainbow Table User Quick Test Function
+#               This function sets the Rainbow Table Crack settings to a predefined default value and then calls
+#               the Validate Rainbow Table Inputs Function
+#------------------------------------------------------------
     def configureRainbowTableUserQuickTest(self, event):
         self.panel_eleven.selectedAlgorithm.SetValue("MD5")
         self.panel_eleven.selectedFileHeader.SetLabel("Selected Rainbow Table File: rain.txt")
@@ -2149,6 +2247,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateRainbowTableUserInputs(fakeVariable)
 
+#------------------------------------------------------------
+#           Configure Rainbow Table Maker Quick Test Function
+#               This function sets the Rainbow Table Maker settings to a predefined default value and then calls
+#               the Validate Rainbow Table Maker Inputs Function.
+#------------------------------------------------------------
     def configureRainbowTableMakerQuickTest(self, event):
         self.panel_twelve.selectedAlgorithm.SetValue("MD5")
         self.panel_twelve.keyLengthHeader.SetLabel("Key Length: 10")
@@ -2159,6 +2262,19 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateRainbowTableMakerInputs(fakeVariable)
 
+#----------------------------------------------------------
+#           Validate Dictionary Inputs Function
+#               This function checks to make sure that all of the input settings for Dictionary are valid.
+#               First, checks to make sure that the selected algorithm is valid.
+#               Then checks to make sure that the selected hashing mode is valid.
+#               Then checks to make sure that the hash to be cracked value is not its default text.
+#               Then checks to make sure the hash code to be cracked is the correct amount of characters based on the
+#               selected algorithm.
+#               Then checks to make sure that the selected dictionary file is not the default text.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Dictionary Crack Function
+#---------------------------------------------------------------------
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2187,9 +2303,9 @@ class myFrame(wx.Frame):
 
         #check for valid selected hashing mode
         if(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "Individual Hash Code",0,0,len("Individual Hash Code"),len("Individual Hash Code"))==True):
-            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+            fakeVariable= False
         elif(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "File of Hash Codes",0,0,len("File of Hash Codes"),len("File of Hash Codes"))==True):
-            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+            fakeVariable= False
         else:
             foundInvalidInput= "True"
             invalidHashingMode= "True"
@@ -2277,6 +2393,21 @@ class myFrame(wx.Frame):
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate dictionary input
 
+#------------------------------------------------------------------
+#           Validate Brute Force Inputs Function
+#               This function checks to make sure that all of the input settings for Brute Force are valid.
+#               First, checks to make sure that a valid algorithm is selected.
+#               Then checks to make sure that the hash to be cracked is not the default text.
+#               Then checks to make sure the hash to be cracked is the correct amount of characters based on
+#               the selected algorithm.
+#               Then checks to make sure the min key length value was left blank.
+#               Then checks to make sure the max key length value was not left blank.
+#               Then checks to make sure that the min key length value is less than or equal to the max key length value.
+#               Then checks to make sure that the selected alphabet is valid.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Brute Force Crack Function
+#---------------------------------------------------------------------
     def validateBruteForceInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2431,6 +2562,18 @@ class myFrame(wx.Frame):
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate brute force inputs
 
+#------------------------------------------------------------------------
+#           Validate Rainbow Table User Inputs Function
+#               This function checks to make sure that all of the input settings for Rainbow Table User are valid.
+#               First, checks to make sure that a valid algorithm was selected.
+#               Then checks to make sure that the selected Rainbow Table File is not the default value.
+#               Then checks to make sure that the hash to be cracked is not the default text.
+#               Then checks to make sure that the hash to be cracked is the correct amount of characters based on the
+#               selected algorithm.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Rainbow Table Crack Function
+#---------------------------------------------------------------------
     def validateRainbowTableUserInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2532,6 +2675,19 @@ class myFrame(wx.Frame):
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
         #end of validate rainbowtable user inputs
 
+#----------------------------------------------------------------------
+#           Validate Rainbow Table Maker Inputs Function
+#               This function checks to make sure that all of the input settings for Rainbow Table are valid.
+#               First, checks to see if a valid algorithm has been selected.
+#               Then checks to make sure the key length is not left blank.
+#               Then checks to see if a valid alphabet has been selected.
+#               Then checks to make sure the table chain length was not left blank.
+#               Then checks to make sure the number of rows is not left blank.
+#               Then checks to make sure the Rainbow Table File Name was not left blank.
+#               Finally, evaluates whether or not there were any checks that failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Rainbow Table Maker Creation Session Function
+#---------------------------------------------------------------------
     def validateRainbowTableMakerInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
