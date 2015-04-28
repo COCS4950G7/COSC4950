@@ -1,8 +1,17 @@
 __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
-#TODO add SHA 384 to the list of supported algorithms (untested for bf, rainbow table)
-#TODO if using SHA384 or SHA512 on dictionary, status screen doesn't show the hash being cracked
+
+#NOTICE:
+#=======================================
+#Main Section Header
+#=======================================
+#---------------------------------------
+#Sub Section Header
+#---------------------------------------
+#.......................................
+#Secondary Sub Section Header
+#.......................................
 import wx
 import string
 import hashlib
@@ -756,7 +765,33 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Close the Server button)
 #---------------------------------------------------------------
-class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
+class PanelNine(wx.Panel):
+#...............................................................
+#           Initialization Function for Panel 9
+#               This function is automatically called when a new instance of panel 9 is made
+#               Creates a screen header that says 'Network Server Status Screen'
+#                   Sets the screen header text to use the title font and sets the text color to white
+#               Creates a text field that says 'cracking mode: not specified'
+#                   Sets the cracking mode text to use the text font and sets the text color white
+#               Creates a text field that says 'Server IP Address Not Set Yet'
+#                   Sets the server ip text to use text font and sets the text color to white
+#               Creates a text field that says 'Current Status: Running'
+#                   Sets the current status text to use text font and sets the text color to white
+#               Creates a text field that says 'Hash being cracked not specified'
+#                   Sets the hash being cracked text to use the text font and sets the text color to white
+#               Creates a text field that says 'activity gauge:" and a gauge
+#                   Sets the activity gauge text to use the text font and sets its text color to white
+#                   Sets the activity gauge to pulse (only works on windows)
+#               Creates a text field that says 'Progress:'
+#                   Sets the progress text to use the text font and sets the text color to white
+#               Creates a text field that say 'Number of completed chunks ' and 'total number of chunks'
+#                   Sets both text fields to use the text font and set the font color to white
+#               Creates a text field to say 'Solution: Serach not finished yet'
+#                   Sets the solution text to use the text font and sets the text to white
+#               Creates a button that says 'close the server' and a button that says 'close'
+#               Creates tooltips for the buttons and labels
+#               Creates a timer object
+#               Binds the buttons to their corresponding functions
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -881,7 +916,31 @@ class PanelNine(wx.Panel):                     #================Network Server S
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back To Main Menu button)
 #-------------------------------------------------------------
-class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
+class PanelTen(wx.Panel):
+#............................................................
+#           Initialization Function for Panel 10
+#               This function is automatically called when a new instance of panel 10 is made
+#               Creates a screen header that says 'single mode status screen'
+#                   Sets the screen header to use the title font and sets the text color to white
+#               Creates a text field that says 'cracking mode not specified'
+#                   Sets the cracking mode text to use the text font and sets the text color to white
+#               Creates a text field that says ' current status: starting up'
+#                   Sets the current status text to use the text font and sets the text color to white
+#               Creates a text field that says 'hash being cracked: not specified'
+#                   Sets the hash being cracked text to use the text font and sets the text color to white
+#               Creates a text field that says 'activity gauge' and gauge
+#                   Sets the label text to use the text font and sets the text color to white
+#               Creates a text field that says 'progress' and a gauge
+#                   Sets the label text to use the text font and sets the text color to white
+#               Creates a text field that says 'number of completed chunks: calculating and a text field that says
+#                   'Total number of chunks : calculating'
+#                   Sets the text to use the text font and sets the text color to white
+#               Creates a text field that says ' solution : search not finished yet'
+#                   Sets the solution text to use the text font and sets the text color to white
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the labels
+#               Binds the buttons to their corresponding functions
+#...............................................................
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -992,14 +1051,36 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 #----------------------------------------------------------------
-#           Rainbow Table Cracking Method Settings
+#           Rainbow Table Cracking Method Settings Screen
 #               This Panel allows the user to configure the setting for the Rainbow Table Cracking method
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back To Main Menu button)
 #                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
 #                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #----------------------------------------------------------------
-class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
+class PanelEleven(wx.Panel):
+#................................................................
+#           Initialization Function for Panel 11
+#               This function is automatically called when a new instance of panel eleven is made
+#               Creates a screen header text that says 'rainbow table cracking method settings'
+#                   Sets the screen header text to use the title font and sets the text color to white
+#               Creates a text field that says ' current mode: not specified'
+#                   Sets the current mode text to use the text font and sets the text color to white
+#               Creates a text field that says 'Selected algorithm' and a dropdown menu that contains the algorithms
+#                   Sets the selected algorithm text to use text font and sets the text color to white
+#               Creates a text field that says 'selected rainbow table file: no file has been selected'
+#                   Sets the text to use text font and sets text color to be white
+#               Creates a button that says 'select file button'
+#               Creates a text field that says 'hash to be cracked: no hash has been entered'
+#                   Sets the hash to be cracked text to use the text font and sets the font color to white
+#               Creates a button that says 'set hash to be cracked' and a button that says 'generate hash code'
+#               Creates a buttton that says 'start/connect button'
+#               Creates a button that says 'reset settings back to default'
+#               Creates a button that says 'run quick sample test'
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the text labels
+#               Binds the buttons to their corresponding functions
+#...............................................................
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
@@ -1131,7 +1212,36 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 #                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
 #                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #------------------------------------------------------------
-class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
+class PanelTwelve(wx.Panel):
+#...........................................................
+#           Initialization Function for Panel 12
+#               This function is automatically called when a new instance of panel 12 is made
+#               Creates a screen header with the text 'Rainbow Table Maker'
+#                   Sets the screen header text font to the title font and sets the text color to white
+#               Creates a text field that says 'Current Mode: Not Specified'
+#                   Sets the current mode text font to text font and sets text color to white
+#               Creates a text field that says 'Selected Algorithm' and a dropdown menu containing the algorithms
+#                   Sets the selected algorithm text to use text font and set the text color to white
+#               Creates a text field that says ' Key Length: 10' and a button that says 'Set Key Length'
+#                   Sets the key length text to use text font and sets the text color to white
+#               Creates a text field that says 'select alphabet' and a dropdown menu containing the alphabets
+#                   Sets the select alphabet text to use text font and sets the text color to white
+#               Creates a text field that says 'table chain lengt: 100' and a button that says 'Set table chain length'
+#                   Sets the table chain length text to use the text font and sets the text color to white
+#               Creates a text fiels that says 'number of rows: 100' and a  button that says 'Set number of rows'
+#                   Sets the number of rows text to use the text font and sets the text color to white
+#               Creates a text field that says 'save rainbow table file as: myRainbowTable.txt'
+#                   Sets the save rainbow table file text to use the text font and sets the text color to white
+#               Creates a button that says 'change saved file name'
+#               Creates a text field that displays the notice about the size of the rainbow table
+#                   Sets the notice text to use the text font and sets the text color to white
+#               Creates a button that says 'Start/connect'
+#               Creates a button that says 'reset settings back to default'
+#               Creates a button that says 'run quick sample test'
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the labels
+#               Binds the buttons to their corresponding function
+#.............................................................
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
         listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
@@ -1309,7 +1419,16 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back to Main Menu button)
 #----------------------------------------------------------
-class PanelThirteen(wx.Panel):              #====================About Us Page===================================
+class PanelThirteen(wx.Panel):
+#..........................................................
+#           Initialization Function for Panel Thirteen
+#               This function is automatically called when a new instance of panel 13 is made
+#               Sets the title text to 'About Us'
+#               Sets the font of the title text to title font and sets the font color to white
+#               Displays the About Us text to the textctrl using the appropriate new line character for the OS in use
+#               Adds a Back to Main Menu button and a Close the Program button and displays them
+#               Links all buttons to their corresponding functions
+#..........................................................
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -1411,6 +1530,21 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 #               The Frame contains all of the Graphical Display Panels
 #=======================================================================================================================
 class myFrame(wx.Frame):
+#------------------------------------------------------------------
+#           Initialization Function For the MyFrame Class
+#               This function is called automatically when a new instance of myFrame is created.
+#               This function defines the three custom fonts that are used (Title Font, Text Font, Enlarged Solution Font)
+#               Initializes the detected OS variable
+#               Calls the detect OS Function (which sets the detected OS variable)
+#               Defines the thirteen panels and sets their background color to black
+#               Hides all panels except for panel 1 (Main Menu Panel)
+#               Adds all of the panels to the main box sizer
+#               Resets all search settings to default on all panels
+#               Add a menu bar to the top of the screen and define and add components to the menu bar
+#               If this is the main process and not a subprocess
+#                   -Declare the shared dictionary of shared values
+#                   -Declare a shared a list of shared variables
+#--------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
@@ -1568,10 +1702,21 @@ class myFrame(wx.Frame):
 #           Frame Resizing Functions
 #               Functions that resize the frame that displays the panels
 #=======================================================================================================================
-    #specail frame resizing functions====================================================================================
+#------------------------------------------------------------------------
+#           View Maximized Screen Function
+#               This function makes the window fill the screen completely, (but not in a fullscreen mode)
+#               NOTE: Full screen mode was removed because full screen mode glitches out and removes the menu bars
+#               This sets the maximize flag to true
+#-----------------------------------------------------------------------
     def viewMaximizedScreen(self, event):
         self.Maximize(True)
 
+#------------------------------------------------------------------------
+#           View Normal Screen Function
+#               This function resizes the window to its native size.
+#               This sets the maximize flag to false
+#               This sets the full screen flag to false
+#------------------------------------------------------------------------
     def viewNormalScreen(self, event):
         self.Maximize(False)
         self.ShowFullScreen(False)
@@ -1581,7 +1726,12 @@ class myFrame(wx.Frame):
 #                       These functions are called when the user selects Start Quick Test from the Menu
 #                       These functions simply call the Quick Test functions that their corresponding button counterparts call
 #=======================================================================================================================
-    #special start quick test from menu functions---------------------------------------
+#------------------------------------------------------------------------
+#           Start Single Dictionary Quick Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Dictionary Quick Test Function
+#------------------------------------------------------------------------
     def startSingleDictionaryQuickTestFromMenu(self, event):
         self.panel_three.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1598,6 +1748,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureDictionaryQuickTest(None)
 
+#-----------------------------------------------------------------------
+#           Start Network Server Dictionary Quick Test From Menu Function
+#               This function Sets the current mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Dictionary Quick Test Function
+#-----------------------------------------------------------------------
     def startNetworkServerDictionaryQuickTestFromMenu(self, event):
         self.panel_three.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1614,6 +1770,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureDictionaryQuickTest(None)
 
+#-------------------------------------------------------------------
+#           Start Single Brute Force Quick Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Brute Force Quick Test Function
+#------------------------------------------------------------------
     def startSingleBruteForceQuickTestFromMenu(self, event):
         self.panel_four.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1630,6 +1792,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureBruteForceQuickTest(None)
 
+#-------------------------------------------------------------------
+#           Start Network Server Brute Force Quick Test From Menu Function
+#               This function Sets the current mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Brute Force Quick Test Function
+#-------------------------------------------------------------------
     def startNetworkServerBruteForceQuickTestFromMenu(self, event):
         self.panel_four.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1646,6 +1814,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureBruteForceQuickTest(None)
 
+#-----------------------------------------------------------------
+#           Start Single Rainbow Table User Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Rainbow Table User Quick Test Function
+#----------------------------------------------------------------
     def startSingleRainbowTableUserTestFromMenu(self, event):
         self.panel_eleven.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1662,6 +1836,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableUserQuickTest(None)
 
+#----------------------------------------------------------------
+#           Start Network Server Rainbow Table User Quick Test From Menu Function
+#               This function Sets the Current Mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Rainbow Table User Quick Test Function
+#----------------------------------------------------------------
     def startNetworkServerRainbowTableUserQuickTestFromMenu(self, event):
         self.panel_eleven.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1678,6 +1858,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableUserQuickTest(None)
 
+#---------------------------------------------------------------
+#           Start Single Rainbow Table Maker Quick Test From Menu Function
+#               This function Sets the Current Mode to Single Mode
+#               Then hides all of the panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Rainbow Table Maker Quick Test Function
+#---------------------------------------------------------------
     def startSingleRainbowTableMakerQuickTestFromMenu(self, event):
         self.panel_twelve.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1694,6 +1880,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableMakerQuickTest(None)
 
+#--------------------------------------------------------------
+#           Start Network Server Rainbow Table Maker Quick Test From Menu Function
+#               This function Sets the Current Mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Rainbow Table Maker Quick Test Function
+#-------------------------------------------------------------
     def startNetworkServerRainbowTableMakerQuickTestFromMenu(self, event):
         self.panel_twelve.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
