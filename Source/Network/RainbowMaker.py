@@ -9,32 +9,45 @@
 #   Chris Bugg
 #   10/7/14
 
+#Imports
 import hashlib
 import random
-import time
 from multiprocessing import Process, Pipe, Lock, cpu_count
-import os
-import string
 
 from Chunk import Chunk
+
 
 class RainbowMaker():
 
     #Class Variables
-    algorithm = 1
-    numChars = 1
+
+    #Algorithm that is used
+    algorithm = ""
+    #How many characters is the key
+    num_chars = 1
+    #List of the alphabet to be used
     alphabet = []
-    #alphabetChoice = ""
-    fileName = "1"
+    #Name of the file we're creating
+    file_name = "1"
+    #File object
     file = 1
+    #Width of the table, in columns
     width = 1
+    #Height of the table, in rows
     height = 1
-    hashList = []
-    keyList = []
+    #List of hashes
+    hash_list = []
+    #List of keys
+    key_list = []
+    #Are we done making the table yet?
     done = False
-    fileLocation = 1
-    chunkCount = 0
-    numProcesses = cpu_count()
+    #How far in the file are we, in bits
+    file_location = 1
+    #How many chunks we've processed
+    chunk_count = 0
+    #Number of processes we should run, based on virtual cpu cores
+    num_processes = cpu_count()
+    #Total chunks in the file
     total_chunks = 0
     #Total rows per chunk, depends on table width
     total_rows = 0
@@ -44,321 +57,21 @@ class RainbowMaker():
     #Constructor
     def __init__(self):
 
+        #Do nothing
         x=0
 
-    #Sets the algorithm choice
-    def setAlgorithm(self, algo):
-
-        self.algorithm = algo
-
-
-    #Sets the number of characters of the key
-    def setNumChars(self, numChars):
-
-        self.numChars = numChars
-
-
-    #Get the alphabet and direction to be searched
-    def setAlphabet(self, alphabet):
-
-        self.alphabet = alphabet
-
-        '''
-        choicesList = list(alphabetChoice)
-
-        self.alphabetChoice = ""
-
-        for x in choicesList:
-
-            self.alphabetChoice += str(x)
-
-        lowerAlphabet = "abcdefghijklmnopqrstuvwxyz_"
-        upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-        digits = "0123456789_"
-        punctuation = string.punctuation
-
-        lowerAlphabetList = list(lowerAlphabet)
-        upperAlphabetList = list(upperAlphabet)
-        digitsList = list(digits)
-        punctuationList = list(punctuation)
-
-        self.alphabet = []
-
-        for choice in choicesList:
-
-            if choice == "a":
-
-                self.alphabet += lowerAlphabetList
-
-            elif choice == "A":
-
-                self.alphabet += upperAlphabetList
-
-            elif choice == "p":
-
-                self.alphabet += punctuationList
-
-            elif choice == "d":
-
-                self.alphabet += digitsList
-
-            else:
-
-                return False
-
-        return True
-    '''
-
-
-    #Get file name
-    def setFileName(self, fileName):
-
-        self.fileName = fileName
-
-
-    #Gets the fileName
-    def getFileName(self):
-
-        return self.fileName
-
-
-    #Get dimensions of the table
-    def setDimensions(self, chainLength, numRows):
-
-        self.width = int(chainLength)
-
-        self.height = int(numRows)
-
-
-    #Returns whether or not we're done creating
-    def isDone(self):
-
-        return self.done
-
-
-    #Hashes key
-    def hashThis(self, key):
-
-        return hashlib.new(self.algorithm, key).hexdigest()
-
-
-    #Produces seeded key (Reduction Function)
-    def getSeededKey(self, seed):
-
-        random.seed(seed)
-
-        seedKey = ""
-
-        characters = int(self.numChars)
-
-        for x in range(characters):
-
-            seedKey = seedKey + random.choice(self.alphabet)
-
-        return seedKey
-
-
-    #Produces a random key to start
-    def getRandKey(self):
-
-        random.seed()
-
-        randKey = ""
-
-        characters = int(self.numChars)
-
-        for x in range(characters):
-
-            randKey = randKey + random.choice(self.alphabet)
-
-        return randKey
-
-
-    #Finds collisions so the user can determine if they want to run collisionFixer()
-    def collisionFinder(self):
-
-        #Open file for reading
-        self.file = open(self.fileName, 'r')
-
-        #Make every line an element in a list
-        allLinesList = list(self.file)
-
-        #Close the dang file
-        self.file.close()
-
-        #Number of offending hashes (duplicates)
-        offenderCount = 0
-
-        #For every line (x) in the list (of all the lines)
-        for x in allLinesList:
-
-            #Split the line into a list of two (key and hash)
-            lineListX = x.split()
-
-            #Store hash value in temp var
-            hashX = lineListX[1]
-
-            #How many times have we seen this hash
-            hashCount = 0
-
-            #For every other line in the list (of all the lines)
-            for y in allLinesList:
-
-                #Split the line into a list of two (key and hash)
-                lineListY = y.split()
-
-                #Store hash value in temp var
-                hashY = lineListY[1]
-
-                if hashX == hashY:
-
-                    hashCount += 1
-
-            #If this hash has duplicates, increment offenderCount
-            if hashCount > 1:
-
-                offenderCount += 1
-
-        #Returns the number of duplicate hashes
-        return offenderCount
-
-
-    #Finds and fixes collisions in the final hash list
-    def collisionFixer(self):
-
-        #Create/open file
-        self.file = open(self.fileName, 'r')
-
-        #Make every line an element in a list
-        allLinesList = list(self.file)
-
-        self.file.close()
-
-        #Counter to keep track of how many duplicates
-        offenderCount = 0
-
-        #For every line (x) in the list (of all the lines)
-        for x in allLinesList:
-
-            #Split the line into a list of two (key and hash)
-            lineListX = x.split()
-
-            #Store hash value in temp var
-            hashX = lineListX[1]
-
-            #How many times have we seen this hash
-            hashCount = 0
-
-            #For every other line in the list (of all the lines)
-            for y in allLinesList:
-
-                #Split the line into a list of two (key and hash)
-                lineListY = y.split()
-
-                #Store hash value in temp var
-                hashY = lineListY[1]
-
-                if hashX == hashY:
-
-                    hashCount += 1
-
-            #If this hash has duplicates, increment offenderCount
-            if hashCount > 1:
-
-                #remove that line (since it's a duplicate)
-                allLinesList.remove(x)
-
-                offenderCount += 1
-
-        #for every line that was a duplicate, make a new one
-        for x in range(offenderCount):
-
-            #Get a new key for this row
-            randKey = self.getRandKey()
-
-            reduced = randKey
-
-            #Do the iteration for this row
-            for y in range(self.width):
-
-                hash = self.hashThis(reduced)
-
-                reduced = self.getSeededKey(hash)
-
-            hash = self.hashThis(reduced)
-
-            line = randKey + " " + hash + "\n"
-
-            allLinesList.append(line)
-
-        #Create/open file
-        self.file = open(self.fileName, 'r+')
-
-        for z in allLinesList:
-
-            self.file.write("%s" % z)
-
-        self.file.close()
-
-
-    #Sets up the file initially (put info in first line)
-    def setupFile(self):
-
-        #Open the file for writing
-        self.file = open(self.fileName, 'w')
-
-        self.file.write(self.algorithm + " " + str(self.numChars) + " " + str(self.alphabet) + " " + str(self.width) + "\n")
-
-        self.fileLocation = self.file.tell()
-
-        self.file.close()
-
-        #Sets total_chunk variable, based on input variables
-        self.set_total_chunks()
-
-    #Puts a done chunk (already processed by a node) into the table (file)
-    def putChunkInFile(self, chunkOfDone):
-
-        #Split chunkOfDone's data into a list
-        linesList = chunkOfDone.data.splitlines()
-
-        #Open the file for writing
-        self.file = open(self.fileName, 'r+')
-
-        #Seek to where we left off in the file
-        self.file.seek(self.fileLocation)
-
-        for x in linesList:
-
-            #print to file
-            self.file.write(x + "\n")
-
-            #And increment count
-            self.chunkCount += 1
-
-        #Save where we are in file
-        self.fileLocation = self.file.tell()
-
-        #Close the file
-        self.file.close()
-
-        #Check if we've gotten all the chunks we need
-        if self.chunkCount >= self.height:
-
-            #Chunk count will now represent the true height (since we're done adding to it)
-            self.height = self.chunkCount
-
-            self.done = True
-
+    ############################################################
+    ###############         Main Methods         ###############
+    ############################################################
 
     #Create (and return) a chunk of the table, and do all that sub-process stuff
-    def create(self, paramsChunk):
+    def create(self, params_chunk):
 
         #Set variables to that of server, get from parameter(-bearing) chunk
-        self.setVariables(paramsChunk.params)
+        self.set_variables(params_chunk.params)
 
         #big list containing all the lines from the nodes
-        bigChunk = ""
+        big_chunk = ""
 
         #This is duplicate code because it needs to be determined by server and clients
         #rows per chunk equals chunk_size (good chunk size) divided by width
@@ -372,25 +85,27 @@ class RainbowMaker():
         #print "total_rows in create():", str(self.total_rows)
         #Number of rows each sub-process will create
         #   equals total rows per chunk divided by number of processes
-        subChunkSize = self.total_rows / self.numProcesses
+        sub_chunk_size = self.total_rows / self.num_processes
 
         #If the rows are wider than our chunk_size, do one per process
-        if subChunkSize <= 0:
+        if sub_chunk_size <= 0:
 
-            subChunkSize = 1
+            sub_chunk_size = 1
 
-        #print "subChunkSize: ", str(subChunkSize)
+        #print "sub_chunk_size: ", str(sub_chunk_size)
 
         #Create lock
         lock = Lock()
 
         #Create the pipes
-        parentPipe, childPipe = Pipe()
+        parent_pipe, child_pipe = Pipe()
 
         children = []
 
-        for i in range(0, self.numProcesses):
-            children.append(Process(target=self.subProcess, args=(childPipe, lock, subChunkSize, )))
+        for i in range(0, self.num_processes):
+
+            children.append(Process(target=self.sub_process, args=(child_pipe, lock, sub_chunk_size, )))
+
             children[i].start()
 
         #Count our iterations of responses
@@ -404,13 +119,11 @@ class RainbowMaker():
         while not done:
 
             #If all the nodes have given us their lists
-            if count > (self.numProcesses - 1):
+            if count > (self.num_processes - 1):
 
-                for i in range(0, self.numProcesses):
+                for i in range(0, self.num_processes):
 
                     children[i].join()
-
-                    self.found = False
 
                     self.done = True
 
@@ -419,115 +132,281 @@ class RainbowMaker():
             else:
 
                 #Get a sub-chunk from a node
-                rec = parentPipe.recv()
+                rec = parent_pipe.recv()
 
-                bigChunk += rec
+                big_chunk += rec
 
                 count += 1
 
-        returnChunk = Chunk()
+        return_chunk = Chunk()
 
-        returnChunk.data = bigChunk
+        return_chunk.data = big_chunk
 
-        return returnChunk
-
+        return return_chunk
 
     #The sub-process function
-    def subProcess(self, pipe, lock, chunkSize):
+    def sub_process(self, pipe, lock, chunk_size):
 
         #The list to return with strings to be the lines of the file
-        daList = ""
+        return_list = ""
 
-        for x in range(chunkSize):
+        for x in range(chunk_size):
 
-            randKey = self.getRandKey()
+            rand_key = self.get_rand_key()
 
-            reduced = randKey
+            reduced = rand_key
 
-            #hash = self.hashThis(reduced)
+            #temp_hash = self.hashThis(reduced)
 
             for y in range(self.width):
 
-                hash = self.hashThis(reduced)
+                temp_hash = self.hash_this(reduced)
 
-                reduced = self.getSeededKey(hash)
+                reduced = self.get_seeded_key(temp_hash)
 
-            hash = self.hashThis(reduced)
+            temp_hash = self.hash_this(reduced)
 
-            daList += randKey + " " + hash + "\n"
+            return_list += rand_key + " " + temp_hash + "\n"
 
         lock.acquire()
 
-        pipe.send(daList)
+        pipe.send(return_list)
 
         pipe.close()
 
         lock.release()
 
+    #Finds collisions so the user can determine if they want to run collisionFixer()
+    def collision_finder(self):
+
+        #Open file for reading
+        self.file = open(self.file_name, 'r')
+
+        #Make every line an element in a list
+        all_lines_list = list(self.file)
+
+        #Close the dang file
+        self.file.close()
+
+        #Number of offending hashes (duplicates)
+        offender_count = 0
+
+        #For every line (x) in the list (of all the lines)
+        for x in all_lines_list:
+
+            #Split the line into a list of two (key and hash)
+            line_list_x = x.split()
+
+            #Store hash value in temp var
+            hash_x = line_list_x[1]
+
+            #How many times have we seen this hash
+            hash_count = 0
+
+            #For every other line in the list (of all the lines)
+            for y in all_lines_list:
+
+                #Split the line into a list of two (key and hash)
+                line_list_y = y.split()
+
+                #Store hash value in temp var
+                hash_y = line_list_y[1]
+
+                if hash_x == hash_y:
+
+                    hash_count += 1
+
+            #If this hash has duplicates, increment offender_count
+            if hash_count > 1:
+
+                offender_count += 1
+
+        #Returns the number of duplicate hashes
+        return offender_count
+
+    #Finds and fixes collisions in the final hash list
+    def collision_fixer(self):
+
+        #Create/open file
+        self.file = open(self.file_name, 'r')
+
+        #Make every line an element in a list
+        all_lines_list = list(self.file)
+
+        self.file.close()
+
+        #Counter to keep track of how many duplicates
+        offender_count = 0
+
+        #For every line (x) in the list (of all the lines)
+        for x in all_lines_list:
+
+            #Split the line into a list of two (key and hash)
+            line_list_x = x.split()
+
+            #Store hash value in temp var
+            hash_x = line_list_x[1]
+
+            #How many times have we seen this hash
+            hash_count = 0
+
+            #For every other line in the list (of all the lines)
+            for y in all_lines_list:
+
+                #Split the line into a list of two (key and hash)
+                line_list_y = y.split()
+
+                #Store hash value in temp var
+                hash_y = line_list_y[1]
+
+                if hash_x == hash_y:
+
+                    hash_count += 1
+
+            #If this hash has duplicates, increment offender_count
+            if hash_count > 1:
+
+                #remove that line (since it's a duplicate)
+                all_lines_list.remove(x)
+
+                offender_count += 1
+
+        #for every line that was a duplicate, make a new one
+        for x in range(offender_count):
+
+            #Get a new key for this row
+            rand_key = self.get_rand_key()
+
+            reduced = rand_key
+
+            #Do the iteration for this row
+            for y in range(self.width):
+
+                temp_hash = self.hash_this(reduced)
+
+                reduced = self.get_seeded_key(temp_hash)
+
+            temp_hash = self.hash_this(reduced)
+
+            line = rand_key + " " + temp_hash + "\n"
+
+            all_lines_list.append(line)
+
+        #Create/open file
+        self.file = open(self.file_name, 'r+')
+
+        for z in all_lines_list:
+
+            self.file.write("%s" % z)
+
+        self.file.close()
+
+    ###########################################################
+    ###############         Get Methods         ###############
+    ###########################################################
+
+    #Gets the fileName
+    def get_file_name(self):
+
+        return self.file_name
+
+    #Produces seeded key (Reduction Function)
+    def get_seeded_key(self, seed):
+
+        random.seed(seed)
+
+        seed_key = ""
+
+        characters = int(self.num_chars)
+
+        for x in range(characters):
+
+            seed_key = seed_key + random.choice(self.alphabet)
+
+        return seed_key
+
+    #Produces a random key to start
+    def get_rand_key(self):
+
+        random.seed()
+
+        rand_key = ""
+
+        characters = int(self.num_chars)
+
+        for x in range(characters):
+
+            rand_key = rand_key + random.choice(self.alphabet)
+
+        return rand_key
 
     #Returns number of rows in table
-    def numRows(self):
+    def get_rows(self):
 
         return self.height
 
-
     #Returns number of columns (chains) in table
-    def getLength(self):
+    def get_length(self):
 
         return self.width
 
-
     #Returns number of rows in table
-    def getHeight(self):
+    def get_height(self):
 
         return self.height
 
+    #Returns total_chunks variable
+    def get_total_chunks(self):
 
-    #Resets all class variables to default
-    def reset(self):
+        return self.total_chunks
 
-        self.algorithm = 1
-        self.numChars = 1
-        self.alphabet = 1
-        #self.alphabetChoice = 1
-        self.fileName = "1"
-        self.file = 1
-        self.width = 1
-        self.height = 1
-        self.hashList = []
-        self.keyList = []
-        self.done = False
-        self.fileLocation = 1
-        self.chunkCount = 0
+    ###########################################################
+    ###############         Set Methods         ###############
+    ###########################################################
 
+    #Sets the algorithm choice
+    def set_algorithm(self, algo):
+
+        self.algorithm = algo
+
+    #Sets the number of characters of the key
+    def set_num_chars(self, num_chars):
+
+        self.num_chars = num_chars
+
+    #Get the alphabet and direction to be searched
+    def set_alphabet(self, alphabet):
+
+        self.alphabet = alphabet
+
+    #Get file name
+    def set_file_name(self, file_name):
+
+        self.file_name = file_name
+
+    #Get dimensions of the table
+    def set_dimensions(self, chain_length, num_rows):
+
+        self.width = int(chain_length)
+
+        self.height = int(num_rows)
 
     #Sets all class variables to ones given from server (params)
-    def setVariables(self, paramsString):
+    def set_variables(self, params_string):
 
-        paramsList = paramsString.split()
+        params_list = params_string.split()
 
-        self.algorithm = paramsList[1]
+        self.algorithm = params_list[1]
 
-        self.alphabet = paramsList[3]
+        self.alphabet = params_list[3]
 
-        self.setAlphabet(self.alphabet)
+        self.set_alphabet(self.alphabet)
 
-        self.numChars = int(paramsList[4])
+        self.num_chars = int(params_list[4])
 
-        self.width = int(paramsList[8])
+        self.width = int(params_list[8])
 
-        self.height = int(paramsList[9])
-
-
-    #Returns a chunk with all variables needed by nodes
-    def makeParamsChunk(self):
-
-        tempChunk = Chunk()
-
-        tempChunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabet) + " " + str(self.numChars)
-        tempChunk.params += " " + str(self.numChars) + " 0 0 " + str(self.width) + " " + str(self.height)
-
-        return tempChunk
+        self.height = int(params_list[9])
 
     #Sets the total_chunks variable
     def set_total_chunks(self):
@@ -549,7 +428,92 @@ class RainbowMaker():
 
             self.total_chunks = 1
 
-    #Returns total_chunks variable
-    def get_total_chunks(self):
+    #############################################################
+    ###############         Other Methods         ###############
+    #############################################################
 
-        return self.total_chunks
+    #Returns whether or not we're done creating
+    def is_done(self):
+
+        return self.done
+
+    #Hashes key
+    def hash_this(self, key):
+
+        return hashlib.new(self.algorithm, key).hexdigest()
+
+    #Sets up the file initially (put info in first line)
+    def setup_file(self):
+
+        #Open the file for writing
+        self.file = open(self.file_name, 'w')
+
+        self.file.write(self.algorithm + " " + str(self.num_chars) + " " + str(self.alphabet) + " "
+                        + str(self.width) + "\n")
+
+        self.file_location = self.file.tell()
+
+        self.file.close()
+
+        #Sets total_chunk variable, based on input variables
+        self.set_total_chunks()
+
+    #Puts a done chunk (already processed by a node) into the table (file)
+    def put_chunk_in_file(self, chunk_of_done):
+
+        #Split chunkOfDone's data into a list
+        lines_list = chunk_of_done.data.splitlines()
+
+        #Open the file for writing
+        self.file = open(self.file_name, 'r+')
+
+        #Seek to where we left off in the file
+        self.file.seek(self.file_location)
+
+        for x in lines_list:
+
+            #print to file
+            self.file.write(x + "\n")
+
+            #And increment count
+            self.chunk_count += 1
+
+        #Save where we are in file
+        self.file_location = self.file.tell()
+
+        #Close the file
+        self.file.close()
+
+        #Check if we've gotten all the chunks we need
+        if self.chunk_count >= self.height:
+
+            #Chunk count will now represent the true height (since we're done adding to it)
+            self.height = self.chunk_count
+
+            self.done = True
+
+    #Resets all class variables to default
+    def reset(self):
+
+        self.algorithm = ""
+        self.num_chars = 1
+        self.alphabet = 1
+        self.file_name = "1"
+        self.file = 1
+        self.width = 1
+        self.height = 1
+        self.hash_list = []
+        self.key_list = []
+        self.done = False
+        self.file_location = 1
+        self.chunk_count = 0
+
+    #Returns a chunk with all variables needed by nodes
+    def make_params_chunk(self):
+
+        temp_chunk = Chunk()
+
+        temp_chunk.params = "rainbowmaker " + self.algorithm + " 0 " + str(self.alphabet) + " " + str(self.num_chars)
+        temp_chunk.params += " " + str(self.num_chars) + " 0 0 " + str(self.width) + " " + str(self.height)
+
+        return temp_chunk

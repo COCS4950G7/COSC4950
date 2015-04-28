@@ -1,6 +1,17 @@
 __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
+
+#NOTICE:
+#=======================================
+#Main Section Header
+#=======================================
+#---------------------------------------
+#Sub Section Header
+#---------------------------------------
+#.......................................
+#Secondary Sub Section Header
+#.......................................
 import wx
 import string
 import hashlib
@@ -164,7 +175,7 @@ class PanelTwo(wx.Panel):             #====================Select Cracking Metho
 class PanelThree(wx.Panel):         #========================Dictionary Cracking Method Settings Panel=================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
         listOfHashingModes= ['Individual Hash Code','File of Hash Codes']
         vbox= wx.BoxSizer(wx.VERTICAL)
 
@@ -321,7 +332,7 @@ class PanelThree(wx.Panel):         #========================Dictionary Cracking
 class PanelFour(wx.Panel):            #==================Brute Force Cracking method Settings Panel==================
     def __init__(self, parent):
         wx.Panel.__init__(self, parent=parent)
-        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -754,7 +765,33 @@ class PanelEight(wx.Panel):       #========================Network Client Status
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Close the Server button)
 #---------------------------------------------------------------
-class PanelNine(wx.Panel):                     #================Network Server Status Screen======================
+class PanelNine(wx.Panel):
+#...............................................................
+#           Initialization Function for Panel 9
+#               This function is automatically called when a new instance of panel 9 is made
+#               Creates a screen header that says 'Network Server Status Screen'
+#                   Sets the screen header text to use the title font and sets the text color to white
+#               Creates a text field that says 'cracking mode: not specified'
+#                   Sets the cracking mode text to use the text font and sets the text color white
+#               Creates a text field that says 'Server IP Address Not Set Yet'
+#                   Sets the server ip text to use text font and sets the text color to white
+#               Creates a text field that says 'Current Status: Running'
+#                   Sets the current status text to use text font and sets the text color to white
+#               Creates a text field that says 'Hash being cracked not specified'
+#                   Sets the hash being cracked text to use the text font and sets the text color to white
+#               Creates a text field that says 'activity gauge:" and a gauge
+#                   Sets the activity gauge text to use the text font and sets its text color to white
+#                   Sets the activity gauge to pulse (only works on windows)
+#               Creates a text field that says 'Progress:'
+#                   Sets the progress text to use the text font and sets the text color to white
+#               Creates a text field that say 'Number of completed chunks ' and 'total number of chunks'
+#                   Sets both text fields to use the text font and set the font color to white
+#               Creates a text field to say 'Solution: Serach not finished yet'
+#                   Sets the solution text to use the text font and sets the text to white
+#               Creates a button that says 'close the server' and a button that says 'close'
+#               Creates tooltips for the buttons and labels
+#               Creates a timer object
+#               Binds the buttons to their corresponding functions
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -879,7 +916,31 @@ class PanelNine(wx.Panel):                     #================Network Server S
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back To Main Menu button)
 #-------------------------------------------------------------
-class PanelTen(wx.Panel):                          #====================Single Mode Status Screen==================
+class PanelTen(wx.Panel):
+#............................................................
+#           Initialization Function for Panel 10
+#               This function is automatically called when a new instance of panel 10 is made
+#               Creates a screen header that says 'single mode status screen'
+#                   Sets the screen header to use the title font and sets the text color to white
+#               Creates a text field that says 'cracking mode not specified'
+#                   Sets the cracking mode text to use the text font and sets the text color to white
+#               Creates a text field that says ' current status: starting up'
+#                   Sets the current status text to use the text font and sets the text color to white
+#               Creates a text field that says 'hash being cracked: not specified'
+#                   Sets the hash being cracked text to use the text font and sets the text color to white
+#               Creates a text field that says 'activity gauge' and gauge
+#                   Sets the label text to use the text font and sets the text color to white
+#               Creates a text field that says 'progress' and a gauge
+#                   Sets the label text to use the text font and sets the text color to white
+#               Creates a text field that says 'number of completed chunks: calculating and a text field that says
+#                   'Total number of chunks : calculating'
+#                   Sets the text to use the text font and sets the text color to white
+#               Creates a text field that says ' solution : search not finished yet'
+#                   Sets the solution text to use the text font and sets the text color to white
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the labels
+#               Binds the buttons to their corresponding functions
+#...............................................................
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -990,17 +1051,39 @@ class PanelTen(wx.Panel):                          #====================Single M
         self.CloseButton.Bind(wx.EVT_BUTTON, parent.OnClose)
 
 #----------------------------------------------------------------
-#           Rainbow Table Cracking Method Settings
+#           Rainbow Table Cracking Method Settings Screen
 #               This Panel allows the user to configure the setting for the Rainbow Table Cracking method
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back To Main Menu button)
 #                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
 #                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #----------------------------------------------------------------
-class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking Method Settings=========================
+class PanelEleven(wx.Panel):
+#................................................................
+#           Initialization Function for Panel 11
+#               This function is automatically called when a new instance of panel eleven is made
+#               Creates a screen header text that says 'rainbow table cracking method settings'
+#                   Sets the screen header text to use the title font and sets the text color to white
+#               Creates a text field that says ' current mode: not specified'
+#                   Sets the current mode text to use the text font and sets the text color to white
+#               Creates a text field that says 'Selected algorithm' and a dropdown menu that contains the algorithms
+#                   Sets the selected algorithm text to use text font and sets the text color to white
+#               Creates a text field that says 'selected rainbow table file: no file has been selected'
+#                   Sets the text to use text font and sets text color to be white
+#               Creates a button that says 'select file button'
+#               Creates a text field that says 'hash to be cracked: no hash has been entered'
+#                   Sets the hash to be cracked text to use the text font and sets the font color to white
+#               Creates a button that says 'set hash to be cracked' and a button that says 'generate hash code'
+#               Creates a buttton that says 'start/connect button'
+#               Creates a button that says 'reset settings back to default'
+#               Creates a button that says 'run quick sample test'
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the text labels
+#               Binds the buttons to their corresponding functions
+#...............................................................
     def __init__ (self, parent):
         wx.Panel.__init__(self,parent)
-        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
         vbox= wx.BoxSizer(wx.VERTICAL)
 
         hbox1=wx.BoxSizer(wx.HORIZONTAL)
@@ -1129,10 +1212,39 @@ class PanelEleven(wx.Panel):     #======================Rainbow Table Cracking M
 #                   -Single Mode Status Screen (if in Single Mode via Start/Connect button or Run Quick Sample Test button)
 #                   -Network Mode Status Screen (if in Network Server Mode via Start/Connect button or Run Quick Sample Test button)
 #------------------------------------------------------------
-class PanelTwelve(wx.Panel):              #=========================Rainbow Table Maker===========================
+class PanelTwelve(wx.Panel):
+#...........................................................
+#           Initialization Function for Panel 12
+#               This function is automatically called when a new instance of panel 12 is made
+#               Creates a screen header with the text 'Rainbow Table Maker'
+#                   Sets the screen header text font to the title font and sets the text color to white
+#               Creates a text field that says 'Current Mode: Not Specified'
+#                   Sets the current mode text font to text font and sets text color to white
+#               Creates a text field that says 'Selected Algorithm' and a dropdown menu containing the algorithms
+#                   Sets the selected algorithm text to use text font and set the text color to white
+#               Creates a text field that says ' Key Length: 10' and a button that says 'Set Key Length'
+#                   Sets the key length text to use text font and sets the text color to white
+#               Creates a text field that says 'select alphabet' and a dropdown menu containing the alphabets
+#                   Sets the select alphabet text to use text font and sets the text color to white
+#               Creates a text field that says 'table chain lengt: 100' and a button that says 'Set table chain length'
+#                   Sets the table chain length text to use the text font and sets the text color to white
+#               Creates a text fiels that says 'number of rows: 100' and a  button that says 'Set number of rows'
+#                   Sets the number of rows text to use the text font and sets the text color to white
+#               Creates a text field that says 'save rainbow table file as: myRainbowTable.txt'
+#                   Sets the save rainbow table file text to use the text font and sets the text color to white
+#               Creates a button that says 'change saved file name'
+#               Creates a text field that displays the notice about the size of the rainbow table
+#                   Sets the notice text to use the text font and sets the text color to white
+#               Creates a button that says 'Start/connect'
+#               Creates a button that says 'reset settings back to default'
+#               Creates a button that says 'run quick sample test'
+#               Creates a button that says 'back to main menu' and a button that says 'close'
+#               Creates tooltips for the buttons and some of the labels
+#               Binds the buttons to their corresponding function
+#.............................................................
     def __init__ (self,parent):
         wx.Panel.__init__(self, parent)
-        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA512']
+        listOfAlgorithms= ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
         listOfAlphabets= ["All","Letters and Digits","Letters and Punctuation","Letters Only","Uppercase Letters","Lowercase Letters",
                           "Digits"]
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -1307,7 +1419,16 @@ class PanelTwelve(wx.Panel):              #=========================Rainbow Tabl
 #               Able to navigate to these panels from this panel:
 #                   -Main Menu Panel (via Back to Main Menu button)
 #----------------------------------------------------------
-class PanelThirteen(wx.Panel):              #====================About Us Page===================================
+class PanelThirteen(wx.Panel):
+#..........................................................
+#           Initialization Function for Panel Thirteen
+#               This function is automatically called when a new instance of panel 13 is made
+#               Sets the title text to 'About Us'
+#               Sets the font of the title text to title font and sets the font color to white
+#               Displays the About Us text to the textctrl using the appropriate new line character for the OS in use
+#               Adds a Back to Main Menu button and a Close the Program button and displays them
+#               Links all buttons to their corresponding functions
+#..........................................................
     def __init__(self,parent):
         wx.Panel.__init__(self,parent)
         vbox= wx.BoxSizer(wx.VERTICAL)
@@ -1409,6 +1530,21 @@ class PanelThirteen(wx.Panel):              #====================About Us Page==
 #               The Frame contains all of the Graphical Display Panels
 #=======================================================================================================================
 class myFrame(wx.Frame):
+#------------------------------------------------------------------
+#           Initialization Function For the MyFrame Class
+#               This function is called automatically when a new instance of myFrame is created.
+#               This function defines the three custom fonts that are used (Title Font, Text Font, Enlarged Solution Font)
+#               Initializes the detected OS variable
+#               Calls the detect OS Function (which sets the detected OS variable)
+#               Defines the thirteen panels and sets their background color to black
+#               Hides all panels except for panel 1 (Main Menu Panel)
+#               Adds all of the panels to the main box sizer
+#               Resets all search settings to default on all panels
+#               Add a menu bar to the top of the screen and define and add components to the menu bar
+#               If this is the main process and not a subprocess
+#                   -Declare the shared dictionary of shared values
+#                   -Declare a shared a list of shared variables
+#--------------------------------------------------------------------
     def __init__(self):
         wx.Frame.__init__(self, None, wx.ID_ANY, "Mighty Cracker", size=(1024, 768))
 
@@ -1566,10 +1702,21 @@ class myFrame(wx.Frame):
 #           Frame Resizing Functions
 #               Functions that resize the frame that displays the panels
 #=======================================================================================================================
-    #specail frame resizing functions====================================================================================
+#------------------------------------------------------------------------
+#           View Maximized Screen Function
+#               This function makes the window fill the screen completely, (but not in a fullscreen mode)
+#               NOTE: Full screen mode was removed because full screen mode glitches out and removes the menu bars
+#               This sets the maximize flag to true
+#-----------------------------------------------------------------------
     def viewMaximizedScreen(self, event):
         self.Maximize(True)
 
+#------------------------------------------------------------------------
+#           View Normal Screen Function
+#               This function resizes the window to its native size.
+#               This sets the maximize flag to false
+#               This sets the full screen flag to false
+#------------------------------------------------------------------------
     def viewNormalScreen(self, event):
         self.Maximize(False)
         self.ShowFullScreen(False)
@@ -1577,8 +1724,14 @@ class myFrame(wx.Frame):
 #=======================================================================================================================
 #                   Start Quick Test Functions
 #                       These functions are called when the user selects Start Quick Test from the Menu
+#                       These functions simply call the Quick Test functions that their corresponding button counterparts call
 #=======================================================================================================================
-    #special start quick test from menu functions---------------------------------------
+#------------------------------------------------------------------------
+#           Start Single Dictionary Quick Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Dictionary Quick Test Function
+#------------------------------------------------------------------------
     def startSingleDictionaryQuickTestFromMenu(self, event):
         self.panel_three.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1595,6 +1748,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureDictionaryQuickTest(None)
 
+#-----------------------------------------------------------------------
+#           Start Network Server Dictionary Quick Test From Menu Function
+#               This function Sets the current mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Dictionary Quick Test Function
+#-----------------------------------------------------------------------
     def startNetworkServerDictionaryQuickTestFromMenu(self, event):
         self.panel_three.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1611,6 +1770,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureDictionaryQuickTest(None)
 
+#-------------------------------------------------------------------
+#           Start Single Brute Force Quick Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Brute Force Quick Test Function
+#------------------------------------------------------------------
     def startSingleBruteForceQuickTestFromMenu(self, event):
         self.panel_four.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1627,6 +1792,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureBruteForceQuickTest(None)
 
+#-------------------------------------------------------------------
+#           Start Network Server Brute Force Quick Test From Menu Function
+#               This function Sets the current mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Brute Force Quick Test Function
+#-------------------------------------------------------------------
     def startNetworkServerBruteForceQuickTestFromMenu(self, event):
         self.panel_four.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1643,6 +1814,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureBruteForceQuickTest(None)
 
+#-----------------------------------------------------------------
+#           Start Single Rainbow Table User Test From Menu Function
+#               This function Sets the current mode to Single Mode
+#               Then hides all panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Rainbow Table User Quick Test Function
+#----------------------------------------------------------------
     def startSingleRainbowTableUserTestFromMenu(self, event):
         self.panel_eleven.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1659,6 +1836,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableUserQuickTest(None)
 
+#----------------------------------------------------------------
+#           Start Network Server Rainbow Table User Quick Test From Menu Function
+#               This function Sets the Current Mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Rainbow Table User Quick Test Function
+#----------------------------------------------------------------
     def startNetworkServerRainbowTableUserQuickTestFromMenu(self, event):
         self.panel_eleven.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1675,6 +1858,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableUserQuickTest(None)
 
+#---------------------------------------------------------------
+#           Start Single Rainbow Table Maker Quick Test From Menu Function
+#               This function Sets the Current Mode to Single Mode
+#               Then hides all of the panels except for panel 10 (single mode status screen)
+#               Finally, it then calls the Configure Rainbow Table Maker Quick Test Function
+#---------------------------------------------------------------
     def startSingleRainbowTableMakerQuickTestFromMenu(self, event):
         self.panel_twelve.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_one.Hide()
@@ -1691,6 +1880,12 @@ class myFrame(wx.Frame):
         self.panel_thirteen.Hide()
         self.configureRainbowTableMakerQuickTest(None)
 
+#--------------------------------------------------------------
+#           Start Network Server Rainbow Table Maker Quick Test From Menu Function
+#               This function Sets the Current Mode to Network Mode
+#               Then hides all panels except for panel 9 (network server status screen)
+#               Finally, it then calls the Configure Rainbow Table Maker Quick Test Function
+#-------------------------------------------------------------
     def startNetworkServerRainbowTableMakerQuickTestFromMenu(self, event):
         self.panel_twelve.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_one.Hide()
@@ -1998,17 +2193,53 @@ class myFrame(wx.Frame):
 #           Defining Main Functions
 #               These are the functions that are called by the main code
 #=======================================================================================================================
-    #defined functions ========================================================================================
+#-----------------------------------------------------------
+#           Show Not Finished Message 1 Function
+#               This function creates a dialog window that informs the user that a function has not been completed yet.
+#               This prevents the user from going to the screen that the particular button went to.
+#               Primary Purpose for this was debugging purposes indicating something was not completed yet.
+#-----------------------------------------------------------
     def ShowNotFinishedMessage1(self, event):
         dial= wx.MessageDialog(None, 'This function has not been completed yet', 'Notice:', wx.OK)
         dial.ShowModal()
 
+#--------------------------------------------------------------
+#           Update Single Timer Function (Used in Single Mode)
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -Sets the percent complete value to zero
+#                   -If the total chunks value is greater than 0, then set the percent Complete value to
+#                    number of finished chunks / number of total chunks
+#                   -Set the new percent complete value
+#                   -Set the number of completed chunks to the number of finished chunks
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the Current Status label to say 'Searching'
+#                   -If running OS X or Linux, check to see if the activity gauge is filled. If it is filled, set the activity
+#                    gauge to be empty. If not filled, increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly
+#                   -If in the Rainbow Table Maker Cracking Mode, set the hash to be cracked label to say 'There is no
+#                    hash to be cracked in this mode'
+#                   -Clear the update flag
+#               Else if the shutdown flag has been set, this function:
+#                   -Set the number of completed chunks label to the number of finished chunks value
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the activity gauge to full (on windows, this stops the gauge pulsing also)
+#                   -Set the progress bar to full
+#                   -If a solution was not found, check to see if in Rainbow Table Maker Cracking Mode. If in Rainbow Table
+#                    Maker Cracking Mode, set the solution header label to say 'There are no solutions for this mode'
+#                    and set the current Status label to say 'Finished Creating Rainbow Table'
+#                    If not in Rainbow Table Maker Cracking Mode, set the solution header label to say 'No solution
+#                    found' and set the current Status label to say 'Finished Searching, no solution found.' (For this
+#                    change the solution text color to red and change the font size)
+#                   -If a solution was found, set the solution header label to say what the solution was.
+#                    Then change the color of the solution text to be green and change the font size. Also, set the
+#                    current Status Label to say 'Finished Searching, Solution was found'
+#----------------------------------------------------------------
     def updateSingleTimer(self,  event):
         if(not self.shutdown.is_set()):
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
-            print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_ten.progressBar.SetValue(percentComplete)
             self.panel_ten.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_ten.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
@@ -2055,12 +2286,43 @@ class myFrame(wx.Frame):
                 self.panel_ten.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 self.panel_ten.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
+#-------------------------------------------------------------
+#           Update Network Server Timer Function
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -Sets the percent complete value to zero
+#                   -If the total chunks value is greater than 0, then set the percent Complete value to
+#                    number of finished chunks / number of total chunks
+#                   -Set the new percent complete value
+#                   -Set the number of completed chunks to the number of finished chunks
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the Current Status label to say 'Searching'
+#                   -If running OS X or Linux, check to see if the activity gauge is filled. If it is filled, set the activity
+#                    gauge to be empty. If not filled, increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly
+#                   -If in the Rainbow Table Maker Cracking Mode, set the hash to be cracked label to say 'There is no
+#                    hash to be cracked in this mode'
+#                   -Clear the update flag
+#               Else if the shutdown flag has been set, this function:
+#                   -Set the number of completed chunks label to the number of finished chunks value
+#                   -Set the number of total chunks label to the number of total chunks value
+#                   -Set the activity gauge to full (on windows, this stops the gauge pulsing also)
+#                   -Set the progress bar to full
+#                   -If a solution was not found, check to see if in Rainbow Table Maker Cracking Mode. If in Rainbow Table
+#                    Maker Cracking Mode, set the solution header label to say 'There are no solutions for this mode'
+#                    and set the current Status label to say 'Finished Creating Rainbow Table'
+#                    If not in Rainbow Table Maker Cracking Mode, set the solution header label to say 'No solution
+#                    found' and set the current Status label to say 'Finished Searching, no solution found.' (For this
+#                    change the solution text color to red and change the font size)
+#                   -If a solution was found, set the solution header label to say what the solution was.
+#                    Then change the color of the solution text to be green and change the font size. Also, set the
+#                    current Status Label to say 'Finished Searching, Solution was found'
+#----------------------------------------------------------------
     def updateNetworkServerTimer(self, event):
         if(not self.shutdown.is_set()):
             percentComplete= 0
             if(int(self.dictionary["total chunks"]) > 0):
                 percentComplete= 100 * float(float(self.dictionary['finished chunks']) / float(self.dictionary['total chunks']))
-            #print "GUI DEBUG: percent complete: '"+str(percentComplete)+"'"
             self.panel_nine.progressBar.SetValue(percentComplete)
             self.panel_nine.numCompletedChunksHeader.SetLabel("Number of Completed Chunks: "+str(self.dictionary["finished chunks"]))
             self.panel_nine.numTotalChunksHeader.SetLabel("Total Number of Chunks: "+str(self.dictionary["total chunks"]))
@@ -2102,6 +2364,19 @@ class myFrame(wx.Frame):
                 self.panel_nine.SolutionHeader.SetFont(self.enlargedSolutionFont)
                 self.panel_nine.currentStatus.SetLabel("Current Status: Finished Searching, Solution was Found!")
 
+#-----------------------------------------------------------------
+#           Update Network Client Timer Function
+#               This function is repeatedly called while a search is being conducted.
+#               If the shutdown flag is not set, this function:
+#                   -(If running OS X or Linux) checks to see the activity gauge of the Network Client is completely filled,
+#                    if it is, then reset it back to empty. If not full, then increment the activity guage by 10.
+#                   -NOTE: If running windows, the activity gauge pulses properly.
+#               Else if the shutdown flag is set, then this function:
+#                   -Sets the Current Status Label to say 'Finished Searching'
+#                   -Fills the activity gauge to full (regardless of OS)
+#                   -If a solution was found, change the solution header label to print out the solution
+#                   -If no solution was found, change the solution header label to say 'No solution was found'
+#-----------------------------------------------------------------
     def updateNetworkClientTimer(self, event):
         if(not self.shutdown.is_set()):
             if(self.compareString(self.theDetectedOS, "Linux",0,0,len("Linux"),len("Linux"))==True): #if running linux
@@ -2120,13 +2395,16 @@ class myFrame(wx.Frame):
         else: #if shutdown variable is set
             self.panel_eight.currentStatus.SetLabel("Current Status: Finished Searching")
             self.panel_eight.activityGauge.SetValue(100) #set value to 100 to fill the activity gauge
-            if(len(self.dictionary["key"])<1):
-                #if no solution was found
+            if(len(self.dictionary["key"])<1):  #if no solution was found
                 self.panel_eight.solutionHeader.SetLabel("Solution: Sorry, No Solution Was Found")
-            else:
-                #if there was a found solution
+            else:      #if there was a found solution
                 self.panel_eight.solutionHeader.SetLabel("Solution: "+str(self.dictionary["key"]))
 
+#------------------------------------------------------------
+#           Configure Dictionary Quick Test Function
+#               This function sets the Dictionary Crack settings to a predefined default value and then calls
+#               the Validate Dictionary Inputs Function
+#------------------------------------------------------------
     def configureDictionaryQuickTest(self, event):
         self.panel_three.selectedAlgorithm.SetValue("MD5")
         self.panel_three.selectedHashingMode.SetValue("Individual Hash Code")
@@ -2135,6 +2413,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateDictionaryInputs(fakeVariable)
 
+#-----------------------------------------------------------
+#           Configure Brute Force Quick Test Function
+#               This function sets the Brute Force Crack settings to a predefined default value and then calls
+#               the Validate Brute Force Inputs Function
+#-----------------------------------------------------------
     def configureBruteForceQuickTest(self,event):
         self.panel_four.selectedAlgorithm.SetValue("MD5")
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: 98ae126efdbc62e121649406c83337d9")
@@ -2144,6 +2427,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateBruteForceInputs(fakeVariable)
 
+#------------------------------------------------------------
+#           Configure Rainbow Table User Quick Test Function
+#               This function sets the Rainbow Table Crack settings to a predefined default value and then calls
+#               the Validate Rainbow Table Inputs Function
+#------------------------------------------------------------
     def configureRainbowTableUserQuickTest(self, event):
         self.panel_eleven.selectedAlgorithm.SetValue("MD5")
         self.panel_eleven.selectedFileHeader.SetLabel("Selected Rainbow Table File: rain.txt")
@@ -2151,6 +2439,11 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateRainbowTableUserInputs(fakeVariable)
 
+#------------------------------------------------------------
+#           Configure Rainbow Table Maker Quick Test Function
+#               This function sets the Rainbow Table Maker settings to a predefined default value and then calls
+#               the Validate Rainbow Table Maker Inputs Function.
+#------------------------------------------------------------
     def configureRainbowTableMakerQuickTest(self, event):
         self.panel_twelve.selectedAlgorithm.SetValue("MD5")
         self.panel_twelve.keyLengthHeader.SetLabel("Key Length: 10")
@@ -2161,6 +2454,19 @@ class myFrame(wx.Frame):
         fakeVariable= ""
         self.validateRainbowTableMakerInputs(fakeVariable)
 
+#----------------------------------------------------------
+#           Validate Dictionary Inputs Function
+#               This function checks to make sure that all of the input settings for Dictionary are valid.
+#               First, checks to make sure that the selected algorithm is valid.
+#               Then checks to make sure that the selected hashing mode is valid.
+#               Then checks to make sure that the hash to be cracked value is not its default text.
+#               Then checks to make sure the hash code to be cracked is the correct amount of characters based on the
+#               selected algorithm.
+#               Then checks to make sure that the selected dictionary file is not the default text.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Dictionary Crack Function
+#---------------------------------------------------------------------
     def validateDictionaryInputs(self, event): #call start dictionary if valid, else display dial error
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2179,6 +2485,8 @@ class myFrame(wx.Frame):
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             inputAlgorithm= "SHA256"
+        elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            inputAlgorithm= "SHA384"
         elif(self.compareString(self.panel_three.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             inputAlgorithm= "SHA512"
         else:
@@ -2187,9 +2495,9 @@ class myFrame(wx.Frame):
 
         #check for valid selected hashing mode
         if(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "Individual Hash Code",0,0,len("Individual Hash Code"),len("Individual Hash Code"))==True):
-            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+            fakeVariable= False
         elif(self.compareString(self.panel_three.selectedHashingMode.GetValue(), "File of Hash Codes",0,0,len("File of Hash Codes"),len("File of Hash Codes"))==True):
-            print "GUI DEBUG: valid dictionary selected hashing mode detected"
+            fakeVariable= False
         else:
             foundInvalidInput= "True"
             invalidHashingMode= "True"
@@ -2232,6 +2540,14 @@ class myFrame(wx.Frame):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
 
+        elif(self.compareString(inputAlgorithm, "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            if(len(self.panel_three.inputHashHeader.GetLabel()) < 116):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+            elif(len(self.panel_three.inputHashHeader.GetLabel()) > 116):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             if(len(self.panel_three.inputHashHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
@@ -2262,12 +2578,28 @@ class myFrame(wx.Frame):
                                      "  Proper SHA1 length: 40 \n" \
                                      "  Proper SHA224 length: 56 \n" \
                                      "  Proper SHA256 length: 64 \n" \
+                                     "  Proper SHA384 length: 94 \n" \
                                      "  Proper SHA512 length: 128 \n"
             if(self.compareString(invalidDictionaryFile, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Dictionary File Detected \n"
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate dictionary input
 
+#------------------------------------------------------------------
+#           Validate Brute Force Inputs Function
+#               This function checks to make sure that all of the input settings for Brute Force are valid.
+#               First, checks to make sure that a valid algorithm is selected.
+#               Then checks to make sure that the hash to be cracked is not the default text.
+#               Then checks to make sure the hash to be cracked is the correct amount of characters based on
+#               the selected algorithm.
+#               Then checks to make sure the min key length value was left blank.
+#               Then checks to make sure the max key length value was not left blank.
+#               Then checks to make sure that the min key length value is less than or equal to the max key length value.
+#               Then checks to make sure that the selected alphabet is valid.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Brute Force Crack Function
+#---------------------------------------------------------------------
     def validateBruteForceInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2290,6 +2622,8 @@ class myFrame(wx.Frame):
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             inputAlgorithm= "SHA256"
+        elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            inputAlgorithm= "SHA384"
         elif(self.compareString(self.panel_four.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             inputAlgorithm= "SHA512"
         else:
@@ -2331,6 +2665,14 @@ class myFrame(wx.Frame):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
             elif(len(self.panel_four.inputHashHeader.GetLabel()) > 84):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+
+        elif(self.compareString(inputAlgorithm, "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            if(len(self.panel_four.inputHashHeader.GetLabel()) < 114):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+            elif(len(self.panel_four.inputHashHeader.GetLabel()) > 114):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
 
@@ -2399,6 +2741,7 @@ class myFrame(wx.Frame):
                                      "  Proper SHA1 length: 40 \n" \
                                      "  Proper SHA224 length: 56 \n" \
                                      "  Proper SHA256 length: 64 \n" \
+                                     "  Proper SHA384 length: 94 \n" \
                                      "  Proper SHA512 length: 128 \n"
             if(self.compareString(invalidMinKeyInput, "True",0,0,len("True"),len("True"))==True):
                 invalidInputString+= "Invalid Min Key Input Detected \n"
@@ -2411,6 +2754,18 @@ class myFrame(wx.Frame):
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self)
         #end of validate brute force inputs
 
+#------------------------------------------------------------------------
+#           Validate Rainbow Table User Inputs Function
+#               This function checks to make sure that all of the input settings for Rainbow Table User are valid.
+#               First, checks to make sure that a valid algorithm was selected.
+#               Then checks to make sure that the selected Rainbow Table File is not the default value.
+#               Then checks to make sure that the hash to be cracked is not the default text.
+#               Then checks to make sure that the hash to be cracked is the correct amount of characters based on the
+#               selected algorithm.
+#               Finally, evaluates whether or not any of the checks failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Rainbow Table Crack Function
+#---------------------------------------------------------------------
     def validateRainbowTableUserInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2428,6 +2783,8 @@ class myFrame(wx.Frame):
             inputAlgorithm= "SHA224"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
             inputAlgorithm= "SHA256"
+        elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            inputAlgorithm= "SHA384"
         elif(self.compareString(self.panel_eleven.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             inputAlgorithm= "SHA512"
         else:
@@ -2473,6 +2830,13 @@ class myFrame(wx.Frame):
             elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 84):
                 foundInvalidInput= "True"
                 invalidHashLength= "True"
+        elif(self.compareString(inputAlgorithm, "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
+            if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 114):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
+            elif(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) > 114):
+                foundInvalidInput= "True"
+                invalidHashLength= "True"
         elif(self.compareString(inputAlgorithm, "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             if(len(self.panel_eleven.hashToBeCrackedHeader.GetLabel()) < 148):
                 foundInvalidInput= "True"
@@ -2498,10 +2862,24 @@ class myFrame(wx.Frame):
                                      "  Proper SHA1 length: 40 \n" \
                                      "  Proper SHA224 length: 56 \n" \
                                      "  Proper SHA256 length: 64 \n" \
+                                     "  Proper SHA384 length: 94 \n" \
                                      "  Proper SHA512 length: 128 \n"
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
         #end of validate rainbowtable user inputs
 
+#----------------------------------------------------------------------
+#           Validate Rainbow Table Maker Inputs Function
+#               This function checks to make sure that all of the input settings for Rainbow Table are valid.
+#               First, checks to see if a valid algorithm has been selected.
+#               Then checks to make sure the key length is not left blank.
+#               Then checks to see if a valid alphabet has been selected.
+#               Then checks to make sure the table chain length was not left blank.
+#               Then checks to make sure the number of rows is not left blank.
+#               Then checks to make sure the Rainbow Table File Name was not left blank.
+#               Finally, evaluates whether or not there were any checks that failed.
+#               Any checks that failed are listed in a message box window that is displayed to the user.
+#               If all checks succeeded, then the function calls the Start Rainbow Table Maker Creation Session Function
+#---------------------------------------------------------------------
     def validateRainbowTableMakerInputs(self, event):
         foundInvalidInput= "False"
         invalidAlgorithm= "False"
@@ -2519,6 +2897,8 @@ class myFrame(wx.Frame):
         elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA224",0,0,len("SHA224"),len("SHA224"))==True):
             fakeVariable= False;
         elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA256",0,0,len("SHA256"),len("SHA256"))==True):
+            fakeVariable= False;
+        elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA384",0,0,len("SHA384"),len("SHA384"))==True):
             fakeVariable= False;
         elif(self.compareString(self.panel_twelve.selectedAlgorithm.GetValue(), "SHA512",0,0,len("SHA512"),len("SHA512"))==True):
             fakeVariable= False;
@@ -2586,6 +2966,10 @@ class myFrame(wx.Frame):
             dial= wx.MessageBox(invalidInputString, "Invalid Input/Selection Detected", wx.OK, self )
         #end of check for rainbow table maker inputs
 
+#-------------------------------------------------------
+#           Validate Network Client Input Function
+#               This function checks to make sure that an IP address was entered and it is not the default message
+#------------------------------------------------------
     def validateNetworkClientInput(self, event):
         foundInvalidInput= "False"
         if(len(self.panel_seven.serverIPAddress.GetLabel()) < 22): #check to see if ip is empty
@@ -2599,12 +2983,21 @@ class myFrame(wx.Frame):
         else:
             dial= wx.MessageBox("You must input an IP address", "No IP address entered", wx.OK, self)
 
+#-------------------------------------------------------
+#           Get Server IP Address From User Function
+#               This function creates a dialog window that prompts the user for the IP address of the Network Server
+#-------------------------------------------------------
     def getIPFromUser(self, event):
         dial = wx.TextEntryDialog(self, "What is the Server's IP Address?", "Input IP Address", "", style=wx.OK)
         dial.ShowModal()
         self.panel_seven.serverIPAddress.SetLabel("Server's IP Address: "+ str(dial.GetValue()))
         dial.Destroy()
 
+#-------------------------------------------------------
+#           Set Dictionary Hash To be Cracked Function
+#               This function creates a dialog window that prompts the user to input the hash
+#               code that they want to be cracked.
+#-------------------------------------------------------
     def setDictionaryHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
                                         "(Must be in hexadecimal form \n"
@@ -2613,6 +3006,11 @@ class myFrame(wx.Frame):
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
+#---------------------------------------------------------
+#           Set Brute-Force Hash To be Cracked Function
+#               This function creates a dialog window that prompts the user to input the hash
+#               code that they want to be cracked.
+#--------------------------------------------------------
     def setBruteForceHashToBeCracked(self, event):
         dial = wx.TextEntryDialog(self, "Input the Hash To Be Cracked \n"
                                         "(Must be in hexadecimal form \n"
@@ -2621,6 +3019,11 @@ class myFrame(wx.Frame):
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
+#---------------------------------------------------------------
+#           Select Dictionary File Function
+#               This function creates a file dialog window that allows the user to select which file
+#               They want to use as their dictionary file.
+#---------------------------------------------------------------
     def selectDictFile(self, event):
         dial= wx.FileDialog(self, message="Choose a Dictionary File", defaultFile="",
                              style=wx.OPEN|wx.MULTIPLE|wx.CHANGE_DIR)
@@ -2629,12 +3032,24 @@ class myFrame(wx.Frame):
             self.panel_three.inputDictFileHeader.SetLabel("Selected Dictionary File: "+ str(paths))
         dial.Destroy()
 
+#--------------------------------------------------------------
+#           On Close Function
+#               This function is called when the Close button is pressed. This function creates
+#               A dialog window to prompt the user if they are sure they want to close the application.
+#               If yes, then set the shutdown flag and then close the program
+#--------------------------------------------------------------
     def OnClose(self, event):
         dial = wx.MessageBox('Are you sure you want to quit?', 'Exit?', wx.YES_NO|wx.NO_DEFAULT, self)
         if dial == wx.YES:
             self.shutdown.set()
             self.Close()
 
+#--------------------------------------------------------------
+#           Quit Single Status and go Back To Main Menu Function
+#               This function creates a dialog window that prompts the user with a confirmation message asking
+#               If they are sure that they want to stop cracking the hash.
+#               If yes, then terminate the Network Server Process and then return to Main Menu
+#--------------------------------------------------------------
     def quitSingleStatusBackToMainMenu(self, event):
         dial = wx.MessageBox('Are you sure you want to stop cracking the hash \n'
                              'and return to the Main Menu?', 'Stop Cracking and Return to Main Menu?', wx.YES_NO|wx.NO_DEFAULT, self)
@@ -2642,6 +3057,12 @@ class myFrame(wx.Frame):
             self.NetworkServer.terminate()
             self.switchFromPanel10ToPanel1()
 
+#----------------------------------------------------------------
+#           Disconnect Client Function
+#               This function creates a dialog window that prompts the user with a confirmation message asking
+#               If they are sure they want to disconnect from the server.
+#               If yes, then terminate the Network Client Process and then return to Main Menu
+#---------------------------------------------------------------
     def disconnectClient(self, event):
         dial= wx.MessageBox('Are you sure you want to disconnect from the server? Disconnecting before the search is finished could cause errors',
                             'Disconnect from Server?', wx.YES_NO|wx.NO_DEFAULT, self)
@@ -2649,6 +3070,12 @@ class myFrame(wx.Frame):
             self.NetworkClient.terminate()
             self.switchFromPanel8ToPanel1()
 
+#-----------------------------------------------------------------
+#           Force Close Server Function
+#               This function creates a dialog window that prompts the user with a confirmation message asking
+#               If they are sure they want to forcifully close the server.
+#               If yes, then terminates the Network Server process, sets the shutdown flag, then goes back to the main menu.
+#-----------------------------------------------------------------
     def forceCloseServer(self, event):
         dial= wx.MessageBox('Are you sure you want to close the server? Closing the server will forcifully disconnect all clients.',
                             'Close the Server?', wx.YES_NO|wx.NO_DEFAULT, self)
@@ -2657,28 +3084,36 @@ class myFrame(wx.Frame):
             self.shutdown.set()
             self.switchFromPanel9ToPanel1()
 
+#-----------------------------------------------------------------
+#           Set Current Mode Function
+#               This function is used to set the Current Mode value
+#------------------------------------------------------------------
     def setCurrentMode(self, inputText):
         self.CurrentMode= inputText
 
-    def resetDictionarySettingsToDefault(self, event):
+#------------------------------------------------------------------
+#           Reset To Default Functions
+#               These functions reset all of the search configurations to their default settings
+#------------------------------------------------------------------
+    def resetDictionarySettingsToDefault(self, event):  #Reset the Dictionary Search Settings to Default
         self.panel_three.selectedAlgorithm.SetValue('MD5')
         self.panel_three.selectedHashingMode.SetValue('Individual Hash Code')
         self.panel_three.inputHashHeader.SetLabel("Hash to be Cracked: No Hash has been input")
         self.panel_three.inputDictFileHeader.SetLabel("Selected Dictionary File: No Dictionary File Selected")
 
-    def resetBruteForceSettingsToDefault(self, event):
+    def resetBruteForceSettingsToDefault(self, event):  #Reset the Brute-Force Search Settings to Default
         self.panel_four.selectedAlgorithm.SetValue('MD5')
         self.panel_four.inputHashHeader.SetLabel('Hash To Be Cracked: No Hash has been Input')
         self.panel_four.minKeyLengthHeader.SetLabel('Min Key Length: 5')
         self.panel_four.maxKeyLengthHeader.SetLabel('Max Key Length: 15')
         self.panel_four.selectedAlphabet.SetValue('All')
 
-    def resetRainbowTableCrackingSettingsToDefault(self, event):
+    def resetRainbowTableCrackingSettingsToDefault(self, event): #Reset the Rainbow Table Search Settings to Default
         self.panel_eleven.selectedAlgorithm.SetValue('MD5')
         self.panel_eleven.selectedFileHeader.SetLabel('Selected Rainbow Table File: No File has been Selected')
         self.panel_eleven.hashToBeCrackedHeader.SetLabel('Hash to be cracked: No Hash has been entered')
 
-    def resetRainbowTableMakerSettingsToDefault(self, event):
+    def resetRainbowTableMakerSettingsToDefault(self, event):  #Reset the Rainbow Table Maker Search Settings to Default
         self.panel_twelve.selectedAlgorithm.SetValue('MD5')
         self.panel_twelve.keyLengthHeader.SetLabel('Key Length: 10')
         self.panel_twelve.selectedAlphabet.SetValue('All')
@@ -2686,7 +3121,12 @@ class myFrame(wx.Frame):
         self.panel_twelve.numOfRowsHeader.SetLabel('Number of Rows: 100')
         self.panel_twelve.fileNameHeader.SetLabel('Save Rainbow Table File As: myRainbowTable.txt')
 
-    def generateHashDialogDic(self, event):
+#-----------------------------------------------------------------
+#           Generate Hash Dialog Functions
+#               These functions generate a dialog window that prompts the user to input the key that they want converted into a hash code
+#               The input will be converted into a hash code using the currently selected algorithm in the drop down menu
+#-----------------------------------------------------------------
+    def generateHashDialogDic(self, event): #Hash Generator for Dictionary Crack
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
         dial.ShowModal()
         inputKey= str(dial.GetValue())
@@ -2695,7 +3135,7 @@ class myFrame(wx.Frame):
         self.panel_three.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
 
-    def generateHashDialogBF(self, event):
+    def generateHashDialogBF(self, event): #Hash Generator for Brute-Force Crack
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
         dial.ShowModal()
         inputKey= str(dial.GetValue())
@@ -2704,7 +3144,7 @@ class myFrame(wx.Frame):
         self.panel_four.inputHashHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
 
-    def generateHashDialogRT(self, event):
+    def generateHashDialogRT(self, event): #Hash Generator for Rainbow Table Crack
         dial= wx.TextEntryDialog(self, "Input Key To Be Hashed", "Input Key To Be Hashed","", style=wx.OK)
         dial.ShowModal()
         inputKey= str(dial.GetValue())
@@ -2713,6 +3153,11 @@ class myFrame(wx.Frame):
         self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash To Be Cracked: "+str(generatedHash))
         dial.Destroy()
 
+#-------------------------------------------------------------
+#           Set Brute-Force Min Key Length Functions
+#               This function creates a dialog window that prompts the user to input the new Min Key Length Value
+#               Shortest allowed key length is 4. Longest allowed Key Length is 1000.
+#-------------------------------------------------------------
     def setBFMinKeyLength(self, event):
         dial = wx.TextEntryDialog(self, "Input the Min Key Length \n"
                                         "Minimum: 3 \n"
@@ -2741,6 +3186,12 @@ class myFrame(wx.Frame):
             self.panel_four.minKeyLengthHeader.SetLabel("Min Key Length: "+str(input))
         dial.Destroy()
 
+#-----------------------------------------------------------------
+#           Set Brute-Force Max Key Length Function
+#               This function creates a dialog window that prompts the user to input a new Max Key Length Value.
+#               Shortest allowed key length is 4. Longest allowed key length is 1000.
+#               Checks to make sure that the value being set as the Max Key length is greater than or equal to the Min Key Length
+#-----------------------------------------------------------------
     def setBFMaxKeyLength(self, event):
         #get min key length so min and max can be compared
         bfMinKeyLength= ""
@@ -2781,6 +3232,11 @@ class myFrame(wx.Frame):
             self.panel_four.maxKeyLengthHeader.SetLabel("Max Key Length: "+str(input))
         dial.Destroy()
 
+#------------------------------------------------------------------
+#           Set Rainbow Maker Key Length Function
+#               This function creates a dialog window that prompts the user to input the new Key Length Value
+#               Shortest Key Length allowed is 4. Longest Key Length allowed is 1000.
+#------------------------------------------------------------------
     def setRMKeyLength(self, event):
         dial= wx.TextEntryDialog(self, "Input New Key Length", "Input the new Key Length", "", style=wx.OK)
         dial.ShowModal()
@@ -2815,6 +3271,12 @@ class myFrame(wx.Frame):
             self.panel_twelve.keyLengthHeader.SetLabel("Key Length: "+str(input))
         dial.Destroy()
 
+#----------------------------------------------------------------
+#           Set Rainbow Maker Chain Length Value Function
+#               This function creates a dialog window that prompts the user to input a new Chain Length Value
+#               The smallest value allowed is 1. The largest value allowed is the Max Int value.
+#               Smallest chain length allowed is 1. Largest chain length allowed is Max Int value.
+#----------------------------------------------------------------
     def setRMChainLength(self, event):
         #min = 1, max = maxint
         import sys
@@ -2843,6 +3305,11 @@ class myFrame(wx.Frame):
             self.panel_twelve.chainLengthHeader.SetLabel("Table Chain Length: "+str(input))
         dial.Destroy()
 
+#-----------------------------------------------------------------
+#           Change Rainbow Maker Number of Rows Function
+#               This function creates a dialog window that prompts the user to input the new Number of Rows Value
+#               Smallest value allowed is 1. Largest value allowed is Max Int value.
+#-----------------------------------------------------------------
     def setRMNumOfRows(self, event):
         import sys
         dial= wx.TextEntryDialog(self, "Input New Number of Rows", "Input the new Number of Rows", "", style=wx.OK)
@@ -2870,6 +3337,10 @@ class myFrame(wx.Frame):
             self.panel_twelve.numOfRowsHeader.SetLabel("Number of Rows: "+str(input))
         dial.Destroy()
 
+#---------------------------------------------------------------
+#           Change Rainbow Maker File Name Function
+#               This function creates a dialog window that prompts the user to input the new File Name Value
+#--------------------------------------------------------------
     def setRMFileName(self,event):
         dial= wx.TextEntryDialog(self, "Input the name for this rainbow table file\n"
                                        "(The file extension will automatically be added)", "Enter in the new name", "", style=wx.OK)
@@ -2884,6 +3355,11 @@ class myFrame(wx.Frame):
             dial2.ShowModal()
         dial.Destroy()
 
+#--------------------------------------------------------------
+#           Check for Valid File Name Length Function
+#               This function makes sure that the file name that the user input is of legal length
+#               Maximum legal file name length is 255 characters
+#--------------------------------------------------------------
     def checkForValidFileNameLength(self, inputString):
         if((len(inputString) > 255) or (len(inputString) < 1)):
             return False
@@ -2892,6 +3368,10 @@ class myFrame(wx.Frame):
         else:
             return True
 
+#---------------------------------------------------------------
+#           Select Rainbow User File Function
+#               This function creates a file selection dialog window that allows the user to pick what rainbow table file they wish to use
+#---------------------------------------------------------------
     def selectRUFileSelect(self, event):
         import os
         fileDial= wx.FileDialog(None, "Select a rainbow table file", os.getcwd(), "", "All files (*.*)|*.*", wx.OPEN)
@@ -2900,12 +3380,20 @@ class myFrame(wx.Frame):
             self.panel_eleven.selectedFileHeader.SetLabel("Selected Rainbow Table File: "+str(input))
         fileDial.Destroy()
 
+#---------------------------------------------------------------
+#           Set Hash to be Cracked For Rainbow User Function
+#               This function creates a dialog window that prompts the user to input the hash that they wish to have cracked
+#---------------------------------------------------------------
     def setRUHashToBeCracked(self, event):
         dial= wx.TextEntryDialog(self, "Insert the Hash Code to be cracked", "Insert the Hash Code to be cracked", "", style=wx.OK)
         dial.ShowModal()
         self.panel_eleven.hashToBeCrackedHeader.SetLabel("Hash to be cracked: "+str(dial.GetValue()))
         dial.Destroy()
 
+#--------------------------------------------------------------
+#           On Single Mode Button Click Function
+#               This function sets all of the panel labels to use single tense on the start buttons labels
+#--------------------------------------------------------------
     def onSingleModeButtonClick(self, e):
         self.panel_two.currentMode.SetLabel("Current Mode: Single Mode")
         self.panel_three.StartConnectButton.SetLabel("Start Dictionary Crack")
@@ -2914,6 +3402,10 @@ class myFrame(wx.Frame):
         self.panel_twelve.startConnectButton.SetLabel("Make Rainbow Table")
         self.switchFromPanel1ToPanel2()
 
+#-------------------------------------------------------------
+#           On Network Mode Button Click Function
+#               This function sets all of the panel labels to use plural (networking) tense on the start button labels
+#-------------------------------------------------------------
     def onNetworkModeButtonClick(self, e):
         self.panel_two.currentMode.SetLabel("Current Mode: Network Mode")
         self.panel_three.StartConnectButton.SetLabel("Start Hosting Dictionary Crack")
@@ -2922,9 +3414,14 @@ class myFrame(wx.Frame):
         self.panel_twelve.startConnectButton.SetLabel("Start Hosting a Rainbow Table Creation Session")
         self.switchFromPanel6ToPanel2()
 
+#--------------------------------------------------------------
+#           Connect To Server Function
+#               This function retrieves the IP address and sets it to the status screens
+#               Then it starts up a NetworkClient process
+#-------------------------------------------------------------
     def connectToServer(self):
         tempServerIP= self.panel_seven.serverIPAddress.GetLabel()
-        #remove the prefix to th eip address
+        #remove the prefix to the ip address
         serverIP=""
         for i in range(21, len(tempServerIP)):
             serverIP+= tempServerIP[i]
@@ -2933,6 +3430,13 @@ class myFrame(wx.Frame):
         self.panel_eight.connectedToIP.SetLabel("Connected To: "+str(serverIP))
         self.switchFromPanel7ToPanel8()
 
+#---------------------------------------------------------
+#           Start Dictionary Crack Function
+#               This function retrieves all of the settings from the dictionary search settings panel (panel 3)
+#               and stores all of the settings in a dictionary.
+#               Then starts up a Network Server Process using the settings stored in the dictionary.
+#               Then creates a list of shared variables to be shared amongst the processes
+#---------------------------------------------------------
     def startDictionaryCrack(self):
         crackingMethodSetting= "dic"
         tempAlgorithmSetting= str(self.panel_three.selectedAlgorithm.GetValue())
@@ -2963,16 +3467,23 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        if(self.compareString(singleSetting, "False",0,0,len("False"),len("False"))):
-            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
-        else:
-            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
+        #if(self.compareString(singleSetting, "False",0,0,len("False"),len("False"))):
+         #   self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        #else:
+        self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
-        if(singleSetting is 'False'):
+        if(singleSetting is 'False'): #if in Networking Mode
             self.switchFromPanel3ToPanel9()
-        else:
+        else:   #if in Single Mode
             self.switchFromPanel3ToPanel10()
 
+#---------------------------------------------------------------------
+#           Start Brute-Force Crack Function
+#               This function retrieves all of the settings from the brute-force search settings panel (panel 4)
+#               and stores all of the settings in a dictionary.
+#               Then starts up a Network Server Process using the settings stored in the dictionary.
+#               Then creates a list of shared variables to be shared amongst the processes
+#--------------------------------------------------------------------
     def startBruteForceCrack(self):
         crackingMethodSetting= "bf"
         tempAlgorithmSetting= str(self.panel_four.selectedAlgorithm.GetValue())
@@ -3009,7 +3520,6 @@ class myFrame(wx.Frame):
         elif(self.compareString(tempAlphabetSetting, "Digits",0,0,len("Digits"), len("Digits"))==True):
             tempAlphabetSetting2= string.digits
         else:
-            #print "GUI ERROR: alphabet not recognized: '"+str(tempAlphabetSetting)+"'"
             fakeVariable= False;
         alphabetSetting= tempAlphabetSetting2
         tempSingleSetting= str(self.panel_four.currentMode.GetLabel())
@@ -3031,16 +3541,23 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
-            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
-        else:
-            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
+        #if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+         #   self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        #else:
+        self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
-        if(singleSetting is 'False'):
+        if(singleSetting is 'False'): #if in Network Mode
             self.switchFromPanel4ToPanel9()
-        else:
+        else:  #if in Single Mode
             self.switchFromPanel4ToPanel10()
 
+#-------------------------------------------------------------------
+#           Start Rainbow Table Crack Function
+#               This function retrieves all of the settings from the Rainbow Table User search settings panel (panel 11)
+#               and then stores the settings in a dictionary.
+#               Then starts up a Network Server Process using the settings stored in the dictionary.
+#               Then creates a list of shared variables to be shared amongst the processes
+#-------------------------------------------------------------------
     def startRainbowTableCrack(self):
         crackingMethod= "rain"
         tempFileName= self.panel_eleven.selectedFileHeader.GetLabelText()
@@ -3059,8 +3576,6 @@ class myFrame(wx.Frame):
         for i in range (14, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
-        #Space is intentional (below) do not remove!!!!!!!!!!!!!!!!!!
-        #print "GUI DEBUG: rainbowTableUser tempSingleSetting2: '"+str(tempSingleSetting2)+"'"
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
@@ -3073,16 +3588,23 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
-            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
-        else:
-            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
+        #if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+         #   self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        #else:
+        self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
-        if(singleSetting is 'False'):
+        if(singleSetting is 'False'): #if in Networking Mode
             self.switchFromPanel11ToPanel9()
-        else:
+        else:       #if in Single Mode
             self.switchFromPanel11ToPanel10()
 
+#------------------------------------------------------------------------
+#           Start Rainbow Table Creation Session Function
+#               This function retrieves all of the settings from the Rainbow Table Maker settings panel (panel 12)
+#               and stores them in a dictionary.
+#               Then starts up a Network Server Process using the settings stored in the dictionary.
+#               Then creates a list of shared variables to be shared amongst the processes.
+#-----------------------------------------------------------------------
     def startRainbowTableCreationSession(self):
         crackingMethod= "rainmaker"
         tempAlgorithmSetting= str(self.panel_twelve.selectedAlgorithm.GetValue())
@@ -3111,7 +3633,6 @@ class myFrame(wx.Frame):
         elif(self.compareString(tempAlphabetSettings, "Digits",0,0,len("Digits"), len("Digits"))==True):
             tempAlphabetSetting2= string.digits
         else:
-            #print "GUI ERROR: alphabet not recognized: '"+str(tempAlphabetSettings)+"'"
             fakeVariable= False;
         alphabetSetting= tempAlphabetSetting2
         tempChainLengthSetting= str(self.panel_twelve.chainLengthHeader.GetLabelText())
@@ -3137,7 +3658,6 @@ class myFrame(wx.Frame):
         for i in range (14, len(tempSingleSetting)):
             tempSingleSetting2+= str(tempSingleSetting[i])
         singleSetting = ""
-        #tested, and the single mode has no space in front
         if(self.compareString(tempSingleSetting2, "Single Mode",0,0,len("Single Mode"), len("Single Mode"))==True):
             singleSetting="True"
         else:
@@ -3152,35 +3672,38 @@ class myFrame(wx.Frame):
         listOfSharedVariables.append(crackingSettings)
         listOfSharedVariables.append(self.shutdown)
         listOfSharedVariables.append(self.update)
-        if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
-            self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
-        else:
-            self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
+        #if(self.compareString(singleSetting,"False",0,0,len("False"),len("False"))):
+         #   self.NetworkServer= Process(target=Server, args=(crackingSettings,self.shared,))
+        #else:
+        self.NetworkServer= Process(target=Server, args=(crackingSettings, self.shared,))
         self.NetworkServer.start()
-        if(singleSetting is 'False'):
+        if(singleSetting is 'False'): #if in Networking mode
             self.switchFromPanel12ToPanel9()
-        else:
+        else:  #if in single mode
             self.switchFromPanel12ToPanel10()
 
+#---------------------------------------------------------------------
+#           Get IP Function
+#               This function gets the local IP address of the users machine based on the OS the user is running.
+#               Then returns the IP address.
+#---------------------------------------------------------------------
     def get_ip(self):
         import platform
         import socket
             #detect the OS
         try:  # getOS try block
-            if platform.system() == "Windows":  # Detecting Windows
+            if platform.system() == "Windows":  # Detecting IP for Windows
                 self.IP= socket.gethostbyname(socket.gethostname())
                 return self.IP
-            elif platform.system() == "Linux":  # Detecting Linux
+            elif platform.system() == "Linux":  # Detecting IP for Linux
                 import fcntl
                 import struct
                 import os
-
                 def get_interface_ip(ifname):
                     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915,
                                                         struct.pack('256s', ifname[:15]))[20:24])
-
-                #end of def
+                #end of inner def
                 def get_lan_ip():
                     ip = socket.gethostbyname(socket.gethostname())
                     if ip.startswith("127.") and os.name != "nt":
@@ -3196,10 +3719,10 @@ class myFrame(wx.Frame):
                 #end of def
                 self.IP= get_lan_ip()
                 return self.IP
-            elif platform.system() == "Darwin":  # Detecting OSX
+            elif platform.system() == "Darwin":  # Detecting IP for OSX
                 self.IP = socket.gethostbyname(socket.gethostname())
                 return self.IP
-            else:                           # Detecting an OS that is not listed
+            else:                           # Detecting an IP for an OS that is not listed
                 self.IP = socket.gethostbyname(socket.gethostname())
                 return self.IP
 
@@ -3210,8 +3733,13 @@ class myFrame(wx.Frame):
             print inst.args  # arguments stored in .args
             print inst  # _str_ allows args tto be printed directly
             print "========================================================================================"
-        #end of detect the OS
+        #end of detect the OS function
 
+#-------------------------------------------------------------
+#           Compare String Function
+#               This function compares two strings character by character to see if they are equal.
+#               Returns True/False
+#-------------------------------------------------------------
     def compareString(self,inboundStringA, inboundStringB, startA, startB, endA, endB):
         try:
             posA = startA
@@ -3240,6 +3768,11 @@ class myFrame(wx.Frame):
             print "========================================================================\n"
             return False
 
+#--------------------------------------------------------------------
+#           Detect OS Function
+#               This function detects the Operating System that the user is running.
+#               If unable to detect what OS the user is running, default to Linux.
+#--------------------------------------------------------------------
     def detectOS(self):
         import platform
         print "OS DETECTION:"

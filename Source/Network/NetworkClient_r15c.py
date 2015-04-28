@@ -185,7 +185,7 @@ class Client():
                 chunk.params = job['params']
                 chunk.data = job['data']
                 dictionary.find(chunk)
-                result = dictionary.isFound()
+                result = dictionary.is_found()
                 params = chunk.params.split()
                 if result:
                     if dictionary.doneList is not []:
@@ -194,8 +194,8 @@ class Client():
                         dictionary.result = False
                     else:
                         print "Hooray!"
-                        print "key is: " + dictionary.showKey()
-                        key = dictionary.showKey()
+                        print "key is: " + dictionary.show_key()
+                        key = dictionary.show_key()
                         result_queue.put(("w", key))
                 elif params[10] == "True":
                     result_queue.put(("e", chunk.params))
@@ -252,7 +252,7 @@ class Client():
                 chunk.params = job["params"]
                 chunk.data = job["data"]
                 rain.find(chunk)
-                if rain.isFound():
+                if rain.is_found():
                     result_queue.put(("w", rain.getKey()))
                 elif chunk.params.split()[10] == "True":
                     result_queue.put(("e", chunk.params))

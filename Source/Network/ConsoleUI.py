@@ -1,7 +1,8 @@
 #   Console_UI.py
 
 #   This is a text-based UI class that connects
-#   with the network server and client classes
+#   with the network server and client classes.
+#   It is the main class to run when in Console-mode.
 
 #   Chris Bugg
 #   10/7/14
@@ -13,7 +14,6 @@ import time
 import os
 from multiprocessing import Process, Event, Manager, freeze_support
 import string
-import Chunk
 
 from NetworkClient_r15b import Client
 from NetworkServer_r15c import Server
@@ -162,7 +162,6 @@ class ConsoleUI():
             #############################################
             elif state == "aboutScreen":
 
-                #What did the user pick? (Be a node, Back, Exit)
                 print "============="
                 print "Start -> About"
 
@@ -175,8 +174,8 @@ class ConsoleUI():
                 print "and Windows 7+. It uses the power of multiprocessing to fully utilize"
                 print "every computer available, and can utilize a LAN to distribute the"
                 print "workload over up to 90 computers (nodes). For now, the algorithms"
-                print "that it can utilize are: sha 224,sha 256, sha 512, sha 1, and md5,"
-                print "which cover a fair amount of the common hashing algorithms used."
+                print "that it can utilize are: sha 224, sha 256, sha 384, sha 512, sha 1,"
+                print "and md5, which cover a fair amount of the common hashing algorithms used."
                 print
                 print "We've implemented three common attack methods to find an original password."
                 print " Dictionary takes a list of passwords, hashes them, and compares the "
@@ -464,112 +463,13 @@ class ConsoleUI():
                 print "Start -> Server Mode -> Brute Force"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the alphabet to be used
-                print
-                print "Choose your alphabet: "
-                print "0-9(d)"
-                print "a-z(a)"
-                print "A-Z(A)"
-                print "!-~(p)"
-                print
-                print "Add letters together to add"
-                print " multiple alphabets together."
-                print "IE: dap = 0-9 & a-z & !-~"
-                print
-
-                alphabet = raw_input("Choice: ")
-
-                #Sterolize inputs
-                while not self.is_valid_alphabet(alphabet):
-
-                    print "Input Error!"
-
-                    alphabet = raw_input("Try Again: ")
-
-                alphabet = self.convert_to_string(alphabet)
-
-                #Get min key length
-                print
-                min_key_length = raw_input("What's the minimum key length? ")
-                while not self.is_int(min_key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    min_key_length = raw_input("Try Again: ")
-
-                #Get max key length
-                print
-                max_key_length = raw_input("What's the maximum key length?")
-                while not self.is_int(max_key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    max_key_length = raw_input("Try Again: ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    self.settings['file mode'] = True
+                self.get_algorithm()
+                self.get_alphabet()
+                self.get_min_max_key_length("minimum")
+                self.get_min_max_key_length("maximum")
+                self.get_hash()
 
                 self.settings['cracking method'] = "bf"
-                self.settings['algorithm'] = algorithm
-                self.settings['alphabet'] = alphabet
-                self.settings['min key length'] = int(min_key_length)
-                self.settings['max key length'] = int(max_key_length)
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -740,63 +640,13 @@ class ConsoleUI():
                 print "Start -> Server -> Rainbow User"
                 print
 
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
-                while not self.does_file_exist(file_name):
-
-                    print "File not found..."
-                    file_name = raw_input("What's the file name (___.txt): ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
-                    self.settings['file mode'] = True
+                self.get_file_name()
+                self.get_hash()
 
                 self.settings['cracking method'] = "rain"
-                self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
-
                 print
                 print "Ready to go?"
                 print
@@ -969,84 +819,14 @@ class ConsoleUI():
                 print "Start -> Server -> Rainbow Maker"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the Number of chars of key
-                print
-                key_length = raw_input("How many characters will the key be? ")
-                while not self.is_int(key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    key_length = raw_input("Try Again: ")
-
-                #Get the alphabet to be used
-                print
-                print "Choose your alphabet: "
-                print "0-9(d)"
-                print "a-z(a)"
-                print "A-Z(A)"
-                print "!-~(p)"
-                print
-                print "Add letters together to add"
-                print " multiple alphabets together."
-                print "IE: dap = 0-9 & a-z & !-~"
-                print
-
-                alphabet = raw_input("Choice: ")
-
-                #Sterolize inputs
-                while not self.is_valid_alphabet(alphabet):
-
-                    print "Input Error!"
-
-                    alphabet = raw_input("Try Again: ")
-
-                alphabet_string = self.convert_to_string(alphabet)
-
-                #Get dimensions
-                print
-                chain_length = raw_input("How long will the chains be? ")
-                while not self.is_int(chain_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    chain_length = raw_input("Try Again: ")
-
-                print
-                num_rows = raw_input("How many rows will there be? ")
-                while not self.is_int(num_rows):
-
-                    print "Input Error, Not an Integer!"
-
-                    num_rows = raw_input("Try Again: ")
-
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
+                self.get_algorithm()
+                self.get_min_max_key_length("")
+                self.get_alphabet()
+                self.get_length()
+                self.get_height()
+                self.get_file_name()
 
                 self.settings['cracking method'] = "rainmaker"
-                self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name + ".txt"
-                self.settings['key length'] = key_length
-                self.settings['alphabet'] = alphabet_string
-                self.settings['chain length'] = chain_length
-                self.settings['num rows'] = num_rows
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -1269,77 +1049,11 @@ class ConsoleUI():
                 print "Start -> Server Mode -> Dictionary"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
-                while not self.does_file_exist(file_name):
-
-                    print "File not found..."
-                    file_name = raw_input("What's the file name (___.txt): ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
-                    self.settings['file mode'] = True
+                self.get_algorithm()
+                self.get_file_name()
+                self.get_hash()
 
                 self.settings['cracking method'] = "dic"
-                self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "False"
 
                 #Get the go-ahead
@@ -1573,113 +1287,13 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Brute Force"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the alphabet to be used
-                print
-                print "Choose your alphabet: "
-                print "0-9(d)"
-                print "a-z(a)"
-                print "A-Z(A)"
-                print "!-~(p)"
-                print
-                print "Add letters together to add"
-                print " multiple alphabets together."
-                print "IE: dap = 0-9 & a-z & !-~"
-                print
-
-                alphabet = raw_input("Choice: ")
-
-                #Sterolize inputs
-                while not self.is_valid_alphabet(alphabet):
-
-                    print "Input Error!"
-
-                    alphabet = raw_input("Try Again: ")
-
-                alphabet = self.convert_to_string(alphabet)
-
-                #Get min key length
-                print
-                min_key_length = raw_input("What's the minimum key length? ")
-                while not self.is_int(min_key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    min_key_length = raw_input("Try Again: ")
-
-                #Get max key length
-                print
-                max_key_length = raw_input("What's the maximum key length? ")
-                while not self.is_int(max_key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    max_key_length = raw_input("Try Again: ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
-                    self.settings['file mode'] = True
+                self.get_algorithm()
+                self.get_alphabet()
+                self.get_min_max_key_length("minimum")
+                self.get_min_max_key_length("maximum")
+                self.get_hash()
 
                 self.settings['cracking method'] = "bf"
-                self.settings['algorithm'] = algorithm
-                self.settings['alphabet'] = alphabet
-                self.settings['min key length'] = int(min_key_length)
-                self.settings['max key length'] = int(max_key_length)
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -1854,63 +1468,13 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Rainbow User"
                 print
 
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
-                while not self.does_file_exist(file_name):
-
-                    print "File not found..."
-                    file_name = raw_input("What's the file name (___.txt): ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
-                    self.settings['file mode'] = True
+                self.get_file_name()
+                self.get_hash()
 
                 self.settings['cracking method'] = "rain"
-                self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
-
                 print
                 print "Ready to go?"
                 print
@@ -2085,99 +1649,14 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Rainbow Maker"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the Number of chars of key
-                print
-                key_length = raw_input("How many characters will the key be? ")
-                while not self.is_int(key_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    key_length = raw_input("Try Again: ")
-
-                #Get the alphabet to be used
-                print
-                print "Choose your alphabet: "
-                print "0-9(d)"
-                print "a-z(a)"
-                print "A-Z(A)"
-                print "!-~(p)"
-                print
-                print "Add letters together to add"
-                print " multiple alphabets together."
-                print "IE: dap = 0-9 & a-z & !-~"
-                print
-
-                alphabet = raw_input("Choice: ")
-
-                #Sterolize inputs
-                while not self.is_valid_alphabet(alphabet):
-
-                    print "Input Error!"
-
-                    alphabet = raw_input("Try Again: ")
-
-                alphabet_string = self.convert_to_string(alphabet)
-
-                #Get dimensions
-                print
-                print "Longer chains reduce table size, but make using the table take longer."
-                chain_length = raw_input("How long will the chains be? (50000?) ")
-                while not self.is_int(chain_length):
-
-                    print "Input Error, Not an Integer!"
-
-                    chain_length = raw_input("Try Again: ")
-
-                if int(chain_length) >= 1000000:
-
-                    print
-                    print "If the table width (length of chains) is at least 1,000,000"
-                    print " the 'finished chunks' count should be multiplied by the average "
-                    print " number of CPU cores per client."
-
-                print
-                print "More rows increases the size of the file and the table."
-                num_rows = raw_input("How many rows will there be? (50000?) ")
-                while not self.is_int(num_rows):
-
-                    print "Input Error, Not an Integer!"
-
-                    num_rows = raw_input("Try Again: ")
-
-                if (int(chain_length) * int(num_rows)) < 1000000:
-
-                    print
-                    print "The total dimensions of the table (width*height) will be set to at"
-                    print " least 1,000,000. Your set width won't change, but rows will be added."
-
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
+                self.get_algorithm()
+                self.get_min_max_key_length("")
+                self.get_alphabet()
+                self.get_length()
+                self.get_height()
+                self.get_file_name()
 
                 self.settings['cracking method'] = "rainmaker"
-                self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name + ".txt"
-                self.settings['key length'] = key_length
-                self.settings['alphabet'] = alphabet_string
-                self.settings['chain length'] = int(chain_length)
-                self.settings['num rows'] = int(num_rows)
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -2400,77 +1879,11 @@ class ConsoleUI():
                 print "Start -> Single-User Mode -> Dictionary"
                 print
 
-                #Get the algorithm
-                print "What's the algorithm: "
-                print "(md5)"
-                print "(sha1)"
-                print "(sha256)"
-                print "(sha512)"
-                print
-                algorithm = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"md5", "sha1", "sha256", "sha512"}
-                while not algorithm in good_names:
-
-                    print "Input Error!"
-
-                    algorithm = raw_input("Try Again: ")
-
-                #Get the file name
-                print
-                file_name = raw_input("What's the file name (___.txt): ")
-                while not self.does_file_exist(file_name):
-
-                    print "File not found..."
-                    file_name = raw_input("What's the file name (___.txt): ")
-
-                #Get the hash
-                print
-                print "Are we searching for a single hash, or from a file of hashes?"
-                print
-                print "Single Hash (s)"
-                print "From a File (f)"
-                print
-                single_or_file = raw_input("Choice: ")
-
-                #Sterolize inputs
-                good_names = {"single", "s", "file", "f", "Single", "File"}
-                while not single_or_file in good_names:
-
-                    print "Input Error!"
-
-                    single_or_file = raw_input("Try Again: ")
-
-                if single_or_file in ("single", "s", "Single"):
-
-                    #Get the hash
-                    print
-                    temp_hash = raw_input("What's the hash we're searching for: ")
-                    self.settings['hash'] = temp_hash
-                    self.settings['file mode'] = False
-
-                elif single_or_file in ("file", "f", "File"):
-
-                    #Get the file name
-                    print
-                    hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    while not self.does_file_exist(hash_file_name):
-
-                        print "File not found..."
-                        hash_file_name = raw_input("What's the hash file name (___.txt): ")
-                    self.settings['input file name'] = hash_file_name + ".txt"
-
-                    #Get the file name
-                    print
-                    results_file = raw_input("What's file name that we'll put the results (____.txt): ")
-                    self.settings['output file name'] = results_file + ".txt"
-                    #Hashes from a file?
-                    self.settings['file mode'] = True
+                self.get_algorithm()
+                self.get_file_name()
+                self.get_hash()
 
                 self.settings['cracking method'] = "dic"
-                self.settings['algorithm'] = algorithm
-                self.settings['file name'] = file_name + ".txt"
                 self.settings['single'] = "True"
 
                 #Get the go-ahead
@@ -2634,6 +2047,180 @@ class ConsoleUI():
                     #We're done
                     self.done = True
 
+    #Gets the hash from the user and returns it
+    def get_hash(self):
+
+        print
+        print "Are we searching for a single hash, or from a file of hashes?"
+        print
+        print "Single Hash (s)"
+        print "From a File (f)"
+        print
+        single_or_file = raw_input("Choice: ")
+
+        #Sterolize inputs
+        good_names = {"single", "s", "file", "f", "Single", "File"}
+        while not single_or_file in good_names:
+
+            print "Input Error!"
+
+            single_or_file = raw_input("Try Again: ")
+
+        if single_or_file in ("single", "s", "Single"):
+
+            #Get the hash
+            print
+            temp_hash = raw_input("What's the hash we're searching for: ")
+            self.settings['hash'] = temp_hash
+            self.settings['file mode'] = False
+
+        elif single_or_file in ("file", "f", "File"):
+
+            #Get the file name
+            print
+            hash_file_name = raw_input("What's the hash file name (___.txt): ")
+            while not self.does_file_exist(hash_file_name):
+
+                print "File not found..."
+                hash_file_name = raw_input("What's the hash file name (___.txt): ")
+            self.settings['input file name'] = hash_file_name + ".txt"
+
+            #Get the file name
+            print
+            results_file = raw_input("What's file name that we'll put the results (____.txt): ")
+            self.settings['output file name'] = results_file + ".txt"
+            #Hashes from a file?
+            self.settings['file mode'] = True
+
+    #Gets the file name from the user and returns it
+    def get_file_name(self):
+
+        print
+        file_name = raw_input("What's the file name (___.txt): ")
+        while not self.does_file_exist(file_name):
+
+            print "File not found..."
+            file_name = raw_input("What's the file name (___.txt): ")
+
+        self.settings['file name'] = file_name + ".txt"
+
+    #Gets the rainbow table height and returns it
+    def get_height(self):
+
+        print
+        print "More rows increases the size of the file and the table."
+        num_rows = raw_input("How many rows will there be? (50000?) ")
+        while not self.is_int(num_rows):
+
+            print "Input Error, Not an Integer!"
+
+            num_rows = raw_input("Try Again: ")
+
+        self.settings['num rows'] = num_rows
+
+        if (int(self.settings['chain_length']) * int(self.settings['num_rows'])) < 1000000:
+
+            print
+            print "The total dimensions of the table (width*height) will be set to at"
+            print " least 1,000,000. Your set width won't change, but rows will be added."
+
+    #Gets the rainbow table length and returns it
+    def get_length(self):
+
+        print
+        print "Longer chains reduce table size, but make using the table take longer."
+        chain_length = raw_input("How long will the chains be? (50000?) ")
+        while not self.is_int(chain_length):
+
+            print "Input Error, Not an Integer!"
+
+            chain_length = raw_input("Try Again: ")
+
+        if int(chain_length) >= 1000000:
+
+            print
+            print "If the table width (length of chains) is at least 1,000,000"
+            print " the 'finished chunks' count should be multiplied by the average "
+            print " number of CPU cores per client."
+
+        self.settings['chain length'] = chain_length
+
+    #Gets the minimum or maximum key length and returns it
+    def get_min_max_key_length(self, min_max):
+
+        print
+        key_length = raw_input("What's the " + min_max + " key length? ")
+        while not self.is_int(key_length):
+
+            print "Input Error, Not an Integer!"
+
+            key_length = raw_input("Try Again: ")
+
+        if min_max == "":
+
+            self.settings['key length'] = int(key_length)
+
+        elif min_max == "minimum":
+
+            self.settings['min key length'] = int(key_length)
+
+        else:
+
+            self.settings['max key length'] = int(key_length)
+
+    #Gets the alphabet from user and returns it
+    def get_alphabet(self):
+
+        #Get the alphabet to be used
+        print
+        print "Choose your alphabet: "
+        print "0-9(d)"
+        print "a-z(a)"
+        print "A-Z(A)"
+        print "!-~(p)"
+        print
+        print "Add letters together to add"
+        print " multiple alphabets together."
+        print "IE: dap = 0-9 & a-z & !-~"
+        print
+
+        alphabet = raw_input("Choice: ")
+
+        #Sterolize inputs
+        while not self.is_valid_alphabet(alphabet):
+
+            print "Input Error!"
+
+            alphabet = raw_input("Try Again: ")
+
+        alphabet = self.convert_to_string(alphabet)
+
+        self.settings['alphabet'] = alphabet
+
+    #Gets algorithm from user and return it
+    def get_algorithm(self):
+
+        #Get the algorithm
+        print "What's the algorithm: "
+        print "(md5)"
+        print "(sha1)"
+        print "(sha224)"
+        print "(sha256)"
+        print "(sha384)"
+        print "(sha512)"
+        print
+        algorithm = raw_input("Choice: ")
+
+        #Sterolize inputs
+        good_names = {"md5", "sha1", "sha224", "sha256", "sha384", "sha512"}
+        while not algorithm in good_names:
+
+            print "Input Error!"
+
+            algorithm = raw_input("Try Again: ")
+
+        self.settings['algorithm'] = algorithm
+
     #returns true/false if value is int
     @staticmethod
     def is_int(value):
@@ -2711,5 +2298,5 @@ class ConsoleUI():
 
         return alphabet_string
 
-
+#Run the class
 ConsoleUI()

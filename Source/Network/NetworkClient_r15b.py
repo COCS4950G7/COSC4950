@@ -187,13 +187,13 @@ class Client():
                 chunk.data = job['data']
                 #run the chunk
                 dictionary.find(chunk)
-                result = dictionary.isFound()
+                result = dictionary.is_found()
                 params = chunk.params.split()
 
                 if result:  # solution found, send it back
                     print "Hooray!"
-                    print "key is: " + dictionary.showKey()
-                    key = dictionary.showKey()
+                    print "key is: " + dictionary.show_key()
+                    key = dictionary.show_key()
                     result_queue.put(("w", key))
                 elif params[10] == "True":  # check for end of file flag in chunk parameters
                     result_queue.put(("e", chunk.params))
@@ -257,7 +257,7 @@ class Client():
                 #run the chunk
                 rain.find(chunk)
 
-                if rain.isFound():  # solution found, send it back
+                if rain.is_found():  # solution found, send it back
                     result_queue.put(("w", rain.getKey()))
                 elif chunk.params.split()[10] == "True":  # check for end of file flag in chunk parameters
                     result_queue.put(("e", chunk.params))
