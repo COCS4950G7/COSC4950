@@ -128,12 +128,12 @@ class Server():
                 if self.cracking_mode == "dic":
                     #if running dictionary mode, create new dictionary, set up settings, start new process
                     dictionary = Dictionary.Dictionary()
-                    dictionary.setAlgorithm(self.settings["algorithm"])
-                    dictionary.setFileName(self.settings["file name"])
+                    dictionary.set_algorithm(self.settings["algorithm"])
+                    dictionary.set_file_name(self.settings["file name"])
                     if self.hash_file_mode:
-                        dictionary.setHash(self.hash_string)
+                        dictionary.set_hash(self.hash_string)
                     else:
-                        dictionary.setHash(self.settings["hash"])
+                        dictionary.set_hash(self.settings["hash"])
                     self.found_solution.value = False
                     self.total_chunks = dictionary.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
@@ -440,9 +440,9 @@ class Server():
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
                 import time
-                while not dictionary.isEof() and not self.shutdown.is_set():  # Keep looping while it is not eof
+                while not dictionary.is_eof() and not self.shutdown.is_set():  # Keep looping while it is not eof
                     #chunk is a Chunk object
-                    chunk = dictionary.getNextChunk()  # get next chunk from dictionary
+                    chunk = dictionary.get_next_chunk()  # get next chunk from dictionary
                     #Retrieves word from chunk
                     temp_word = self.extract_word(chunk)
                     #Shares a 'current' word with UIs for display
@@ -470,7 +470,7 @@ class Server():
                             except Qqueue.Full:
                                 continue
 
-                    if dictionary.isEof():
+                    if dictionary.is_eof():
                         break
                     if self.shutdown.is_set():
                         while True:
@@ -615,7 +615,7 @@ class Server():
                 result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
                 result_monitor.start()
                 while not shutdown.is_set():
-                    chunk = rainbow.getNextChunk()
+                    chunk = rainbow.get_next_chunk()
                     #Retrieves word from chunk
                     #temp_word = self.extract_word(chunk)  # TODO: Broken, throws list index out of range exception
                     #Shares a 'current' word with UIs for display
@@ -870,7 +870,7 @@ class Server():
                     except Qqueue.Empty:
                         continue
                     dictionary.find(chunk)
-                    result = dictionary.isFound()
+                    result = dictionary.is_found()
                     params = chunk.params.split()
                     if result:
                         if dictionary.doneList is not []:
@@ -881,8 +881,8 @@ class Server():
                                 result_queue.put(("e", chunk.params))
                         else:
                             print "Hooray!"
-                            print "key is: " + dictionary.showKey()
-                            key = dictionary.showKey()
+                            print "key is: " + dictionary.show_key()
+                            key = dictionary.show_key()
                             result_queue.put(("w", key))
                     elif params[10] == "True":
                         result_queue.put(("e", chunk.params))
@@ -911,7 +911,7 @@ class Server():
                     continue
 
                 rain.find(chunk)
-                if rain.isFound():
+                if rain.is_found():
                     result_queue.put(("w", rain.getKey()))
                 elif chunk.params.split()[10] == "True":
                     result_queue.put(("e", chunk.params))
