@@ -166,12 +166,12 @@ class Server():
 
                 elif self.cracking_mode == "rainmaker":
                     rainmaker = self.rainmaker
-                    rainmaker.setAlgorithm(self.settings['algorithm'])
-                    rainmaker.setNumChars(self.settings['key length'])
-                    rainmaker.setAlphabet(self.settings['alphabet'])
-                    rainmaker.setDimensions(self.settings['chain length'], self.settings['num rows'])
-                    rainmaker.setFileName(self.settings['file name'])
-                    rainmaker.setupFile()
+                    rainmaker.set_algorithm(self.settings['algorithm'])
+                    rainmaker.set_num_chars(self.settings['key length'])
+                    rainmaker.set_alphabet(self.settings['alphabet'])
+                    rainmaker.set_dimensions(self.settings['chain length'], self.settings['num rows'])
+                    rainmaker.set_file_name(self.settings['file name'])
+                    rainmaker.setup_file()
                     self.total_chunks = rainmaker.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, self.shutdown))
@@ -371,9 +371,9 @@ class Server():
                             if self.cracking_mode == "rainmaker":
                                 rainChunk = result[1]
 
-                                self.rainmaker.putChunkInFile(rainChunk)
-                                if self.rainmaker.isDone():
-                                    print "Table complete and stored in file '%s'." % self.rainmaker.getFileName()
+                                self.rainmaker.put_chunk_in_file(rainChunk)
+                                if self.rainmaker.is_done():
+                                    print "Table complete and stored in file '%s'." % self.rainmaker.get_file_name()
                                     shutdown.set()
                                     self.shutdown.set()
                                     self.found_solution = True
@@ -700,7 +700,7 @@ class Server():
 
                 #all rainbow table maker chunks are the same, keep running until file is big enough
                 while not shutdown.is_set():
-                    params_chunk = rainmaker.makeParamsChunk()
+                    params_chunk = rainmaker.make_params_chunk()
                     new_chunk = {"params": params_chunk.params,
                                  "data": params_chunk.data}
                     try:

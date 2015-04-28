@@ -14,7 +14,6 @@ import time
 import os
 from multiprocessing import Process, Event, Manager, freeze_support
 import string
-import Chunk
 
 from NetworkClient_r15b import Client
 from NetworkServer_r15c import Server
