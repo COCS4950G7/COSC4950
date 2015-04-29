@@ -10,7 +10,7 @@ Description:
 Our project, Mighty Cracker, is a program designed to crack hashed passwords. It is stand-alone, GUI, and can run on Mac 10+,
 Linux 14+, and Windows 7+. It uses the power of multiprocessing to fully utilize every computer available, and can utilize
 a LAN to distribute the workload over up to 90 computers (nodes). For now, the algorithms that it can utilize are: sha 224,
-sha 256, sha 512, sha 1, and md5, which cover a fair amount of the common hashing algorithms used.
+sha 256, sha 384, sha 512, sha 1, and md5, which cover a fair amount of the common hashing algorithms used.
 
 We've implemented three common "attack methods" to find an original password. 
     Dictionary takes a list of passwords, hashes them, and compares the hashes to the original (user inputted) hash to 
@@ -37,25 +37,29 @@ Our designs and concepts (along with an ER-ish Diagram) are in the Resources fol
 which may be helpful to browse before delving into the source. At the moment we have several versions of each file,
 please assume that the most current version (Latest Stable Versions) is the correct one to look at.
 
-The source contains Several files:
+The Latest_Stable_Versions folder contains several files:
 
-Controller.py -> This is the main, 'controlling' class which acts as an interface
-                    between the GUI, the Networking, and the other classes.
+ConsoleUI.py -> This is a main class that runs the console-only version of the program.
+                    It only talks to the networking classes.
                     
 GUI.py ->        This is the GUI class which is responsible to all User-Interaction
-                    and Display of information to the user. That's all it does.
+                    and Display of information to the user. It only talks to the networking classes.
                     
 NetworkClient.py -> These are the class's that provides for all communication between the 
-NetworkServer.py      server and the nodes (for the distributed aspect).
+NetworkServer.py      server and the nodes (for the distributed aspect). They are directly run
+                        by the UIs and then in turn directly run the attack method classes.
                     
-Brute_Force.py -> This is the class that does all the work in regards to our Brute-Force capabilities. 
-                     It talks only with the Controller.py class to get and give information.
+Brute_Force.py -> This is the class that does all the work in regards to our Brute-Force capabilities.
+                    It is run directly by the network classes when appropriate.
                     
 Dictionary.py -> This is the class that does all the work in regards to our Dictionary capabilities.
-                     It talks only with the Controller.py class to get and give information.
-
-dic.txt       -> this is the word file for use with the Dictionary.py, in future we hope to have some more,
+                    It is run directly by the network classes when appropriate.
+    
+dic.txt       -> This is the word file for use with the Dictionary.py, in future we hope to have some more,
                      some could be simple dictionary words, others could be list of most common passwords.
                      
-Rainbow.py ->    This is the class that does all the work in regards to our Rainbow Table capabilities.
-                     It talks only with the Controller.yp class to get and give information.
+RainbowMaker.py -> This is the class that does all the work in regards to making rainbow tables.
+                    It is run directly by the network classes when appropriate.
+
+RainbowUser.py -> This is the class that does all the work in regards to using rainbow tables.
+                    It is run directly by the network classes when appropriate.
