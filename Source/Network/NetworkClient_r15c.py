@@ -253,7 +253,7 @@ class Client():
                 chunk.data = job["data"]
                 rain.find(chunk)
                 if rain.is_found():
-                    result_queue.put(("w", rain.getKey()))
+                    result_queue.put(("w", rain.get_key()))
                 elif chunk.params.split()[10] == "True":
                     result_queue.put(("e", chunk.params))
                 else:

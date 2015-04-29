@@ -157,9 +157,9 @@ class Server():
                 elif self.cracking_mode == "rain":
                     self.found_solution.value = False
                     rain = RainbowUser.RainbowUser()
-                    rain.setFileName(self.settings["file name"])
-                    rain.setHash(self.settings["hash"])
-                    rain.gatherInfo()
+                    rain.set_file_name(self.settings["file name"])
+                    rain.set_hash(self.settings["hash"])
+                    rain.gather_info()
                     self.total_chunks = rain.get_total_chunks()
                     self.shared_dict["total chunks"] = self.total_chunks
                     chunk_maker = Process(target=self.chunk_rainbow, args=(rain, self.shutdown))
@@ -912,7 +912,7 @@ class Server():
 
                 rain.find(chunk)
                 if rain.is_found():
-                    result_queue.put(("w", rain.getKey()))
+                    result_queue.put(("w", rain.get_key()))
                 elif chunk.params.split()[10] == "True":
                     result_queue.put(("e", chunk.params))
                 else:
