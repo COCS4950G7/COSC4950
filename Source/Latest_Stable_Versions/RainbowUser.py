@@ -7,13 +7,11 @@
 #   Chris Bugg
 #   10/7/14
 
+#TODO: Implement hashes-from-a-file
 
 import hashlib
 import random
-import time
 from multiprocessing import Process, Pipe, Lock, cpu_count
-import os
-import string
 
 from Chunk import Chunk
 
@@ -21,330 +19,95 @@ from Chunk import Chunk
 class RainbowUser():
 
     #Class Variables
-    algorithm = 1
+
+    #Algorithm that is used
+    algorithm = ""
+    #How many characters is the key
     numChars = 1
-    alphabet = 1
-    alphabetChoice = 1
-    fileName = "1"
+    #List of the alphabet to be used
+    alphabet = []
+    #What is the shorthand of the alphabet
+    alphabet_choice = ""
+    #Name of the file to be used
+    file_name = "1"
+    #File object
     file = 1
+    #Width of the table
     width = 1
+    #Height of the table
     height = 1
-    hashList = []
-    keyList = []
+    #List of hashes
+    hash_list = []
+    key_list = []
     done = False
-    fileLocation = 1
-    chunkCount = 0
+    file_location = 1
+    chunk_count = 0
     hash = 0
     eof = False
     found = False
     key = ""
     iteration = 100000
-    numProcesses = cpu_count()
+    num_processes = cpu_count()
+    total_chunks = 0
 
     #Constructor
     def __init__(self):
 
+        #Do nothing
         x=0
 
-
-    #Sets the hash we're looking for
-    def setHash(self, hash):
-
-        self.hash = hash
-
-
-    #Sets the algorithm choice
-    def setAlgorithm(self, algo):
-
-        self.algorithm = algo
-
-
-    #Sets the number of characters of the key
-    def setNumChars(self, numChars):
-
-        self.numChars = numChars
-
-
-    #Get the alphabet and direction to be searched
-    def setAlphabet(self, alphabet):
-
-        self.alphabet = list(alphabet)
-
-        '''
-        choicesList = list(alphabetChoice)
-
-        self.alphabetChoice = ""
-
-        for x in choicesList:
-
-            self.alphabetChoice += str(x)
-
-        lowerAlphabet = "abcdefghijklmnopqrstuvwxyz_"
-        upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-        digits = "0123456789_"
-        punctuation = string.punctuation
-
-        lowerAlphabetList = list(lowerAlphabet)
-        upperAlphabetList = list(upperAlphabet)
-        digitsList = list(digits)
-        punctuationList = list(punctuation)
-
-        self.alphabet = []
-
-        for choice in choicesList:
-
-            if choice == "a":
-
-                self.alphabet += lowerAlphabetList
-
-            elif choice == "A":
-
-                self.alphabet += upperAlphabetList
-
-            elif choice == "p":
-
-                self.alphabet += punctuationList
-
-            elif choice == "d":
-
-                self.alphabet += digitsList
-
-            else:
-
-                return False
-
-        return True
-    '''
-
-
-    #Get file name
-    def setFileName(self, fileName):
-
-        self.fileName = fileName
-
-        #Checks for filenotfound and returns code to caller class
-        try:
-            file = open(fileName, "r")
-            file.close()
-
-        except (OSError, IOError):
-            return "Fail"
-
-        return "Good"
-
-
-    #Gets the fileName
-    def getFileName(self):
-
-        return self.fileName
-
-
-    #Returns whether or not we're done creating
-    def isDone(self):
-
-        return self.done
-
-
-    #Hashes key
-    def hashThis(self, key):
-
-        return hashlib.new(self.algorithm, key).hexdigest()
-
-
-    #Produces seeded key
-    def getSeededKey(self, seed):
-
-        random.seed(seed)
-
-        seedKey = ""
-
-        characters = int(self.numChars)
-
-        for x in range(characters):
-
-            seedKey = seedKey + random.choice(self.alphabet)
-
-        return seedKey
-
-    #Produces a random key to start
-    def getRandKey(self):
-
-        random.seed()
-
-        randKey = ""
-
-        characters = int(self.numChars)
-
-        for x in range(characters):
-
-            randKey = randKey + random.choice(self.alphabet)
-
-        return randKey
-
-
-    #Returns number of rows in table
-    def numRows(self):
-
-        return self.height
-
-
-    #Returns number of columns (chains) in table
-    def getLength(self):
-
-        return self.width
-
-
-    #Resets all class variables to default
-    def reset(self):
-
-        self.algorithm = 1
-        self.numChars = 1
-        self.alphabet = 1
-        #self.alphabetChoice = 1
-        self.fileName = "1"
-        self.file = 1
-        self.width = 1
-        self.height = 1
-        self.hashList = []
-        self.keyList = []
-        self.done = False
-
-
-    #Sets all class variables to ones given from server (params)
-    def setVariables(self, paramsString):
-
-        paramsList = paramsString.split()
-
-        self.algorithm = paramsList[1]
-
-        self.hash = paramsList[2]
-
-        self.alphabet = paramsList[3]
-
-        self.setAlphabet(self.alphabet)
-
-        self.numChars = int(paramsList[4])
-
-        self.width = int(paramsList[8])
-
-        self.iteration = self.width * 2
-
-
-    #Returns if eof
-    def isEof(self):
-
-        return self.eof
-
-
-    #Returns T/F if found or not
-    def isFound(self):
-
-        return self.found
-
-    #Returns key
-    def getKey(self):
-
-        return self.key
-
-    #Gets the next chunk from the file to process
-    def getNextChunk(self):
-
-        #Open the file for reading
-        self.file = open(self.fileName, 'r')
-
-        #Seek to where we left off in the file
-        self.file.seek(self.fileLocation)
-
-        line = self.file.readline()
-
-        data = ""
-
-        #keeps count of how many lines we've pu in currentChunk[]
-        lineCounter = 0
-
-        #to send to controller to say we're not done yet
-        eof = False
-
-        while not line == "":
-
-            data += line
-
-            line = self.file.readline()
-
-            if line == "":
-
-                eof = True
-
-            lineCounter += 1
-
-            #If our chunk is at least 1000 lines, stop adding to it
-            if lineCounter >= 1000:
-
-                line = ""
-
-                eof = False
-
-        #update class on where we are in the file
-        self.fileLocation = self.file.tell()
-
-        self.file.close()
-
-        self.eof = eof
-
-        chunk = Chunk()
-
-        chunk.data = data
-
-        chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabet)
-        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 " + str(eof)
-
-        return chunk
+    ############################################################
+    ###############         Main Methods         ###############
+    ############################################################
 
     #Searches the chunk for the key (given the hash in the chunk.params)
     def find(self, chunk):
 
         #Set class variables based on parameters from the chunk
-        self.setVariables(chunk.params)
+        self.set_variables(chunk.params)
 
         #Split the data (as a string) into a list of lines
-        linesList = chunk.data.splitlines()
+        lines_list = chunk.data.splitlines()
 
         #
         # First, we'll take the data and put it into two lists for searching
 
         #Make two lists, one for each key and one for each hash of the lines
-        keyList = []
-        hashList = []
+        key_list = []
+        hash_list = []
 
         tempCounter = 0
 
         #For every line in the list
-        for x in linesList:
+        for x in lines_list:
 
             #Split the line into a list of the two elements
-            lineList = x.split()
+            line_list = x.split()
 
             #Put the key in the key list
-            keyList.append(lineList[0])
+            key_list.append(line_list[0])
 
             #put the hash in the hash list
-            hashList.append(lineList[1])
+            hash_list.append(line_list[1])
 
         #divides up list into smaller lists, that we will feed the sub-processes
-        keySubList = self.chunkIt(keyList, self.numProcesses)
-        hashSubList = self.chunkIt(hashList, self.numProcesses)
+        key_sub_list = self.chunk_it(key_list, self.num_processes)
+        hash_sub_list = self.chunk_it(hash_list, self.num_processes)
 
         #
         # Second, we'll actually do the searching
 
         lock = Lock()
 
-        parentPipe, childPipe = Pipe()
+        parent_pipe, child_pipe = Pipe()
 
         children = []
 
-        for i in range(0, self.numProcesses):
-            children.append(Process(target=self.subProcess, args=(childPipe, lock, keySubList[i], hashSubList[i], )))
+        for i in range(0, self.num_processes):
+            children.append(Process(target=self.sub_process,
+                                    args=(child_pipe, lock,
+                                          key_sub_list[i],
+                                          hash_sub_list[i], )))
             children[i].start()
 
         count = 0
@@ -355,9 +118,9 @@ class RainbowUser():
 
         while not done:
 
-            if count > (self.numProcesses - 1):
+            if count > (self.num_processes - 1):
 
-                for i in range(0, self.numProcesses):
+                for i in range(0, self.num_processes):
 
                     children[i].join()
 
@@ -369,13 +132,13 @@ class RainbowUser():
 
             else:
 
-                rec = parentPipe.recv()
+                rec = parent_pipe.recv()
 
                 if rec == "found":
 
-                    self.key = parentPipe.recv()
+                    self.key = parent_pipe.recv()
 
-                    for i in range(0, self.numProcesses):
+                    for i in range(0, self.num_processes):
 
                         children[i].terminate()
 
@@ -385,15 +148,18 @@ class RainbowUser():
 
                     self.done = True
 
+                elif rec == "collisionDetected":
+
+                    print "Collision Detected!"
+
                 count += 1
 
-
     #The sub-process function
-    def subProcess(self, pipe, lock, keyList, hashList):
+    def sub_process(self, pipe, lock, key_list, hash_list):
 
         done = False
 
-        tempHash = self.hash
+        temp_hash = self.hash
 
         #Which line we found the hash on
         where = 0
@@ -406,10 +172,10 @@ class RainbowUser():
         while not done:
 
             #For every hash in the list
-            for x in hashList:
+            for x in hash_list:
 
                 #If our hash matches the one in the list
-                if tempHash == x:
+                if temp_hash == x:
 
                     #We found the line that matches, now just search the line for the key
                     done = True
@@ -417,13 +183,13 @@ class RainbowUser():
                     signal = 1
 
                     #Which line we found the hash on (index location)
-                    where = hashList.index(x)
+                    where = hash_list.index(x)
 
             if not done:
 
-                tempReduced = self.getSeededKey(tempHash)
+                temp_reduced = self.get_seeded_key(temp_hash)
 
-                tempHash = self.hashThis(tempReduced)
+                temp_hash = self.hash_this(temp_reduced)
 
             timeout += 1
 
@@ -436,16 +202,16 @@ class RainbowUser():
         if signal == 1:
 
             #Set our key to the starting key of that line
-            tempKey = keyList[where]
+            temp_key = key_list[where]
 
             #For as wide as our table is plus one
             for y in range(self.width + 1):
 
-                #hash our tempKey
-                tempHash = self.hashThis(tempKey)
+                #hash our temp_key
+                temp_hash = self.hash_this(temp_key)
 
                 #And compare to original key
-                if self.hash == tempHash:
+                if self.hash == temp_hash:
 
                     #FOUND THE KEY!
 
@@ -457,7 +223,7 @@ class RainbowUser():
 
                     pipe.send("found")
 
-                    pipe.send(tempKey)
+                    pipe.send(temp_key)
 
                     pipe.close()
 
@@ -466,7 +232,7 @@ class RainbowUser():
                 else:
 
                     #If not, reduce the hash and try again
-                    tempKey = self.getSeededKey(tempHash)
+                    temp_key = self.get_seeded_key(temp_hash)
 
             if self.found == False:
 
@@ -493,45 +259,284 @@ class RainbowUser():
 
             lock.release()
 
+    ###########################################################
+    ###############         Get Methods         ###############
+    ###########################################################
 
-    #Reads the first line of file to setup variables
-    def gatherInfo(self):
+    #Gets the fileName
+    def get_file_name(self):
+
+        return self.file_name
+
+    #Produces seeded key
+    def get_seeded_key(self, seed):
+
+        random.seed(seed)
+
+        seed_key = ""
+
+        characters = int(self.numChars)
+
+        for x in range(characters):
+
+            seed_key = seed_key + random.choice(self.alphabet)
+
+        return seed_key
+
+    #Produces a random key to start
+    def get_rand_key(self):
+
+        random.seed()
+
+        rand_key = ""
+
+        characters = int(self.numChars)
+
+        for x in range(characters):
+
+            rand_key = rand_key + random.choice(self.alphabet)
+
+        return rand_key
+
+    #Returns number of rows in table
+    def get_height(self):
+
+        return self.height
+
+    #Returns number of columns (chains) in table
+    def get_length(self):
+
+        return self.width
+
+    #Returns key
+    def get_key(self):
+
+        return self.key
+
+    #Gets the next chunk from the file to process
+    def get_next_chunk(self):
 
         #Open the file for reading
-        self.file = open(self.fileName, 'r')
+        self.file = open(self.file_name, 'r')
+
+        #Seek to where we left off in the file
+        self.file.seek(self.file_location)
+
+        line = self.file.readline()
+
+        data = ""
+
+        #keeps count of how many lines we've pu in currentChunk[]
+        line_counter = 0
+
+        #to send to controller to say we're not done yet
+        eof = False
+
+        if line == "":
+
+            eof = True
+
+        while not line == "":
+
+            data += line
+
+            line = self.file.readline()
+
+            if line == "":
+
+                eof = True
+
+            line_counter += 1
+
+            #If our chunk is at least 1000 lines, stop adding to it
+            if line_counter >= 1000:
+
+                line = ""
+
+                eof = False
+
+        #update class on where we are in the file
+        self.file_location = self.file.tell()
+
+        self.file.close()
+
+        self.eof = eof
+
+        chunk = Chunk()
+
+        chunk.data = data
+
+        chunk.params = "rainbowuser " + self.algorithm + " " + self.hash + " " + str(self.alphabet)
+        chunk.params += " " + str(self.numChars) + " 0 0 0 " + str(self.width) + " 0 " + str(eof)
+
+        return chunk
+
+    #Returns the original hash
+    def get_hash(self):
+
+        return self.hash
+
+    #Returns total_chunks variable
+    def get_total_chunks(self):
+
+        return self.total_chunks
+
+    ###########################################################
+    ###############         Set Methods         ###############
+    ###########################################################
+
+    #Sets the hash we're looking for
+    def set_hash(self, temp_hash):
+
+        self.hash = temp_hash
+
+    #Sets the algorithm choice
+    def set_algorithm(self, algo):
+
+        self.algorithm = algo
+
+    #Sets the number of characters of the key
+    def set_num_chars(self, num_chars):
+
+        self.numChars = num_chars
+
+    #Get the alphabet and direction to be searched
+    def set_alphabet(self, alphabet):
+
+        self.alphabet = alphabet
+
+    #Get file name
+    def set_file_name(self, file_name):
+
+        self.file_name = file_name
+
+        #Checks for filenotfound and returns code to caller class
+        try:
+            temp_file = open(file_name, "r")
+            temp_file.close()
+
+        except (OSError, IOError):
+
+            return "Fail"
+
+        return "Good"
+
+    #Sets all class variables to ones given from server (params)
+    def set_variables(self, params_string):
+
+        params_list = params_string.split()
+
+        self.algorithm = params_list[1]
+
+        self.hash = params_list[2]
+
+        self.alphabet = params_list[3]
+
+        self.set_alphabet(self.alphabet)
+
+        self.numChars = int(params_list[4])
+
+        self.width = int(params_list[8])
+
+        self.iteration = self.width * 2
+
+    #Sets the total_chunks variable based on file
+    def set_total_chunks(self):
+
+        temp_file = open(self.file_name, "r")
+
+        line_count = 0
+
+        for line in temp_file:
+            line_count += 1
+
+        temp_file.close()
+
+        #Total chunks = lines in dictionary minus first line divided by size of chunks
+        self.total_chunks = (line_count - 1) / 1000
+
+        #Adjust the total chunks to account for larger chunks that occur
+        self.total_chunks -= 1
+
+        #If total chunks is <1, make it at least 1
+        if self.total_chunks < 1:
+
+            self.total_chunks = 1
+
+    #############################################################
+    ###############         Other Methods         ###############
+    #############################################################
+
+    #Returns whether or not we're done creating
+    def is_done(self):
+
+        return self.done
+
+    #Hashes key
+    def hash_this(self, key):
+
+        return hashlib.new(self.algorithm, key).hexdigest()
+
+    #Resets all class variables to default
+    def reset(self):
+
+        self.algorithm = 1
+        self.numChars = 1
+        self.alphabet = 1
+        self.file_name = "1"
+        self.file = 1
+        self.width = 1
+        self.height = 1
+        self.hash_list = []
+        self.key_list = []
+        self.done = False
+
+    #Returns if eof
+    def is_eof(self):
+
+        return self.eof
+
+    #Returns T/F if found or not
+    def is_found(self):
+
+        return self.found
+
+    #Reads the first line of file to setup variables
+    def gather_info(self):
+
+        #Open the file for reading
+        self.file = open(self.file_name, 'r')
 
         #Read the first line
         line = self.file.readline()
 
         #Update class on where we are in the file (hopefully, second line)
-        self.fileLocation = self.file.tell()
+        self.file_location = self.file.tell()
 
         #Close the file, since we're done with it
         self.file.close()
         #print line
         #Split the line into a list, and assign list elements to variables
-        varsList = line.split()
-        #print varsList
-        self.algorithm = varsList[0]
+        vars_list = line.split()
+        #print vars_list
+        self.algorithm = vars_list[0]
 
-        self.numChars = int(varsList[1])
+        self.numChars = int(vars_list[1])
 
-        self.alphabet = varsList[2]
+        self.alphabet = vars_list[2]
 
-        self.alphabet = self.setAlphabet(self.alphabet)
+        #self.alphabet = self.setAlphabet(self.alphabet)
 
-        self.width = int(varsList[3])
+        self.width = int(vars_list[3])
         #print self.width
 
-    #Returns the original hash
-    def getHash(self):
-
-        return self.hash
-
+        #Sets the total_chunks variable based on file
+        self.set_total_chunks()
 
     #Divides up a list, and stores those sub-lists in a big list
-    def chunkIt(self, list, pieces):
+    @staticmethod
+    def chunk_it(temp_list, pieces):
 
-        chunky = [list[i::pieces] for i in range(pieces)]
+        chunky = [temp_list[i::pieces] for i in range(pieces)]
 
         return chunky

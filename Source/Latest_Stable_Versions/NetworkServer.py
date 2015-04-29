@@ -1,23 +1,13 @@
-# NetworkServer_r15a
-
-# 2/28/2015
-
-# Now requires a dictionary parameter which contains all necessary settings.
-
-# 3/2/2015
-
-# Added support for single node mode, without the need for any networking.
-
-# Settings dictionary extended to include a new, required, entry 'single' with possible values: 'True' and 'False'
-# to indicate whether the server is operating in single computer mode. For now, default value is networked mode.
-
-# Added automatic setting of client cracking mode.
+# NetworkServer_r15c
+#
+# This class does most of the work, it creates a queue of work units and a network server if needed.
+# It also runs the cracking classes as needed for single user mode.
 
 #=====================================================================================================================
 #IMPORTS
 #=====================================================================================================================
 from multiprocessing.managers import SyncManager
-from multiprocessing import Process, Value, Event, Queue
+from multiprocessing import Process, Value, Event, Queue, freeze_support, current_process
 import os
 import platform
 import Queue as Qqueue
@@ -28,14 +18,13 @@ import Brute_Force
 import RainbowMaker
 import RainbowUser
 import Chunk
+import signal
 #=====================================================================================================================
 #END OF IMPORTS
 #=====================================================================================================================
 
-
 class Server():
-    try:
-        IP = "127.0.0.1" #defaults to the pingback
+        IP = "127.0.0.1"  # defaults to the ping back
         PORTNUM = 22536
         AUTHKEY = "Popcorn is awesome!!!"
 
@@ -45,104 +34,146 @@ class Server():
         total_chunks = 0
         settings = dict()
         single_user_mode = False
+        rainmaker = RainbowMaker.RainbowMaker()
+        shared_dict = None
+        update = None
+        shutdown = None
+        job_queue = Queue(100)
+        result_queue = Queue()
+        mode_bit_1 = Event()
+        mode_bit_2 = Event()
+        manager = None
+        debug_file = "/Users/327pzq/procs.txt"
 
-        def __init__(self, settings):
+        def __init__(self, settings, shared_variables):
+            current_process()._authkey = self.AUTHKEY #set the authentication key
             self.settings = settings
-            self.get_ip()
+            self.get_ip() #gets the ip address of the machine
             self.cracking_mode = settings["cracking method"]
+
+            self.shared_dict = shared_variables[0]
+            self.shared_dict["server ip"] = self.IP
+            self.shutdown = shared_variables[1]
+
+            self.update = shared_variables[2]
+            #Dictionary settings check
+            #print "DEBUG: cracking method= "+str(settings["cracking method"])
+            #print "DEBUG: algorithm= "+str(settings["algorithm"])
+            #print "DEBUG: hash= "+str(settings["hash"])
+            #print "DEBUG: file name= "+str(settings["file name"])
+            #print "DEBUG: single= "+str(settings["single"])
+            #Brute Force settings Check
+            #print "DEBUG: cracking method="+str(settings["cracking method"])
+            #print "DEBUG: algorithm="+str(settings["algorithm"])
+            #print "DEBUG: hash="+str(settings["hash"])
+            #print "DEBUG: min key length="+str(settings["min key length"])
+            #print "DEBUG: max key length="+str(settings["max key length"])
+            #print "DEBUG: alphabet="+str(settings["alphabet"])
+            #print "DEBUG: single="+str(settings["single"])
+
+            #Rainbow Table Maker settings check
+            '''
+            print "Rainbow Table Maker Settings Check"
+            print "DEBUG: cracking method= "+str(settings["cracking method"])
+            print "DEBUG: algorithm= "+str(settings["algorithm"])
+            print "DEBUG: key length= "+str(settings["key length"])
+            print "DEBUG: alphabet= "+str(settings["alphabet"])
+            print "DEBUG: chain length= "+str(settings["chain length"])
+            print "DEBUG: num rows= "+str(settings["num rows"])
+            print "DEBUG: file name= "+str(settings["file name"])
+            print "DEBUG: single= "+str(settings["single"])
+            '''
+            #check to see if running single mode
             if "single" in settings:
                 if settings["single"] == "True":
                     self.single_user_mode = True
                 else:
                     self.single_user_mode = False
-            self.run_server()
-        #=====================================================================================================================
+            #check to if in rainbow maker mode
+            if self.cracking_mode == "rainmaker":
+                self.rainmaker = RainbowMaker.RainbowMaker()
+            self.run_server() #start running the server
+        #==============================================================================================================
         #FUNCTIONS
-        #=====================================================================================================================
+        #==============================================================================================================
         #--------------------------------------------------------------------------------------------------
         #runserver function
         #--------------------------------------------------------------------------------------------------
 
-        def run_server(self):  #the primary server loop
+        def run_server(self):  # the primary server loop
             start_time = time.time()
-            try: #runserver definition try block
+            try:  # runserver definition try block
                 if self.single_user_mode:
                     print "Single User Mode"
-                    shutdown = Event()
-                    shutdown.clear()
-                    shared_job_q = Queue(10)
-                    shared_result_q = Queue()
-                    single = Process(target=self.start_single_user, args=(shared_job_q, shared_result_q, shutdown))
-                    single.start()
-                    manager = None
-
                 else:
                     print "Network Server Mode"
-                    # Start a shared manager server and access its queues
-                    manager = self.make_server_manager(self.PORTNUM, self.IP, self.AUTHKEY) #Make a new manager
-                    shared_job_q = manager.get_job_q()
-                    shared_result_q = manager.get_result_q() #Shared result queue
-                    shutdown = manager.get_shutdown()
-                    mode_bit_1 = manager.get_mode_bit_1()
-                    mode_bit_2 = manager.get_mode_bit_2()
 
-                # Spawn processes to feed the job queue and monitor the result queue
+                # setup appropriate chunking class and spawn processes to feed the job queue and monitor the result queue
                 if self.cracking_mode == "dic":
-                    if not self.single_user_mode:
-                        mode_bit_1.set()
-                        mode_bit_2.set()
+                    #if running dictionary mode, create new dictionary, set up settings, start new process
                     dictionary = Dictionary.Dictionary()
-                    dictionary.setAlgorithm(self.settings["algorithm"])
-                    dictionary.setFileName(self.settings["file name"])
-                    dictionary.setHash(self.settings["hash"])
+                    dictionary.set_algorithm(self.settings["algorithm"])
+                    dictionary.set_file_name(self.settings["file name"])
+                    dictionary.set_hash(self.settings["hash"])
                     self.found_solution.value = False
-                    chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, manager, shared_job_q))
+                    self.total_chunks = dictionary.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
+                    chunk_maker = Process(target=self.chunk_dictionary, args=(dictionary, self.shutdown))
+
                 elif self.cracking_mode == "bf":
-                    if not self.single_user_mode:
-                        mode_bit_1.set()
-                        mode_bit_2.clear()
+                    self.found_solution.value = False
                     bf = Brute_Force.Brute_Force()
                     bf.set_params(alphabet=self.settings["alphabet"],
                                   algorithm=self.settings["algorithm"],
                                   origHash=self.settings["hash"],
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
+
                     self.total_chunks = bf.get_total_chunks()
-                    chunk_maker = Process(target=self.chunk_brute_force, args=(bf, manager, shared_job_q))
+                    self.shared_dict["total chunks"] = self.total_chunks
+                    chunk_maker = Process(target=self.chunk_brute_force, args=(bf, self.shutdown))
+
                 elif self.cracking_mode == "rain":
-                    if not self.single_user_mode:
-                        mode_bit_1.clear()
-                        mode_bit_2.set()
-                    return  # haven't figured out how to set this up yet
+                    self.found_solution.value = False
+                    rain = RainbowUser.RainbowUser()
+                    rain.set_file_name(self.settings["file name"])
+                    rain.set_hash(self.settings["hash"])
+                    rain.gather_info()
+                    self.total_chunks = rain.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
+                    chunk_maker = Process(target=self.chunk_rainbow, args=(rain, self.shutdown))
+
                 elif self.cracking_mode == "rainmaker":
-                    if not self.single_user_mode:
-                        mode_bit_1.clear()
-                        mode_bit_2.clear()
-                    return  # haven't figured out how to set this up yet
+                    rainmaker = self.rainmaker
+                    rainmaker.set_algorithm(self.settings['algorithm'])
+                    rainmaker.set_num_chars(self.settings['key length'])
+                    rainmaker.set_alphabet(self.settings['alphabet'])
+                    rainmaker.set_dimensions(self.settings['chain length'], self.settings['num rows'])
+                    rainmaker.set_file_name(self.settings['file name'])
+                    rainmaker.setup_file()
+                    self.total_chunks = rainmaker.get_total_chunks()
+                    self.shared_dict["total chunks"] = self.total_chunks
+                    chunk_maker = Process(target=self.chunk_rainbow_maker, args=(rainmaker, self.shutdown))
+
                 else:
                     return "wtf?"
 
                 chunk_maker.start()
-
-                result_monitor = Process(target=self.check_results, args=(shared_result_q, shutdown))
-                result_monitor.start()
-                # block while there is no result, then terminate chunking and checking
-                result_monitor.join()
-                result_monitor.terminate()
+                #print "chunk maker pid: %i" % chunk_maker.pid
                 chunk_maker.join()
-                chunk_maker.terminate()
-                # Sleep a bit before shutting down the server - to give clients time to
-                # realize the job queue is empty and exit in an orderly way.
-                time.sleep(2)
-                manager.shutdown()
+                #chunk_maker.terminate()
+                if chunk_maker.is_alive():
+                    print "oh no!"
+                    print "NETWORKSERVER DEBUG: chunk_maker is alive" #Added by c hamm, a more useful print statement
 
-                return
+                self.update.set()
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in runserver definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
@@ -155,96 +186,139 @@ class Server():
         #End of runserver function
         #--------------------------------------------------------------------------------------------------
 
-        #--------------------------------------------------------------------------------------------------
-        #make_server_manager function
-        #--------------------------------------------------------------------------------------------------
-        def make_server_manager(self, port, ip, authkey):
-            """ Create a manager for the server, listening on the given port.
-                Return a manager object with get_job_q and get_result_q methods.
-            """
-            try: #Make_server_manager definition try block
-                job_q = Queue(maxsize=100)
-                result_q = Queue()
-                shutdown = Event()
-                shutdown.clear()
-                mode_bit_1 = Event()
-                mode_bit_2 = Event()
+        # these get_* functions are registered with the manager to provide access to shared queues
+        # replaces the lambda functions since lambdas can not be pickled and would not work with windows
+        def get_job_queue(self):
+            return self.job_queue
 
-                try: #JobQueueManager/Lambda functions Try Block
-                    self.JobQueueManager.register('get_job_q', callable=lambda: job_q)
-                    self.JobQueueManager.register('get_result_q', callable=lambda: result_q)
-                    self.JobQueueManager.register('get_shutdown', callable=lambda: shutdown)
-                    self.JobQueueManager.register('get_mode_bit_1', callable=lambda: mode_bit_1)
-                    self.JobQueueManager.register('get_mode_bit_2', callable=lambda: mode_bit_2)
-                except Exception as inst:
-                    print "============================================================================================="
-                    print "ERROR: An exception was thrown in Make_server_Manager: JobQueueManager/Lambda functions Try Block"
-                    #the exception instance
-                    print type(inst)
-                    #srguments stored in .args
-                    print inst.args
-                    #_str_ allows args tto be printed directly
-                    print inst
-                    print "============================================================================================="
+        def get_result_queue(self):
+            return self.result_queue
 
-                manager = self.JobQueueManager(address=(ip, port), authkey=authkey)
-                manager.start()
-                print 'Server started at port %s' % port
-                return manager
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in Make_server_manager definition Try block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
-        #--------------------------------------------------------------------------------------------------
-        #End of make_server_manager function
-        #--------------------------------------------------------------------------------------------------
+        def get_shutdown(self):
+            return self.shutdown
+
+        def get_mode_bit_1(self):
+            return self.mode_bit_1
+
+        def get_mode_bit_2(self):
+            return self.mode_bit_2
 
         #--------------------------------------------------------------------------------------------------
         # monitor results queue
         #--------------------------------------------------------------------------------------------------
         def check_results(self, results_queue, shutdown):
+            current_process().authkey = "Popcorn is awesome!!!"
+            #print "check results started"
             completed_chunks = 0
             try:
-                while not self.found_solution.value:
+                while not shutdown.is_set():
                     try:
-                        result = results_queue.get(block=True, timeout=.1) #get chunk from shared result queue
+                        self.update.set()
+                        result = results_queue.get(block=True, timeout=.25)
                     except Qqueue.Empty:
                         continue
-                    if result[0] == "w": #check to see if solution was found
+                    #print "chunk done, result: %s" % result[0]
+                    #print "params: %s" % result[1]
+                    if result[0] == "w":  # check to see if solution was found
                         print "The solution was found!"
                         shutdown.set()
+                        self.shutdown.set()
                         print "shutdown notice sent to clients"
                         key = result[1]
                         self.found_solution.value = True
                         print "Key is: %s" % key
+                        self.shared_dict["finished chunks"] += 1
+                        self.shared_dict["key"] = key
+                        self.update.set()
+                        #print "win block finished"
+                        #print "result monitor process: %i" % current_process().pid
+                        #print "result monitor parent process: %i" % current_process()._parent_pid
 
-                    elif(result[0] == "c"):  #check to see if client has crashed
-                        print "A client has crashed!" #THIS FUNCTION IS UNTESTED
+                        #wait for clients to get shutdown message, then kill processes
+                        time.sleep(2)
+                        try:
+                            os.kill(current_process().pid-1, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid-1
+                        try:
+                            os.kill(current_process()._parent_pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process()._parent_pid
+                        try:
+                            os.kill(current_process().pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid
+                        break
+                    elif(result[0] == "c"):  # check to see if client has crashed
+                        print "A client has crashed!"  # THIS FUNCTION IS UNTESTED
+                        break
                     elif result[0] == "e":
                         print "Final chunk processed, no solution found."
                         shutdown.set()
+                        self.shutdown.set()
+                        self.shared_dict["finished chunks"] += 1
+                        time.sleep(2)
+                        try:
+                            os.kill(current_process().pid-1, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid-1
+                        try:
+                            os.kill(current_process()._parent_pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process()._parent_pid
+                        try:
+                            os.kill(current_process().pid, signal.SIGKILL)
+                        except Exception:
+                            print
+                            #print "process %i is already dead." % current_process().pid
                         break
-                    else: #solution has not been found
+                    else:  # solution has not been found
                         completed_chunks += 1
+                        self.shared_dict["finished chunks"] += 1
                         #print "Chunk finished with params: %s" %result[1]
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print "%d chunks completed." % completed_chunks
+                        #os.system('cls' if os.name == 'nt' else 'clear')
+                        #print "%d chunks completed." % completed_chunks
                         # go through the sent chunks list and remove the finished chunk
-                        for chunk in self.sent_chunks:
-                            if chunk[0] == result[1]:
-                                self.sent_chunks.remove(chunk)
+
+                        # rainmaker just runs until the table is big enough
+                        if self.cracking_mode == "rainmaker":
+                            rainChunk = result[1]
+
+                            self.rainmaker.put_chunk_in_file(rainChunk)
+                            if self.rainmaker.is_done():
+                                print "Table complete and stored in file '%s'." % self.rainmaker.get_file_name()
+                                shutdown.set()
+                                self.shutdown.set()
+                                self.found_solution = True
+                                time.sleep(2)
+                                try:
+                                    os.kill(current_process().pid-1, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process().pid-1
+                                try:
+                                    os.kill(current_process()._parent_pid, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process()._parent_pid
+                                try:
+                                    os.kill(current_process().pid, signal.SIGKILL)
+                                except Exception:
+                                    print
+                                    #print "process %i is already dead." % current_process().pid
+                                break
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in check_results definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
@@ -256,37 +330,88 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # feed dictionary chunks to job queue
         #--------------------------------------------------------------------------------------------------
-        def chunk_dictionary(self, dictionary, manager, job_queue):
+        def chunk_dictionary(self, dictionary, shutdown):
             try:
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
+                    mode_bit_1.set()
+                    mode_bit_2.set()
+                else:
+                    manager = None  # no manager needed for local cracking
+                    job_queue = self.job_queue
+                    result_queue = self.result_queue
+                    #start the single user process which starts the correct run method
+                    single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
+                    single.start()
+                #start the result monitor process which reads finished chunks off the result queue
+                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor.start()
                 import time
-                while not dictionary.isEof() and not self.found_solution.value:  # Keep looping while it is not the end of the file
+                while not dictionary.is_eof() and not self.shutdown.is_set():  # Keep looping while it is not eof
                     #chunk is a Chunk object
-                    chunk = dictionary.getNextChunk() #get next chunk from dictionary
+                    chunk = dictionary.get_next_chunk()  # get next chunk from dictionary
+                    #Retrieves word from chunk
+                    temp_word = self.extract_word(chunk)
+                    #Shares a 'current' word with UIs for display
+                    self.shared_dict["current word"] = temp_word
                     if self.single_user_mode:
-                        job_queue.put(chunk)
+                        while not self.shutdown.is_set():
+                            try:
+                                #single node mode can just push a chunk object onto the queue
+                                job_queue.put(chunk, timeout=.1)
+                                break
+                            except Qqueue.Full:
+                                continue
                     else:
-                        new_chunk = manager.Value(dict, {'params': chunk.params,
-                                                         'data': chunk.data,
-                                                         'timestamp': time.time(),
-                                                         'halt': False})
-                        job_queue.put(new_chunk)  # put next chunk on the job queue.
-                                                  # queue is blocking by default, so will just wait until it is no longer full before adding another.
-                        #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
+                        #chunks don't work across the network, use a dictionary instead
+                        new_chunk = {'params': chunk.params,
+                                     'data': chunk.data,
+                                     'timestamp': time.time(),
+                                     'halt': False}
+                        while not self.shutdown.is_set():
+                            try:
+                                job_queue.put(new_chunk, timeout=.1)
+                                #add params to list of sent chunks along with a timestamp
+                                self.sent_chunks.append((chunk.params, time.time()))
+                                break
+                            except Qqueue.Full:
+                                continue
+
                         self.sent_chunks.append((chunk.params, time.time()))
-                    if dictionary.isEof():
+                    if dictionary.is_eof():
                         break
-                if self.found_solution.value:
-                    while True:
-                        try:
-                            job_queue.get_nowait()
-                        except Qqueue.Empty:
-                            return
+                    if self.shutdown.is_set():
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                break
+                result_monitor.join()
+                #result_monitor.terminate()
+                if manager is not None:
+                    manager.shutdown()
+
+                time.sleep(1)
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_dictionary definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
@@ -298,47 +423,83 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunk for brute force function
         #--------------------------------------------------------------------------------------------------
-        def chunk_brute_force(self, bf, manager, job_queue):
+        def chunk_brute_force(self, bf, shutdown):
             try:
-                # Had strange difficulties with the internal chunking method, so extracted the funtional bits here
+                current_process()._authkey = self.AUTHKEY
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
+                    result_queue = manager.get_result_q()
+                    job_queue = manager.get_job_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
+                    mode_bit_1.set()
+                    mode_bit_2.clear()
+                    result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                else:
+                    manager = None  # no manager needed for local cracking
+                    job_queue = self.job_queue
+                    result_monitor = Process(target=self.check_results, args=(self.result_queue, shutdown))
+                    #start the single user process which starts the correct run method
+                    single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
+                    single.start()
+                result_monitor.start()
                 for prefix in bf.get_prefix():
                     if prefix == '':
-                        prefix = "-99999999999999999999999999999999999"
+                        prefix = "-99999999999999999999999999999999999"  # sentinel for keys shorter than chars_to_check
+                    else:
+                        #Shares a 'current' word with UIs for display
+                        self.shared_dict["current word"] = prefix
+                    if prefix == "******possibilities exhausted******":
+                        prefix = "******possibilities exhausted******"
                     params = "bruteforce\n" + bf.algorithm + "\n" + bf.origHash + "\n" + bf.alphabet + "\n" \
                              + str(bf.minKeyLength) + "\n" + str(bf.maxKeyLength) + "\n" + prefix + "\n0\n0\n0"
                     #print params
-                    if self.single_user_mode:
+                    if self.single_user_mode: #if in single mode
                         new_chunk = Chunk.Chunk()
                         new_chunk.params = params
-                    else:
+                    else: #if in network mode
+                        new_chunk = {'params': params,
+                                     'data': '',
+                                     'timestamp': time.time(),
+                                     'halt': False}
+                    while not shutdown.is_set():
+                        try:
+                            job_queue.put(new_chunk, timeout=.1)  # put next chunk on the job queue.
+                            #self.sent_chunks.append((params, time.time()))
+                            break
+                        except Qqueue.Full:
+                            continue
+                while not shutdown.is_set():
+                    time.sleep(.1)
 
-                        new_chunk = manager.Value(dict, {'params': params,
-                                                         'data': '',
-                                                         'timestamp': time.time(),
-                                                         'halt': False})
-                    job_queue.put(new_chunk)  # put next chunk on the job queue.
-                                              # queue is blocking by default, so will just wait until it is no longer full before adding another.
-                    #add chunk params to list of sent chunks along with a timestamp so we can monitor which ones come back
-                    self.sent_chunks.append((params, time.time()))
-                    if self.found_solution.value:
-                        while True:
-                            try:
-                                job_queue.get_nowait()
-                            except Qqueue.Empty:
-                                return
-                            finally:
-                                return
+                result_monitor.terminate()
+                result_monitor.join()
+                if manager is not None:
+                    manager.shutdown()
+                time.sleep(1)
+                return
 
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_brute_force definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
+
         #--------------------------------------------------------------------------------------------------
         #end of chunk for brute force function
         #--------------------------------------------------------------------------------------------------
@@ -346,16 +507,78 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # Chunks for rainbow function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow(self, rainbow, job_queue):
+        def chunk_rainbow(self, rainbow, shutdown):
             try:
-                #INSERT CODE HERE
-                return
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
+                    mode_bit_1.clear()
+                    mode_bit_2.set()
+                else: #if in single mode
+                    manager = None  # no manager needed for local cracking
+                    result_queue = self.result_queue
+                    job_queue = self.job_queue
+                    #start the single user process which starts the correct run method
+                    single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
+                    single.start()
+                #start the result monitor process which reads finished chunks off the result queue
+                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor.start()
+                while not shutdown.is_set():
+                    chunk = rainbow.get_next_chunk()
+                    #Retrieves word from chunk
+                    #temp_word = self.extract_word(chunk)  # TODO: Broken, throws list index out of range exception
+                    #Shares a 'current' word with UIs for display
+                    #self.shared_dict["current word"] = temp_word
+                    if self.single_user_mode: #if in single mode
+                        while not shutdown.is_set():
+                            try:
+                                job_queue.put(chunk, timeout=.1)
+                                break
+                            except Qqueue.Full:
+                                continue
+                    else:
+                        new_chunk = {'params': chunk.params,
+                                     'data': chunk.data,
+                                     'timestamp': time.time()}
+                        while not shutdown.is_set():
+                            try:
+                                job_queue.put(new_chunk, timeout=.1)
+                                #self.sent_chunks.append((chunk.params, time.time()))
+                                break
+                            except Qqueue.Full:
+                                continue
+                    if shutdown.is_set():
+                        print "chunker trying to shut down"
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                return
+                            finally:
+                                time.sleep(2)
+                if manager is not None:
+                    manager.shutdown()
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
@@ -367,16 +590,61 @@ class Server():
         #--------------------------------------------------------------------------------------------------
         # chunks for rainbow maker function
         #--------------------------------------------------------------------------------------------------
-        def chunk_rainbow_maker(self, rainmaker, job_queue):
+        def chunk_rainbow_maker(self, rainmaker, shutdown):
             try:
-                #INSERT CODE HERE
-                return
+                if not self.single_user_mode:  # setup a networked manager
+                    # register shared variables
+                    JobQueueManager.register('get_job_q', callable=self.get_job_queue)
+                    JobQueueManager.register('get_result_q', callable=self.get_result_queue)
+                    JobQueueManager.register('get_shutdown', callable=self.get_shutdown)
+                    JobQueueManager.register('get_mode_bit_1', callable=self.get_mode_bit_1)
+                    JobQueueManager.register('get_mode_bit_2', callable=self.get_mode_bit_2)
+                    # set server's IP and port number
+                    manager = JobQueueManager(address=(self.IP, self.PORTNUM), authkey=self.AUTHKEY)
+                    manager.start()  # start the server
+                    #get the shared variables from the manager
+                    job_queue = manager.get_job_q()
+                    result_queue = manager.get_result_q()
+                    mode_bit_1 = manager.get_mode_bit_1()
+                    mode_bit_2 = manager.get_mode_bit_2()
+                    #set cracking mode
+                    mode_bit_1.clear()
+                    mode_bit_2.clear()
+                else:
+                    manager = None  # no manager needed for local cracking
+                    result_queue = self.result_queue
+                    job_queue = self.job_queue
+                    #start the single user process which starts the correct run method
+                    single = Process(target=self.start_single_user, args=(self.job_queue, self.result_queue,))
+                    single.start()
+                #start the result monitor process which reads finished chunks off the result queue
+                result_monitor = Process(target=self.check_results, args=(result_queue, shutdown))
+                result_monitor.start()
+
+                #all rainbow table maker chunks are the same, keep running until file is big enough
+                while not shutdown.is_set():
+                    params_chunk = rainmaker.make_params_chunk()
+                    new_chunk = {"params": params_chunk.params,
+                                 "data": params_chunk.data}
+                    try:
+                        job_queue.put(new_chunk, timeout=.1)
+                    except Qqueue.Full:
+                        continue
+                    if shutdown.is_set():
+                        while True:
+                            try:
+                                job_queue.get_nowait()
+                            except Qqueue.Empty:
+                                break
+                if manager is not None:
+                    time.sleep(2)
+                    manager.shutdown()
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in chunk_rainbow_maker definition Try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
@@ -385,24 +653,23 @@ class Server():
         #end of chunks for rainbow maker function
         #--------------------------------------------------------------------------------------------------
 
-
         def get_ip(self):
                     #detect the OS
-                try: #getOS try block
+                try:  # getOS try block
                     print "*************************************"
                     print "    Network Server"
                     print "*************************************"
                     print "OS DETECTION:"
-                    if(platform.system()=="Windows"): #Detecting Windows
+                    if platform.system() == "Windows":  # Detecting Windows
                         print platform.system()
                         print platform.win32_ver()
-                    elif(platform.system()=="Linux"): #Detecting Linux
+                    elif platform.system() == "Linux":  # Detecting Linux
                         print platform.system()
                         print platform.dist()
-                    elif(platform.system()=="Darwin"): #Detecting OSX
+                    elif platform.system() == "Darwin":  # Detecting OSX
                         print platform.system()
                         print platform.mac_ver()
-                    else:                           #Detecting an OS that is not listed
+                    else:                           # Detecting an OS that is not listed
                         print platform.system()
                         print platform.version()
                         print platform.release()
@@ -410,19 +677,19 @@ class Server():
                 except Exception as inst:
                     print "========================================================================================"
                     print "ERROR: An exception was thrown in getOS try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
+                    print type(inst)  # the exception instance
+                    print inst.args  # arguments stored in .args
+                    print inst  # _str_ allows args tto be printed directly
                     print "========================================================================================"
                 #end of detect the OS
 
                 #get the IP address
-                try: #getIP tryblock
-                    print "STATUS: Getting your network IP adddress"
-                    if(platform.system()=="Windows"):
+                try:  # getIP tryblock
+                    print "STATUS: Getting your network IP address"
+                    if platform.system() == "Windows":
                         self.IP= socket.gethostbyname(socket.gethostname())
                         print "My IP Address: " + str(self.IP)
-                    elif(platform.system()=="Linux"):
+                    elif platform.system() == "Linux":
                         #Source: http://stackoverflow.com/questions/11735821/python-get-localhost-ip
                         #Claims that this works on linux and windows machines
                         import fcntl
@@ -431,12 +698,14 @@ class Server():
 
                         def get_interface_ip(ifname):
                             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                            return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s',ifname[:15]))[20:24])
+                            return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915,
+                                                                struct.pack('256s', ifname[:15]))[20:24])
+
                         #end of def
                         def get_lan_ip():
                             ip = socket.gethostbyname(socket.gethostname())
                             if ip.startswith("127.") and os.name != "nt":
-                                interfaces = ["eth0","eth1","eth2","wlan0","wlan1","wifi0","ath0","ath1","ppp0"]
+                                interfaces = ["eth0", "eth1", "eth2", "wlan0", "wlan1", "wifi0", "ath0", "ath1", "ppp0"]
                                 for ifname in interfaces:
                                     try:
                                         ip = get_interface_ip(ifname)
@@ -448,157 +717,207 @@ class Server():
                         #end of def
                         self.IP= get_lan_ip()
                         print "My IP Address: " + str(self.IP)
-                    elif(platform.system()=="Darwin"):
-                        self.IP= socket.gethostbyname(socket.gethostname())
-                        print "My IP Address: "+ str(self.IP)
+                    elif platform.system() == "Darwin":
+                        self.IP = socket.gethostbyname(socket.gethostname())
+                        print "My IP Address: " + str(self.IP)
                     else:
                         #NOTE: MAY REMOVE THIS AND REPLACE WITH THE LINUX DETECTION METHOD
                         print "INFO: The system has detected that you are not running Windows, OS X, or Linux."
                         print "INFO: System is using a generic IP detection method"
-                        self.IP= socket.gethostbyname(socket.gethostname())
+                        self.IP = socket.gethostbyname(socket.gethostname())
                         print "My IP Address: " + str(self.IP)
                 except Exception as inst:
                     print "========================================================================================"
                     print "ERROR: An exception was thrown in getIP try block"
-                    print type(inst) #the exception instance
-                    print inst.args #srguments stored in .args
-                    print inst #_str_ allows args tto be printed directly
+                    print type(inst)  # the exception instance
+                    print inst.args  # arguments stored in .args
+                    print inst  # _str_ allows args tto be printed directly
                     print "========================================================================================"
                 #end of get the IP address
 
-        def start_single_user(self, job_queue, result_queue, shutdown):
+        def start_single_user(self, job_queue, result_queue):
             print "Single User Mode"
-            try:  # runclient definition try block
+            try:  # start_single_user definition try block
 
                 chunk_runner = []
                 if self.cracking_mode == "dic":
                     print "Starting dictionary cracking."
                     dictionary = Dictionary.Dictionary()
-                    chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
-                    chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
-                    chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
-                else:
-                    if self.cracking_mode == "bf":
-                        print "Starting brute force cracking."
-                        bf = Brute_Force.Brute_Force()
+                    for i in range(0, 3):
+                        chunk_runner.append(Process(target=self.run_dictionary,
+                                                    args=(dictionary, job_queue, result_queue)))
 
-                        chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue, shutdown)))
-                    else:
-                        if self.cracking_mode == "rain":
-                            print "Starting rainbow table cracking."
-                            return  # haven't figured out how to set this up yet
-                        else:
-                            if self.cracking_mode == "rainmaker":
-                                print "Starting rainbow table generator."
-                                return  # haven't figured out how to set this up yet
-                            else:
-                                return "wtf?"
+                elif self.cracking_mode == "bf":
+                    print "Starting brute force cracking."
+                    bf = Brute_Force.Brute_Force()
+                    chunk_runner.append(Process(target=self.run_brute_force, args=(bf, job_queue, result_queue)))
+
+                elif self.cracking_mode == "rain":
+                    print "Starting rainbow table cracking."
+                    rainbow = RainbowUser.RainbowUser()
+                    chunk_runner.append(Process(target=self.run_rain_user, args=(rainbow, job_queue, result_queue)))
+
+                elif self.cracking_mode == "rainmaker":
+                    print "Starting rainbow table generator."
+                    rainmaker = RainbowMaker.RainbowMaker()
+                    chunk_runner.append(Process(target=self.run_rain_maker, args=(rainmaker, job_queue, result_queue)))
+
+                else:
+                    return "wtf?"
+
                 for process in chunk_runner:
                     process.start()
                 for process in chunk_runner:
                     process.join()
-                if shutdown.is_set():
+
+                if self.shutdown.is_set():
                     print "received shutdown notice from server."
                     for process in chunk_runner:
                         process.terminate()
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in start_single_user definition try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
 
-        def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
+        def run_dictionary(self, dictionary, job_queue, result_queue):
             try:
-                while not shutdown.is_set():
+                while not self.shutdown.is_set():
                     try:
                         chunk = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
+                        print "got a chunk"
                     except Qqueue.Empty:
                         continue
-
                     dictionary.find(chunk)
-                    result = dictionary.isFound()
+                    result = dictionary.is_found()
                     params = chunk.params.split()
                     if result:
-                        key = dictionary.showKey()
+                        key = dictionary.show_key()
                         result_queue.put(("w", key))
-                       # result_queue.put(("c", key))
                     elif params[10] == "True":
                         result_queue.put(("e", chunk.params))
                     else:
                         result_queue.put(("f", chunk.params))
-                            #result_q.put(("c", chunk.params)) #unction has never been tested
+
             except Exception as inst:
                 print "============================================================================================="
                 print "ERROR: An exception was thrown in run_dictionary definition try block"
                 #the exception instance
                 print type(inst)
-                #srguments stored in .args
+                #arguments stored in .args
                 print inst.args
                 #_str_ allows args tto be printed directly
                 print inst
                 print "============================================================================================="
 
-        def run_brute_force(self, bf, job_queue, result_queue, shutdown):
-            try:
-                bf.result_queue = result_queue
+        def run_brute_force(self, bf, job_queue, result_queue):
+            bf.result_queue = result_queue
+            while not self.shutdown.is_set():
+                try:
+                    chunk = job_queue.get(timeout=.1)
+                except Qqueue.Empty:
+                    continue
 
+                bf.run_chunk(chunk)
+                bf.start_processes()
 
-                while not shutdown.is_set():
-                    try:
-                        chunk = job_queue.get()
-                    except Qqueue.Empty:
-                        continue
+            bf.terminate_processes()
 
-                    bf.run_chunk(chunk)
-                    bf.start_processes()
+        def run_rain_user(self, rain, job_queue, result_queue):
+            while not self.shutdown.is_set():
+                try:
+                    chunk = job_queue.get(block=True, timeout=.25)
+                except Qqueue.Empty:
+                    continue
 
-            except Exception as inst:
-                print "============================================================================================="
-                print "ERROR: An exception was thrown in run_brute_force definition try block"
-                #the exception instance
-                print type(inst)
-                #srguments stored in .args
-                print inst.args
-                #_str_ allows args tto be printed directly
-                print inst
-                print "============================================================================================="
-            finally:
-                bf.terminate_processes()
+                rain.find(chunk)
+                if rain.is_found():
+                    result_queue.put(("w", rain.get_key()))
+                elif chunk.params.split()[10] == "True":
+                    result_queue.put(("e", chunk.params))
+                else:
+                    result_queue.put(("f", chunk.params))
 
-        def run_rain_user(self, rain, job_queue, result_queue, shutdown):
-            #NEEDS ERROR HANDLING!!!!!!!!!!
-            return
+        def run_rain_maker(self, maker, job_queue, result_queue):
+            while not self.shutdown.is_set():
+                params_chunk = Chunk.Chunk()
+                try:
+                    job = job_queue.get(block=True, timeout=.25)
+                except Qqueue.Empty:
+                    continue
 
-        def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
-            #NEEDS ERROR HANDLING!!!!!!!!!!!!!!!!!!
-            return
-        #=======================================4==============================================================================
+                params_chunk.params = job["params"]
+                finished_chunk = maker.create(params_chunk)
+                result_queue.put(('f', finished_chunk))
+
+        #Returns a list of hashes from the hash file
+        def get_hashes_from_file(self, file_name):
+
+            temp_file = open(file_name, "r")
+
+            list_of_hashes = list(temp_file)
+
+            temp_file.close()
+
+            return list_of_hashes
+
+        #Retrieves word from chunk
+        def extract_word(self, chunk):
+
+            #If the chunk isn't empty
+            if not chunk.params == "":
+
+                #Take the parameters and split them into a list
+                params_list = chunk.params.split()
+
+                #Get the attack method from the parameters
+                attack_method = params_list[0]
+
+                #Take the data and split it into a list
+                chunk_list = chunk.data.split()
+
+                if attack_method == "dictionary":
+
+                    #Return the 1th item from the data
+                    return chunk_list[1]
+
+                elif attack_method == "bruteforce":
+
+                    #TODO: Fix bruteforce chunk parsing
+                    #BROKEN
+                    #return chunk_list[1]
+                    x = "Fix Me"
+                    return x
+
+                elif attack_method == "rainbowuser":
+
+                    #Return the 0th item from the data
+                    return chunk_list[0]
+
+        #=======================================4=======================================================================
         #END OF FUNCTIONS
-        #=====================================================================================================================
+        #===============================================================================================================
 
-        #=====================================================================================================================
+        #===============================================================================================================
         #AUXILLERY CLASSES
-        #=====================================================================================================================
+        #===============================================================================================================
 
          # This is based on the examples in the official docs of multiprocessing.
             # get_{job|result}_q return synchronized proxies for the actual Queue
             # objects.
-        class JobQueueManager(SyncManager):
-            pass
 
 
-        #=====================================================================================================================
-        #END OF AUXILLERY CLASSES
-        #=====================================================================================================================
-    except Exception as inst:
-        print "========================================================================================"
-        print "ERROR: An exception was thrown in master try block"
-        print type(inst) #the exception instance
-        print inst.args #srguments stored in .args
-        print inst #_str_ allows args tto be printed directly
-        print "========================================================================================"
+        #===============================================================================================================
+        #END OF AUXILIARY CLASSES
+        #===============================================================================================================
+
+
+class JobQueueManager(SyncManager):
+    current_process().authkey = "Popcorn is awesome!!!"
+    pass
