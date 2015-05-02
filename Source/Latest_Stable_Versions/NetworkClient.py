@@ -1,6 +1,15 @@
-# NetworkClient_r15b.py
+# NetworkClient_r15a.py
 
-# This class connects to a server to get and run work units and return the results to the server.
+# 3/1/2015
+
+# Now runs three instances of Dictionary concurrently, the result is consistent near 100% processor usage over
+# long term runs (>20 chunks). Previously, usage was 40-60%. Also, removed function to request server ip from user as
+# this is no longer used.
+
+# 3/2/2015
+
+# Added automatic setting of client cracking mode.
+
 
 from multiprocessing.managers import SyncManager
 from multiprocessing import Process, current_process
@@ -25,12 +34,14 @@ class Client():
         current_process().authkey = self.AUTHKEY
         current_process().authkey = "Popcorn is awesome!!!"
         #Allows ConsoleUI to use shared value and others to use parameter value
-
         if not ip == "127.0.1.1":
+
             self.IP = ip
 
         else:
+
             self.shared_dict = shared_variables[0]
+
             self.IP = self.shared_dict["server ip"]
 
         self.client_shutdown = shared_variables[1]
@@ -45,13 +56,14 @@ class Client():
     #FUNCTIONS
     #===================================================================================================================
 
+
     #--------------------------------------------------------------------------------------------------
     #runclient function
     #--------------------------------------------------------------------------------------------------
-    def run_client(self):
+    def run_client(self):  # Client Primary loop
+        #start_time = time.time()
         current_process().authkey = "Popcorn is awesome!!!"
         try:  # runclient definition try block
-            #setup manager to connect with server and get shared variables from server
             manager = self.make_client_manager(self.IP, self.PORTNUM, self.AUTHKEY)
             self.is_connected.set()
             job_queue = manager.get_job_q()
@@ -63,7 +75,6 @@ class Client():
             if self.cracking_mode == "dic":
                 print "Starting dictionary cracking."
                 dictionary = Dictionary.Dictionary()
-                #use multiple instances of dictionary for extra efficiency
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
                 chunk_runner.append(Process(target=self.run_dictionary, args=(dictionary, job_queue, result_queue, shutdown)))
@@ -86,7 +97,6 @@ class Client():
             else:
                 return "wtf?"
 
-            #start cracking and block while the processes run
             for process in chunk_runner:
                 process.start()
             for process in chunk_runner:
@@ -100,6 +110,7 @@ class Client():
 
             for process in chunk_runner:
                 process.terminate()
+
 
         except Exception as inst:
             print "============================================================================================="
@@ -124,7 +135,6 @@ class Client():
     #End of runclient function
     #--------------------------------------------------------------------------------------------------
 
-    #decode the two mode bits to determine which mode the client needs to run in
     def set_cracking_mode(self, manager):
         bit_1 = manager.get_mode_bit_1()
         bit_2 = manager.get_mode_bit_2()
@@ -143,14 +153,13 @@ class Client():
     #--------------------------------------------------------------------------------------------------
     def make_client_manager(self, ip, port, authkey):
         try:
-            #register custom methods for retrieving shared variables
+
             self.ServerQueueManager.register('get_job_q')
             self.ServerQueueManager.register('get_result_q')
             self.ServerQueueManager.register('get_shutdown')
             self.ServerQueueManager.register('get_mode_bit_1')
             self.ServerQueueManager.register('get_mode_bit_2')
             print [ip]
-            #set server info and connect
             manager = self.ServerQueueManager(address=(ip, port), authkey=authkey)
             manager.connect()
             import time
@@ -158,7 +167,6 @@ class Client():
 
             print 'Client connected to %s:%s' % (ip, port)
             return manager
-
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in make_client_manager definition try block"
@@ -175,31 +183,26 @@ class Client():
 
     def run_dictionary(self, dictionary, job_queue, result_queue, shutdown):
         try:
-            #keep getting jobs and running them until the shutdown flag is set
             while not shutdown.is_set():
                 try:
-                    job = job_queue.get(block=True, timeout=.1)  # block for at most .1 seconds, then loop again
+                    job = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
                 except Queue.Empty:
                     continue
-                #translate the contents of the dictionary object sent across the network into a Chunk.Chunk object
                 chunk = Chunk.Chunk()
                 chunk.params = job['params']
                 chunk.data = job['data']
-                #run the chunk
                 dictionary.find(chunk)
-                result = dictionary.is_found()
+                result = dictionary.isFound()
                 params = chunk.params.split()
-
-                if result:  # solution found, send it back
+                if result:
                     print "Hooray!"
-                    print "key is: " + dictionary.show_key()
-                    key = dictionary.show_key()
+                    print "key is: " + dictionary.showKey()
+                    key = dictionary.showKey()
                     result_queue.put(("w", key))
-                elif params[10] == "True":  # check for end of file flag in chunk parameters
+                elif params[10] == "True":
                     result_queue.put(("e", chunk.params))
-                else:  # chunk done, but no solution found
+                else:
                     result_queue.put(("f", chunk.params))
-
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in run_dictionary definition try block"
@@ -214,18 +217,16 @@ class Client():
     def run_brute_force(self, bf, job_queue, result_queue, shutdown):
         try:
             current_process().authkey = "Popcorn is awesome!!!"
-            bf.result_queue = result_queue  # Brute_Force sends its own results back internally
-            #keep getting jobs and running them until the shutdown flag is set
+            bf.result_queue = result_queue
             while not shutdown.is_set():
                 try:
                     job = job_queue.get(block=True, timeout=.25)
                 except Queue.Empty:
                     continue
-                #translate the contents of the dictionary object sent across the network into a Chunk.Chunk object
                 chunk = Chunk.Chunk()
                 chunk.params = job['params']
                 chunk.data = job['data']
-                #run the chunk
+                #print chunk.params
                 bf.run_chunk(chunk)
                 bf.start_processes()
 
@@ -244,26 +245,21 @@ class Client():
 
     def run_rain_user(self, rain, job_queue, result_queue, shutdown):
         try:
-            #keep getting jobs and running them until the shutdown flag is set
             while not shutdown.is_set():
                 try:
                     job = job_queue.get(block=True, timeout=.25)
                 except Queue.Empty:
                     continue
-                #translate the contents of the dictionary object sent across the network into a Chunk.Chunk object
                 chunk = Chunk.Chunk()
                 chunk.params = job["params"]
                 chunk.data = job["data"]
-                #run the chunk
                 rain.find(chunk)
-
-                if rain.is_found():  # solution found, send it back
-                    result_queue.put(("w", rain.get_key()))
-                elif chunk.params.split()[10] == "True":  # check for end of file flag in chunk parameters
+                if rain.isFound():
+                    result_queue.put(("w", rain.getKey()))
+                elif chunk.params.split()[10] == "True":
                     result_queue.put(("e", chunk.params))
-                else:  # chunk done, but no solution found
+                else:
                     result_queue.put(("f", chunk.params))
-
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in run_rain_user definition try block"
@@ -277,20 +273,17 @@ class Client():
 
     def run_rain_maker(self, maker, job_queue, result_queue, shutdown):
         try:
-            #keep getting jobs and running them until the shutdown flag is set
             while not shutdown.is_set():
                 try:
                     job = job_queue.get(block=True, timeout=.25)
                 except Queue.Empty:
                     continue
-                #translate the contents of the dictionary object sent across the network into a Chunk.Chunk object
                 params_chunk = Chunk.Chunk()
                 params_chunk.params = job["params"]
-                #run the chunk
                 chunk_of_rainbow = maker.create(params_chunk)
+
                 result_queue.put(('f', chunk_of_rainbow), timeout=.2)
                 time.sleep(.05)
-
         except Exception as inst:
             print "============================================================================================="
             print "ERROR: An exception was thrown in run_rain_maker definition try block"

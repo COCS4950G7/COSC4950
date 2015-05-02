@@ -56,34 +56,7 @@ class Server():
             self.shutdown = shared_variables[1]
 
             self.update = shared_variables[2]
-            #Dictionary settings check
-            #print "DEBUG: cracking method= "+str(settings["cracking method"])
-            #print "DEBUG: algorithm= "+str(settings["algorithm"])
-            #print "DEBUG: hash= "+str(settings["hash"])
-            #print "DEBUG: file name= "+str(settings["file name"])
-            #print "DEBUG: single= "+str(settings["single"])
-            #Brute Force settings Check
-            #print "DEBUG: cracking method="+str(settings["cracking method"])
-            #print "DEBUG: algorithm="+str(settings["algorithm"])
-            #print "DEBUG: hash="+str(settings["hash"])
-            #print "DEBUG: min key length="+str(settings["min key length"])
-            #print "DEBUG: max key length="+str(settings["max key length"])
-            #print "DEBUG: alphabet="+str(settings["alphabet"])
-            #print "DEBUG: single="+str(settings["single"])
 
-            #Rainbow Table Maker settings check
-            '''
-            print "Rainbow Table Maker Settings Check"
-            print "DEBUG: cracking method= "+str(settings["cracking method"])
-            print "DEBUG: algorithm= "+str(settings["algorithm"])
-            print "DEBUG: key length= "+str(settings["key length"])
-            print "DEBUG: alphabet= "+str(settings["alphabet"])
-            print "DEBUG: chain length= "+str(settings["chain length"])
-            print "DEBUG: num rows= "+str(settings["num rows"])
-            print "DEBUG: file name= "+str(settings["file name"])
-            print "DEBUG: single= "+str(settings["single"])
-            '''
-            #check to see if running single mode
             if "single" in settings:
                 if settings["single"] == "True":
                     self.single_user_mode = True
@@ -540,7 +513,7 @@ class Server():
                 while not shutdown.is_set():
                     chunk = rainbow.get_next_chunk()
                     #Retrieves word from chunk
-                    #temp_word = self.extract_word(chunk)  # TODO: Broken, throws list index out of range exception
+                    #temp_word = self.extract_word(chunk)
                     #Shares a 'current' word with UIs for display
                     #self.shared_dict["current word"] = temp_word
                     if self.single_user_mode: #if in single mode
@@ -887,14 +860,6 @@ class Server():
                     #Return the 1th item from the data
                     return chunk_list[1]
 
-                elif attack_method == "bruteforce":
-
-                    #TODO: Fix bruteforce chunk parsing
-                    #BROKEN
-                    #return chunk_list[1]
-                    x = "Fix Me"
-                    return x
-
                 elif attack_method == "rainbowuser":
 
                     #Return the 0th item from the data
@@ -903,20 +868,6 @@ class Server():
         #=======================================4=======================================================================
         #END OF FUNCTIONS
         #===============================================================================================================
-
-        #===============================================================================================================
-        #AUXILLERY CLASSES
-        #===============================================================================================================
-
-         # This is based on the examples in the official docs of multiprocessing.
-            # get_{job|result}_q return synchronized proxies for the actual Queue
-            # objects.
-
-
-        #===============================================================================================================
-        #END OF AUXILIARY CLASSES
-        #===============================================================================================================
-
 
 class JobQueueManager(SyncManager):
     current_process().authkey = "Popcorn is awesome!!!"

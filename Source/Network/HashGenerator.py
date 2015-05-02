@@ -21,7 +21,8 @@ for algorithm in schemes:
     print "The %s hash representation of %s is: " % (algorithm, key)
     print myctx.encrypt(key, algorithm)
 
-hash1 = myctx.encrypt(key, 'des_crypt')
+
+hash1 = myctx.encrypt(key, 'ldap_md5')
 
 if myctx.verify(key, hash1):
     print "true"

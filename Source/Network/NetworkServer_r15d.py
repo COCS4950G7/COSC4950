@@ -142,12 +142,15 @@ class Server():
                 elif self.cracking_mode == "bf":
                     self.found_solution.value = False
                     bf = Brute_Force.Brute_Force()
+                    if self.hash_file_mode:
+                        hash_value = self.hash_string
+                    else:
+                        hash_value = self.settings["hash"]
                     bf.set_params(alphabet=self.settings["alphabet"],
                                   algorithm=self.settings["algorithm"],
-                                  origHash=self.settings["hash"],
+                                  origHash=hash_value,
                                   min_key_length=self.settings["min key length"],
                                   max_key_length=self.settings["max key length"])
-
 
 
                     chunk_maker = Process(target=self.chunk_brute_force, args=(bf, self.shutdown))
@@ -233,7 +236,7 @@ class Server():
             #print "check results started"
             completed_chunks = 0
             try:
-                if self.hash_file_mode:
+                if self.hash_file_mode:  # files from a hash mode
                     hash_list = self.hash_list
                     self.shared_dict["hashes found"] = 0
                     while not shutdown.is_set():
@@ -259,7 +262,7 @@ class Server():
                                             the_file.write(split_key[0] + '\n\n')
                                         except Exception:
                                             continue
-                            if not hash_list:
+                            if not hash_list:  # list is empty so all hashes found
                                 shutdown.set()
                                 self.shutdown.set()
                                 self.update.set()
@@ -278,7 +281,7 @@ class Server():
                                     print
                                 break
                         elif result[0] == "e":
-                            print "Final chunk processed, found keys stored in '%s.'" % self.out_file_name
+                            print "Final chunk processed, %i found keys stored in '%s.'" % (self.shared_dict["hashes found"],self.out_file_name)
                             shutdown.set()
                             self.shutdown.set()
                             self.shared_dict["finished chunks"] += 1
@@ -889,9 +892,10 @@ class Server():
                     else:
                         result_queue.put(("f", chunk.params))
 
-
         def run_brute_force(self, bf, job_queue, result_queue):
             bf.result_queue = result_queue
+            bf.hash_list = self.hash_list
+            bf.list_mode = self.hash_file_mode
             while not self.shutdown.is_set():
                 try:
                     chunk = job_queue.get(timeout=.1)
