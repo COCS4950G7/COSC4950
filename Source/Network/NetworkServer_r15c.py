@@ -200,7 +200,7 @@ class Server():
                         key = result[1]
                         self.found_solution.value = True
                         print "Key is: %s" % key
-                        self.shared_dict["finished chunks"] += 1
+                        #self.shared_dict["finished chunks"] += 1
                         self.shared_dict["key"] = key
                         self.update.set()
                         #print "win block finished"
@@ -764,7 +764,7 @@ class Server():
                 while not self.shutdown.is_set():
                     try:
                         chunk = job_queue.get(block=True, timeout=.25)  # block for at most .25 seconds, then loop again
-                        print "got a chunk"
+                        #print "got a chunk"
                     except Qqueue.Empty:
                         continue
                     dictionary.find(chunk)
