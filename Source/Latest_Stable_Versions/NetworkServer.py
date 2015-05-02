@@ -43,7 +43,6 @@ class Server():
         mode_bit_1 = Event()
         mode_bit_2 = Event()
         manager = None
-        debug_file = "/Users/327pzq/procs.txt"
 
         def __init__(self, settings, shared_variables):
             current_process()._authkey = self.AUTHKEY #set the authentication key
