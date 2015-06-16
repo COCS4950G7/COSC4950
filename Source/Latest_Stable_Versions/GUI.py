@@ -1,8 +1,8 @@
 __author__ = 'chris hamm'
 #GUI_WX_Demo4
 
-
-#NOTICE:
+#IMPORTANT!!!!!!!
+#NOTICE: USE GUI DEMO 4 for true functionality!!!! This version of gui is broken on the server side!!!!!
 #=======================================
 #Main Section Header
 #=======================================
